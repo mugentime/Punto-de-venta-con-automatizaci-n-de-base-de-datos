@@ -86,21 +86,60 @@ app.get('/api/health', (req, res) => {
   res.json({
     status: 'OK',
     timestamp: new Date().toISOString(),
-    uptime: process.uptime()
+    uptime: process.uptime(),
+    storage: process.env.RAILWAY_VOLUME_MOUNT_PATH || 'local',
+    database: process.env.MONGODB_URI ? 'connected' : 'not configured'
   });
+});
+
+// Database setup endpoint
+app.post('/api/setup', async (req, res) => {
+  try {
+    const SetupService = require('./setup');
+    const setupService = new SetupService();
+    
+    const result = await setupService.setupDatabase();
+    
+    res.json({
+      success: true,
+      message: 'Database setup completed successfully',
+      ...result
+    });
+  } catch (error) {
+    console.error('Setup error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
 });
 
 // Serve HTML files
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  try {
+    res.sendFile(path.join(__dirname, 'index.html'));
+  } catch (error) {
+    console.error('Error serving index.html:', error);
+    res.status(500).send('Error loading homepage');
+  }
 });
 
 app.get('/online', (req, res) => {
-  res.sendFile(path.join(__dirname, 'conejo_negro_online.html'));
+  try {
+    res.sendFile(path.join(__dirname, 'conejo_negro_online.html'));
+  } catch (error) {
+    console.error('Error serving online.html:', error);
+    res.status(500).send('Error loading online version');
+  }
 });
 
 app.get('/cafe', (req, res) => {
-  res.sendFile(path.join(__dirname, 'conejo_negro_cafe.html'));
+  try {
+    res.sendFile(path.join(__dirname, 'conejo_negro_cafe.html'));
+  } catch (error) {
+    console.error('Error serving cafe.html:', error);
+    res.status(500).send('Error loading cafe version');
+  }
 });
 
 // 404 handler
