@@ -1,0 +1,1687 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conejo Negro - Café Coworking</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d00ff;
+            --accent-pink: #ff00d9;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        nav a.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        /* Main Content */
+        main {
+            padding: 30px 0;
+            min-height: calc(100vh - 120px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.5);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 85, 0.5);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.5);
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(26, 26, 46, 0.5);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        /* Footer */
+        footer {
+            background: var(--bg-secondary);
+            padding: 20px 0;
+            text-align: center;
+            color: var(--text-secondary);
+            border-top: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .card {
+                padding: 15px;
+            }
+        }
+
+        /* Loading animation */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            background: var(--success);
+        }
+
+        .notification-error {
+            background: var(--danger);
+        }
+
+        .notification-warning {
+            background: var(--warning);
+        }
+
+        /* Futuristic elements */
+        .glow {
+            text-shadow: 0 0 10px rgba(0, 217, 255, 0.7);
+        }
+
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Mejoras en el diseño */
+        .highlight {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .stats-card {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Animación para botones de acción */
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .action-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* Animación para filas de tabla */
+        @keyframes rowIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        tbody tr {
+            animation: rowIn 0.3s ease;
+        }
+
+        /* Mejora en la visualización de totales */
+        .total-display {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        /* Selector de periodo para reportes */
+        .report-period-selector {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+            align-items: center;
+        }
+
+        .period-btn {
+            padding: 10px 20px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-btn:hover {
+            background: rgba(0, 217, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .period-btn.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .date-range-inputs {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .date-range-inputs input[type="date"] {
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 6px;
+            color: var(--text-primary);
+        }
+
+        /* Gráfica container */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 20px 0;
+            padding: 20px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <i class="fas fa-coffee"></i>
+                    </div>
+                    <h1>CONEJO NEGRO</h1>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
+                        <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
+                        <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
+                        <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Registro de Clientes -->
+        <section id="registro" class="section active">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-user-plus"></i>
+                    Registro de Clientes
+                </h2>
+                
+                <form id="client-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-name">Nombre del Cliente</label>
+                            <input type="text" id="client-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="service-type">Servicio</label>
+                            <select id="service-type" class="form-control" required>
+                                <option value="">Seleccionar</option>
+                                <option value="cafeteria">Cafetería</option>
+                                <option value="coworking">Coworking</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="drink-select">Bebida</label>
+                            <select id="drink-select" class="form-control" required>
+                                <option value="">Seleccionar bebida</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hours">Horas (solo coworking)</label>
+                            <input type="number" id="hours" class="form-control" min="1" value="1" disabled>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment-method">Método de Pago</label>
+                            <select id="payment-method" class="form-control" required>
+                                <option value="">Seleccionar</option>
+                                <option value="efectivo">Efectivo</option>
+                                <option value="tarjeta">Tarjeta</option>
+                                <option value="transferencia">Transferencia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Total a Pagar</label>
+                            <div class="total-display" id="total-amount">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i>
+                        Registrar Cliente
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-list"></i>
+                    Registros del Día
+                </h2>
+                
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-value" id="daily-clients">0</div>
+                        <div class="stat-label">Clientes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="daily-income">$0.00</div>
+                        <div class="stat-label">Ingresos</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="daily-profit">$0.00</div>
+                        <div class="stat-label">Ganancias</div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="daily-records">
+                        <thead>
+                            <tr>
+                                <th>Hora</th>
+                                <th>Cliente</th>
+                                <th>Servicio</th>
+                                <th>Bebida</th>
+                                <th>Total</th>
+                                <th>Pago</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los registros se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div style="margin-top: 20px; display: flex; gap: 15px;">
+                    <button id="export-day" class="btn btn-success">
+                        <i class="fas fa-file-export"></i>
+                        Exportar Reporte
+                    </button>
+                    <button id="finish-day" class="btn btn-warning">
+                        <i class="fas fa-calendar-check"></i>
+                        Finalizar Día
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventario Refrigerador -->
+        <section id="inventario-refrigerador" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-snowflake"></i>
+                    Inventario de Refrigerador
+                </h2>
+                
+                <form id="refrigerador-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="refrigerador-name">Nombre del Producto</label>
+                            <input type="text" id="refrigerador-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="refrigerador-quantity">Cantidad</label>
+                            <input type="number" id="refrigerador-quantity" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="refrigerador-cost">Costo de Compra</label>
+                            <input type="number" id="refrigerador-cost" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="refrigerador-price">Precio de Venta</label>
+                            <input type="number" id="refrigerador-price" class="form-control" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Agregar Producto
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-boxes"></i>
+                    Productos en Refrigerador
+                </h2>
+                
+                <div class="table-container">
+                    <table id="refrigerador-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Costo Compra</th>
+                                <th>Precio Venta</th>
+                                <th>Ganancia</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los productos se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventario Cafetería -->
+        <section id="inventario-cafeteria" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-mug-hot"></i>
+                    Inventario de Cafetería
+                </h2>
+                
+                <form id="cafeteria-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cafeteria-name">Nombre del Producto</label>
+                            <input type="text" id="cafeteria-name" class="form-control" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cafeteria-quantity">Cantidad</label>
+                            <input type="number" id="cafeteria-quantity" class="form-control" min="1" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cafeteria-cost">Costo de Producción</label>
+                            <input type="number" id="cafeteria-cost" class="form-control" step="0.01" min="0" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="cafeteria-price">Precio de Venta</label>
+                            <input type="number" id="cafeteria-price" class="form-control" step="0.01" min="0" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                        Agregar Producto
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-coffee"></i>
+                    Productos de Cafetería
+                </h2>
+                
+                <div class="table-container">
+                    <table id="cafeteria-table">
+                        <thead>
+                            <tr>
+                                <th>Producto</th>
+                                <th>Cantidad</th>
+                                <th>Costo Producción</th>
+                                <th>Precio Venta</th>
+                                <th>Ganancia</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los productos se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reportes -->
+        <section id="reportes" class="section">
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Reportes y Análisis
+                </h2>
+                
+                <!-- Selector de período -->
+                <div class="report-period-selector">
+                    <button class="period-btn active" data-period="day">Día</button>
+                    <button class="period-btn" data-period="week">Semana</button>
+                    <button class="period-btn" data-period="month">Mes</button>
+                    <button class="period-btn" data-period="custom">Personalizado</button>
+                    
+                    <div class="date-range-inputs" style="display: none;">
+                        <input type="date" id="start-date" class="form-control">
+                        <span>hasta</span>
+                        <input type="date" id="end-date" class="form-control">
+                        <button class="btn btn-primary btn-sm" id="apply-date-range">
+                            <i class="fas fa-check"></i>
+                            Aplicar
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Contenedor para gráficas -->
+                <div class="chart-container">
+                    <canvas id="salesChart"></canvas>
+                </div>
+                
+                <!-- Estadísticas del período seleccionado -->
+                <div class="stats-card">
+                    <div class="stat-item">
+                        <div class="stat-value" id="period-clients">0</div>
+                        <div class="stat-label">Total Clientes</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="period-income">$0.00</div>
+                        <div class="stat-label">Ingresos Totales</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="period-profit">$0.00</div>
+                        <div class="stat-label">Ganancias Netas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="period-average">$0.00</div>
+                        <div class="stat-label">Ticket Promedio</div>
+                    </div>
+                </div>
+                
+                <!-- Botones de exportación -->
+                <div style="margin-top: 20px; display: flex; gap: 15px;">
+                    <button id="export-pdf" class="btn btn-danger">
+                        <i class="fas fa-file-pdf"></i>
+                        Exportar PDF
+                    </button>
+                    <button id="export-csv" class="btn btn-success">
+                        <i class="fas fa-file-csv"></i>
+                        Exportar CSV
+                    </button>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h2 class="card-title">
+                    <i class="fas fa-history"></i>
+                    Historial de Reportes
+                </h2>
+                
+                <div class="table-container">
+                    <table id="reports-table">
+                        <thead>
+                            <tr>
+                                <th>Fecha</th>
+                                <th>Clientes</th>
+                                <th>Ingresos Totales</th>
+                                <th>Ganancias Netas</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los reportes se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <p>&copy; 2024 Conejo Negro - Café Coworking. Todos los derechos reservados.</p>
+        </div>
+    </footer>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- jsPDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    
+    <script>
+        // Datos iniciales de ejemplo
+        const initialData = {
+            refrigerador: [
+                { id: 1, name: "Coca-Cola", quantity: 24, cost: 15, price: 25 },
+                { id: 2, name: "Agua Mineral", quantity: 30, cost: 8, price: 15 },
+                { id: 3, name: "Jugo de Naranja", quantity: 15, cost: 20, price: 35 }
+            ],
+            cafeteria: [
+                { id: 1, name: "Espresso", quantity: 50, cost: 10, price: 35 },
+                { id: 2, name: "Capuccino", quantity: 40, cost: 15, price: 45 },
+                { id: 3, name: "Latte", quantity: 35, cost: 12, price: 40 }
+            ],
+            dailyRecords: [],
+            reports: [],
+            allRecords: [] // Para mantener todos los registros históricos
+        };
+
+        // Cargar datos desde localStorage o usar datos iniciales
+        let data = JSON.parse(localStorage.getItem('conejoNegroData')) || initialData;
+
+        // Variable para la gráfica
+        let salesChart = null;
+
+        // Guardar datos en localStorage
+        function saveData() {
+            localStorage.setItem('conejoNegroData', JSON.stringify(data));
+        }
+
+        // Mostrar notificación
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification notification-${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Navegación entre secciones
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Remover clase active de todos los enlaces
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                
+                // Agregar clase active al enlace actual
+                this.classList.add('active');
+                
+                // Ocultar todas las secciones
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                // Mostrar la sección seleccionada
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+                
+                // Actualizar datos de la sección si es necesario
+                if (sectionId === 'registro') {
+                    updateDrinkOptions();
+                    updateDailyRecordsTable();
+                    updateDailyStats();
+                } else if (sectionId === 'inventario-refrigerador') {
+                    updateRefrigeradorTable();
+                } else if (sectionId === 'inventario-cafeteria') {
+                    updateCafeteriaTable();
+                } else if (sectionId === 'reportes') {
+                    updateReportsTable();
+                    updatePeriodStats('day');
+                    initChart();
+                }
+            });
+        });
+
+        // Actualizar opciones de bebidas
+        function updateDrinkOptions() {
+            const drinkSelect = document.getElementById('drink-select');
+            drinkSelect.innerHTML = '<option value="">Seleccionar bebida</option>';
+            
+            // Agregar bebidas de cafetería
+            data.cafeteria.forEach(drink => {
+                if (drink.quantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = `cafeteria-${drink.id}`;
+                    option.textContent = `${drink.name} (Cafetería) - $${drink.price}`;
+                    drinkSelect.appendChild(option);
+                }
+            });
+            
+            // Agregar bebidas de refrigerador
+            data.refrigerador.forEach(drink => {
+                if (drink.quantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = `refrigerador-${drink.id}`;
+                    option.textContent = `${drink.name} (Refrigerador) - $${drink.price}`;
+                    drinkSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Cambio en el tipo de servicio
+        document.getElementById('service-type').addEventListener('change', function() {
+            const hoursInput = document.getElementById('hours');
+            hoursInput.disabled = this.value !== 'coworking';
+            updateTotalAmount();
+        });
+
+        // Cambio en la bebida seleccionada
+        document.getElementById('drink-select').addEventListener('change', updateTotalAmount);
+        document.getElementById('hours').addEventListener('input', updateTotalAmount);
+
+        // Actualizar monto total
+        function updateTotalAmount() {
+            const serviceType = document.getElementById('service-type').value;
+            const drinkValue = document.getElementById('drink-select').value;
+            const hours = parseInt(document.getElementById('hours').value) || 1;
+            const totalInput = document.getElementById('total-amount');
+            
+            if (!serviceType || !drinkValue) {
+                totalInput.textContent = '$0.00';
+                return;
+            }
+            
+            const [source, id] = drinkValue.split('-');
+            const drinkId = parseInt(id);
+            let drink;
+            
+            if (source === 'cafeteria') {
+                drink = data.cafeteria.find(d => d.id === drinkId);
+            } else {
+                drink = data.refrigerador.find(d => d.id === drinkId);
+            }
+            
+            if (!drink) {
+                totalInput.textContent = '$0.00';
+                return;
+            }
+            
+            let total = 0;
+            
+            if (serviceType === 'cafeteria') {
+                // Para cafetería: solo el precio de la bebida
+                total = drink.price;
+            } else {
+                // Para coworking: tarifa por hora + bebida gratis
+                const coworkingRate = 58; // Tarifa por hora de coworking
+                total = coworkingRate * hours;
+            }
+            
+            totalInput.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Registrar cliente
+        document.getElementById('client-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const clientName = document.getElementById('client-name').value;
+            const serviceType = document.getElementById('service-type').value;
+            const drinkValue = document.getElementById('drink-select').value;
+            const hours = parseInt(document.getElementById('hours').value) || 1;
+            const paymentMethod = document.getElementById('payment-method').value;
+            const totalAmountText = document.getElementById('total-amount').textContent;
+            const totalAmount = parseFloat(totalAmountText.replace('$', ''));
+            
+            const [source, id] = drinkValue.split('-');
+            const drinkId = parseInt(id);
+            let drink;
+            
+            if (source === 'cafeteria') {
+                drink = data.cafeteria.find(d => d.id === drinkId);
+            } else {
+                drink = data.refrigerador.find(d => d.id === drinkId);
+            }
+            
+            if (!drink) {
+                showNotification('Error: Bebida no encontrada', 'error');
+                return;
+            }
+            
+            // Reducir cantidad de bebida
+            drink.quantity -= 1;
+            
+            // Crear registro
+            const now = new Date();
+            const record = {
+                id: Date.now(),
+                date: now.toISOString().split('T')[0],
+                time: now.toLocaleTimeString(),
+                client: clientName,
+                service: serviceType,
+                drink: drink.name,
+                drinkSource: source,
+                drinkId: drinkId,
+                hours: hours,
+                total: totalAmount,
+                payment: paymentMethod,
+                cost: drink.cost,
+                price: drink.price
+            };
+            
+            data.dailyRecords.push(record);
+            data.allRecords.push(record); // Guardar en histórico
+            saveData();
+            
+            // Actualizar tabla y estadísticas
+            updateDailyRecordsTable();
+            updateDailyStats();
+            updateDrinkOptions();
+            
+            // Resetear formulario
+            this.reset();
+            document.getElementById('hours').disabled = true;
+            document.getElementById('total-amount').textContent = '$0.00';
+            
+            showNotification('Cliente registrado exitosamente');
+        });
+
+        // Actualizar estadísticas diarias
+        function updateDailyStats() {
+            const clientsCount = data.dailyRecords.length;
+            const totalIncome = data.dailyRecords.reduce((sum, record) => sum + record.total, 0);
+            const totalCost = data.dailyRecords.reduce((sum, record) => sum + record.cost, 0);
+            const netProfit = totalIncome - totalCost;
+            
+            document.getElementById('daily-clients').textContent = clientsCount;
+            document.getElementById('daily-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('daily-profit').textContent = `$${netProfit.toFixed(2)}`;
+        }
+
+        // Actualizar tabla de registros diarios
+        function updateDailyRecordsTable() {
+            const tbody = document.querySelector('#daily-records tbody');
+            tbody.innerHTML = '';
+            
+            data.dailyRecords.forEach(record => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.time}</td>
+                    <td>${record.client}</td>
+                    <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
+                    <td>${record.drink}</td>
+                    <td>$${record.total.toFixed(2)}</td>
+                    <td>${record.payment}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteRecord(${record.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Eliminar registro
+        function deleteRecord(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+                return;
+            }
+            
+            const recordIndex = data.dailyRecords.findIndex(r => r.id === id);
+            if (recordIndex !== -1) {
+                const record = data.dailyRecords[recordIndex];
+                
+                // Devolver bebida al inventario
+                if (record.drinkSource === 'cafeteria') {
+                    const drink = data.cafeteria.find(d => d.id === record.drinkId);
+                    if (drink) drink.quantity += 1;
+                } else {
+                    const drink = data.refrigerador.find(d => d.id === record.drinkId);
+                    if (drink) drink.quantity += 1;
+                }
+                
+                data.dailyRecords.splice(recordIndex, 1);
+                
+                // También eliminar del histórico
+                const allRecordsIndex = data.allRecords.findIndex(r => r.id === id);
+                if (allRecordsIndex !== -1) {
+                    data.allRecords.splice(allRecordsIndex, 1);
+                }
+                
+                saveData();
+                
+                updateDailyRecordsTable();
+                updateDailyStats();
+                updateDrinkOptions();
+                
+                showNotification('Registro eliminado', 'warning');
+            }
+        }
+
+        // Gestión de inventario refrigerador
+        document.getElementById('refrigerador-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('refrigerador-name').value;
+            const quantity = parseInt(document.getElementById('refrigerador-quantity').value);
+            const cost = parseFloat(document.getElementById('refrigerador-cost').value);
+            const price = parseFloat(document.getElementById('refrigerador-price').value);
+            
+            const newProduct = {
+                id: Date.now(),
+                name: name,
+                quantity: quantity,
+                cost: cost,
+                price: price
+            };
+            
+            data.refrigerador.push(newProduct);
+            saveData();
+            
+            updateRefrigeradorTable();
+            updateDrinkOptions();
+            
+            this.reset();
+            showNotification('Producto agregado al refrigerador');
+        });
+
+        // Actualizar tabla de refrigerador
+        function updateRefrigeradorTable() {
+            const tbody = document.querySelector('#refrigerador-table tbody');
+            tbody.innerHTML = '';
+            
+            data.refrigerador.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteRefrigeradorProduct(${product.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Eliminar producto del refrigerador
+        function deleteRefrigeradorProduct(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                return;
+            }
+            
+            const index = data.refrigerador.findIndex(p => p.id === id);
+            if (index !== -1) {
+                data.refrigerador.splice(index, 1);
+                saveData();
+                updateRefrigeradorTable();
+                updateDrinkOptions();
+                showNotification('Producto eliminado del refrigerador', 'warning');
+            }
+        }
+
+        // Gestión de inventario cafetería
+        document.getElementById('cafeteria-form').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('cafeteria-name').value;
+            const quantity = parseInt(document.getElementById('cafeteria-quantity').value);
+            const cost = parseFloat(document.getElementById('cafeteria-cost').value);
+            const price = parseFloat(document.getElementById('cafeteria-price').value);
+            
+            const newProduct = {
+                id: Date.now(),
+                name: name,
+                quantity: quantity,
+                cost: cost,
+                price: price
+            };
+            
+            data.cafeteria.push(newProduct);
+            saveData();
+            
+            updateCafeteriaTable();
+            updateDrinkOptions();
+            
+            this.reset();
+            showNotification('Producto agregado a la cafetería');
+        });
+
+        // Actualizar tabla de cafetería
+        function updateCafeteriaTable() {
+            const tbody = document.querySelector('#cafeteria-table tbody');
+            tbody.innerHTML = '';
+            
+            data.cafeteria.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteCafeteriaProduct(${product.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Eliminar producto de cafetería
+        function deleteCafeteriaProduct(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                return;
+            }
+            
+            const index = data.cafeteria.findIndex(p => p.id === id);
+            if (index !== -1) {
+                data.cafeteria.splice(index, 1);
+                saveData();
+                updateCafeteriaTable();
+                updateDrinkOptions();
+                showNotification('Producto eliminado de la cafetería', 'warning');
+            }
+        }
+
+        // Manejo de períodos de reporte
+        document.querySelectorAll('.period-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+                this.classList.add('active');
+                
+                const period = this.getAttribute('data-period');
+                const dateRangeInputs = document.querySelector('.date-range-inputs');
+                
+                if (period === 'custom') {
+                    dateRangeInputs.style.display = 'flex';
+                } else {
+                    dateRangeInputs.style.display = 'none';
+                    updatePeriodStats(period);
+                }
+            });
+        });
+
+        // Aplicar rango de fechas personalizado
+        document.getElementById('apply-date-range')?.addEventListener('click', function() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                showNotification('Por favor selecciona ambas fechas', 'warning');
+                return;
+            }
+            
+            updatePeriodStats('custom', startDate, endDate);
+        });
+
+        // Actualizar estadísticas del período
+        function updatePeriodStats(period, startDate = null, endDate = null) {
+            let filteredRecords = [];
+            const today = new Date();
+            
+            if (period === 'day') {
+                const todayStr = today.toISOString().split('T')[0];
+                filteredRecords = (data.allRecords || []).filter(r => r.date === todayStr);
+            } else if (period === 'week') {
+                const weekAgo = new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000);
+                filteredRecords = (data.allRecords || []).filter(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate >= weekAgo && recordDate <= today;
+                });
+            } else if (period === 'month') {
+                const monthAgo = new Date(today.getTime() - 30 * 24 * 60 * 60 * 1000);
+                filteredRecords = (data.allRecords || []).filter(r => {
+                    const recordDate = new Date(r.date);
+                    return recordDate >= monthAgo && recordDate <= today;
+                });
+            } else if (period === 'custom' && startDate && endDate) {
+                filteredRecords = (data.allRecords || []).filter(r => {
+                    return r.date >= startDate && r.date <= endDate;
+                });
+            }
+            
+            const clientsCount = filteredRecords.length;
+            const totalIncome = filteredRecords.reduce((sum, r) => sum + r.total, 0);
+            const totalCost = filteredRecords.reduce((sum, r) => sum + (r.cost || 0), 0);
+            const netProfit = totalIncome - totalCost;
+            const avgTicket = clientsCount > 0 ? totalIncome / clientsCount : 0;
+            
+            document.getElementById('period-clients').textContent = clientsCount;
+            document.getElementById('period-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('period-profit').textContent = `$${netProfit.toFixed(2)}`;
+            document.getElementById('period-average').textContent = `$${avgTicket.toFixed(2)}`;
+            
+            // Actualizar gráfica
+            updateChart(filteredRecords, period);
+        }
+
+        // Inicializar gráfica
+        function initChart() {
+            const ctx = document.getElementById('salesChart');
+            if (!ctx) return;
+            
+            if (salesChart) {
+                salesChart.destroy();
+            }
+            
+            salesChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Ingresos',
+                        data: [],
+                        borderColor: '#00d9ff',
+                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: '#a0a0c0'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Actualizar gráfica
+        function updateChart(records, period) {
+            if (!salesChart) return;
+            
+            const groupedData = {};
+            
+            records.forEach(record => {
+                const key = record.date;
+                if (!groupedData[key]) {
+                    groupedData[key] = 0;
+                }
+                groupedData[key] += record.total;
+            });
+            
+            const labels = Object.keys(groupedData).sort();
+            const data = labels.map(label => groupedData[label]);
+            
+            salesChart.data.labels = labels;
+            salesChart.data.datasets[0].data = data;
+            salesChart.update();
+        }
+
+        // Exportar a PDF
+        document.getElementById('export-pdf')?.addEventListener('click', function() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            // Título
+            doc.setFontSize(20);
+            doc.text('Reporte - Conejo Negro Café Coworking', 20, 20);
+            
+            // Fecha
+            doc.setFontSize(12);
+            doc.text(`Fecha: ${new Date().toLocaleDateString()}`, 20, 35);
+            
+            // Estadísticas
+            const stats = {
+                'Total Clientes': document.getElementById('period-clients').textContent,
+                'Ingresos Totales': document.getElementById('period-income').textContent,
+                'Ganancias Netas': document.getElementById('period-profit').textContent,
+                'Ticket Promedio': document.getElementById('period-average').textContent
+            };
+            
+            let y = 50;
+            Object.entries(stats).forEach(([key, value]) => {
+                doc.text(`${key}: ${value}`, 20, y);
+                y += 10;
+            });
+            
+            // Guardar PDF
+            doc.save(`reporte_${new Date().toISOString().split('T')[0]}.pdf`);
+            showNotification('PDF exportado exitosamente');
+        });
+
+        // Exportar a CSV
+        document.getElementById('export-csv')?.addEventListener('click', function() {
+            const records = data.allRecords || [];
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Fecha,Hora,Cliente,Servicio,Bebida,Total,Método de Pago\n";
+            
+            records.forEach(record => {
+                csvContent += `${record.date},${record.time},${record.client},${record.service},${record.drink},${record.total},${record.payment}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `reporte_${new Date().toISOString().split('T')[0]}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('CSV exportado exitosamente');
+        });
+
+        // Exportar reporte del día
+        document.getElementById('export-day').addEventListener('click', function() {
+            if (data.dailyRecords.length === 0) {
+                showNotification('No hay registros para exportar', 'warning');
+                return;
+            }
+            
+            const today = new Date().toLocaleDateString();
+            const clientsCount = data.dailyRecords.length;
+            const totalIncome = data.dailyRecords.reduce((sum, record) => sum + record.total, 0);
+            const totalCost = data.dailyRecords.reduce((sum, record) => sum + record.cost, 0);
+            const netProfit = totalIncome - totalCost;
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Reporte del Día - Conejo Negro\n";
+            csvContent += `Fecha:,${today}\n`;
+            csvContent += `Total Clientes:,${clientsCount}\n`;
+            csvContent += `Ingresos Totales:,$${totalIncome.toFixed(2)}\n`;
+            csvContent += `Ganancias Netas:,$${netProfit.toFixed(2)}\n\n`;
+            csvContent += "Hora,Cliente,Servicio,Bebida,Total,Pago\n";
+            
+            data.dailyRecords.forEach(record => {
+                csvContent += `${record.time},${record.client},${record.service},${record.drink},$${record.total.toFixed(2)},${record.payment}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `reporte_diario_${today.replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Reporte exportado exitosamente');
+        });
+
+        // Finalizar día
+        document.getElementById('finish-day').addEventListener('click', function() {
+            if (data.dailyRecords.length === 0) {
+                showNotification('No hay registros para finalizar el día', 'warning');
+                return;
+            }
+            
+            if (!confirm('¿Estás seguro de que deseas finalizar el día? Los registros se guardarán como reporte.')) {
+                return;
+            }
+            
+            const today = new Date().toLocaleDateString();
+            const clientsCount = data.dailyRecords.length;
+            const totalIncome = data.dailyRecords.reduce((sum, record) => sum + record.total, 0);
+            const totalCost = data.dailyRecords.reduce((sum, record) => sum + record.cost, 0);
+            const netProfit = totalIncome - totalCost;
+            
+            const report = {
+                id: Date.now(),
+                date: today,
+                clients: clientsCount,
+                income: totalIncome,
+                profit: netProfit,
+                records: [...data.dailyRecords]
+            };
+            
+            data.reports.push(report);
+            data.dailyRecords = [];
+            saveData();
+            
+            updateDailyRecordsTable();
+            updateDailyStats();
+            updateReportsTable();
+            
+            showNotification('Día finalizado y reporte guardado');
+        });
+
+        // Actualizar tabla de reportes
+        function updateReportsTable() {
+            const tbody = document.querySelector('#reports-table tbody');
+            tbody.innerHTML = '';
+            
+            data.reports.forEach(report => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${report.date}</td>
+                    <td>${report.clients}</td>
+                    <td>$${report.income.toFixed(2)}</td>
+                    <td>$${report.profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-success btn-sm action-btn" onclick="downloadReport(${report.id})">
+                            <i class="fas fa-download"></i>
+                        </button>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteReport(${report.id})">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Descargar reporte específico
+        function downloadReport(id) {
+            const report = data.reports.find(r => r.id === id);
+            if (!report) return;
+            
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Reporte del Día - Conejo Negro\n";
+            csvContent += `Fecha:,${report.date}\n`;
+            csvContent += `Total Clientes:,${report.clients}\n`;
+            csvContent += `Ingresos Totales:,$${report.income.toFixed(2)}\n`;
+            csvContent += `Ganancias Netas:,$${report.profit.toFixed(2)}\n\n`;
+            csvContent += "Hora,Cliente,Servicio,Bebida,Total,Pago\n";
+            
+            report.records.forEach(record => {
+                csvContent += `${record.time},${record.client},${record.service},${record.drink},$${record.total.toFixed(2)},${record.payment}\n`;
+            });
+            
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `reporte_${report.date.replace(/\//g, '-')}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showNotification('Reporte descargado');
+        }
+
+        // Eliminar reporte
+        function deleteReport(id) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este reporte?')) {
+                return;
+            }
+            
+            const index = data.reports.findIndex(r => r.id === id);
+            if (index !== -1) {
+                data.reports.splice(index, 1);
+                saveData();
+                updateReportsTable();
+                showNotification('Reporte eliminado', 'warning');
+            }
+        }
+
+        // Inicializar la aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            updateDrinkOptions();
+            updateDailyRecordsTable();
+            updateDailyStats();
+            updateRefrigeradorTable();
+            updateCafeteriaTable();
+            updateReportsTable();
+            
+            // Establecer fecha de hoy en los campos de fecha
+            const today = new Date().toISOString().split('T')[0];
+            const startDate = document.getElementById('start-date');
+            const endDate = document.getElementById('end-date');
+            if (startDate) startDate.value = today;
+            if (endDate) endDate.value = today;
+        });
+    </script>
+</body>
+</html>

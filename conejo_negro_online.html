@@ -1,0 +1,1641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conejo Negro - Café Coworking Online</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d00ff;
+            --accent-pink: #ff00d9;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Login Screen */
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .login-screen.hidden {
+            display: none;
+        }
+
+        .login-card {
+            background: var(--bg-card);
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            max-width: 400px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .login-logo {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 32px;
+            color: var(--bg-primary);
+            margin: 0 auto 20px;
+            box-shadow: 0 0 30px rgba(0, 217, 255, 0.7);
+        }
+
+        .login-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 30px;
+        }
+
+        .login-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 10px;
+            padding: 5px;
+        }
+
+        .login-tab {
+            flex: 1;
+            padding: 10px;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .login-tab.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .connection-status {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--bg-card);
+            padding: 10px 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            z-index: 1001;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-online { background: var(--success); }
+        .status-offline { background: var(--danger); }
+        .status-syncing { background: var(--warning); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        /* Header */
+        header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-card) 100%);
+            padding: 15px 0;
+            box-shadow: 0 4px 20px rgba(0, 217, 255, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--bg-primary);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .logo h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            color: var(--text-secondary);
+        }
+
+        .logout-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+        }
+
+        /* Navigation */
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+        }
+
+        nav a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: all 0.3s ease;
+        }
+
+        nav a:hover {
+            color: var(--accent-cyan);
+            transform: translateY(-2px);
+        }
+
+        nav a.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        /* Main Content */
+        main {
+            padding: 30px 0;
+            min-height: calc(100vh - 120px);
+        }
+
+        .section {
+            display: none;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .section.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Cards */
+        .card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(0, 217, 255, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .card-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 22px;
+            font-weight: 700;
+            margin-bottom: 20px;
+            color: var(--accent-cyan);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Forms */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: flex;
+            gap: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-cyan);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        select.form-control {
+            cursor: pointer;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 16px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 217, 255, 0.5);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(0, 255, 136, 0.3);
+        }
+
+        .btn-success:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0, 255, 136, 0.5);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 0, 85, 0.5);
+        }
+
+        .btn-warning {
+            background: var(--warning);
+            color: var(--bg-primary);
+            box-shadow: 0 4px 15px rgba(255, 170, 0, 0.3);
+        }
+
+        .btn-warning:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 170, 0, 0.5);
+        }
+
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+            text-align: center;
+        }
+
+        /* Tables */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: rgba(26, 26, 46, 0.5);
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        th {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        /* Notification */
+        .notification {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            transform: translateX(150%);
+            transition: transform 0.3s ease;
+            max-width: 350px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .notification-success {
+            background: var(--success);
+        }
+
+        .notification-error {
+            background: var(--danger);
+        }
+
+        .notification-warning {
+            background: var(--warning);
+        }
+
+        /* Futuristic elements */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(0, 217, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 217, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Estadísticas */
+        .stats-card {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+
+        .stat-item {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            flex: 1;
+            margin: 0 5px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .action-btn {
+            transition: all 0.2s ease;
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .total-display {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+            padding: 10px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        /* Loading spinner */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content {
+                flex-direction: column;
+                gap: 15px;
+            }
+
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .form-row {
+                flex-direction: column;
+            }
+
+            .card {
+                padding: 15px;
+            }
+
+            .stats-card {
+                flex-direction: column;
+            }
+
+            .stat-item {
+                margin: 5px 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cyber-grid"></div>
+    
+    <!-- Pantalla de Login -->
+    <div id="login-screen" class="login-screen">
+        <div class="login-card">
+            <div class="login-logo">
+                <i class="fas fa-coffee"></i>
+            </div>
+            <h1 class="login-title">CONEJO NEGRO</h1>
+            <p style="color: var(--text-secondary); margin-bottom: 30px;">Café Coworking Online</p>
+            
+            <div class="login-tabs">
+                <button class="login-tab active" data-tab="login">Iniciar Sesión</button>
+                <button class="login-tab" data-tab="register">Registrarse</button>
+            </div>
+            
+            <form id="login-form">
+                <div class="form-group">
+                    <input type="email" id="login-email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-sign-in-alt"></i>
+                    Iniciar Sesión
+                </button>
+            </form>
+            
+            <form id="register-form" style="display: none;">
+                <div class="form-group">
+                    <input type="text" id="register-name" class="form-control" placeholder="Nombre completo" required>
+                </div>
+                <div class="form-group">
+                    <input type="email" id="register-email" class="form-control" placeholder="Email" required>
+                </div>
+                <div class="form-group">
+                    <input type="password" id="register-password" class="form-control" placeholder="Contraseña" required>
+                </div>
+                <div class="form-group">
+                    <select id="register-role" class="form-control">
+                        <option value="employee">Empleado</option>
+                        <option value="admin">Administrador</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn btn-primary btn-block">
+                    <i class="fas fa-user-plus"></i>
+                    Registrarse
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Estado de conexión -->
+    <div id="connection-status" class="connection-status">
+        <div class="status-dot status-offline"></div>
+        <span>Desconectado</span>
+    </div>
+    
+    <!-- Aplicación principal -->
+    <div id="main-app" style="display: none;">
+        <header>
+            <div class="container">
+                <div class="header-content">
+                    <div class="logo">
+                        <div class="logo-icon">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <h1>CONEJO NEGRO</h1>
+                    </div>
+                    
+                    <nav>
+                        <ul>
+                            <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
+                            <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
+                            <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
+                            <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
+                        </ul>
+                    </nav>
+                    
+                    <div class="user-info">
+                        <span>Bienvenido, <span id="user-name">Usuario</span></span>
+                        <button id="logout-btn" class="logout-btn">
+                            <i class="fas fa-sign-out-alt"></i>
+                            Salir
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <main class="container">
+            <!-- Registro de Clientes -->
+            <section id="registro" class="section active">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-user-plus"></i>
+                        Registro de Clientes
+                    </h2>
+                    
+                    <form id="client-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="client-name">Nombre del Cliente</label>
+                                <input type="text" id="client-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="service-type">Servicio</label>
+                                <select id="service-type" class="form-control" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="cafeteria">Cafetería</option>
+                                    <option value="coworking">Coworking</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="drink-select">Bebida</label>
+                                <select id="drink-select" class="form-control" required>
+                                    <option value="">Seleccionar bebida</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="hours">Horas (solo coworking)</label>
+                                <input type="number" id="hours" class="form-control" min="1" value="1" disabled>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="payment-method">Método de Pago</label>
+                                <select id="payment-method" class="form-control" required>
+                                    <option value="">Seleccionar</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Total a Pagar</label>
+                                <div class="total-display" id="total-amount">$0.00</div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Registrar Cliente
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-list"></i>
+                        Registros del Día
+                    </h2>
+                    
+                    <div class="stats-card">
+                        <div class="stat-item">
+                            <div class="stat-value" id="daily-clients">0</div>
+                            <div class="stat-label">Clientes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="daily-income">$0.00</div>
+                            <div class="stat-label">Ingresos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="daily-profit">$0.00</div>
+                            <div class="stat-label">Ganancias</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="daily-records">
+                            <thead>
+                                <tr>
+                                    <th>Hora</th>
+                                    <th>Cliente</th>
+                                    <th>Servicio</th>
+                                    <th>Bebida</th>
+                                    <th>Total</th>
+                                    <th>Pago</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los registros se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventario Refrigerador -->
+            <section id="inventario-refrigerador" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-snowflake"></i>
+                        Inventario de Refrigerador
+                    </h2>
+                    
+                    <form id="refrigerador-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="refrigerador-name">Nombre del Producto</label>
+                                <input type="text" id="refrigerador-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refrigerador-quantity">Cantidad</label>
+                                <input type="number" id="refrigerador-quantity" class="form-control" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="refrigerador-cost">Costo de Compra</label>
+                                <input type="number" id="refrigerador-cost" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="refrigerador-price">Precio de Venta</label>
+                                <input type="number" id="refrigerador-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Agregar Producto
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-boxes"></i>
+                        Productos en Refrigerador
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="refrigerador-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Compra</th>
+                                    <th>Precio Venta</th>
+                                    <th>Ganancia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los productos se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventario Cafetería -->
+            <section id="inventario-cafeteria" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-mug-hot"></i>
+                        Inventario de Cafetería
+                    </h2>
+                    
+                    <form id="cafeteria-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cafeteria-name">Nombre del Producto</label>
+                                <input type="text" id="cafeteria-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cafeteria-quantity">Cantidad</label>
+                                <input type="number" id="cafeteria-quantity" class="form-control" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cafeteria-cost">Costo de Producción</label>
+                                <input type="number" id="cafeteria-cost" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cafeteria-price">Precio de Venta</label>
+                                <input type="number" id="cafeteria-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Agregar Producto
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-coffee"></i>
+                        Productos de Cafetería
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="cafeteria-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Producción</th>
+                                    <th>Precio Venta</th>
+                                    <th>Ganancia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los productos se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Reportes -->
+            <section id="reportes" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-chart-line"></i>
+                        Reportes y Análisis Online
+                    </h2>
+                    
+                    <div class="stats-card">
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-products">0</div>
+                            <div class="stat-label">Total Productos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="today-records">0</div>
+                            <div class="stat-label">Ventas Hoy</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="today-income">$0.00</div>
+                            <div class="stat-label">Ingresos Hoy</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="total-users">0</div>
+                            <div class="stat-label">Usuarios Online</div>
+                        </div>
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button id="sync-data" class="btn btn-primary">
+                            <i class="fas fa-sync"></i>
+                            Sincronizar Datos
+                        </button>
+                        <button id="export-backup" class="btn btn-success">
+                            <i class="fas fa-download"></i>
+                            Exportar Respaldo
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <script>
+        // Configuración de la API
+        const API_BASE_URL = 'http://localhost:3000/api';
+        
+        // Variables globales
+        let authToken = localStorage.getItem('authToken');
+        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        let isOnline = false;
+        let data = {
+            products: [],
+            records: [],
+            reports: []
+        };
+
+        // ===========================================
+        // GESTIÓN DE AUTENTICACIÓN
+        // ===========================================
+
+        // Verificar si el usuario está autenticado
+        async function checkAuth() {
+            if (!authToken) {
+                showLoginScreen();
+                return false;
+            }
+
+            try {
+                const response = await fetch(`${API_BASE_URL}/auth/verify`, {
+                    headers: {
+                        'Authorization': `Bearer ${authToken}`
+                    }
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    currentUser = data.user;
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showMainApp();
+                    return true;
+                } else {
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    showLoginScreen();
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error verificando autenticación:', error);
+                showLoginScreen();
+                return false;
+            }
+        }
+
+        // Mostrar pantalla de login
+        function showLoginScreen() {
+            document.getElementById('login-screen').classList.remove('hidden');
+            document.getElementById('main-app').style.display = 'none';
+            updateConnectionStatus('offline');
+        }
+
+        // Mostrar aplicación principal
+        function showMainApp() {
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').style.display = 'block';
+            document.getElementById('user-name').textContent = currentUser?.email || 'Usuario';
+            updateConnectionStatus('online');
+            loadInitialData();
+        }
+
+        // Manejar tabs de login
+        document.querySelectorAll('.login-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+                
+                const tabType = this.getAttribute('data-tab');
+                document.getElementById('login-form').style.display = tabType === 'login' ? 'block' : 'none';
+                document.getElementById('register-form').style.display = tabType === 'register' ? 'block' : 'none';
+            });
+        });
+
+        // Login
+        document.getElementById('login-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('login-email').value;
+            const password = document.getElementById('login-password').value;
+            
+            try {
+                updateConnectionStatus('syncing');
+                const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showNotification('Login exitoso', 'success');
+                    showMainApp();
+                } else {
+                    showNotification(data.error || 'Error en login', 'error');
+                    updateConnectionStatus('offline');
+                }
+            } catch (error) {
+                console.error('Error en login:', error);
+                showNotification('Error de conexión', 'error');
+                updateConnectionStatus('offline');
+            }
+        });
+
+        // Registro
+        document.getElementById('register-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = document.getElementById('register-name').value;
+            const email = document.getElementById('register-email').value;
+            const password = document.getElementById('register-password').value;
+            const role = document.getElementById('register-role').value;
+            
+            try {
+                updateConnectionStatus('syncing');
+                const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ name, email, password, role })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok) {
+                    authToken = data.token;
+                    currentUser = data.user;
+                    localStorage.setItem('authToken', authToken);
+                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    showNotification('Registro exitoso', 'success');
+                    showMainApp();
+                } else {
+                    showNotification(data.error || 'Error en registro', 'error');
+                    updateConnectionStatus('offline');
+                }
+            } catch (error) {
+                console.error('Error en registro:', error);
+                showNotification('Error de conexión', 'error');
+                updateConnectionStatus('offline');
+            }
+        });
+
+        // Logout
+        document.getElementById('logout-btn').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('currentUser');
+                authToken = null;
+                currentUser = null;
+                showLoginScreen();
+                showNotification('Sesión cerrada', 'warning');
+            }
+        });
+
+        // ===========================================
+        // GESTIÓN DE ESTADO DE CONEXIÓN
+        // ===========================================
+
+        function updateConnectionStatus(status) {
+            const statusElement = document.getElementById('connection-status');
+            const dot = statusElement.querySelector('.status-dot');
+            const text = statusElement.querySelector('span');
+            
+            dot.className = `status-dot status-${status}`;
+            
+            switch(status) {
+                case 'online':
+                    text.textContent = 'Conectado';
+                    isOnline = true;
+                    break;
+                case 'offline':
+                    text.textContent = 'Desconectado';
+                    isOnline = false;
+                    break;
+                case 'syncing':
+                    text.textContent = 'Sincronizando...';
+                    break;
+            }
+        }
+
+        // ===========================================
+        // GESTIÓN DE DATOS Y API
+        // ===========================================
+
+        // Realizar petición autenticada a la API
+        async function apiRequest(endpoint, options = {}) {
+            const url = `${API_BASE_URL}${endpoint}`;
+            const headers = {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${authToken}`,
+                ...options.headers
+            };
+            
+            try {
+                const response = await fetch(url, {
+                    ...options,
+                    headers
+                });
+                
+                if (response.status === 401) {
+                    // Token expirado
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    showLoginScreen();
+                    throw new Error('Sesión expirada');
+                }
+                
+                const data = await response.json();
+                
+                if (!response.ok) {
+                    throw new Error(data.error || 'Error en la petición');
+                }
+                
+                return data;
+            } catch (error) {
+                if (error.message === 'Sesión expirada') {
+                    throw error;
+                }
+                updateConnectionStatus('offline');
+                throw error;
+            }
+        }
+
+        // Cargar datos iniciales
+        async function loadInitialData() {
+            try {
+                updateConnectionStatus('syncing');
+                
+                // Cargar productos
+                const products = await apiRequest('/products');
+                data.products = products;
+                
+                // Cargar registros del día actual
+                const today = new Date().toISOString().split('T')[0];
+                const records = await apiRequest(`/records?date=${today}`);
+                data.records = records;
+                
+                // Cargar estadísticas
+                const stats = await apiRequest('/stats');
+                updateStatsDisplay(stats);
+                
+                // Inicializar datos de ejemplo si no hay productos
+                if (products.length === 0) {
+                    await initSampleData();
+                }
+                
+                updateConnectionStatus('online');
+                updateProductTables();
+                updateDailyRecordsDisplay();
+                updateDrinkOptions();
+                
+                showNotification('Datos cargados exitosamente', 'success');
+            } catch (error) {
+                console.error('Error cargando datos:', error);
+                showNotification('Error cargando datos: ' + error.message, 'error');
+                updateConnectionStatus('offline');
+            }
+        }
+
+        // Inicializar datos de ejemplo
+        async function initSampleData() {
+            try {
+                await apiRequest('/init-data', { method: 'POST' });
+                // Recargar productos después de inicializar
+                const products = await apiRequest('/products');
+                data.products = products;
+            } catch (error) {
+                console.error('Error inicializando datos:', error);
+            }
+        }
+
+        // Sincronizar datos manualmente
+        document.getElementById('sync-data').addEventListener('click', async function() {
+            try {
+                updateConnectionStatus('syncing');
+                const syncData = await apiRequest('/sync');
+                
+                data.products = syncData.products;
+                data.records = syncData.records;
+                data.reports = syncData.reports;
+                
+                updateConnectionStatus('online');
+                updateProductTables();
+                updateDailyRecordsDisplay();
+                updateDrinkOptions();
+                
+                showNotification('Sincronización completada', 'success');
+            } catch (error) {
+                showNotification('Error en sincronización: ' + error.message, 'error');
+            }
+        });
+
+        // ===========================================
+        // FUNCIONES DE LA APLICACIÓN
+        // ===========================================
+
+        // Mostrar notificación
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `notification notification-${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Actualizar display de estadísticas
+        function updateStatsDisplay(stats) {
+            document.getElementById('total-products').textContent = stats.totalProducts;
+            document.getElementById('today-records').textContent = stats.todayRecords;
+            document.getElementById('today-income').textContent = `$${stats.todayIncome.toFixed(2)}`;
+            document.getElementById('total-users').textContent = stats.totalUsers;
+        }
+
+        // Actualizar tablas de productos
+        function updateProductTables() {
+            updateRefrigeradorTable();
+            updateCafeteriaTable();
+        }
+
+        // Actualizar tabla de refrigerador
+        function updateRefrigeradorTable() {
+            const tbody = document.querySelector('#refrigerador-table tbody');
+            tbody.innerHTML = '';
+            
+            const refrigeradorProducts = data.products.filter(p => p.category === 'refrigerador');
+            
+            refrigeradorProducts.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteProduct('${product._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar tabla de cafetería
+        function updateCafeteriaTable() {
+            const tbody = document.querySelector('#cafeteria-table tbody');
+            tbody.innerHTML = '';
+            
+            const cafeteriaProducts = data.products.filter(p => p.category === 'cafeteria');
+            
+            cafeteriaProducts.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteProduct('${product._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Actualizar opciones de bebidas
+        function updateDrinkOptions() {
+            const drinkSelect = document.getElementById('drink-select');
+            drinkSelect.innerHTML = '<option value="">Seleccionar bebida</option>';
+            
+            data.products.forEach(product => {
+                if (product.quantity > 0) {
+                    const option = document.createElement('option');
+                    option.value = product._id;
+                    option.textContent = `${product.name} (${product.category}) - $${product.price}`;
+                    option.dataset.category = product.category;
+                    option.dataset.price = product.price;
+                    option.dataset.cost = product.cost;
+                    drinkSelect.appendChild(option);
+                }
+            });
+        }
+
+        // Actualizar display de registros diarios
+        function updateDailyRecordsDisplay() {
+            const tbody = document.querySelector('#daily-records tbody');
+            tbody.innerHTML = '';
+            
+            let totalIncome = 0;
+            let totalCost = 0;
+            
+            data.records.forEach(record => {
+                totalIncome += record.total;
+                totalCost += record.cost;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.time}</td>
+                    <td>${record.client}</td>
+                    <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
+                    <td>${record.drink}</td>
+                    <td>$${record.total.toFixed(2)}</td>
+                    <td>${record.payment}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteRecord('${record._id}')">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            document.getElementById('daily-clients').textContent = data.records.length;
+            document.getElementById('daily-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('daily-profit').textContent = `$${(totalIncome - totalCost).toFixed(2)}`;
+        }
+
+        // Navegación entre secciones
+        document.querySelectorAll('.nav-link').forEach(link => {
+            link.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+                this.classList.add('active');
+                
+                document.querySelectorAll('.section').forEach(section => {
+                    section.classList.remove('active');
+                });
+                
+                const sectionId = this.getAttribute('data-section');
+                document.getElementById(sectionId).classList.add('active');
+            });
+        });
+
+        // Agregar producto refrigerador
+        document.getElementById('refrigerador-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('refrigerador-name').value,
+                quantity: parseInt(document.getElementById('refrigerador-quantity').value),
+                cost: parseFloat(document.getElementById('refrigerador-cost').value),
+                price: parseFloat(document.getElementById('refrigerador-price').value),
+                category: 'refrigerador'
+            };
+            
+            try {
+                const newProduct = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                data.products.push(newProduct);
+                updateRefrigeradorTable();
+                updateDrinkOptions();
+                this.reset();
+                showNotification('Producto agregado al refrigerador', 'success');
+            } catch (error) {
+                showNotification('Error agregando producto: ' + error.message, 'error');
+            }
+        });
+
+        // Agregar producto cafetería
+        document.getElementById('cafeteria-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('cafeteria-name').value,
+                quantity: parseInt(document.getElementById('cafeteria-quantity').value),
+                cost: parseFloat(document.getElementById('cafeteria-cost').value),
+                price: parseFloat(document.getElementById('cafeteria-price').value),
+                category: 'cafeteria'
+            };
+            
+            try {
+                const newProduct = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                data.products.push(newProduct);
+                updateCafeteriaTable();
+                updateDrinkOptions();
+                this.reset();
+                showNotification('Producto agregado a la cafetería', 'success');
+            } catch (error) {
+                showNotification('Error agregando producto: ' + error.message, 'error');
+            }
+        });
+
+        // Eliminar producto
+        async function deleteProduct(productId) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
+                return;
+            }
+            
+            try {
+                await apiRequest(`/products/${productId}`, { method: 'DELETE' });
+                
+                data.products = data.products.filter(p => p._id !== productId);
+                updateProductTables();
+                updateDrinkOptions();
+                showNotification('Producto eliminado exitosamente', 'warning');
+            } catch (error) {
+                showNotification('Error eliminando producto: ' + error.message, 'error');
+            }
+        }
+
+        // Registrar cliente
+        document.getElementById('client-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const drinkId = document.getElementById('drink-select').value;
+            const selectedOption = document.querySelector(`#drink-select option[value="${drinkId}"]`);
+            
+            if (!selectedOption) {
+                showNotification('Por favor selecciona una bebida válida', 'error');
+                return;
+            }
+            
+            const recordData = {
+                client: document.getElementById('client-name').value,
+                service: document.getElementById('service-type').value,
+                drink: selectedOption.textContent.split(' (')[0],
+                drinkSource: selectedOption.dataset.category,
+                drinkId: drinkId,
+                hours: parseInt(document.getElementById('hours').value) || 1,
+                total: parseFloat(document.getElementById('total-amount').textContent.replace('$', '')),
+                payment: document.getElementById('payment-method').value,
+                cost: parseFloat(selectedOption.dataset.cost),
+                price: parseFloat(selectedOption.dataset.price)
+            };
+            
+            try {
+                const newRecord = await apiRequest('/records', {
+                    method: 'POST',
+                    body: JSON.stringify(recordData)
+                });
+                
+                data.records.push(newRecord);
+                
+                // Actualizar cantidad del producto localmente
+                const product = data.products.find(p => p._id === drinkId);
+                if (product) {
+                    product.quantity -= 1;
+                }
+                
+                updateDailyRecordsDisplay();
+                updateDrinkOptions();
+                updateProductTables();
+                this.reset();
+                document.getElementById('total-amount').textContent = '$0.00';
+                document.getElementById('hours').disabled = true;
+                
+                showNotification('Cliente registrado exitosamente', 'success');
+            } catch (error) {
+                showNotification('Error registrando cliente: ' + error.message, 'error');
+            }
+        });
+
+        // Eliminar registro
+        async function deleteRecord(recordId) {
+            if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) {
+                return;
+            }
+            
+            try {
+                await apiRequest(`/records/${recordId}`, { method: 'DELETE' });
+                
+                const record = data.records.find(r => r._id === recordId);
+                if (record) {
+                    // Devolver cantidad al producto
+                    const product = data.products.find(p => p._id === record.drinkId);
+                    if (product) {
+                        product.quantity += 1;
+                    }
+                }
+                
+                data.records = data.records.filter(r => r._id !== recordId);
+                updateDailyRecordsDisplay();
+                updateDrinkOptions();
+                updateProductTables();
+                
+                showNotification('Registro eliminado exitosamente', 'warning');
+            } catch (error) {
+                showNotification('Error eliminando registro: ' + error.message, 'error');
+            }
+        }
+
+        // Actualizar total cuando cambian los campos
+        document.getElementById('service-type').addEventListener('change', function() {
+            const hoursInput = document.getElementById('hours');
+            hoursInput.disabled = this.value !== 'coworking';
+            updateTotalAmount();
+        });
+
+        document.getElementById('drink-select').addEventListener('change', updateTotalAmount);
+        document.getElementById('hours').addEventListener('input', updateTotalAmount);
+
+        function updateTotalAmount() {
+            const serviceType = document.getElementById('service-type').value;
+            const drinkValue = document.getElementById('drink-select').value;
+            const hours = parseInt(document.getElementById('hours').value) || 1;
+            const totalDisplay = document.getElementById('total-amount');
+            
+            if (!serviceType || !drinkValue) {
+                totalDisplay.textContent = '$0.00';
+                return;
+            }
+            
+            const selectedOption = document.querySelector(`#drink-select option[value="${drinkValue}"]`);
+            if (!selectedOption) {
+                totalDisplay.textContent = '$0.00';
+                return;
+            }
+            
+            const drinkPrice = parseFloat(selectedOption.dataset.price);
+            let total = 0;
+            
+            if (serviceType === 'cafeteria') {
+                total = drinkPrice;
+            } else {
+                const coworkingRate = 58;
+                total = coworkingRate * hours;
+            }
+            
+            totalDisplay.textContent = `$${total.toFixed(2)}`;
+        }
+
+        // Exportar respaldo
+        document.getElementById('export-backup').addEventListener('click', async function() {
+            try {
+                const syncData = await apiRequest('/sync');
+                const backup = {
+                    timestamp: new Date().toISOString(),
+                    data: syncData
+                };
+                
+                const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `conejo-negro-backup-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Respaldo exportado exitosamente', 'success');
+            } catch (error) {
+                showNotification('Error exportando respaldo: ' + error.message, 'error');
+            }
+        });
+
+        // Inicializar aplicación
+        document.addEventListener('DOMContentLoaded', function() {
+            checkAuth();
+        });
+
+        // Verificar conexión periódicamente
+        setInterval(async function() {
+            if (authToken && currentUser) {
+                try {
+                    await apiRequest('/auth/verify');
+                    if (!isOnline) {
+                        updateConnectionStatus('online');
+                        showNotification('Conexión restaurada', 'success');
+                    }
+                } catch (error) {
+                    if (isOnline) {
+                        updateConnectionStatus('offline');
+                        showNotification('Conexión perdida', 'warning');
+                    }
+                }
+            }
+        }, 30000); // Verificar cada 30 segundos
+    </script>
+</body>
+</html>

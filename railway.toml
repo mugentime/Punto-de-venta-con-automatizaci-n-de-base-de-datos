@@ -1,0 +1,15 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "npm start"
+healthcheckPath = "/api/health"
+healthcheckTimeout = 60
+restartPolicyType = "always"
+
+[[services]]
+name = "web"
+port = 3000
+
+[services.web]
+healthcheckPath = "/api/health"

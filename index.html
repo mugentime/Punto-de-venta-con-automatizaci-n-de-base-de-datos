@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conejo Negro - Café Coworking Tepozteco</title>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@300;400;500;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- SVG Background Elements -->
+    <div class="background-elements">
+        <svg class="mountain-bg" viewBox="0 0 1200 400" xmlns="http://www.w3.org/2000/svg">
+            <path d="M0,400 L200,100 L400,200 L600,50 L800,150 L1000,80 L1200,180 L1200,400 Z" 
+                  fill="var(--accent-secondary)" opacity="0.1"/>
+            <path d="M0,400 L150,200 L350,280 L550,120 L750,220 L950,160 L1200,240 L1200,400 Z" 
+                  fill="var(--accent-primary)" opacity="0.08"/>
+        </svg>
+        
+        <!-- Floating Mexican Elements -->
+        <div class="floating-elements">
+            <div class="floating-element" style="--delay: 0s; --duration: 12s;">🌵</div>
+            <div class="floating-element" style="--delay: 2s; --duration: 15s;">🦋</div>
+            <div class="floating-element" style="--delay: 4s; --duration: 10s;">🌺</div>
+            <div class="floating-element" style="--delay: 6s; --duration: 13s;">🏔️</div>
+        </div>
+    </div>
+    
+    <header>
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <!-- SVG Logo del Conejo Negro -->
+                        <svg viewBox="0 0 50 50" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <circle cx="25" cy="25" r="23" fill="#2C1810" stroke="#FF6B35" stroke-width="2"/>
+                            <ellipse cx="25" cy="20" rx="8" ry="12" fill="#1A0E08"/>
+                            <ellipse cx="22" cy="15" rx="2" ry="4" fill="#1A0E08"/>
+                            <ellipse cx="28" cy="15" rx="2" ry="4" fill="#1A0E08"/>
+                            <circle cx="23" cy="18" r="1" fill="#FF6B35"/>
+                            <circle cx="27" cy="18" r="1" fill="#FF6B35"/>
+                            <ellipse cx="25" cy="22" rx="1" ry="0.5" fill="#FF6B35"/>
+                            <path d="M23 24 Q25 26 27 24" stroke="#FF6B35" stroke-width="1" fill="none"/>
+                        </svg>
+                    </div>
+                    <div class="logo-text">
+                        <h1>CONEJO NEGRO</h1>
+                        <span class="tagline">Café Coworking Tepozteco</span>
+                    </div>
+                </div>
+                <nav>
+                    <ul>
+                        <li><a href="#" class="nav-link active" data-section="registro">
+                            <i class="fas fa-user-plus"></i> Registro
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="inventario-refrigerador">
+                            <i class="fas fa-snowflake"></i> Refrigerador
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="inventario-cafeteria">
+                            <i class="fas fa-mug-hot"></i> Cafetería
+                        </a></li>
+                        <li><a href="#" class="nav-link" data-section="reportes">
+                            <i class="fas fa-chart-line"></i> Reportes
+                        </a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Registro de Clientes -->
+        <section id="registro" class="section active">
+            <div class="welcome-banner">
+                <h2>¡Bienvenido al Conejo Negro!</h2>
+                <p>Tu espacio de coworking en el corazón de Tepoztlán</p>
+            </div>
+
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-user-plus"></i>
+                    Registro de Clientes
+                    <div class="card-decoration">🌮</div>
+                </h2>
+                
+                <form id="client-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="client-name">
+                                <i class="fas fa-user"></i> Nombre del Cliente
+                            </label>
+                            <input type="text" id="client-name" class="form-control" required placeholder="Escribe el nombre aquí...">
+                        </div>
+                        <div class="form-group">
+                            <label for="service-type">
+                                <i class="fas fa-concierge-bell"></i> Servicio
+                            </label>
+                            <select id="service-type" class="form-control" required>
+                                <option value="">🤔 ¿Qué necesitas hoy?</option>
+                                <option value="cafeteria">☕ Solo Cafetería</option>
+                                <option value="coworking">💻 Coworking + Bebida</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="drink-select">
+                                <i class="fas fa-coffee"></i> Bebida
+                            </label>
+                            <select id="drink-select" class="form-control" required>
+                                <option value="">🥤 Elige tu bebida favorita</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="hours">
+                                <i class="fas fa-clock"></i> Horas (solo coworking)
+                            </label>
+                            <input type="number" id="hours" class="form-control" min="1" value="1" disabled placeholder="¿Cuántas horas?">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="payment-method">
+                                <i class="fas fa-credit-card"></i> Método de Pago
+                            </label>
+                            <select id="payment-method" class="form-control" required>
+                                <option value="">💰 ¿Cómo pagas?</option>
+                                <option value="efectivo">💵 Efectivo</option>
+                                <option value="tarjeta">💳 Tarjeta</option>
+                                <option value="transferencia">📱 Transferencia</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>
+                                <i class="fas fa-calculator"></i> Total a Pagar
+                            </label>
+                            <div class="total-display" id="total-amount">$0.00</div>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary pulse-animation">
+                        <i class="fas fa-save"></i>
+                        ¡Registrar Cliente!
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-calendar-day"></i>
+                    Registros del Día
+                    <div class="card-decoration">📊</div>
+                </h2>
+                
+                <div class="stats-grid">
+                    <div class="stat-card clients-stat">
+                        <div class="stat-icon">👥</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="daily-clients">0</div>
+                            <div class="stat-label">Clientes</div>
+                        </div>
+                    </div>
+                    <div class="stat-card income-stat">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="daily-income">$0.00</div>
+                            <div class="stat-label">Ingresos</div>
+                        </div>
+                    </div>
+                    <div class="stat-card profit-stat">
+                        <div class="stat-icon">📈</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="daily-profit">$0.00</div>
+                            <div class="stat-label">Ganancias</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="table-container">
+                    <table id="daily-records">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-clock"></i> Hora</th>
+                                <th><i class="fas fa-user"></i> Cliente</th>
+                                <th><i class="fas fa-concierge-bell"></i> Servicio</th>
+                                <th><i class="fas fa-coffee"></i> Bebida</th>
+                                <th><i class="fas fa-money-bill"></i> Total</th>
+                                <th><i class="fas fa-credit-card"></i> Pago</th>
+                                <th><i class="fas fa-cog"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los registros se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="export-day" class="btn btn-success">
+                        <i class="fas fa-file-export"></i>
+                        Exportar Reporte
+                    </button>
+                    <button id="export-pdf" class="btn btn-warning">
+                        <i class="fas fa-file-pdf"></i>
+                        Exportar PDF
+                    </button>
+                    <button id="finish-day" class="btn btn-danger">
+                        <i class="fas fa-calendar-check"></i>
+                        Finalizar Día
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventario Refrigerador -->
+        <section id="inventario-refrigerador" class="section">
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-snowflake"></i>
+                    Inventario de Refrigerador
+                    <div class="card-decoration">🧊</div>
+                </h2>
+                
+                <form id="refrigerador-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="refrigerador-name">
+                                <i class="fas fa-tag"></i> Nombre del Producto
+                            </label>
+                            <input type="text" id="refrigerador-name" class="form-control" required placeholder="Ej: Coca-Cola, Agua Mineral...">
+                        </div>
+                        <div class="form-group">
+                            <label for="refrigerador-quantity">
+                                <i class="fas fa-sort-numeric-up"></i> Cantidad
+                            </label>
+                            <input type="number" id="refrigerador-quantity" class="form-control" min="1" required placeholder="¿Cuántos tienes?">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="refrigerador-cost">
+                                <i class="fas fa-shopping-cart"></i> Costo de Compra
+                            </label>
+                            <input type="number" id="refrigerador-cost" class="form-control" step="0.01" min="0" required placeholder="¿Cuánto te costó?">
+                        </div>
+                        <div class="form-group">
+                            <label for="refrigerador-price">
+                                <i class="fas fa-tag"></i> Precio de Venta
+                            </label>
+                            <input type="number" id="refrigerador-price" class="form-control" step="0.01" min="0" required placeholder="¿A cuánto lo vendes?">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary pulse-animation">
+                        <i class="fas fa-plus"></i>
+                        Agregar al Refrigerador
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-boxes"></i>
+                    Productos en Refrigerador
+                    <div class="card-decoration">📦</div>
+                </h2>
+                
+                <div class="table-container">
+                    <table id="refrigerador-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-box"></i> Producto</th>
+                                <th><i class="fas fa-sort-numeric-up"></i> Cantidad</th>
+                                <th><i class="fas fa-shopping-cart"></i> Costo</th>
+                                <th><i class="fas fa-tag"></i> Precio</th>
+                                <th><i class="fas fa-chart-line"></i> Ganancia</th>
+                                <th><i class="fas fa-cog"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los productos se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Inventario Cafetería -->
+        <section id="inventario-cafeteria" class="section">
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-mug-hot"></i>
+                    Inventario de Cafetería
+                    <div class="card-decoration">☕</div>
+                </h2>
+                
+                <form id="cafeteria-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cafeteria-name">
+                                <i class="fas fa-coffee"></i> Nombre del Producto
+                            </label>
+                            <input type="text" id="cafeteria-name" class="form-control" required placeholder="Ej: Espresso, Capuccino...">
+                        </div>
+                        <div class="form-group">
+                            <label for="cafeteria-quantity">
+                                <i class="fas fa-sort-numeric-up"></i> Cantidad
+                            </label>
+                            <input type="number" id="cafeteria-quantity" class="form-control" min="1" required placeholder="¿Cuántos puedes hacer?">
+                        </div>
+                    </div>
+                    
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="cafeteria-cost">
+                                <i class="fas fa-industry"></i> Costo de Producción
+                            </label>
+                            <input type="number" id="cafeteria-cost" class="form-control" step="0.01" min="0" required placeholder="¿Cuánto cuesta hacer uno?">
+                        </div>
+                        <div class="form-group">
+                            <label for="cafeteria-price">
+                                <i class="fas fa-tag"></i> Precio de Venta
+                            </label>
+                            <input type="number" id="cafeteria-price" class="form-control" step="0.01" min="0" required placeholder="¿A cuánto lo vendes?">
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="btn btn-primary pulse-animation">
+                        <i class="fas fa-plus"></i>
+                        Agregar a Cafetería
+                    </button>
+                </form>
+            </div>
+            
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-coffee"></i>
+                    Productos de Cafetería
+                    <div class="card-decoration">🌮</div>
+                </h2>
+                
+                <div class="table-container">
+                    <table id="cafeteria-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-coffee"></i> Producto</th>
+                                <th><i class="fas fa-sort-numeric-up"></i> Cantidad</th>
+                                <th><i class="fas fa-industry"></i> Costo</th>
+                                <th><i class="fas fa-tag"></i> Precio</th>
+                                <th><i class="fas fa-chart-line"></i> Ganancia</th>
+                                <th><i class="fas fa-cog"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los productos se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <!-- Reportes -->
+        <section id="reportes" class="section">
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-chart-line"></i>
+                    Centro de Reportes
+                    <div class="card-decoration">📊</div>
+                </h2>
+                
+                <div class="reports-controls">
+                    <div class="report-type-selector">
+                        <button class="btn btn-secondary report-btn active" data-report="daily">
+                            <i class="fas fa-calendar-day"></i> Diario
+                        </button>
+                        <button class="btn btn-secondary report-btn" data-report="weekly">
+                            <i class="fas fa-calendar-week"></i> Semanal
+                        </button>
+                        <button class="btn btn-secondary report-btn" data-report="monthly">
+                            <i class="fas fa-calendar-month"></i> Mensual
+                        </button>
+                        <button class="btn btn-secondary report-btn" data-report="custom">
+                            <i class="fas fa-calendar-alt"></i> Personalizado
+                        </button>
+                    </div>
+                    
+                    <div id="custom-date-range" class="custom-date-range" style="display: none;">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="start-date">Fecha Inicio</label>
+                                <input type="date" id="start-date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <label for="end-date">Fecha Fin</label>
+                                <input type="date" id="end-date" class="form-control">
+                            </div>
+                            <div class="form-group">
+                                <button id="generate-custom-report" class="btn btn-primary">
+                                    <i class="fas fa-search"></i> Generar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Gráfica de estadísticas -->
+                <div class="chart-container">
+                    <canvas id="statsChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="card glass-card">
+                <h2 class="card-title">
+                    <i class="fas fa-history"></i>
+                    Historial de Reportes
+                    <div class="card-decoration">📋</div>
+                </h2>
+                
+                <div class="table-container">
+                    <table id="reports-table">
+                        <thead>
+                            <tr>
+                                <th><i class="fas fa-calendar"></i> Fecha</th>
+                                <th><i class="fas fa-users"></i> Clientes</th>
+                                <th><i class="fas fa-money-bill"></i> Ingresos</th>
+                                <th><i class="fas fa-chart-line"></i> Ganancias</th>
+                                <th><i class="fas fa-cog"></i> Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <!-- Los reportes se agregarán aquí dinámicamente -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-logo">
+                    <i class="fas fa-mountain"></i>
+                    <span>Conejo Negro</span>
+                </div>
+                <p>Café Coworking en el corazón mágico de Tepoztlán 🌮✨</p>
+                <div class="footer-elements">
+                    <span>🌵</span><span>☕</span><span>🦋</span><span>🏔️</span>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification System -->
+    <div id="notification" class="notification">
+        <div class="notification-content">
+            <div class="notification-icon"></div>
+            <div class="notification-message"></div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div id="loading-overlay" class="loading-overlay">
+        <div class="loading-spinner">
+            <div class="spinner-ring"></div>
+            <div class="loading-text">Cargando...</div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script type="module" src="app.js"></script>
+</body>
+</html>
