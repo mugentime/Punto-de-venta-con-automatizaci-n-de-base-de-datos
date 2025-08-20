@@ -4,8 +4,20 @@ const crypto = require('crypto');
 
 class CloudStorageService {
   constructor() {
-    // Use Railway's persistent volume or fallback to local temp
-    this.storageBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH || path.join(__dirname, '..', 'storage');
+    // Railway storage configuration
+    this.isRailway = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+    
+    // Use Railway's persistent volume, Railway's temp storage, or local fallback
+    if (this.isRailway) {
+      // Railway persistent volume (if available) or Railway's temp directory
+      this.storageBasePath = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp/pos-storage';
+      console.log(`🚄 Railway environment detected - using Railway storage: ${this.storageBasePath}`);
+    } else {
+      // Local development fallback
+      this.storageBasePath = path.join(__dirname, '..', 'storage');
+      console.log(`💻 Local environment - using local storage: ${this.storageBasePath}`);
+    }
+    
     this.backupsPath = path.join(this.storageBasePath, 'backups');
     this.exportsPath = path.join(this.storageBasePath, 'exports');
     this.cachePath = path.join(this.storageBasePath, 'cache');
@@ -18,12 +30,20 @@ class CloudStorageService {
       await this.ensureDirectories();
       
       this.initialized = true;
-      console.log('✅ Cloud Storage Service initialized');
-      console.log(`📁 Storage path: ${this.storageBasePath}`);
       
-      // Check available storage
+      if (this.isRailway) {
+        console.log('✅ Railway Cloud Storage Service initialized');
+        console.log(`🚄 Railway storage path: ${this.storageBasePath}`);
+        console.log(`📊 Railway environment: ${process.env.RAILWAY_ENVIRONMENT || 'production'}`);
+      } else {
+        console.log('✅ Local Cloud Storage Service initialized');
+        console.log(`📁 Local storage path: ${this.storageBasePath}`);
+      }
+      
+      // Check available storage and permissions
+      await this.testStoragePermissions();
       const storageInfo = await this.getStorageInfo();
-      console.log(`💾 Available storage: ${this.formatBytes(storageInfo.available)}`);
+      console.log(`💾 Storage stats: ${this.formatBytes(storageInfo.used)} used, ${storageInfo.backupsCount} backups`);
       
       return true;
     } catch (error) {
@@ -303,6 +323,19 @@ class CloudStorageService {
     }
   }
 
+  // Test storage permissions
+  async testStoragePermissions() {
+    try {
+      const testFile = path.join(this.storageBasePath, 'test-write-permissions.tmp');
+      await fs.writeFile(testFile, 'Railway storage test');
+      await fs.unlink(testFile);
+      console.log('✅ Storage write permissions confirmed');
+    } catch (error) {
+      console.warn('⚠️ Storage write test failed:', error.message);
+      throw new Error(`Storage not writable: ${error.message}`);
+    }
+  }
+
   // Get storage information
   async getStorageInfo() {
     try {
@@ -333,29 +366,51 @@ class CloudStorageService {
         // Ignore if cache directory doesn't exist
       }
       
-      // Railway provides 10GB persistent storage on paid plans
-      const totalAvailable = 10 * 1024 * 1024 * 1024; // 10GB in bytes
+      // Railway storage limits
+      let totalAvailable, storageType;
+      if (this.isRailway) {
+        if (process.env.RAILWAY_VOLUME_MOUNT_PATH) {
+          // Persistent volume (paid plans) - typically 10GB+
+          totalAvailable = 10 * 1024 * 1024 * 1024; // 10GB
+          storageType = 'Railway Persistent Volume';
+        } else {
+          // Ephemeral storage (all plans) - limited but sufficient for temp files
+          totalAvailable = 512 * 1024 * 1024; // 512MB reasonable limit
+          storageType = 'Railway Ephemeral Storage';
+        }
+      } else {
+        // Local development
+        totalAvailable = 100 * 1024 * 1024 * 1024; // 100GB
+        storageType = 'Local Storage';
+      }
+      
       const totalUsed = totalSize + exportsSize + cacheSize;
       
       return {
+        type: storageType,
         total: totalAvailable,
         used: totalUsed,
         available: totalAvailable - totalUsed,
         backupsSize: totalSize,
         exportsSize,
         cacheSize,
-        backupsCount: backups.length
+        backupsCount: backups.length,
+        isRailway: this.isRailway,
+        isPersistent: !!process.env.RAILWAY_VOLUME_MOUNT_PATH
       };
     } catch (error) {
       console.error('❌ Failed to get storage info:', error);
       return {
+        type: 'Unknown',
         total: 0,
         used: 0,
         available: 0,
         backupsSize: 0,
         exportsSize: 0,
         cacheSize: 0,
-        backupsCount: 0
+        backupsCount: 0,
+        isRailway: false,
+        isPersistent: false
       };
     }
   }

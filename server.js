@@ -93,14 +93,42 @@ app.get('/api/exports/:filename', async (req, res) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({
-    status: 'OK',
-    timestamp: new Date().toISOString(),
-    uptime: process.uptime(),
-    storage: process.env.RAILWAY_VOLUME_MOUNT_PATH || 'local',
-    database: process.env.MONGODB_URI ? 'connected' : 'not configured'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    // Get storage information
+    const storageStats = await cloudStorageService.getStorageStats ? 
+      await cloudStorageService.getStorageStats() : 
+      { type: 'unknown', available: 0 };
+
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      environment: {
+        railway: !!(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID),
+        node_env: process.env.NODE_ENV || 'development'
+      },
+      storage: {
+        type: storageStats.type || 'Unknown',
+        available: storageStats.available || 0,
+        used: storageStats.used || 0,
+        isPersistent: storageStats.isPersistent || false,
+        backupsCount: storageStats.backupsCount || 0
+      },
+      database: {
+        configured: !!process.env.MONGODB_URI,
+        status: process.env.MONGODB_URI ? 'configured' : 'not configured'
+      }
+    });
+  } catch (error) {
+    console.error('Health check error:', error);
+    res.json({
+      status: 'OK',
+      timestamp: new Date().toISOString(),
+      uptime: process.uptime(),
+      error: 'Could not fetch detailed stats'
+    });
+  }
 });
 
 // Database setup endpoint
