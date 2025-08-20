@@ -11,6 +11,9 @@ const productRoutes = require('./routes/products-file');
 const recordRoutes = require('./routes/records-file');
 const backupRoutes = require('./routes/backup-file');
 
+// Import auth middleware
+const { auth } = require('./middleware/auth-file');
+
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
 const fileDatabase = require('./utils/fileDatabase');
@@ -149,6 +152,91 @@ app.get('/api/health', async (req, res) => {
       timestamp: new Date().toISOString(),
       uptime: process.uptime(),
       error: 'Could not fetch detailed stats'
+    });
+  }
+});
+
+// Stats endpoint for dashboard
+app.get('/api/stats', requireDatabase, auth, async (req, res) => {
+  try {
+    // Get today's records and products
+    const todayRecords = await fileDatabase.getTodayRecords();
+    const products = await fileDatabase.getProducts();
+    const users = await fileDatabase.getUsers();
+    
+    // Calculate basic statistics
+    const totalProducts = products.filter(p => p.isActive).length;
+    const todayRecordsCount = todayRecords.length;
+    const todayIncome = todayRecords.reduce((sum, record) => sum + record.total, 0);
+    const totalUsers = users.filter(u => u.isActive).length;
+    
+    res.json({
+      totalProducts,
+      todayRecords: todayRecordsCount,
+      todayIncome: Math.round(todayIncome * 100) / 100,
+      totalUsers
+    });
+  } catch (error) {
+    console.error('Stats endpoint error:', error);
+    res.status(500).json({ 
+      error: 'Failed to fetch statistics',
+      totalProducts: 0,
+      todayRecords: 0,
+      todayIncome: 0,
+      totalUsers: 0
+    });
+  }
+});
+
+// Sync endpoint for frontend data synchronization
+app.get('/api/sync', requireDatabase, auth, async (req, res) => {
+  try {
+    // Get all data for frontend synchronization
+    const products = await fileDatabase.getProducts();
+    const records = await fileDatabase.getTodayRecords();
+    const users = await fileDatabase.getUsers();
+    
+    res.json({
+      products: products.filter(p => p.isActive),
+      records,
+      reports: [], // Add reports if needed
+      lastSync: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Sync endpoint error:', error);
+    res.status(500).json({
+      error: 'Failed to sync data',
+      products: [],
+      records: [],
+      reports: []
+    });
+  }
+});
+
+// Initialize sample data endpoint
+app.post('/api/init-data', requireDatabase, auth, async (req, res) => {
+  try {
+    // Check if products already exist
+    const products = await fileDatabase.getProducts();
+    if (products.length > 0) {
+      return res.json({
+        message: 'Sample data already exists',
+        products: products.filter(p => p.isActive)
+      });
+    }
+    
+    // Initialize with default products (they should already be created by fileDatabase.initialize)
+    await fileDatabase.initialize();
+    const newProducts = await fileDatabase.getProducts();
+    
+    res.json({
+      message: 'Sample data initialized successfully',
+      products: newProducts.filter(p => p.isActive)
+    });
+  } catch (error) {
+    console.error('Init data error:', error);
+    res.status(500).json({
+      error: 'Failed to initialize sample data'
     });
   }
 });
