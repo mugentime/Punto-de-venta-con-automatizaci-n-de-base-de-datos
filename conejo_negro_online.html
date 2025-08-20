@@ -431,6 +431,74 @@
             background: rgba(0, 217, 255, 0.05);
         }
 
+        /* Multi-product form styles */
+        .products-section {
+            background: rgba(26, 26, 46, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+        }
+
+        .add-product-row {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .selected-products {
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .product-item {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 6px;
+            padding: 10px;
+            margin-bottom: 8px;
+        }
+
+        .product-info {
+            flex: 1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .product-name {
+            font-weight: 500;
+            color: var(--accent-cyan);
+        }
+
+        .product-details {
+            font-size: 0.9em;
+            color: var(--text-secondary);
+        }
+
+        .product-remove {
+            background: rgba(255, 77, 77, 0.8);
+            border: none;
+            color: white;
+            border-radius: 4px;
+            padding: 5px 8px;
+            cursor: pointer;
+            margin-left: 10px;
+        }
+
+        .product-remove:hover {
+            background: rgba(255, 77, 77, 1);
+        }
+
+        .summary-line {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
         /* Notification */
         .notification {
             position: fixed;
@@ -697,20 +765,31 @@
                             </div>
                         </div>
                         
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="drink-select">Bebida</label>
-                                <select id="drink-select" class="form-control" required>
-                                    <option value="">Seleccionar bebida</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label for="hours">Horas (solo coworking)</label>
-                                <input type="number" id="hours" class="form-control" min="1" value="1" disabled>
+                        <!-- Sección de productos múltiples -->
+                        <div class="form-group">
+                            <label>Productos de la Orden</label>
+                            <div class="products-section">
+                                <div class="add-product-row">
+                                    <select id="product-select" class="form-control" style="flex: 2;">
+                                        <option value="">Seleccionar producto</option>
+                                    </select>
+                                    <input type="number" id="product-quantity" class="form-control" placeholder="Cantidad" min="1" value="1" style="flex: 1; margin: 0 5px;">
+                                    <button type="button" id="add-product-btn" class="btn btn-secondary" style="flex: 0 0 auto;">
+                                        <i class="fas fa-plus"></i> Agregar
+                                    </button>
+                                </div>
+                                
+                                <div id="selected-products" class="selected-products" style="margin-top: 10px;">
+                                    <!-- Los productos seleccionados aparecerán aquí -->
+                                </div>
                             </div>
                         </div>
                         
                         <div class="form-row">
+                            <div class="form-group">
+                                <label for="hours">Horas (solo coworking)</label>
+                                <input type="number" id="hours" class="form-control" min="1" value="1" disabled>
+                            </div>
                             <div class="form-group">
                                 <label for="payment-method">Método de Pago</label>
                                 <select id="payment-method" class="form-control" required>
@@ -720,9 +799,24 @@
                                     <option value="transferencia">Transferencia</option>
                                 </select>
                             </div>
-                            <div class="form-group">
-                                <label>Total a Pagar</label>
-                                <div class="total-display" id="total-amount">$0.00</div>
+                        </div>
+                        
+                        <!-- Resumen de la orden -->
+                        <div class="order-summary" style="background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; padding: 15px; margin: 15px 0;">
+                            <h4 style="margin: 0 0 10px 0; color: var(--accent-cyan);">Resumen de la Orden</h4>
+                            <div id="order-breakdown">
+                                <div class="summary-line">
+                                    <span>Productos:</span>
+                                    <span id="products-total">$0.00</span>
+                                </div>
+                                <div class="summary-line" id="service-line" style="display: none;">
+                                    <span>Servicio Coworking:</span>
+                                    <span id="service-total">$0.00</span>
+                                </div>
+                                <div class="summary-line" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; margin-top: 8px; font-weight: bold; font-size: 1.1em;">
+                                    <span>Total a Pagar:</span>
+                                    <span id="total-amount">$0.00</span>
+                                </div>
                             </div>
                         </div>
                         
@@ -1017,6 +1111,14 @@
             loadInitialData();
         }
 
+        // Variables globales para la orden
+        let currentOrder = {
+            products: [],
+            subtotal: 0,
+            serviceCharge: 0,
+            total: 0
+        };
+
         // Manejar tabs de login
         document.querySelectorAll('.login-tab').forEach(tab => {
             tab.addEventListener('click', function() {
@@ -1288,6 +1390,25 @@
         function updateProductTables() {
             updateRefrigeradorTable();
             updateCafeteriaTable();
+            updateProductSelects();
+        }
+
+        function updateProductSelects() {
+            // Actualizar select de productos para el nuevo formulario
+            const productSelect = document.getElementById('product-select');
+            if (productSelect) {
+                productSelect.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                data.products.filter(p => p.isActive).forEach(product => {
+                    const option = document.createElement('option');
+                    option.value = product._id;
+                    option.textContent = `${product.name} - $${product.price.toFixed(2)} (Stock: ${product.quantity})`;
+                    option.dataset.price = product.price;
+                    option.dataset.cost = product.cost;
+                    option.dataset.category = product.category;
+                    productSelect.appendChild(option);
+                });
+            }
         }
 
         // Actualizar tabla de refrigerador
@@ -1489,25 +1610,18 @@
         document.getElementById('client-form').addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const drinkId = document.getElementById('drink-select').value;
-            const selectedOption = document.querySelector(`#drink-select option[value="${drinkId}"]`);
-            
-            if (!selectedOption) {
-                showNotification('Por favor selecciona una bebida válida', 'error');
+            // Validar que haya al menos un producto
+            if (currentOrder.products.length === 0) {
+                showNotification('Agrega al menos un producto a la orden', 'error');
                 return;
             }
             
             const recordData = {
                 client: document.getElementById('client-name').value,
                 service: document.getElementById('service-type').value,
-                drink: selectedOption.textContent.split(' (')[0],
-                drinkSource: selectedOption.dataset.category,
-                drinkId: drinkId,
+                products: currentOrder.products,
                 hours: parseInt(document.getElementById('hours').value) || 1,
-                total: parseFloat(document.getElementById('total-amount').textContent.replace('$', '')),
-                payment: document.getElementById('payment-method').value,
-                cost: parseFloat(selectedOption.dataset.cost),
-                price: parseFloat(selectedOption.dataset.price)
+                payment: document.getElementById('payment-method').value
             };
             
             try {
@@ -1518,17 +1632,30 @@
                 
                 data.records.push(newRecord);
                 
-                // Actualizar cantidad del producto localmente
-                const product = data.products.find(p => p._id === drinkId);
-                if (product) {
-                    product.quantity -= 1;
-                }
+                // Actualizar cantidades de productos localmente
+                currentOrder.products.forEach(orderProduct => {
+                    const product = data.products.find(p => p._id === orderProduct.productId);
+                    if (product) {
+                        product.quantity -= orderProduct.quantity;
+                    }
+                });
                 
+                // Limpiar orden actual
+                currentOrder = {
+                    products: [],
+                    subtotal: 0,
+                    serviceCharge: 0,
+                    total: 0
+                };
+                
+                // Actualizar interfaz
+                updateSelectedProductsDisplay();
+                updateOrderSummary();
                 updateDailyRecordsDisplay();
-                updateDrinkOptions();
                 updateProductTables();
+                
+                // Resetear formulario
                 this.reset();
-                document.getElementById('total-amount').textContent = '$0.00';
                 document.getElementById('hours').disabled = true;
                 
                 showNotification('Cliente registrado exitosamente', 'success');
@@ -1566,44 +1693,131 @@
             }
         }
 
-        // Actualizar total cuando cambian los campos
+        // Manejar cambio de servicio
         document.getElementById('service-type').addEventListener('change', function() {
             const hoursInput = document.getElementById('hours');
             hoursInput.disabled = this.value !== 'coworking';
-            updateTotalAmount();
+            updateOrderSummary();
         });
 
-        document.getElementById('drink-select').addEventListener('change', updateTotalAmount);
-        document.getElementById('hours').addEventListener('input', updateTotalAmount);
+        document.getElementById('hours').addEventListener('input', updateOrderSummary);
 
-        function updateTotalAmount() {
-            const serviceType = document.getElementById('service-type').value;
-            const drinkValue = document.getElementById('drink-select').value;
-            const hours = parseInt(document.getElementById('hours').value) || 1;
-            const totalDisplay = document.getElementById('total-amount');
+        // Manejar agregar producto
+        document.getElementById('add-product-btn').addEventListener('click', function() {
+            const productSelect = document.getElementById('product-select');
+            const quantityInput = document.getElementById('product-quantity');
             
-            if (!serviceType || !drinkValue) {
-                totalDisplay.textContent = '$0.00';
+            const productId = productSelect.value;
+            const quantity = parseInt(quantityInput.value) || 1;
+            
+            if (!productId || quantity <= 0) {
+                showNotification('Selecciona un producto y cantidad válida', 'error');
                 return;
             }
             
-            const selectedOption = document.querySelector(`#drink-select option[value="${drinkValue}"]`);
-            if (!selectedOption) {
-                totalDisplay.textContent = '$0.00';
+            // Buscar el producto en los datos
+            const product = data.products.find(p => p._id === productId);
+            if (!product) {
+                showNotification('Producto no encontrado', 'error');
                 return;
             }
             
-            const drinkPrice = parseFloat(selectedOption.dataset.price);
-            let total = 0;
+            // Verificar stock
+            if (product.quantity < quantity) {
+                showNotification(`Stock insuficiente. Disponible: ${product.quantity}`, 'error');
+                return;
+            }
             
-            if (serviceType === 'cafeteria') {
-                total = drinkPrice;
+            // Verificar si el producto ya está en la orden
+            const existingProductIndex = currentOrder.products.findIndex(p => p.productId === productId);
+            
+            if (existingProductIndex >= 0) {
+                // Actualizar cantidad existente
+                currentOrder.products[existingProductIndex].quantity += quantity;
             } else {
-                const coworkingRate = 58;
-                total = coworkingRate * hours;
+                // Agregar nuevo producto
+                currentOrder.products.push({
+                    productId: product._id,
+                    name: product.name,
+                    quantity: quantity,
+                    price: product.price,
+                    cost: product.cost,
+                    category: product.category
+                });
             }
             
-            totalDisplay.textContent = `$${total.toFixed(2)}`;
+            // Resetear formulario de producto
+            productSelect.value = '';
+            quantityInput.value = 1;
+            
+            // Actualizar visualización
+            updateSelectedProductsDisplay();
+            updateOrderSummary();
+        });
+
+        // Función para actualizar la visualización de productos seleccionados
+        function updateSelectedProductsDisplay() {
+            const container = document.getElementById('selected-products');
+            
+            if (currentOrder.products.length === 0) {
+                container.innerHTML = '<p style="color: var(--text-secondary); font-style: italic;">No hay productos agregados</p>';
+                return;
+            }
+            
+            container.innerHTML = currentOrder.products.map((product, index) => `
+                <div class="product-item">
+                    <div class="product-info">
+                        <div>
+                            <div class="product-name">${product.name}</div>
+                            <div class="product-details">Cantidad: ${product.quantity} × $${product.price.toFixed(2)} = $${(product.quantity * product.price).toFixed(2)}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="product-remove" onclick="removeProduct(${index})">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        // Función global para remover producto
+        function removeProduct(index) {
+            currentOrder.products.splice(index, 1);
+            updateSelectedProductsDisplay();
+            updateOrderSummary();
+        }
+
+        // Función para actualizar el resumen de la orden
+        function updateOrderSummary() {
+            const serviceType = document.getElementById('service-type').value;
+            const hours = parseInt(document.getElementById('hours').value) || 1;
+            
+            // Calcular subtotal de productos
+            currentOrder.subtotal = currentOrder.products.reduce((sum, product) => {
+                return sum + (product.quantity * product.price);
+            }, 0);
+            
+            // Calcular cargo de servicio
+            currentOrder.serviceCharge = 0;
+            if (serviceType === 'coworking') {
+                const coworkingRate = 58;
+                currentOrder.serviceCharge = coworkingRate * hours;
+            }
+            
+            // Calcular total
+            currentOrder.total = currentOrder.subtotal + currentOrder.serviceCharge;
+            
+            // Actualizar interfaz
+            document.getElementById('products-total').textContent = `$${currentOrder.subtotal.toFixed(2)}`;
+            document.getElementById('service-total').textContent = `$${currentOrder.serviceCharge.toFixed(2)}`;
+            document.getElementById('total-amount').textContent = `$${currentOrder.total.toFixed(2)}`;
+            
+            // Mostrar/ocultar línea de servicio
+            const serviceLine = document.getElementById('service-line');
+            if (serviceType === 'coworking') {
+                serviceLine.style.display = 'flex';
+            } else {
+                serviceLine.style.display = 'none';
+            }
         }
 
         // Exportar respaldo

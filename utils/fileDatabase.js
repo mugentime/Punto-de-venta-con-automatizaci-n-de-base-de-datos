@@ -395,30 +395,77 @@ class FileDatabase {
   async createRecord(recordData) {
     const records = await this.getRecords();
     
+    // Calculate totals from products array
+    let totalCost = 0;
+    let totalPrice = 0;
+    
+    // Handle both old single-product format and new multi-product format
+    let products = [];
+    
+    if (recordData.products && Array.isArray(recordData.products)) {
+      // New multi-product format
+      products = recordData.products;
+      
+      for (const item of products) {
+        totalCost += (item.cost * item.quantity);
+        totalPrice += (item.price * item.quantity);
+      }
+    } else {
+      // Legacy single-product format - convert to multi-product
+      if (recordData.drinkProduct) {
+        const product = await this.getProductById(recordData.drinkProduct);
+        if (product) {
+          products = [{
+            productId: recordData.drinkProduct,
+            name: recordData.drink || product.name,
+            quantity: 1,
+            price: product.price,
+            cost: product.cost,
+            category: product.category
+          }];
+          totalCost = product.cost;
+          totalPrice = product.price;
+        }
+      }
+    }
+
+    // Add service cost (coworking)
+    if (recordData.service === 'coworking') {
+      const coworkingRate = 58; // $58 per hour
+      const serviceCost = coworkingRate * (recordData.hours || 1);
+      totalPrice += serviceCost;
+      // Service doesn't have a cost, so we don't add to totalCost
+    }
+
     const record = {
       _id: this.generateId(),
       client: recordData.client,
       service: recordData.service,
-      drink: recordData.drink,
-      drinkProduct: recordData.drinkProduct,
+      products: products, // Array of products
       hours: recordData.hours || 1,
-      total: recordData.total,
+      subtotal: totalPrice - (recordData.service === 'coworking' ? (58 * (recordData.hours || 1)) : 0),
+      serviceCharge: recordData.service === 'coworking' ? (58 * (recordData.hours || 1)) : 0,
+      total: totalPrice,
       payment: recordData.payment,
-      cost: recordData.cost,
-      profit: recordData.total - recordData.cost,
+      cost: totalCost,
+      profit: totalPrice - totalCost,
       date: new Date().toISOString(),
       time: new Date().toLocaleTimeString('es-MX', { hour12: false }),
       createdBy: recordData.createdBy,
       isDeleted: false,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      
+      // Legacy fields for backward compatibility
+      drink: products.length > 0 ? products[0].name : null,
+      drinkProduct: products.length > 0 ? products[0].productId : null
     };
     
     records.push(record);
     await fs.writeFile(this.recordsFile, JSON.stringify(records, null, 2));
     
-    // Update product stock
-    if (recordData.drinkProduct) {
-      await this.updateProductStock(recordData.drinkProduct, 1, 'subtract');
+    // Update product stock for all products
+    for (const item of products) {
+      await this.updateProductStock(item.productId, item.quantity, 'subtract');
     }
     
     return record;
@@ -439,8 +486,14 @@ class FileDatabase {
     
     await fs.writeFile(this.recordsFile, JSON.stringify(records, null, 2));
     
-    // Return stock to product
-    if (records[index].drinkProduct) {
+    // Return stock for all products
+    if (records[index].products && Array.isArray(records[index].products)) {
+      // New multi-product format
+      for (const item of records[index].products) {
+        await this.updateProductStock(item.productId, item.quantity, 'add');
+      }
+    } else if (records[index].drinkProduct) {
+      // Legacy single-product format
       await this.updateProductStock(records[index].drinkProduct, 1, 'add');
     }
     

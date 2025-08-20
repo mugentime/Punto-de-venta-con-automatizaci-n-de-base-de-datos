@@ -100,22 +100,31 @@ router.get('/:id', auth, async (req, res) => {
   }
 });
 
-// Create new record
+// Create new record with multiple products
 router.post('/', auth, canRegisterClients, async (req, res) => {
   try {
     const { 
       client, 
       service, 
-      drinkId, 
+      products, // New: array of products
       hours = 1, 
       payment, 
-      notes 
+      notes,
+      // Legacy support for single product
+      drinkId
     } = req.body;
 
     // Validation
-    if (!client || !service || !drinkId || !payment) {
+    if (!client || !service || !payment) {
       return res.status(400).json({
-        error: 'Client, service, drink, and payment method are required'
+        error: 'Client, service, and payment method are required'
+      });
+    }
+
+    // Validate products array or legacy drinkId
+    if (!products && !drinkId) {
+      return res.status(400).json({
+        error: 'At least one product is required'
       });
     }
 
@@ -131,43 +140,74 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       });
     }
 
-    // Get the product (drink)
-    const product = await fileDatabase.getProductById(drinkId);
+    let productsArray = [];
 
-    if (!product || !product.isActive) {
-      return res.status(404).json({
-        error: 'Product not found or inactive'
-      });
-    }
+    // Handle new multi-product format
+    if (products && Array.isArray(products)) {
+      // Validate and prepare products
+      for (const item of products) {
+        if (!item.productId || !item.quantity || item.quantity <= 0) {
+          return res.status(400).json({
+            error: 'Each product must have a valid productId and quantity > 0'
+          });
+        }
 
-    // Check stock
-    if (product.quantity <= 0) {
-      return res.status(400).json({
-        error: 'Product is out of stock'
-      });
-    }
+        const product = await fileDatabase.getProductById(item.productId);
+        if (!product || !product.isActive) {
+          return res.status(404).json({
+            error: `Product ${item.productId} not found or inactive`
+          });
+        }
 
-    // Calculate total based on service type
-    let total = 0;
-    if (service.toLowerCase() === 'cafeteria') {
-      // For cafeteria service, charge the drink price
-      total = product.price;
-    } else {
-      // For coworking service, charge hourly rate (drink is included)
-      const coworkingRate = 58; // $58 per hour
-      total = coworkingRate * parseInt(hours);
+        // Check stock
+        if (product.quantity < item.quantity) {
+          return res.status(400).json({
+            error: `Insufficient stock for ${product.name}. Available: ${product.quantity}, Requested: ${item.quantity}`
+          });
+        }
+
+        productsArray.push({
+          productId: product._id,
+          name: product.name,
+          quantity: parseInt(item.quantity),
+          price: product.price,
+          cost: product.cost,
+          category: product.category
+        });
+      }
+    } else if (drinkId) {
+      // Legacy single-product format
+      const product = await fileDatabase.getProductById(drinkId);
+
+      if (!product || !product.isActive) {
+        return res.status(404).json({
+          error: 'Product not found or inactive'
+        });
+      }
+
+      if (product.quantity <= 0) {
+        return res.status(400).json({
+          error: 'Product is out of stock'
+        });
+      }
+
+      productsArray = [{
+        productId: product._id,
+        name: product.name,
+        quantity: 1,
+        price: product.price,
+        cost: product.cost,
+        category: product.category
+      }];
     }
 
     // Create record
     const record = await fileDatabase.createRecord({
       client: client.trim(),
       service: service.toLowerCase(),
-      drink: product.name,
-      drinkProduct: product._id,
+      products: productsArray,
       hours: parseInt(hours),
-      total: Number(total),
       payment: payment.toLowerCase(),
-      cost: product.cost,
       notes: notes?.trim(),
       createdBy: req.user.userId
     });
