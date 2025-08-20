@@ -57,21 +57,38 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// MongoDB connection state
+let isMongoConnected = false;
+
 // Connect to MongoDB
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/conejo-negro-pos')
   .then(() => {
     console.log('✅ Connected to MongoDB');
+    isMongoConnected = true;
   })
   .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
-    process.exit(1);
+    console.error('❌ MongoDB connection error:', error.message);
+    console.log('⚠️ Running without database - some features will be limited');
+    isMongoConnected = false;
   });
 
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/products', productRoutes);
-app.use('/api/records', recordRoutes);
-app.use('/api/backup', backupRoutes);
+// Middleware to check database connection
+const requireDatabase = (req, res, next) => {
+  if (!isMongoConnected) {
+    return res.status(503).json({
+      error: 'Database service unavailable',
+      message: 'The database is not connected. Please configure MONGODB_URI in environment variables.',
+      help: 'For Railway deployment, add MONGODB_URI in the Railway dashboard under Variables.'
+    });
+  }
+  next();
+};
+
+// Routes (with database requirement)
+app.use('/api/auth', requireDatabase, authRoutes);
+app.use('/api/products', requireDatabase, productRoutes);
+app.use('/api/records', requireDatabase, recordRoutes);
+app.use('/api/backup', backupRoutes); // Backup can work without DB for file operations
 
 // Export/download endpoint
 app.get('/api/exports/:filename', async (req, res) => {
@@ -117,7 +134,9 @@ app.get('/api/health', async (req, res) => {
       },
       database: {
         configured: !!process.env.MONGODB_URI,
-        status: process.env.MONGODB_URI ? 'configured' : 'not configured'
+        connected: isMongoConnected,
+        status: isMongoConnected ? 'connected' : (process.env.MONGODB_URI ? 'connection failed' : 'not configured'),
+        help: !isMongoConnected ? 'Add MONGODB_URI in Railway environment variables' : null
       }
     });
   } catch (error) {
@@ -132,7 +151,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // Database setup endpoint
-app.post('/api/setup', async (req, res) => {
+app.post('/api/setup', requireDatabase, async (req, res) => {
   try {
     const SetupService = require('./setup');
     const setupService = new SetupService();
