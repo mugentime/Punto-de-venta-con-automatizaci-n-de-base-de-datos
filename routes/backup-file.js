@@ -1,7 +1,7 @@
 const express = require('express');
 const backupService = require('../utils/backupService-file');
 const cloudStorageService = require('../utils/cloudStorage');
-const { auth } = require('./auth-file');
+const { auth } = require('../middleware/auth-file');
 
 const router = express.Router();
 

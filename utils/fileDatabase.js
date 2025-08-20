@@ -8,9 +8,13 @@ class FileDatabase {
   constructor() {
     // Use Railway storage or local
     this.isRailway = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
-    this.dataPath = this.isRailway 
-      ? (process.env.RAILWAY_VOLUME_MOUNT_PATH || '/tmp/pos-data')
-      : path.join(__dirname, '..', 'data');
+    
+    if (this.isRailway) {
+      // For Railway, try persistent volume first, fallback to app storage
+      this.dataPath = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/app/data';
+    } else {
+      this.dataPath = path.join(__dirname, '..', 'data');
+    }
     
     this.usersFile = path.join(this.dataPath, 'users.json');
     this.productsFile = path.join(this.dataPath, 'products.json');

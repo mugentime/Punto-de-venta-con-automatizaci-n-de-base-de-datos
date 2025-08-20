@@ -1,6 +1,6 @@
 const express = require('express');
 const fileDatabase = require('../utils/fileDatabase');
-const { auth } = require('./auth-file');
+const { auth } = require('../middleware/auth-file');
 
 const router = express.Router();
 

@@ -13,11 +13,10 @@
   },
   "environments": {
     "production": {
-      "build": {
-        "NODE_ENV": "production"
-      },
-      "deploy": {
-        "NODE_ENV": "production"
+      "variables": {
+        "NODE_ENV": "production",
+        "JWT_SECRET": "generate-secure-key-in-railway",
+        "RAILWAY_VOLUME_MOUNT_PATH": "/app/data"
       }
     }
   }

@@ -35,7 +35,10 @@ app.use(helmet({
 }));
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://pos-conejonegro-production.up.railway.app'] 
+    ? [
+        'https://pos-conejonegro-production.up.railway.app',
+        process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null
+      ].filter(Boolean)
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true
 }));
