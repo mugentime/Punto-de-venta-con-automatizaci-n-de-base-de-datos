@@ -1,0 +1,86 @@
+[
+  {
+    "_id": "a91a51aece2a6002c1004c63",
+    "name": "Espresso",
+    "category": "cafeteria",
+    "quantity": 50,
+    "cost": 10,
+    "price": 35,
+    "lowStockAlert": 10,
+    "description": "Café espresso tradicional",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "dfed68c7e52e1541bc05c2e1",
+    "name": "Americano",
+    "category": "cafeteria",
+    "quantity": 45,
+    "cost": 12,
+    "price": 40,
+    "lowStockAlert": 10,
+    "description": "Café americano suave",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "da3fbc9738bee30c027d82ab",
+    "name": "Capuccino",
+    "category": "cafeteria",
+    "quantity": 40,
+    "cost": 15,
+    "price": 45,
+    "lowStockAlert": 10,
+    "description": "Capuccino cremoso",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "3b2d5196c49a1c461bedab18",
+    "name": "Latte",
+    "category": "cafeteria",
+    "quantity": 35,
+    "cost": 12,
+    "price": 40,
+    "lowStockAlert": 10,
+    "description": "Latte con leche vaporizada",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "d06e8814c3427a93b899ae34",
+    "name": "Coca-Cola",
+    "category": "refrigerador",
+    "quantity": 24,
+    "cost": 15,
+    "price": 25,
+    "lowStockAlert": 6,
+    "description": "Refresco de cola 355ml",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "36cc34c43984d0254e00858c",
+    "name": "Agua Mineral",
+    "category": "refrigerador",
+    "quantity": 30,
+    "cost": 8,
+    "price": 15,
+    "lowStockAlert": 10,
+    "description": "Agua mineral 500ml",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.780Z"
+  },
+  {
+    "_id": "94254701297d33d3fc12f922",
+    "name": "Jugo de Naranja",
+    "category": "refrigerador",
+    "quantity": 15,
+    "cost": 20,
+    "price": 35,
+    "lowStockAlert": 5,
+    "description": "Jugo de naranja natural 500ml",
+    "isActive": true,
+    "createdAt": "2025-08-20T12:38:56.781Z"
+  }
+]

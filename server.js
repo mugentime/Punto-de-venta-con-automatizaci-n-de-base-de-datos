@@ -1,19 +1,19 @@
 const express = require('express');
-const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-// Import routes
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const recordRoutes = require('./routes/records');
-const backupRoutes = require('./routes/backup');
+// Import routes - using file-based system
+const authRoutes = require('./routes/auth-file');
+const productRoutes = require('./routes/products-file');
+const recordRoutes = require('./routes/records-file');
+const backupRoutes = require('./routes/backup-file');
 
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
+const fileDatabase = require('./utils/fileDatabase');
 
 // Import scheduled tasks
 require('./utils/scheduler');
@@ -57,28 +57,28 @@ app.use(express.urlencoded({ extended: true }));
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// MongoDB connection state
-let isMongoConnected = false;
+// Initialize file-based database
+let isDatabaseReady = false;
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/conejo-negro-pos')
-  .then(() => {
-    console.log('✅ Connected to MongoDB');
-    isMongoConnected = true;
-  })
-  .catch((error) => {
-    console.error('❌ MongoDB connection error:', error.message);
-    console.log('⚠️ Running without database - some features will be limited');
-    isMongoConnected = false;
-  });
+// Initialize file database on startup
+(async () => {
+  try {
+    await fileDatabase.initialize();
+    isDatabaseReady = true;
+    console.log('✅ File database ready');
+  } catch (error) {
+    console.error('❌ File database initialization error:', error.message);
+    isDatabaseReady = false;
+  }
+})();
 
-// Middleware to check database connection
+// Middleware to check database availability
 const requireDatabase = (req, res, next) => {
-  if (!isMongoConnected) {
+  if (!isDatabaseReady) {
     return res.status(503).json({
-      error: 'Database service unavailable',
-      message: 'The database is not connected. Please configure MONGODB_URI in environment variables.',
-      help: 'For Railway deployment, add MONGODB_URI in the Railway dashboard under Variables.'
+      error: 'Database service initializing',
+      message: 'The database is still initializing. Please try again in a moment.',
+      help: 'The file-based database is being set up.'
     });
   }
   next();
@@ -133,10 +133,10 @@ app.get('/api/health', async (req, res) => {
         backupsCount: storageStats.backupsCount || 0
       },
       database: {
-        configured: !!process.env.MONGODB_URI,
-        connected: isMongoConnected,
-        status: isMongoConnected ? 'connected' : (process.env.MONGODB_URI ? 'connection failed' : 'not configured'),
-        help: !isMongoConnected ? 'Add MONGODB_URI in Railway environment variables' : null
+        type: 'file-based',
+        ready: isDatabaseReady,
+        status: isDatabaseReady ? 'ready' : 'initializing',
+        path: fileDatabase.dataPath || 'unknown'
       }
     });
   } catch (error) {
@@ -224,8 +224,8 @@ process.on('SIGINT', async () => {
   console.log('\n🔄 Shutting down gracefully...');
   
   try {
-    await mongoose.connection.close();
-    console.log('📊 Database connection closed');
+    // File database doesn't need explicit connection closing
+    console.log('📊 File database operations stopped');
     process.exit(0);
   } catch (error) {
     console.error('❌ Error during shutdown:', error);
