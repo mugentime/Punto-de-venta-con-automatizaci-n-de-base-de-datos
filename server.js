@@ -156,7 +156,7 @@ app.get('/api/health', async (req, res) => {
   }
 });
 
-// Stats endpoint for dashboard
+// Stats endpoint for dashboard  
 app.get('/api/stats', requireDatabase, auth, async (req, res) => {
   try {
     // Get today's records and products
