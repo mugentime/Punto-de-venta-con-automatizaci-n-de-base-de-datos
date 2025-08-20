@@ -250,7 +250,8 @@ class BackupService {
         const existingUsers = await fileDatabase.getUsers();
         const mergedUsers = [...existingUsers];
         
-        users.forEach(user => {
+        const bcrypt = require('bcryptjs');
+        for (const user of users) {
           const existingIndex = mergedUsers.findIndex(u => u.email === user.email);
           if (existingIndex >= 0) {
             // Update existing user but keep the password
@@ -260,14 +261,13 @@ class BackupService {
             };
           } else {
             // New user needs a default password
-            const bcrypt = require('bcryptjs');
             const hashedPassword = await bcrypt.hash('tempPassword123', 12);
             mergedUsers.push({
               ...user,
               password: hashedPassword
             });
           }
-        });
+        }
         
         await fs.writeFile(fileDatabase.usersFile, JSON.stringify(mergedUsers, null, 2));
         console.log(`✅ Restored ${users.length} users`);

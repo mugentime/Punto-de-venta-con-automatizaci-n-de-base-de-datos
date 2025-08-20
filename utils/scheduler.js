@@ -1,5 +1,5 @@
 const cron = require('node-cron');
-const backupService = require('./backupService');
+const backupService = require('./backupService-file');
 const cloudStorageService = require('./cloudStorage');
 
 class BackupScheduler {
