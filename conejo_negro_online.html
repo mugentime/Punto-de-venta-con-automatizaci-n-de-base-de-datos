@@ -1320,7 +1320,6 @@
                 updateConnectionStatus('online');
                 updateProductTables();
                 updateDailyRecordsDisplay();
-                updateDrinkOptions();
                 
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
@@ -1355,7 +1354,6 @@
                 updateConnectionStatus('online');
                 updateProductTables();
                 updateDailyRecordsDisplay();
-                updateDrinkOptions();
                 
                 showNotification('Sincronización completada', 'success');
             } catch (error) {
@@ -1463,23 +1461,6 @@
             });
         }
 
-        // Actualizar opciones de bebidas
-        function updateDrinkOptions() {
-            const drinkSelect = document.getElementById('drink-select');
-            drinkSelect.innerHTML = '<option value="">Seleccionar bebida</option>';
-            
-            data.products.forEach(product => {
-                if (product.quantity > 0) {
-                    const option = document.createElement('option');
-                    option.value = product._id;
-                    option.textContent = `${product.name} (${product.category}) - $${product.price}`;
-                    option.dataset.category = product.category;
-                    option.dataset.price = product.price;
-                    option.dataset.cost = product.cost;
-                    drinkSelect.appendChild(option);
-                }
-            });
-        }
 
         // Actualizar display de registros diarios
         function updateDailyRecordsDisplay() {
@@ -1552,7 +1533,6 @@
                 
                 data.products.push(newProduct);
                 updateRefrigeradorTable();
-                updateDrinkOptions();
                 this.reset();
                 showNotification('Producto agregado al refrigerador', 'success');
             } catch (error) {
@@ -1580,7 +1560,6 @@
                 
                 data.products.push(newProduct);
                 updateCafeteriaTable();
-                updateDrinkOptions();
                 this.reset();
                 showNotification('Producto agregado a la cafetería', 'success');
             } catch (error) {
@@ -1599,7 +1578,6 @@
                 
                 data.products = data.products.filter(p => p._id !== productId);
                 updateProductTables();
-                updateDrinkOptions();
                 showNotification('Producto eliminado exitosamente', 'warning');
             } catch (error) {
                 showNotification('Error eliminando producto: ' + error.message, 'error');
@@ -1684,7 +1662,6 @@
                 
                 data.records = data.records.filter(r => r._id !== recordId);
                 updateDailyRecordsDisplay();
-                updateDrinkOptions();
                 updateProductTables();
                 
                 showNotification('Registro eliminado exitosamente', 'warning');
