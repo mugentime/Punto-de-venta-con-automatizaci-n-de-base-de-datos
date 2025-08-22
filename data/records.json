@@ -1,1 +1,165 @@
-[]
+[
+  {
+    "_id": "sample001",
+    "client": "María González",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "dfed68c7e52e1541bc05c2e1",
+        "name": "Americano",
+        "quantity": 1,
+        "price": 40,
+        "cost": 12,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 40,
+    "serviceCharge": 0,
+    "total": 45,
+    "payment": "efectivo",
+    "cost": 12,
+    "profit": 33,
+    "tip": 5,
+    "drinksCost": 0,
+    "date": "2025-08-22T10:30:00.000Z",
+    "time": "10:30:00",
+    "createdBy": "f933df463d8c3a5a45ddfcd6",
+    "isDeleted": false,
+    "createdAt": "2025-08-22T10:30:00.000Z",
+    "drink": "Americano",
+    "drinkProduct": "dfed68c7e52e1541bc05c2e1"
+  },
+  {
+    "_id": "sample002",
+    "client": "Juan Pérez",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "a91a51aece2a6002c1004c63",
+        "name": "Espresso",
+        "quantity": 2,
+        "price": 35,
+        "cost": 10,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 3,
+    "subtotal": 0,
+    "serviceCharge": 174,
+    "total": 184,
+    "payment": "tarjeta",
+    "cost": 20,
+    "profit": 164,
+    "tip": 10,
+    "drinksCost": 20,
+    "date": "2025-08-22T09:15:00.000Z",
+    "time": "09:15:00",
+    "createdBy": "f933df463d8c3a5a45ddfcd6",
+    "isDeleted": false,
+    "createdAt": "2025-08-22T09:15:00.000Z",
+    "drink": "Espresso",
+    "drinkProduct": "a91a51aece2a6002c1004c63"
+  },
+  {
+    "_id": "sample003",
+    "client": "Ana Ruiz",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "da3fbc9738bee30c027d82ab",
+        "name": "Capuccino",
+        "quantity": 1,
+        "price": 45,
+        "cost": 15,
+        "category": "cafeteria"
+      },
+      {
+        "productId": "d06e8814c3427a93b899ae34",
+        "name": "Coca-Cola",
+        "quantity": 1,
+        "price": 25,
+        "cost": 15,
+        "category": "refrigerador"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 70,
+    "serviceCharge": 0,
+    "total": 70,
+    "payment": "transferencia",
+    "cost": 30,
+    "profit": 40,
+    "tip": 0,
+    "drinksCost": 0,
+    "date": "2025-08-22T11:45:00.000Z",
+    "time": "11:45:00",
+    "createdBy": "f933df463d8c3a5a45ddfcd6",
+    "isDeleted": false,
+    "createdAt": "2025-08-22T11:45:00.000Z",
+    "drink": "Capuccino, Coca-Cola",
+    "drinkProduct": "da3fbc9738bee30c027d82ab"
+  },
+  {
+    "_id": "sample004",
+    "client": "Carlos López",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "3b2d5196c49a1c461bedab18",
+        "name": "Latte",
+        "quantity": 1,
+        "price": 40,
+        "cost": 12,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 2,
+    "subtotal": 0,
+    "serviceCharge": 116,
+    "total": 126,
+    "payment": "efectivo",
+    "cost": 12,
+    "profit": 114,
+    "tip": 10,
+    "drinksCost": 12,
+    "date": "2025-08-22T14:20:00.000Z",
+    "time": "14:20:00",
+    "createdBy": "f933df463d8c3a5a45ddfcd6",
+    "isDeleted": false,
+    "createdAt": "2025-08-22T14:20:00.000Z",
+    "drink": "Latte",
+    "drinkProduct": "3b2d5196c49a1c461bedab18"
+  },
+  {
+    "_id": "sample005",
+    "client": "Sofia Martínez",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "94254701297d33d3fc12f922",
+        "name": "Jugo de Naranja",
+        "quantity": 1,
+        "price": 35,
+        "cost": 20,
+        "category": "refrigerador"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 35,
+    "serviceCharge": 0,
+    "total": 40,
+    "payment": "tarjeta",
+    "cost": 20,
+    "profit": 20,
+    "tip": 5,
+    "drinksCost": 0,
+    "date": "2025-08-22T16:10:00.000Z",
+    "time": "16:10:00",
+    "createdBy": "f933df463d8c3a5a45ddfcd6",
+    "isDeleted": false,
+    "createdAt": "2025-08-22T16:10:00.000Z",
+    "drink": "Jugo de Naranja",
+    "drinkProduct": "94254701297d33d3fc12f922"
+  }
+]
