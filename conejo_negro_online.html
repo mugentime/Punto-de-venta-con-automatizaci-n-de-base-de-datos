@@ -1161,6 +1161,15 @@
                     currentUser = data.user;
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                    
+                    // Debug logging for user permissions
+                    console.log('=== LOGIN SUCCESS DEBUG ===');
+                    console.log('User object:', currentUser);
+                    console.log('User role:', currentUser?.role);
+                    console.log('User permissions:', currentUser?.permissions);
+                    console.log('Can delete records:', currentUser?.permissions?.canDeleteRecords);
+                    console.log('============================');
+                    
                     showNotification('Login exitoso', 'success');
                     showMainApp();
                 } else {
@@ -1647,6 +1656,14 @@
 
         // Eliminar registro
         async function deleteRecord(recordId) {
+            // Debug logging for permissions
+            console.log('=== DELETE RECORD DEBUG ===');
+            console.log('Current user:', currentUser);
+            console.log('User permissions:', currentUser?.permissions);
+            console.log('Can delete records:', currentUser?.permissions?.canDeleteRecords);
+            console.log('Record ID to delete:', recordId);
+            console.log('===============================');
+            
             // Verificar permisos
             if (!currentUser || !currentUser.permissions || !currentUser.permissions.canDeleteRecords) {
                 showNotification('No tienes permisos para eliminar registros', 'error');
@@ -1678,9 +1695,9 @@
                                 product.quantity += item.quantity;
                             }
                         });
-                    } else if (record.drinkId) {
+                    } else if (record.drinkProduct) {
                         // Formato legacy
-                        const product = data.products.find(p => (p._id || p.id) === record.drinkId);
+                        const product = data.products.find(p => (p._id || p.id) === record.drinkProduct);
                         if (product) {
                             product.quantity += 1;
                         }
