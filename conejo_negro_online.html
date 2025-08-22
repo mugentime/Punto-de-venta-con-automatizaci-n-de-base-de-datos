@@ -1638,7 +1638,9 @@
                 service: document.getElementById('service-type').value,
                 products: currentOrder.products,
                 hours: parseInt(document.getElementById('hours').value) || 1,
-                payment: document.getElementById('payment-method').value
+                payment: document.getElementById('payment-method').value,
+                // Para coworking: incluir el costo de bebidas para descuento en reportes
+                drinksCost: currentOrder.drinksCost || 0
             };
             
             try {
@@ -1850,9 +1852,20 @@
             const hours = parseInt(document.getElementById('hours').value) || 1;
             
             // Calcular subtotal de productos
-            currentOrder.subtotal = currentOrder.products.reduce((sum, product) => {
-                return sum + (product.quantity * product.price);
-            }, 0);
+            if (serviceType === 'coworking') {
+                // Para coworking: las bebidas NO se cobran al cliente
+                currentOrder.subtotal = 0;
+                // Guardar el costo de las bebidas para descontarlo en reportes
+                currentOrder.drinksCost = currentOrder.products.reduce((sum, product) => {
+                    return sum + (product.quantity * product.cost);
+                }, 0);
+            } else {
+                // Para cafetería: cobrar normalmente
+                currentOrder.subtotal = currentOrder.products.reduce((sum, product) => {
+                    return sum + (product.quantity * product.price);
+                }, 0);
+                currentOrder.drinksCost = 0;
+            }
             
             // Calcular cargo de servicio
             currentOrder.serviceCharge = 0;
@@ -1865,7 +1878,11 @@
             currentOrder.total = currentOrder.subtotal + currentOrder.serviceCharge;
             
             // Actualizar interfaz
-            document.getElementById('products-total').textContent = `$${currentOrder.subtotal.toFixed(2)}`;
+            if (serviceType === 'coworking') {
+                document.getElementById('products-total').textContent = `$0.00 (bebidas incluidas)`;
+            } else {
+                document.getElementById('products-total').textContent = `$${currentOrder.subtotal.toFixed(2)}`;
+            }
             document.getElementById('service-total').textContent = `$${currentOrder.serviceCharge.toFixed(2)}`;
             document.getElementById('total-amount').textContent = `$${currentOrder.total.toFixed(2)}`;
             

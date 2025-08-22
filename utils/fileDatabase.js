@@ -429,12 +429,24 @@ class FileDatabase {
       }
     }
 
-    // Add service cost (coworking)
+    // Manejar lógica de coworking: bebidas no se cobran pero sí se descuentan del reporte
+    let finalTotal = totalPrice;
+    let finalCost = totalCost;
+    let subtotal = totalPrice;
+    let serviceCharge = 0;
+    
     if (recordData.service === 'coworking') {
       const coworkingRate = 58; // $58 per hour
-      const serviceCost = coworkingRate * (recordData.hours || 1);
-      totalPrice += serviceCost;
-      // Service doesn't have a cost, so we don't add to totalCost
+      serviceCharge = coworkingRate * (recordData.hours || 1);
+      
+      // Para coworking: solo cobrar las horas, no las bebidas
+      subtotal = 0; // Bebidas no se cobran
+      finalTotal = serviceCharge; // Solo el costo del servicio
+      
+      // Pero sí agregar el costo de las bebidas para descontarlo del reporte
+      if (recordData.drinksCost) {
+        finalCost += recordData.drinksCost;
+      }
     }
 
     const record = {
@@ -443,12 +455,13 @@ class FileDatabase {
       service: recordData.service,
       products: products, // Array of products
       hours: recordData.hours || 1,
-      subtotal: totalPrice - (recordData.service === 'coworking' ? (58 * (recordData.hours || 1)) : 0),
-      serviceCharge: recordData.service === 'coworking' ? (58 * (recordData.hours || 1)) : 0,
-      total: totalPrice,
+      subtotal: subtotal,
+      serviceCharge: serviceCharge,
+      total: finalTotal,
       payment: recordData.payment,
-      cost: totalCost,
-      profit: totalPrice - totalCost,
+      cost: finalCost,
+      profit: finalTotal - finalCost,
+      drinksCost: recordData.drinksCost || 0, // Para tracking en coworking
       date: new Date().toISOString(),
       time: new Date().toLocaleTimeString('es-MX', { hour12: false }),
       createdBy: recordData.createdBy,
