@@ -111,6 +111,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       payment, 
       notes,
       drinksCost = 0, // Costo de bebidas para coworking
+      tip = 0, // Propina
       // Legacy support for single product
       drinkId
     } = req.body;
@@ -211,6 +212,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       payment: payment.toLowerCase(),
       notes: notes?.trim(),
       drinksCost: parseFloat(drinksCost),
+      tip: parseFloat(tip),
       createdBy: req.user.userId
     });
 

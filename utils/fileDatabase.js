@@ -448,6 +448,12 @@ class FileDatabase {
         finalCost += recordData.drinksCost;
       }
     }
+    
+    // Agregar propina al total (aplicable a ambos servicios)
+    const tip = parseFloat(recordData.tip) || 0;
+    if (tip > 0) {
+      finalTotal += tip;
+    }
 
     const record = {
       _id: this.generateId(),
@@ -462,6 +468,7 @@ class FileDatabase {
       cost: finalCost,
       profit: finalTotal - finalCost,
       drinksCost: recordData.drinksCost || 0, // Para tracking en coworking
+      tip: tip, // Propina
       date: new Date().toISOString(),
       time: new Date().toLocaleTimeString('es-MX', { hour12: false }),
       createdBy: recordData.createdBy,

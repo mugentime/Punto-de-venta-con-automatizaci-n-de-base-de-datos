@@ -801,6 +801,13 @@
                             </div>
                         </div>
                         
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="tip-amount">Propina (opcional)</label>
+                                <input type="number" id="tip-amount" class="form-control" min="0" step="0.01" value="0" placeholder="0.00">
+                            </div>
+                        </div>
+                        
                         <!-- Resumen de la orden -->
                         <div class="order-summary" style="background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; padding: 15px; margin: 15px 0;">
                             <h4 style="margin: 0 0 10px 0; color: var(--accent-cyan);">Resumen de la Orden</h4>
@@ -812,6 +819,10 @@
                                 <div class="summary-line" id="service-line" style="display: none;">
                                     <span>Servicio Coworking:</span>
                                     <span id="service-total">$0.00</span>
+                                </div>
+                                <div class="summary-line" id="tip-line" style="display: none;">
+                                    <span>Propina:</span>
+                                    <span id="tip-total">$0.00</span>
                                 </div>
                                 <div class="summary-line" style="border-top: 1px solid rgba(255,255,255,0.2); padding-top: 8px; margin-top: 8px; font-weight: bold; font-size: 1.1em;">
                                     <span>Total a Pagar:</span>
@@ -857,6 +868,7 @@
                                     <th>Servicio</th>
                                     <th>Bebida</th>
                                     <th>Total</th>
+                                    <th>Propina</th>
                                     <th>Pago</th>
                                     <th>Acciones</th>
                                 </tr>
@@ -865,6 +877,17 @@
                                 <!-- Los registros se agregarán aquí dinámicamente -->
                             </tbody>
                         </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button id="export-daily-report" class="btn btn-success">
+                            <i class="fas fa-file-export"></i>
+                            Exportar Reporte Diario
+                        </button>
+                        <button id="finish-day" class="btn btn-warning">
+                            <i class="fas fa-calendar-check"></i>
+                            Finalizar Día
+                        </button>
                     </div>
                 </div>
             </section>
@@ -1507,7 +1530,8 @@
                     <td>${record.client}</td>
                     <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
                     <td>${record.drink}</td>
-                    <td>$${record.total.toFixed(2)}</td>
+                    <td>$${(record.total - (record.tip || 0)).toFixed(2)}</td>
+                    <td>$${(record.tip || 0).toFixed(2)}</td>
                     <td>${record.payment}</td>
                     <td>
                         ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
@@ -1640,7 +1664,9 @@
                 hours: parseInt(document.getElementById('hours').value) || 1,
                 payment: document.getElementById('payment-method').value,
                 // Para coworking: incluir el costo de bebidas para descuento en reportes
-                drinksCost: currentOrder.drinksCost || 0
+                drinksCost: currentOrder.drinksCost || 0,
+                // Propina
+                tip: currentOrder.tip || 0
             };
             
             try {
@@ -1664,6 +1690,7 @@
                     products: [],
                     subtotal: 0,
                     serviceCharge: 0,
+                    tip: 0,
                     total: 0
                 };
                 
@@ -1752,6 +1779,7 @@
         });
 
         document.getElementById('hours').addEventListener('input', updateOrderSummary);
+        document.getElementById('tip-amount').addEventListener('input', updateOrderSummary);
 
         // Manejar agregar producto
         document.getElementById('add-product-btn').addEventListener('click', function() {
@@ -1874,8 +1902,12 @@
                 currentOrder.serviceCharge = coworkingRate * hours;
             }
             
-            // Calcular total
-            currentOrder.total = currentOrder.subtotal + currentOrder.serviceCharge;
+            // Calcular propina
+            const tipAmount = parseFloat(document.getElementById('tip-amount').value) || 0;
+            currentOrder.tip = tipAmount;
+            
+            // Calcular total (incluir propina)
+            currentOrder.total = currentOrder.subtotal + currentOrder.serviceCharge + currentOrder.tip;
             
             // Actualizar interfaz
             if (serviceType === 'coworking') {
@@ -1884,14 +1916,23 @@
                 document.getElementById('products-total').textContent = `$${currentOrder.subtotal.toFixed(2)}`;
             }
             document.getElementById('service-total').textContent = `$${currentOrder.serviceCharge.toFixed(2)}`;
+            document.getElementById('tip-total').textContent = `$${currentOrder.tip.toFixed(2)}`;
             document.getElementById('total-amount').textContent = `$${currentOrder.total.toFixed(2)}`;
             
-            // Mostrar/ocultar línea de servicio
+            // Mostrar/ocultar líneas según el contexto
             const serviceLine = document.getElementById('service-line');
+            const tipLine = document.getElementById('tip-line');
+            
             if (serviceType === 'coworking') {
                 serviceLine.style.display = 'flex';
             } else {
                 serviceLine.style.display = 'none';
+            }
+            
+            if (currentOrder.tip > 0) {
+                tipLine.style.display = 'flex';
+            } else {
+                tipLine.style.display = 'none';
             }
         }
 
@@ -1917,6 +1958,100 @@
                 showNotification('Respaldo exportado exitosamente', 'success');
             } catch (error) {
                 showNotification('Error exportando respaldo: ' + error.message, 'error');
+            }
+        });
+
+        // Exportar reporte diario en formato de columnas
+        document.getElementById('export-daily-report').addEventListener('click', function() {
+            try {
+                const today = new Date().toLocaleDateString('es-MX');
+                let report = '';
+                
+                // Encabezado del reporte
+                report += '='.repeat(80) + '\n';
+                report += '                    CONEJO NEGRO - REPORTE DIARIO\n';
+                report += '='.repeat(80) + '\n';
+                report += `Fecha: ${today}\n`;
+                report += `Generado: ${new Date().toLocaleString('es-MX')}\n\n`;
+                
+                // Resumen ejecutivo
+                const totalClients = data.records.length;
+                const totalIncome = data.records.reduce((sum, r) => sum + r.total, 0);
+                const totalCost = data.records.reduce((sum, r) => sum + r.cost, 0);
+                const totalTips = data.records.reduce((sum, r) => sum + (r.tip || 0), 0);
+                const totalProfit = totalIncome - totalCost;
+                
+                report += 'RESUMEN EJECUTIVO\n';
+                report += '-'.repeat(40) + '\n';
+                report += `Total de Clientes:     ${totalClients.toString().padStart(10)}\n`;
+                report += `Ingresos Totales:     $${totalIncome.toFixed(2).padStart(10)}\n`;
+                report += `Propinas Totales:     $${totalTips.toFixed(2).padStart(10)}\n`;
+                report += `Costos Totales:       $${totalCost.toFixed(2).padStart(10)}\n`;
+                report += `Ganancia Neta:        $${totalProfit.toFixed(2).padStart(10)}\n\n`;
+                
+                // Desglose por servicio
+                const cafeteriaRecords = data.records.filter(r => r.service === 'cafeteria');
+                const coworkingRecords = data.records.filter(r => r.service === 'coworking');
+                
+                report += 'DESGLOSE POR SERVICIO\n';
+                report += '-'.repeat(40) + '\n';
+                report += `Cafetería:            ${cafeteriaRecords.length.toString().padStart(10)} clientes\n`;
+                report += `Coworking:            ${coworkingRecords.length.toString().padStart(10)} clientes\n\n`;
+                
+                // Detalle de transacciones
+                report += 'DETALLE DE TRANSACCIONES\n';
+                report += '-'.repeat(80) + '\n';
+                report += 'HORA    CLIENTE               SERVICIO    BEBIDA            SUBTOTAL  PROPINA   TOTAL     PAGO\n';
+                report += '-'.repeat(80) + '\n';
+                
+                data.records.forEach(record => {
+                    const subtotal = record.total - (record.tip || 0);
+                    report += `${record.time.padEnd(8)}`;
+                    report += `${(record.client || '').padEnd(22).substring(0, 22)}`;
+                    report += `${(record.service === 'cafeteria' ? 'Cafetería' : 'Coworking').padEnd(12)}`;
+                    report += `${(record.drink || '').padEnd(18).substring(0, 18)}`;
+                    report += `$${subtotal.toFixed(2).padStart(8)} `;
+                    report += `$${(record.tip || 0).toFixed(2).padStart(7)} `;
+                    report += `$${record.total.toFixed(2).padStart(8)} `;
+                    report += `${record.payment.padEnd(12)}\n`;
+                });
+                
+                report += '-'.repeat(80) + '\n';
+                report += `TOTALES:${' '.repeat(54)}$${totalTips.toFixed(2).padStart(7)} $${totalIncome.toFixed(2).padStart(8)}\n\n`;
+                
+                // Información adicional
+                report += 'NOTAS IMPORTANTES\n';
+                report += '-'.repeat(40) + '\n';
+                report += '* Para coworking: Las bebidas están incluidas en el servicio\n';
+                report += '* Los costos incluyen el costo real de las bebidas consumidas\n';
+                report += '* Las propinas son adicionales al subtotal del servicio\n\n';
+                
+                report += '='.repeat(80) + '\n';
+                report += '                         FIN DEL REPORTE\n';
+                report += '='.repeat(80) + '\n';
+                
+                // Descargar archivo
+                const blob = new Blob([report], { type: 'text/plain; charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reporte-diario-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification('Reporte diario exportado exitosamente', 'success');
+            } catch (error) {
+                showNotification('Error exportando reporte: ' + error.message, 'error');
+            }
+        });
+
+        // Finalizar día (limpiar registros del día)
+        document.getElementById('finish-day').addEventListener('click', function() {
+            if (confirm('¿Estás seguro de que deseas finalizar el día? Esto archivará los registros actuales.')) {
+                // Esta funcionalidad se puede implementar más tarde según necesidades
+                showNotification('Función de finalizar día pendiente de implementación', 'warning');
             }
         });
 
