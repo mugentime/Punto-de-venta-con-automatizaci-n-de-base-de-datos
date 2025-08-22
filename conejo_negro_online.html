@@ -1435,12 +1435,21 @@
                     <td>$${product.price.toFixed(2)}</td>
                     <td>$${profit.toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteProduct('${product._id}')">
+                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(row);
+            });
+            
+            // Agregar event listeners para botones de eliminar productos refrigerador (CSP compliant)
+            document.querySelectorAll('#refrigerador-table .delete-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
             });
         }
 
@@ -1461,12 +1470,21 @@
                     <td>$${product.price.toFixed(2)}</td>
                     <td>$${profit.toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteProduct('${product._id}')">
+                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
                             <i class="fas fa-trash"></i>
                         </button>
                     </td>
                 `;
                 tbody.appendChild(row);
+            });
+            
+            // Agregar event listeners para botones de eliminar productos cafetería (CSP compliant)
+            document.querySelectorAll('#cafeteria-table .delete-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
             });
         }
 
@@ -1493,7 +1511,7 @@
                     <td>${record.payment}</td>
                     <td>
                         ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
-                            `<button class="btn btn-danger btn-sm action-btn" onclick="deleteRecord('${record._id || record.id}')">
+                            `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}">
                                 <i class="fas fa-trash"></i>
                             </button>` : 
                             `<span class="text-muted">Sin permisos</span>`
@@ -1506,6 +1524,15 @@
             document.getElementById('daily-clients').textContent = data.records.length;
             document.getElementById('daily-income').textContent = `$${totalIncome.toFixed(2)}`;
             document.getElementById('daily-profit').textContent = `$${(totalIncome - totalCost).toFixed(2)}`;
+            
+            // Agregar event listeners para botones de eliminar (CSP compliant)
+            document.querySelectorAll('.delete-record-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const recordId = this.getAttribute('data-record-id');
+                    deleteRecord(recordId);
+                });
+            });
         }
 
         // Navegación entre secciones
@@ -1794,11 +1821,20 @@
                             <div class="product-details">Cantidad: ${product.quantity} × $${product.price.toFixed(2)} = $${(product.quantity * product.price).toFixed(2)}</div>
                         </div>
                     </div>
-                    <button type="button" class="product-remove" onclick="removeProduct(${index})">
+                    <button type="button" class="product-remove remove-product-btn" data-product-index="${index}">
                         <i class="fas fa-times"></i>
                     </button>
                 </div>
             `).join('');
+            
+            // Agregar event listeners para botones de remover productos del carrito (CSP compliant)
+            document.querySelectorAll('.remove-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productIndex = parseInt(this.getAttribute('data-product-index'));
+                    removeProduct(productIndex);
+                });
+            });
         }
 
         // Función global para remover producto
