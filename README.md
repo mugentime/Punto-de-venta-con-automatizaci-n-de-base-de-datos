@@ -137,7 +137,6 @@ The server will start on `http://localhost:3000`
 
 - **Main POS**: `http://localhost:3000`
 - **Online Version**: `http://localhost:3000/online` (with authentication)
-- **Café Version**: `http://localhost:3000/cafe` (simplified interface)
 
 ### Default Admin Account
 

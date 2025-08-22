@@ -282,14 +282,6 @@ app.get('/online', (req, res) => {
   }
 });
 
-app.get('/cafe', (req, res) => {
-  try {
-    res.sendFile(path.join(__dirname, 'conejo_negro_cafe.html'));
-  } catch (error) {
-    console.error('Error serving cafe.html:', error);
-    res.status(500).send('Error loading cafe version');
-  }
-});
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -329,7 +321,6 @@ app.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📱 POS System: http://localhost:${PORT}`);
   console.log(`🌐 Online Version: http://localhost:${PORT}/online`);
-  console.log(`☕ Cafe Version: http://localhost:${PORT}/cafe`);
 });
 
 module.exports = app;
