@@ -1521,18 +1521,31 @@
             let totalCost = 0;
             
             data.records.forEach(record => {
-                totalIncome += record.total;
-                totalCost += record.cost;
+                // Validar y usar valores por defecto para evitar NaN
+                const total = record.total || 0;
+                const cost = record.cost || 0;
+                const tip = record.tip || 0;
+                
+                totalIncome += total;
+                totalCost += cost;
+                
+                // Obtener el nombre de la primera bebida si hay productos
+                let drinkName = '-';
+                if (record.products && record.products.length > 0) {
+                    drinkName = record.products.map(p => `${p.name} (${p.quantity})`).join(', ');
+                } else if (record.drink) {
+                    drinkName = record.drink;
+                }
                 
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td>${record.time}</td>
-                    <td>${record.client}</td>
+                    <td>${record.time || new Date(record.date || record.createdAt).toLocaleTimeString('es-MX', { hour12: false })}</td>
+                    <td>${record.client || 'Sin nombre'}</td>
                     <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
-                    <td>${record.drink}</td>
-                    <td>$${(record.total - (record.tip || 0)).toFixed(2)}</td>
-                    <td>$${(record.tip || 0).toFixed(2)}</td>
-                    <td>${record.payment}</td>
+                    <td>${drinkName}</td>
+                    <td>$${(total - tip).toFixed(2)}</td>
+                    <td>$${tip.toFixed(2)}</td>
+                    <td>${record.payment || 'efectivo'}</td>
                     <td>
                         ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
                             `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}">
@@ -1670,11 +1683,14 @@
             };
             
             try {
-                const newRecord = await apiRequest('/records', {
+                const response = await apiRequest('/records', {
                     method: 'POST',
                     body: JSON.stringify(recordData)
                 });
                 
+                // El servidor devuelve { message, record }, necesitamos solo el record
+                const newRecord = response.record || response;
+                console.log('New record created:', newRecord); // Debug
                 data.records.push(newRecord);
                 
                 // Actualizar cantidades de productos localmente
@@ -2005,15 +2021,30 @@
                 report += '-'.repeat(80) + '\n';
                 
                 data.records.forEach(record => {
-                    const subtotal = record.total - (record.tip || 0);
-                    report += `${record.time.padEnd(8)}`;
-                    report += `${(record.client || '').padEnd(22).substring(0, 22)}`;
+                    // Validar valores para evitar NaN y undefined
+                    const total = record.total || 0;
+                    const tip = record.tip || 0;
+                    const subtotal = total - tip;
+                    
+                    // Obtener hora
+                    const time = record.time || new Date(record.date || record.createdAt || Date.now()).toLocaleTimeString('es-MX', { hour12: false });
+                    
+                    // Obtener nombre de bebidas
+                    let drinkName = '-';
+                    if (record.products && record.products.length > 0) {
+                        drinkName = record.products.map(p => p.name).join(', ').substring(0, 18);
+                    } else if (record.drink) {
+                        drinkName = record.drink;
+                    }
+                    
+                    report += `${time.padEnd(8)}`;
+                    report += `${(record.client || 'Sin nombre').padEnd(22).substring(0, 22)}`;
                     report += `${(record.service === 'cafeteria' ? 'Cafetería' : 'Coworking').padEnd(12)}`;
-                    report += `${(record.drink || '').padEnd(18).substring(0, 18)}`;
+                    report += `${drinkName.padEnd(18).substring(0, 18)}`;
                     report += `$${subtotal.toFixed(2).padStart(8)} `;
-                    report += `$${(record.tip || 0).toFixed(2).padStart(7)} `;
-                    report += `$${record.total.toFixed(2).padStart(8)} `;
-                    report += `${record.payment.padEnd(12)}\n`;
+                    report += `$${tip.toFixed(2).padStart(7)} `;
+                    report += `$${total.toFixed(2).padStart(8)} `;
+                    report += `${(record.payment || 'efectivo').padEnd(12)}\n`;
                 });
                 
                 report += '-'.repeat(80) + '\n';
