@@ -1483,9 +1483,12 @@
                     <td>$${record.total.toFixed(2)}</td>
                     <td>${record.payment}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm action-btn" onclick="deleteRecord('${record._id}')">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
+                            `<button class="btn btn-danger btn-sm action-btn" onclick="deleteRecord('${record._id || record.id}')">
+                                <i class="fas fa-trash"></i>
+                            </button>` : 
+                            `<span class="text-muted">Sin permisos</span>`
+                        }
                     </td>
                 `;
                 tbody.appendChild(row);
@@ -1644,28 +1647,53 @@
 
         // Eliminar registro
         async function deleteRecord(recordId) {
+            // Verificar permisos
+            if (!currentUser || !currentUser.permissions || !currentUser.permissions.canDeleteRecords) {
+                showNotification('No tienes permisos para eliminar registros', 'error');
+                return;
+            }
+            
+            // Verificar que tenemos un ID válido
+            if (!recordId) {
+                showNotification('ID de registro inválido', 'error');
+                return;
+            }
+            
             if (!confirm('¿Estás seguro de que deseas eliminar este registro?')) {
                 return;
             }
             
             try {
+                console.log('Eliminando registro:', recordId); // Debug
                 await apiRequest(`/records/${recordId}`, { method: 'DELETE' });
                 
-                const record = data.records.find(r => r._id === recordId);
+                const record = data.records.find(r => (r._id || r.id) === recordId);
                 if (record) {
-                    // Devolver cantidad al producto
-                    const product = data.products.find(p => p._id === record.drinkId);
-                    if (product) {
-                        product.quantity += 1;
+                    // Devolver cantidad al producto - soporte para múltiples productos
+                    if (record.products && Array.isArray(record.products)) {
+                        // Nuevo formato multi-producto
+                        record.products.forEach(item => {
+                            const product = data.products.find(p => (p._id || p.id) === item.productId);
+                            if (product) {
+                                product.quantity += item.quantity;
+                            }
+                        });
+                    } else if (record.drinkId) {
+                        // Formato legacy
+                        const product = data.products.find(p => (p._id || p.id) === record.drinkId);
+                        if (product) {
+                            product.quantity += 1;
+                        }
                     }
                 }
                 
-                data.records = data.records.filter(r => r._id !== recordId);
+                data.records = data.records.filter(r => (r._id || r.id) !== recordId);
                 updateDailyRecordsDisplay();
                 updateProductTables();
                 
                 showNotification('Registro eliminado exitosamente', 'warning');
             } catch (error) {
+                console.error('Error eliminando registro:', error); // Debug
                 showNotification('Error eliminando registro: ' + error.message, 'error');
             }
         }
