@@ -1519,10 +1519,10 @@
 
         // Actualizar display de estadísticas
         function updateStatsDisplay(stats) {
-            document.getElementById('total-products').textContent = stats.totalProducts;
-            document.getElementById('today-records').textContent = stats.todayRecords;
-            document.getElementById('today-income').textContent = `$${stats.todayIncome.toFixed(2)}`;
-            document.getElementById('total-users').textContent = stats.totalUsers;
+            // Los elementos de estadísticas se movieron a la sección de reportes
+            // Ya no necesitamos actualizar elementos específicos aquí
+            // Los reportes se actualizan automáticamente con initializeReports()
+            console.log('Stats loaded:', stats);
         }
 
         // Actualizar tablas de productos
