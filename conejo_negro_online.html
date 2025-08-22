@@ -637,6 +637,26 @@
                 margin: 5px 0;
             }
         }
+
+        /* Estilos para reportes */
+        .text-success {
+            color: #28a745 !important;
+            font-weight: bold;
+        }
+
+        .text-danger {
+            color: #dc3545 !important;
+            font-weight: bold;
+        }
+
+        #report-table {
+            font-size: 0.9em;
+        }
+
+        #report-table th {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-cyan);
+        }
     </style>
 </head>
 <body>
@@ -1474,6 +1494,7 @@
                 updateConnectionStatus('online');
                 updateProductTables();
                 updateDailyRecordsDisplay();
+                initializeReports();
                 
                 showNotification('Sincronización completada', 'success');
             } catch (error) {
@@ -1803,6 +1824,7 @@
                 updateOrderSummary();
                 updateDailyRecordsDisplay();
                 updateProductTables();
+                initializeReports();
                 
                 // Resetear formulario
                 this.reset();
@@ -2173,6 +2195,307 @@
                 showNotification('Función de finalizar día pendiente de implementación', 'warning');
             }
         });
+
+        // ===========================================
+        // FUNCIONALIDAD DE REPORTES
+        // ===========================================
+
+        let reportData = {
+            records: [],
+            period: 'today',
+            startDate: null,
+            endDate: null
+        };
+
+        // Manejar cambio de período
+        document.getElementById('report-period').addEventListener('change', function() {
+            const period = this.value;
+            const customRange = document.getElementById('custom-date-range');
+            
+            if (period === 'custom') {
+                customRange.style.display = 'block';
+                // Establecer fechas por defecto
+                const today = new Date();
+                const weekAgo = new Date(today);
+                weekAgo.setDate(today.getDate() - 7);
+                
+                document.getElementById('start-date').value = weekAgo.toISOString().split('T')[0];
+                document.getElementById('end-date').value = today.toISOString().split('T')[0];
+            } else {
+                customRange.style.display = 'none';
+                updateReportData(period);
+            }
+        });
+
+        // Aplicar filtro de fecha personalizada
+        document.getElementById('apply-date-filter').addEventListener('click', function() {
+            const startDate = document.getElementById('start-date').value;
+            const endDate = document.getElementById('end-date').value;
+            
+            if (!startDate || !endDate) {
+                showNotification('Por favor selecciona ambas fechas', 'error');
+                return;
+            }
+            
+            if (new Date(startDate) > new Date(endDate)) {
+                showNotification('La fecha de inicio debe ser anterior a la fecha final', 'error');
+                return;
+            }
+            
+            updateReportData('custom', startDate, endDate);
+        });
+
+        // Función para obtener registros por período
+        function getRecordsByPeriod(period, startDate = null, endDate = null) {
+            const now = new Date();
+            let filterStart, filterEnd;
+            
+            switch(period) {
+                case 'today':
+                    filterStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    filterEnd = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+                    break;
+                    
+                case 'week':
+                    const startOfWeek = new Date(now);
+                    startOfWeek.setDate(now.getDate() - now.getDay()); // Domingo
+                    filterStart = new Date(startOfWeek.getFullYear(), startOfWeek.getMonth(), startOfWeek.getDate());
+                    filterEnd = new Date(startOfWeek.getTime() + 7 * 24 * 60 * 60 * 1000);
+                    break;
+                    
+                case 'month':
+                    filterStart = new Date(now.getFullYear(), now.getMonth(), 1);
+                    filterEnd = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+                    break;
+                    
+                case 'custom':
+                    if (startDate && endDate) {
+                        filterStart = new Date(startDate);
+                        filterEnd = new Date(endDate);
+                        filterEnd.setDate(filterEnd.getDate() + 1); // Incluir el día final
+                    } else {
+                        return [];
+                    }
+                    break;
+                    
+                default:
+                    return [];
+            }
+            
+            return data.records.filter(record => {
+                const recordDate = new Date(record.date || record.createdAt);
+                return recordDate >= filterStart && recordDate < filterEnd;
+            });
+        }
+
+        // Actualizar datos del reporte
+        function updateReportData(period, startDate = null, endDate = null) {
+            reportData.period = period;
+            reportData.startDate = startDate;
+            reportData.endDate = endDate;
+            reportData.records = getRecordsByPeriod(period, startDate, endDate);
+            
+            updateReportDisplay();
+        }
+
+        // Actualizar visualización del reporte
+        function updateReportDisplay() {
+            const records = reportData.records;
+            
+            // Calcular métricas
+            const totalClients = records.length;
+            const totalIncome = records.reduce((sum, r) => sum + (r.total || 0), 0);
+            const totalCosts = records.reduce((sum, r) => sum + (r.cost || 0), 0);
+            const totalTips = records.reduce((sum, r) => sum + (r.tip || 0), 0);
+            const totalProfit = totalIncome - totalCosts;
+            const averageTicket = totalClients > 0 ? totalIncome / totalClients : 0;
+            
+            // Actualizar métricas generales
+            document.getElementById('report-clients').textContent = totalClients;
+            document.getElementById('report-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('report-costs').textContent = `$${totalCosts.toFixed(2)}`;
+            document.getElementById('report-profit').textContent = `$${totalProfit.toFixed(2)}`;
+            document.getElementById('report-tips').textContent = `$${totalTips.toFixed(2)}`;
+            document.getElementById('report-average').textContent = `$${averageTicket.toFixed(2)}`;
+            
+            // Desglose por servicio
+            const cafeteriaRecords = records.filter(r => r.service === 'cafeteria');
+            const coworkingRecords = records.filter(r => r.service === 'coworking');
+            
+            const cafeteriaIncome = cafeteriaRecords.reduce((sum, r) => sum + (r.total || 0), 0);
+            const coworkingIncome = coworkingRecords.reduce((sum, r) => sum + (r.total || 0), 0);
+            
+            document.getElementById('cafeteria-clients').textContent = cafeteriaRecords.length;
+            document.getElementById('cafeteria-income').textContent = `$${cafeteriaIncome.toFixed(2)}`;
+            document.getElementById('coworking-clients').textContent = coworkingRecords.length;
+            document.getElementById('coworking-income').textContent = `$${coworkingIncome.toFixed(2)}`;
+            
+            // Actualizar tabla detallada
+            updateReportTable();
+        }
+
+        // Actualizar tabla del reporte
+        function updateReportTable() {
+            const tbody = document.querySelector('#report-table tbody');
+            tbody.innerHTML = '';
+            
+            reportData.records.forEach(record => {
+                const total = record.total || 0;
+                const tip = record.tip || 0;
+                const cost = record.cost || 0;
+                const subtotal = total - tip;
+                const profit = total - cost;
+                
+                // Obtener fecha
+                const date = new Date(record.date || record.createdAt);
+                const dateStr = date.toLocaleDateString('es-MX');
+                const timeStr = record.time || date.toLocaleTimeString('es-MX', { hour12: false });
+                
+                // Obtener productos
+                let productsStr = '-';
+                if (record.products && record.products.length > 0) {
+                    productsStr = record.products.map(p => `${p.name} (${p.quantity})`).join(', ');
+                } else if (record.drink) {
+                    productsStr = record.drink;
+                }
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${dateStr}</td>
+                    <td>${timeStr}</td>
+                    <td>${record.client || 'Sin nombre'}</td>
+                    <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
+                    <td>${productsStr}</td>
+                    <td>$${subtotal.toFixed(2)}</td>
+                    <td>$${tip.toFixed(2)}</td>
+                    <td>$${total.toFixed(2)}</td>
+                    <td>$${cost.toFixed(2)}</td>
+                    <td class="${profit >= 0 ? 'text-success' : 'text-danger'}">$${profit.toFixed(2)}</td>
+                `;
+                tbody.appendChild(row);
+            });
+        }
+
+        // Exportar reporte del período
+        document.getElementById('export-report-period').addEventListener('click', function() {
+            try {
+                const period = reportData.period;
+                let periodName = '';
+                let dateRange = '';
+                
+                switch(period) {
+                    case 'today':
+                        periodName = 'DIARIO';
+                        dateRange = new Date().toLocaleDateString('es-MX');
+                        break;
+                    case 'week':
+                        periodName = 'SEMANAL';
+                        const now = new Date();
+                        const startOfWeek = new Date(now);
+                        startOfWeek.setDate(now.getDate() - now.getDay());
+                        const endOfWeek = new Date(startOfWeek.getTime() + 6 * 24 * 60 * 60 * 1000);
+                        dateRange = `${startOfWeek.toLocaleDateString('es-MX')} - ${endOfWeek.toLocaleDateString('es-MX')}`;
+                        break;
+                    case 'month':
+                        periodName = 'MENSUAL';
+                        const currentMonth = new Date();
+                        dateRange = currentMonth.toLocaleDateString('es-MX', { month: 'long', year: 'numeric' });
+                        break;
+                    case 'custom':
+                        periodName = 'PERSONALIZADO';
+                        dateRange = `${reportData.startDate} - ${reportData.endDate}`;
+                        break;
+                }
+                
+                let report = '';
+                report += '='.repeat(80) + '\n';
+                report += `                    CONEJO NEGRO - REPORTE ${periodName}\n`;
+                report += '='.repeat(80) + '\n';
+                report += `Período: ${dateRange}\n`;
+                report += `Generado: ${new Date().toLocaleString('es-MX')}\n\n`;
+                
+                // Métricas del período
+                const totalClients = reportData.records.length;
+                const totalIncome = reportData.records.reduce((sum, r) => sum + (r.total || 0), 0);
+                const totalCosts = reportData.records.reduce((sum, r) => sum + (r.cost || 0), 0);
+                const totalTips = reportData.records.reduce((sum, r) => sum + (r.tip || 0), 0);
+                const totalProfit = totalIncome - totalCosts;
+                
+                report += `RESUMEN DEL PERÍODO\n`;
+                report += '-'.repeat(40) + '\n';
+                report += `Total de Clientes:     ${totalClients.toString().padStart(10)}\n`;
+                report += `Ingresos Totales:     $${totalIncome.toFixed(2).padStart(10)}\n`;
+                report += `Propinas Totales:     $${totalTips.toFixed(2).padStart(10)}\n`;
+                report += `Costos Totales:       $${totalCosts.toFixed(2).padStart(10)}\n`;
+                report += `Ganancia Neta:        $${totalProfit.toFixed(2).padStart(10)}\n`;
+                report += `Ticket Promedio:      $${(totalClients > 0 ? totalIncome / totalClients : 0).toFixed(2).padStart(10)}\n\n`;
+                
+                // Desglose por servicio
+                const cafeteriaRecords = reportData.records.filter(r => r.service === 'cafeteria');
+                const coworkingRecords = reportData.records.filter(r => r.service === 'coworking');
+                const cafeteriaIncome = cafeteriaRecords.reduce((sum, r) => sum + (r.total || 0), 0);
+                const coworkingIncome = coworkingRecords.reduce((sum, r) => sum + (r.total || 0), 0);
+                
+                report += 'DESGLOSE POR SERVICIO\n';
+                report += '-'.repeat(40) + '\n';
+                report += `Cafetería:            ${cafeteriaRecords.length.toString().padStart(4)} clientes - $${cafeteriaIncome.toFixed(2).padStart(8)}\n`;
+                report += `Coworking:            ${coworkingRecords.length.toString().padStart(4)} clientes - $${coworkingIncome.toFixed(2).padStart(8)}\n\n`;
+                
+                // Detalle de transacciones (limitado a 50 para evitar archivos muy grandes)
+                const recordsToShow = reportData.records.slice(0, 50);
+                report += 'DETALLE DE TRANSACCIONES (Últimas 50)\n';
+                report += '-'.repeat(80) + '\n';
+                report += 'FECHA      HORA    CLIENTE               SERVICIO    SUBTOTAL  PROPINA   TOTAL     GANANCIA\n';
+                report += '-'.repeat(80) + '\n';
+                
+                recordsToShow.forEach(record => {
+                    const date = new Date(record.date || record.createdAt);
+                    const dateStr = date.toLocaleDateString('es-MX').padEnd(11);
+                    const timeStr = (record.time || date.toLocaleTimeString('es-MX', { hour12: false })).padEnd(8);
+                    const total = record.total || 0;
+                    const tip = record.tip || 0;
+                    const cost = record.cost || 0;
+                    const subtotal = total - tip;
+                    const profit = total - cost;
+                    
+                    report += dateStr;
+                    report += timeStr;
+                    report += `${(record.client || 'Sin nombre').padEnd(22).substring(0, 22)}`;
+                    report += `${(record.service === 'cafeteria' ? 'Cafetería' : 'Coworking').padEnd(12)}`;
+                    report += `$${subtotal.toFixed(2).padStart(8)} `;
+                    report += `$${tip.toFixed(2).padStart(7)} `;
+                    report += `$${total.toFixed(2).padStart(8)} `;
+                    report += `$${profit.toFixed(2).padStart(9)}\n`;
+                });
+                
+                report += '-'.repeat(80) + '\n';
+                report += `TOTALES:${' '.repeat(55)}$${totalTips.toFixed(2).padStart(7)} $${totalIncome.toFixed(2).padStart(8)} $${totalProfit.toFixed(2).padStart(9)}\n\n`;
+                
+                report += '='.repeat(80) + '\n';
+                report += '                         FIN DEL REPORTE\n';
+                report += '='.repeat(80) + '\n';
+                
+                // Descargar archivo
+                const blob = new Blob([report], { type: 'text/plain; charset=utf-8' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `reporte-${period}-${new Date().toISOString().split('T')[0]}.txt`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                
+                showNotification(`Reporte ${periodName.toLowerCase()} exportado exitosamente`, 'success');
+            } catch (error) {
+                showNotification('Error exportando reporte: ' + error.message, 'error');
+            }
+        });
+
+        // Inicializar reportes cuando se carguen los datos
+        function initializeReports() {
+            updateReportData('today');
+        }
 
         // Inicializar aplicación
         document.addEventListener('DOMContentLoaded', function() {
