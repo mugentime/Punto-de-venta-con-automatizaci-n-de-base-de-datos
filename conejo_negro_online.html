@@ -1025,34 +1025,122 @@
                 <div class="card">
                     <h2 class="card-title">
                         <i class="fas fa-chart-line"></i>
-                        Reportes y Análisis Online
+                        Reportes y Análisis
                     </h2>
                     
-                    <div class="stats-card">
-                        <div class="stat-item">
-                            <div class="stat-value" id="total-products">0</div>
-                            <div class="stat-label">Total Productos</div>
+                    <!-- Selector de período -->
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="report-period">Período de Reporte</label>
+                            <select id="report-period" class="form-control">
+                                <option value="today">Hoy</option>
+                                <option value="week">Esta Semana</option>
+                                <option value="month">Este Mes</option>
+                                <option value="custom">Rango Personalizado</option>
+                            </select>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="today-records">0</div>
-                            <div class="stat-label">Ventas Hoy</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="today-income">$0.00</div>
-                            <div class="stat-label">Ingresos Hoy</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="total-users">0</div>
-                            <div class="stat-label">Usuarios Online</div>
+                        <div class="form-group" id="custom-date-range" style="display: none;">
+                            <label>Rango de Fechas</label>
+                            <div style="display: flex; gap: 10px; align-items: center;">
+                                <input type="date" id="start-date" class="form-control">
+                                <span>hasta</span>
+                                <input type="date" id="end-date" class="form-control">
+                                <button id="apply-date-filter" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-search"></i>
+                                    Aplicar
+                                </button>
+                            </div>
                         </div>
                     </div>
                     
+                    <!-- Resumen de métricas -->
+                    <div class="stats-card">
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-clients">0</div>
+                            <div class="stat-label">Clientes</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-income">$0.00</div>
+                            <div class="stat-label">Ingresos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-costs">$0.00</div>
+                            <div class="stat-label">Costos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-profit">$0.00</div>
+                            <div class="stat-label">Ganancias</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-tips">$0.00</div>
+                            <div class="stat-label">Propinas</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="report-average">$0.00</div>
+                            <div class="stat-label">Ticket Promedio</div>
+                        </div>
+                    </div>
+                    
+                    <!-- Desglose por servicio -->
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">Desglose por Servicio</h3>
+                        <div class="stats-card">
+                            <div class="stat-item">
+                                <div class="stat-value" id="cafeteria-clients">0</div>
+                                <div class="stat-label">Cafetería - Clientes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="cafeteria-income">$0.00</div>
+                                <div class="stat-label">Cafetería - Ingresos</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="coworking-clients">0</div>
+                                <div class="stat-label">Coworking - Clientes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="coworking-income">$0.00</div>
+                                <div class="stat-label">Coworking - Ingresos</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Tabla detallada -->
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">Detalle de Registros</h3>
+                        <div class="table-container">
+                            <table id="report-table">
+                                <thead>
+                                    <tr>
+                                        <th>Fecha</th>
+                                        <th>Hora</th>
+                                        <th>Cliente</th>
+                                        <th>Servicio</th>
+                                        <th>Productos</th>
+                                        <th>Subtotal</th>
+                                        <th>Propina</th>
+                                        <th>Total</th>
+                                        <th>Costo</th>
+                                        <th>Ganancia</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <!-- Los datos se llenarán dinámicamente -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <!-- Botones de acción -->
                     <div style="margin-top: 20px; display: flex; gap: 15px;">
+                        <button id="export-report-period" class="btn btn-success">
+                            <i class="fas fa-file-export"></i>
+                            Exportar Reporte del Período
+                        </button>
                         <button id="sync-data" class="btn btn-primary">
                             <i class="fas fa-sync"></i>
                             Sincronizar Datos
                         </button>
-                        <button id="export-backup" class="btn btn-success">
+                        <button id="export-backup" class="btn btn-warning">
                             <i class="fas fa-download"></i>
                             Exportar Respaldo
                         </button>
