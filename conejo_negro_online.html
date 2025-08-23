@@ -388,6 +388,17 @@
             box-shadow: 0 8px 25px rgba(255, 170, 0, 0.5);
         }
 
+        .btn-info {
+            background: #17a2b8;
+            color: white;
+            box-shadow: 0 4px 15px rgba(23, 162, 184, 0.3);
+        }
+
+        .btn-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(23, 162, 184, 0.5);
+        }
+
         .btn-sm {
             padding: 8px 15px;
             font-size: 14px;
@@ -1163,6 +1174,10 @@
                         <button id="export-backup" class="btn btn-warning">
                             <i class="fas fa-download"></i>
                             Exportar Respaldo
+                        </button>
+                        <button id="import-backup" class="btn btn-info">
+                            <i class="fas fa-upload"></i>
+                            Importar Respaldo
                         </button>
                     </div>
                 </div>
@@ -2491,6 +2506,89 @@
             } catch (error) {
                 showNotification('Error exportando reporte: ' + error.message, 'error');
             }
+        });
+
+        // Importar respaldo
+        document.getElementById('import-backup').addEventListener('click', function() {
+            // Crear input file temporal
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.style.display = 'none';
+            
+            input.addEventListener('change', async function(e) {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                try {
+                    const text = await file.text();
+                    const backupData = JSON.parse(text);
+                    
+                    if (!backupData.data || !backupData.timestamp) {
+                        throw new Error('Archivo de respaldo inválido');
+                    }
+                    
+                    const confirmation = confirm(
+                        `¿Estás seguro de que deseas importar el respaldo del ${new Date(backupData.timestamp).toLocaleString('es-MX')}?\n\n` +
+                        `Esto reemplazará todos los datos actuales:\n` +
+                        `- Productos: ${backupData.data.products?.length || 0}\n` +
+                        `- Registros: ${backupData.data.records?.length || 0}\n` +
+                        `\n⚠️ Esta acción no se puede deshacer.`
+                    );
+                    
+                    if (!confirmation) return;
+                    
+                    // Importar productos
+                    if (backupData.data.products) {
+                        for (const product of backupData.data.products) {
+                            try {
+                                await apiRequest('/products', {
+                                    method: 'POST',
+                                    body: JSON.stringify(product)
+                                });
+                            } catch (error) {
+                                console.log('Producto ya existe o error:', error.message);
+                            }
+                        }
+                    }
+                    
+                    // Importar registros
+                    if (backupData.data.records) {
+                        for (const record of backupData.data.records) {
+                            try {
+                                await apiRequest('/records', {
+                                    method: 'POST',
+                                    body: JSON.stringify(record)
+                                });
+                            } catch (error) {
+                                console.log('Registro ya existe o error:', error.message);
+                            }
+                        }
+                    }
+                    
+                    // Recargar datos
+                    const syncData = await apiRequest('/sync');
+                    data.products = syncData.products;
+                    data.records = syncData.records;
+                    data.reports = syncData.reports;
+                    
+                    // Actualizar interfaz
+                    updateProductTables();
+                    updateDailyRecordsDisplay();
+                    initializeReports();
+                    
+                    showNotification(`Respaldo importado exitosamente: ${backupData.data.products?.length || 0} productos, ${backupData.data.records?.length || 0} registros`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error importando respaldo:', error);
+                    showNotification('Error importando respaldo: ' + error.message, 'error');
+                } finally {
+                    document.body.removeChild(input);
+                }
+            });
+            
+            document.body.appendChild(input);
+            input.click();
         });
 
         // Inicializar reportes cuando se carguen los datos
