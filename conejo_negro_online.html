@@ -1308,15 +1308,6 @@
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
                     
-                    // Debug logging for user permissions
-                    console.log('=== LOGIN SUCCESS DEBUG ===');
-                    console.log('User object:', currentUser);
-                    console.log('User role:', currentUser?.role);
-                    console.log('User permissions:', currentUser?.permissions);
-                    console.log('Can delete records:', currentUser?.permissions?.canDeleteRecords);
-                    console.log('Auth token set:', authToken ? 'YES' : 'NO');
-                    console.log('Auth token preview:', authToken ? authToken.substring(0, 30) + '...' : 'NULL');
-                    console.log('============================');
                     
                     showNotification('Login exitoso', 'success');
                     showMainApp();
@@ -1415,9 +1406,6 @@
         // Realizar petición autenticada a la API
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE_URL}${endpoint}`;
-            console.log('DEBUG FRONTEND - Making API request to:', endpoint);
-            console.log('DEBUG FRONTEND - Auth token exists:', authToken ? 'YES' : 'NO');
-            console.log('DEBUG FRONTEND - Auth token preview:', authToken ? authToken.substring(0, 30) + '...' : 'NULL');
             
             const headers = {
                 'Content-Type': 'application/json',
@@ -1460,9 +1448,6 @@
             try {
                 updateConnectionStatus('syncing');
                 
-                console.log('DEBUG LOAD - Starting loadInitialData');
-                console.log('DEBUG LOAD - Current authToken:', authToken ? 'EXISTS' : 'NULL');
-                console.log('DEBUG LOAD - localStorage authToken:', localStorage.getItem('authToken') ? 'EXISTS' : 'NULL');
                 
                 // Cargar productos
                 const products = await apiRequest('/products');

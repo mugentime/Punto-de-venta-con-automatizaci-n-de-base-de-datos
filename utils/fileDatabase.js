@@ -442,21 +442,14 @@ class FileDatabase {
       // Para coworking: separar bebidas de refrigerador de cafetería
       subtotal = 0;
       
-      console.log('DEBUG - Coworking products:', JSON.stringify(products, null, 2));
-      
       // Para coworking: solo cobrar productos de refrigerador
       for (const item of products) {
-        console.log(`DEBUG - Product: ${item.name}, Category: ${item.category}, Price: ${item.price}`);
         if (item.category === 'refrigerador') {
           subtotal += (item.price * item.quantity);
-          console.log(`DEBUG - Added refrigerador item: ${item.name}, subtotal now: ${subtotal}`);
-        } else {
-          console.log(`DEBUG - Skipped cafeteria item: ${item.name}`);
         }
       }
       
       finalTotal = subtotal + serviceCharge; // Refrigerador items + service charge
-      console.log(`DEBUG - Final calculation: subtotal=${subtotal} + serviceCharge=${serviceCharge} = finalTotal=${finalTotal}`);
     }
     
     // Agregar propina al total (aplicable a ambos servicios)
@@ -601,30 +594,21 @@ class FileDatabase {
   }
 
   generateToken(user) {
-    const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
-    console.log('DEBUG TOKEN GENERATION - JWT_SECRET exists:', process.env.JWT_SECRET ? 'YES' : 'NO (using default)');
-    console.log('DEBUG TOKEN GENERATION - Secret preview:', secret.substring(0, 10) + '...');
-    
     return jwt.sign(
       {
         userId: user._id,
         email: user.email,
         role: user.role
       },
-      secret,
+      process.env.JWT_SECRET || 'default-secret-key-change-in-production',
       { expiresIn: '7d' }
     );
   }
 
   verifyToken(token) {
     try {
-      const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
-      console.log('DEBUG TOKEN VERIFICATION - JWT_SECRET exists:', process.env.JWT_SECRET ? 'YES' : 'NO (using default)');
-      console.log('DEBUG TOKEN VERIFICATION - Secret preview:', secret.substring(0, 10) + '...');
-      
-      return jwt.verify(token, secret);
+      return jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key-change-in-production');
     } catch (error) {
-      console.log('DEBUG TOKEN VERIFICATION - Error:', error.message);
       return null;
     }
   }

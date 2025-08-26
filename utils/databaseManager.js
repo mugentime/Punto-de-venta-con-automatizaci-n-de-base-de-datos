@@ -153,20 +153,14 @@ class DatabaseManager {
             let totalCost = 0;
             let totalPrice = 0;
             
-            console.log('DEBUG POSTGRESQL - Processing products for coworking:', JSON.stringify(products, null, 2));
-            
             for (const item of products) {
                 totalCost += (item.cost * item.quantity);
                 
                 // Apply coworking logic for pricing
                 if (recordData.service === 'coworking') {
-                    console.log(`DEBUG POSTGRESQL - Product: ${item.name}, Category: ${item.category}, Price: ${item.price}`);
                     // Only charge refrigerator items in coworking
                     if (item.category === 'refrigerador') {
                         totalPrice += (item.price * item.quantity);
-                        console.log(`DEBUG POSTGRESQL - Added refrigerador item: ${item.name}, totalPrice now: ${totalPrice}`);
-                    } else {
-                        console.log(`DEBUG POSTGRESQL - Skipped cafeteria item: ${item.name}`);
                     }
                 } else {
                     totalPrice += (item.price * item.quantity);
@@ -183,8 +177,6 @@ class DatabaseManager {
 
             const tip = parseFloat(recordData.tip) || 0;
             const total = subtotal + serviceCharge + tip;
-            
-            console.log(`DEBUG POSTGRESQL - Final calc: subtotal=${subtotal} + serviceCharge=${serviceCharge} + tip=${tip} = total=${total}`);
             
             // Calculate drinks cost (only cafeteria items for coworking)
             let drinksCost = 0;

@@ -3,24 +3,15 @@ const databaseManager = require('../utils/databaseManager');
 // Simple auth middleware
 const auth = async (req, res, next) => {
   try {
-    console.log('DEBUG AUTH - Processing request:', req.method, req.path);
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
-    console.log('DEBUG AUTH - Token received:', token ? 'YES' : 'NO');
-    console.log('DEBUG AUTH - Token preview:', token ? token.substring(0, 30) + '...' : 'NULL');
-    console.log('DEBUG AUTH - JWT_SECRET exists:', process.env.JWT_SECRET ? 'YES' : 'NO (using default)');
-    
     if (!token) {
-      console.log('DEBUG AUTH - No token provided');
       return res.status(401).json({ error: 'No token provided' });
     }
     
     const decoded = databaseManager.verifyToken(token);
-    console.log('DEBUG AUTH - Token decoded:', decoded ? 'SUCCESS' : 'FAILED');
-    console.log('DEBUG AUTH - Decoded payload:', decoded ? JSON.stringify(decoded, null, 2) : 'NULL');
     
     if (!decoded) {
-      console.log('DEBUG AUTH - Token verification failed');
       return res.status(401).json({ error: 'Invalid token' });
     }
     
