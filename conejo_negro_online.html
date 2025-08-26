@@ -1663,6 +1663,92 @@
         }
 
 
+        // Mostrar nota detallada del cliente
+        function showClientNote(clientName, note) {
+            // Crear modal dinámico para mostrar la nota
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+            
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: var(--bg-card);
+                border-radius: 15px;
+                padding: 30px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 80vh;
+                overflow-y: auto;
+                box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
+                border: 1px solid rgba(0, 217, 255, 0.2);
+            `;
+            
+            modalContent.innerHTML = `
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="margin: 0; color: var(--accent-cyan); font-family: 'Orbitron', sans-serif;">
+                        <i class="fas fa-receipt"></i> Nota de ${clientName}
+                    </h3>
+                    <button id="close-modal" style="
+                        background: none;
+                        border: none;
+                        color: var(--text-secondary);
+                        font-size: 24px;
+                        cursor: pointer;
+                        padding: 5px;
+                        border-radius: 50%;
+                        transition: all 0.3s ease;
+                    ">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div style="
+                    background: rgba(0, 217, 255, 0.1);
+                    border: 1px solid rgba(0, 217, 255, 0.3);
+                    border-radius: 8px;
+                    padding: 20px;
+                    font-family: 'Courier New', monospace;
+                    white-space: pre-line;
+                    color: var(--text-primary);
+                    line-height: 1.6;
+                ">
+                    ${note}
+                </div>
+            `;
+            
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+            
+            // Cerrar modal
+            const closeModal = () => {
+                document.body.removeChild(modal);
+            };
+            
+            modalContent.querySelector('#close-modal').addEventListener('click', closeModal);
+            modal.addEventListener('click', function(e) {
+                if (e.target === modal) closeModal();
+            });
+            
+            // Cerrar con ESC
+            const handleEscape = (e) => {
+                if (e.key === 'Escape') {
+                    closeModal();
+                    document.removeEventListener('keydown', handleEscape);
+                }
+            };
+            document.addEventListener('keydown', handleEscape);
+        }
+
         // Actualizar display de registros diarios
         function updateDailyRecordsDisplay() {
             const tbody = document.querySelector('#daily-records tbody');
@@ -1680,15 +1766,56 @@
                 totalIncome += total;
                 totalCost += cost;
                 
-                // Obtener el nombre de la primera bebida si hay productos
+                // Generar nota detallada del cliente con desglose de precios
                 let drinkName = '-';
+                let clientNote = '';
+                
                 if (record.products && record.products.length > 0) {
-                    drinkName = record.products.map(p => `${p.name} (${p.quantity})`).join(', ');
+                    // Crear desglose detallado de productos y precios
+                    const productDetails = record.products.map(p => {
+                        const subtotal = p.quantity * p.price;
+                        let pricingNote = '';
+                        
+                        // Nota especial para coworking
+                        if (record.service === 'coworking') {
+                            if (p.category === 'cafeteria') {
+                                pricingNote = ' (Incluido en coworking)';
+                            } else {
+                                pricingNote = ` ($${p.price.toFixed(2)} c/u)`;
+                            }
+                        } else {
+                            pricingNote = ` ($${p.price.toFixed(2)} c/u)`;
+                        }
+                        
+                        return `${p.name} x${p.quantity}${pricingNote}`;
+                    });
+                    
+                    drinkName = productDetails.join(' + ');
+                    
+                    // Generar nota completa del cliente
+                    clientNote = 'DETALLE DE CONSUMO:\n' + productDetails.map(detail => '• ' + detail).join('\n');
+                    
+                    // Agregar información de servicio
+                    if (record.service === 'coworking') {
+                        clientNote += `\n• Coworking: ${record.hours || 1}h × $58 = $${(record.serviceCharge || 0).toFixed(2)}`;
+                    }
+                    
+                    // Agregar propina si existe
+                    if (tip > 0) {
+                        clientNote += `\n• Propina: $${tip.toFixed(2)}`;
+                    }
+                    
+                    clientNote += `\n\nTOTAL: $${total.toFixed(2)}`;
+                    
                 } else if (record.drink) {
                     drinkName = record.drink;
+                    clientNote = `Bebida: ${record.drink}\nTotal: $${total.toFixed(2)}`;
                 }
                 
                 const row = document.createElement('tr');
+                row.style.cursor = clientNote ? 'pointer' : 'default';
+                row.title = clientNote ? 'Clic para ver detalles del consumo' : '';
+                
                 row.innerHTML = `
                     <td>${record.time || new Date(record.date || record.createdAt).toLocaleTimeString('es-MX', { hour12: false })}</td>
                     <td>${record.client || 'Sin nombre'}</td>
@@ -1706,6 +1833,17 @@
                         }
                     </td>
                 `;
+                
+                // Agregar evento de clic para mostrar detalles
+                if (clientNote) {
+                    row.addEventListener('click', function(e) {
+                        // No mostrar si se hizo clic en el botón de eliminar
+                        if (e.target.closest('.delete-record-btn')) return;
+                        
+                        showClientNote(record.client || 'Cliente', clientNote);
+                    });
+                }
+                
                 tbody.appendChild(row);
             });
             

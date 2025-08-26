@@ -161,5 +161,44 @@
     "createdAt": "2025-08-22T16:10:00.000Z",
     "drink": "Jugo de Naranja",
     "drinkProduct": "94254701297d33d3fc12f922"
+  },
+  {
+    "_id": "a58d7c0054a07ec5b29131f0",
+    "client": "Cliente Prueba",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "cafe001mokha2025",
+        "name": "Mokha",
+        "quantity": 2,
+        "price": 50,
+        "cost": 18,
+        "category": "cafeteria"
+      },
+      {
+        "productId": "refri001tepepsi25",
+        "name": "Pepsi",
+        "quantity": 1,
+        "price": 25,
+        "cost": 14,
+        "category": "refrigerador"
+      }
+    ],
+    "hours": 3,
+    "subtotal": 25,
+    "serviceCharge": 174,
+    "total": 214,
+    "payment": "tarjeta",
+    "cost": 50,
+    "profit": 164,
+    "drinksCost": 0,
+    "tip": 15,
+    "date": "2025-08-26T23:10:29.563Z",
+    "time": "17:10:29",
+    "createdBy": "0ac89352c28b505a577d620c",
+    "isDeleted": false,
+    "createdAt": "2025-08-26T23:10:29.564Z",
+    "drink": "Mokha",
+    "drinkProduct": "cafe001mokha2025"
   }
 ]
