@@ -2023,14 +2023,26 @@
             
             // Calcular subtotal de productos
             if (serviceType === 'coworking') {
-                // Para coworking: las bebidas NO se cobran al cliente
-                currentOrder.subtotal = 0;
-                // Guardar el costo de las bebidas para descontarlo en reportes
+                // Para coworking: solo las bebidas de CAFETERIA están incluidas (gratis)
+                // Las bebidas de REFRIGERADOR se cobran normalmente
+                currentOrder.subtotal = currentOrder.products.reduce((sum, product) => {
+                    // Solo cobrar productos de refrigerador
+                    if (product.category === 'refrigerador') {
+                        return sum + (product.quantity * product.price);
+                    }
+                    return sum;
+                }, 0);
+                
+                // Guardar el costo solo de bebidas de cafetería para descontarlo en reportes
                 currentOrder.drinksCost = currentOrder.products.reduce((sum, product) => {
-                    return sum + (product.quantity * product.cost);
+                    // Solo contar costos de bebidas de cafetería (las que están incluidas gratis)
+                    if (product.category === 'cafeteria') {
+                        return sum + (product.quantity * product.cost);
+                    }
+                    return sum;
                 }, 0);
             } else {
-                // Para cafetería: cobrar normalmente
+                // Para cafetería: cobrar normalmente todos los productos
                 currentOrder.subtotal = currentOrder.products.reduce((sum, product) => {
                     return sum + (product.quantity * product.price);
                 }, 0);
@@ -2053,7 +2065,18 @@
             
             // Actualizar interfaz
             if (serviceType === 'coworking') {
-                document.getElementById('products-total').textContent = `$0.00 (bebidas incluidas)`;
+                // Contar cuántas bebidas de cafetería están incluidas
+                const cafeteriaItems = currentOrder.products.filter(p => p.category === 'cafeteria').length;
+                const refrigeradorItems = currentOrder.products.filter(p => p.category === 'refrigerador').length;
+                
+                let displayText = `$${currentOrder.subtotal.toFixed(2)}`;
+                if (cafeteriaItems > 0 && refrigeradorItems > 0) {
+                    displayText += ` (${cafeteriaItems} bebida${cafeteriaItems > 1 ? 's' : ''} de cafetería incluida${cafeteriaItems > 1 ? 's' : ''})`;
+                } else if (cafeteriaItems > 0) {
+                    displayText = `$0.00 (${cafeteriaItems} bebida${cafeteriaItems > 1 ? 's' : ''} incluida${cafeteriaItems > 1 ? 's' : ''})`;
+                }
+                
+                document.getElementById('products-total').textContent = displayText;
             } else {
                 document.getElementById('products-total').textContent = `$${currentOrder.subtotal.toFixed(2)}`;
             }
