@@ -1434,12 +1434,12 @@
                         tokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'none'
                     });
                     
-                    // Force complete logout
+                    // Clear auth data but don't reload
                     authToken = null;
                     currentUser = null;
-                    localStorage.clear();
-                    location.reload();
-                    return;
+                    localStorage.removeItem('authToken');
+                    localStorage.removeItem('currentUser');
+                    throw new Error('Authentication failed');
                 }
                 
                 const data = await response.json();
