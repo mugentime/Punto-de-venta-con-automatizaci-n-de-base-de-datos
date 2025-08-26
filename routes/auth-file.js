@@ -1,5 +1,5 @@
 const express = require('express');
-const fileDatabase = require('../utils/fileDatabase');
+const databaseManager = require('../utils/databaseManager');
 
 const { auth } = require('../middleware/auth-file');
 
@@ -24,7 +24,7 @@ router.post('/register', async (req, res) => {
     }
     
     // Create user
-    const user = await fileDatabase.createUser({
+    const user = await databaseManager.createUser({
       name: name.trim(),
       email: email.toLowerCase().trim(),
       password,
@@ -32,7 +32,7 @@ router.post('/register', async (req, res) => {
     });
     
     // Generate token
-    const token = fileDatabase.generateToken(user);
+    const token = databaseManager.generateToken(user);
     
     res.status(201).json({
       message: 'User registered successfully',
@@ -68,7 +68,7 @@ router.post('/login', async (req, res) => {
     }
     
     // Validate credentials
-    const user = await fileDatabase.validateUserPassword(email, password);
+    const user = await databaseManager.validateUserPassword(email, password);
     
     if (!user) {
       return res.status(401).json({
@@ -77,7 +77,7 @@ router.post('/login', async (req, res) => {
     }
     
     // Generate token
-    const token = fileDatabase.generateToken(user);
+    const token = databaseManager.generateToken(user);
     
     res.json({
       message: 'Login successful',
@@ -96,7 +96,7 @@ router.post('/login', async (req, res) => {
 // Verify token
 router.get('/verify', auth, async (req, res) => {
   try {
-    const user = await fileDatabase.getUserById(req.user.userId);
+    const user = await databaseManager.getUserById(req.user.userId);
     
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -122,7 +122,7 @@ router.get('/verify', auth, async (req, res) => {
 // Get current user profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const user = await fileDatabase.getUserById(req.user.userId);
+    const user = await databaseManager.getUserById(req.user.userId);
     
     if (!user) {
       return res.status(404).json({
@@ -154,7 +154,7 @@ router.get('/users', auth, async (req, res) => {
       });
     }
     
-    const users = await fileDatabase.getUsers();
+    const users = await databaseManager.getUsers();
     
     // Remove passwords from response
     const safeUsers = users.map(u => {

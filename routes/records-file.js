@@ -1,5 +1,5 @@
 const express = require('express');
-const fileDatabase = require('../utils/fileDatabase');
+const databaseManager = require('../utils/databaseManager');
 const { auth } = require('../middleware/auth-file');
 
 const router = express.Router();
@@ -26,7 +26,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const { date, startDate, endDate, service, payment, limit = 100 } = req.query;
     
-    let records = await fileDatabase.getRecords();
+    let records = await databaseManager.getRecords();
     
     // Filter out deleted records
     records = records.filter(r => !r.isDeleted);
@@ -82,7 +82,7 @@ router.get('/', auth, async (req, res) => {
 // Get record by ID
 router.get('/:id', auth, async (req, res) => {
   try {
-    const record = await fileDatabase.getRecordById(req.params.id);
+    const record = await databaseManager.getRecordById(req.params.id);
 
     if (!record || record.isDeleted) {
       return res.status(404).json({
@@ -154,7 +154,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
           });
         }
 
-        const product = await fileDatabase.getProductById(item.productId);
+        const product = await databaseManager.getProductById(item.productId);
         if (!product || !product.isActive) {
           return res.status(404).json({
             error: `Product ${item.productId} not found or inactive`
@@ -179,7 +179,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       }
     } else if (drinkId) {
       // Legacy single-product format
-      const product = await fileDatabase.getProductById(drinkId);
+      const product = await databaseManager.getProductById(drinkId);
 
       if (!product || !product.isActive) {
         return res.status(404).json({
@@ -204,7 +204,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
     }
 
     // Create record
-    const record = await fileDatabase.createRecord({
+    const record = await databaseManager.createRecord({
       client: client.trim(),
       service: service.toLowerCase(),
       products: productsArray,
@@ -235,7 +235,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     const { client, service, hours, payment, notes } = req.body;
 
     // Find the record
-    const record = await fileDatabase.getRecordById(req.params.id);
+    const record = await databaseManager.getRecordById(req.params.id);
 
     if (!record || record.isDeleted) {
       return res.status(404).json({
@@ -244,7 +244,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     }
 
     // Get the drink product info
-    const product = await fileDatabase.getProductById(record.drinkProduct);
+    const product = await databaseManager.getProductById(record.drinkProduct);
 
     // Prepare update data
     const updateData = {};
@@ -274,7 +274,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     if (notes !== undefined) updateData.notes = notes?.trim();
 
     // Update the record manually since we don't have a direct update method in fileDatabase
-    const records = await fileDatabase.getRecords();
+    const records = await databaseManager.getRecords();
     const recordIndex = records.findIndex(r => r._id === req.params.id);
     
     if (recordIndex === -1) {
@@ -292,7 +292,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
 
     // Save updated records
     const fs = require('fs').promises;
-    await fs.writeFile(fileDatabase.recordsFile, JSON.stringify(records, null, 2));
+    await fs.writeFile(databaseManager.recordsFile, JSON.stringify(records, null, 2));
 
     res.json({
       message: 'Record updated successfully',
@@ -310,7 +310,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
 // Delete record (soft delete)
 router.delete('/:id', auth, canDeleteRecords, async (req, res) => {
   try {
-    await fileDatabase.deleteRecord(req.params.id, req.user.userId);
+    await databaseManager.deleteRecord(req.params.id, req.user.userId);
 
     res.json({
       message: 'Record deleted successfully'
@@ -334,7 +334,7 @@ router.delete('/:id', auth, canDeleteRecords, async (req, res) => {
 // Get today's records
 router.get('/today/summary', auth, async (req, res) => {
   try {
-    const records = await fileDatabase.getTodayRecords();
+    const records = await databaseManager.getTodayRecords();
 
     // Calculate summary statistics
     const totalRecords = records.length;
@@ -392,7 +392,7 @@ router.get('/stats/range', auth, async (req, res) => {
       });
     }
 
-    const stats = await fileDatabase.getStatsByDateRange(startDate, endDate);
+    const stats = await databaseManager.getStatsByDateRange(startDate, endDate);
 
     res.json({
       dateRange: {
@@ -426,7 +426,7 @@ router.get('/stats/daily/:days', auth, async (req, res) => {
     startDate.setDate(endDate.getDate() - days);
 
     // Get records for the period
-    const records = await fileDatabase.getRecordsByDateRange(startDate, endDate);
+    const records = await databaseManager.getRecordsByDateRange(startDate, endDate);
     
     // Group by date and calculate statistics
     const dailyStatsMap = {};

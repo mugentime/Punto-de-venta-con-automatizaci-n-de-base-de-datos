@@ -1,5 +1,5 @@
 const express = require('express');
-const fileDatabase = require('../utils/fileDatabase');
+const databaseManager = require('../utils/databaseManager');
 const { auth } = require('../middleware/auth-file');
 
 const router = express.Router();
@@ -18,7 +18,7 @@ router.get('/', auth, async (req, res) => {
   try {
     const { category, active, lowStock } = req.query;
     
-    let products = await fileDatabase.getProducts();
+    let products = await databaseManager.getProducts();
     
     // Filter by category
     if (category) {
@@ -56,7 +56,7 @@ router.get('/', auth, async (req, res) => {
 // Get product by ID
 router.get('/:id', auth, async (req, res) => {
   try {
-    const product = await fileDatabase.getProductById(req.params.id);
+    const product = await databaseManager.getProductById(req.params.id);
 
     if (!product) {
       return res.status(404).json({
@@ -100,7 +100,7 @@ router.post('/', auth, canManageInventory, async (req, res) => {
 
     // Check if barcode is unique (if provided)
     if (barcode) {
-      const products = await fileDatabase.getProducts();
+      const products = await databaseManager.getProducts();
       const existingProduct = products.find(p => p.barcode === barcode.trim() && p.isActive);
       if (existingProduct) {
         return res.status(409).json({
@@ -109,7 +109,7 @@ router.post('/', auth, canManageInventory, async (req, res) => {
       }
     }
 
-    const product = await fileDatabase.createProduct({
+    const product = await databaseManager.createProduct({
       name: name.trim(),
       category: category.toLowerCase(),
       quantity: Number(quantity),
@@ -156,7 +156,7 @@ router.put('/:id', auth, canManageInventory, async (req, res) => {
 
     // Check if barcode is unique (if provided and changed)
     if (barcode) {
-      const products = await fileDatabase.getProducts();
+      const products = await databaseManager.getProducts();
       const existingProduct = products.find(p => 
         p.barcode === barcode.trim() && 
         p._id !== req.params.id && 
@@ -180,7 +180,7 @@ router.put('/:id', auth, canManageInventory, async (req, res) => {
     if (barcode !== undefined) updateData.barcode = barcode.trim();
     if (typeof isActive === 'boolean') updateData.isActive = isActive;
 
-    const product = await fileDatabase.updateProduct(req.params.id, updateData);
+    const product = await databaseManager.updateProduct(req.params.id, updateData);
 
     res.json({
       message: 'Product updated successfully',
@@ -219,7 +219,7 @@ router.patch('/:id/stock', auth, canManageInventory, async (req, res) => {
       });
     }
 
-    const product = await fileDatabase.updateProductStock(req.params.id, Number(quantity), operation);
+    const product = await databaseManager.updateProductStock(req.params.id, Number(quantity), operation);
 
     res.json({
       message: 'Stock updated successfully',
@@ -244,7 +244,7 @@ router.patch('/:id/stock', auth, canManageInventory, async (req, res) => {
 // Delete product (soft delete by deactivating)
 router.delete('/:id', auth, canManageInventory, async (req, res) => {
   try {
-    await fileDatabase.deleteProduct(req.params.id);
+    await databaseManager.deleteProduct(req.params.id);
 
     res.json({
       message: 'Product deactivated successfully'
@@ -268,7 +268,7 @@ router.delete('/:id', auth, canManageInventory, async (req, res) => {
 // Get low stock products
 router.get('/alerts/low-stock', auth, async (req, res) => {
   try {
-    const products = await fileDatabase.getProducts();
+    const products = await databaseManager.getProducts();
     const lowStockProducts = products.filter(p => 
       p.isActive && p.quantity <= p.lowStockAlert
     ).sort((a, b) => a.quantity - b.quantity);
@@ -289,7 +289,7 @@ router.get('/alerts/low-stock', auth, async (req, res) => {
 // Get product statistics
 router.get('/stats/overview', auth, async (req, res) => {
   try {
-    const products = await fileDatabase.getProducts();
+    const products = await databaseManager.getProducts();
     
     const totalProducts = products.length;
     const activeProducts = products.filter(p => p.isActive).length;

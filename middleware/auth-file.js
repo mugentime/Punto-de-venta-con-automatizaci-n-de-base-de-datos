@@ -1,4 +1,4 @@
-const fileDatabase = require('../utils/fileDatabase');
+const databaseManager = require('../utils/databaseManager');
 
 // Simple auth middleware
 const auth = async (req, res, next) => {
@@ -9,12 +9,12 @@ const auth = async (req, res, next) => {
       return res.status(401).json({ error: 'No token provided' });
     }
     
-    const decoded = fileDatabase.verifyToken(token);
+    const decoded = databaseManager.verifyToken(token);
     if (!decoded) {
       return res.status(401).json({ error: 'Invalid token' });
     }
     
-    const user = await fileDatabase.getUserById(decoded.userId);
+    const user = await databaseManager.getUserById(decoded.userId);
     if (!user || !user.isActive) {
       return res.status(401).json({ error: 'User not found or inactive' });
     }

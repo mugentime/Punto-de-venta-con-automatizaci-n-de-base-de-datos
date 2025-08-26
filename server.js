@@ -16,7 +16,7 @@ const { auth } = require('./middleware/auth-file');
 
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
-const fileDatabase = require('./utils/fileDatabase');
+const databaseManager = require('./utils/databaseManager');
 
 // Import scheduled tasks
 require('./utils/scheduler');
@@ -66,14 +66,20 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Initialize file-based database
 let isDatabaseReady = false;
 
-// Initialize file database on startup
+// Initialize database on startup (PostgreSQL or File-based)
 (async () => {
   try {
-    await fileDatabase.initialize();
+    await databaseManager.initialize();
     isDatabaseReady = true;
-    console.log('✅ File database ready');
+    
+    if (process.env.DATABASE_URL) {
+      console.log('✅ PostgreSQL database ready - Data will persist across deployments!');
+    } else {
+      console.log('✅ File-based database ready - Data may be lost on deployment');
+      console.log('⚠️  Add PostgreSQL database in Railway for persistent storage');
+    }
   } catch (error) {
-    console.error('❌ File database initialization error:', error.message);
+    console.error('❌ Database initialization error:', error.message);
     isDatabaseReady = false;
   }
 })();
@@ -142,7 +148,7 @@ app.get('/api/health', async (req, res) => {
         type: 'file-based',
         ready: isDatabaseReady,
         status: isDatabaseReady ? 'ready' : 'initializing',
-        path: fileDatabase.dataPath || 'unknown'
+        path: process.env.DATABASE_URL ? 'postgresql' : 'file-based'
       }
     });
   } catch (error) {
@@ -160,9 +166,9 @@ app.get('/api/health', async (req, res) => {
 app.get('/api/stats', requireDatabase, auth, async (req, res) => {
   try {
     // Get today's records and products
-    const todayRecords = await fileDatabase.getTodayRecords();
-    const products = await fileDatabase.getProducts();
-    const users = await fileDatabase.getUsers();
+    const todayRecords = await databaseManager.getRecords(); // Get all records for now
+    const products = await databaseManager.getProducts();
+    const users = await databaseManager.getUsers();
     
     // Calculate basic statistics
     const totalProducts = products.filter(p => p.isActive).length;
@@ -192,9 +198,9 @@ app.get('/api/stats', requireDatabase, auth, async (req, res) => {
 app.get('/api/sync', requireDatabase, auth, async (req, res) => {
   try {
     // Get all data for frontend synchronization
-    const products = await fileDatabase.getProducts();
-    const records = await fileDatabase.getTodayRecords();
-    const users = await fileDatabase.getUsers();
+    const products = await databaseManager.getProducts();
+    const records = await databaseManager.getRecords();
+    const users = await databaseManager.getUsers();
     
     res.json({
       products: products.filter(p => p.isActive),
@@ -217,7 +223,7 @@ app.get('/api/sync', requireDatabase, auth, async (req, res) => {
 app.post('/api/init-data', requireDatabase, auth, async (req, res) => {
   try {
     // Check if products already exist
-    const products = await fileDatabase.getProducts();
+    const products = await databaseManager.getProducts();
     if (products.length > 0) {
       return res.json({
         message: 'Sample data already exists',
@@ -225,9 +231,9 @@ app.post('/api/init-data', requireDatabase, auth, async (req, res) => {
       });
     }
     
-    // Initialize with default products (they should already be created by fileDatabase.initialize)
-    await fileDatabase.initialize();
-    const newProducts = await fileDatabase.getProducts();
+    // Initialize with default products (they should already be created by databaseManager.initialize)
+    await databaseManager.initialize();
+    const newProducts = await databaseManager.getProducts();
     
     res.json({
       message: 'Sample data initialized successfully',
