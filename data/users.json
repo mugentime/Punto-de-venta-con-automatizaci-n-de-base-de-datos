@@ -1,7 +1,7 @@
 [
   {
     "_id": "f933df463d8c3a5a45ddfcd6",
-    "name": "Administrador", 
+    "name": "Administrador",
     "email": "gerencia@conejonegro.mx",
     "password": "$2a$12$V9lxdqsBkX4cFLnqQurFw.Crr6VTeoNN9LjLz4DPTRqvu2OFou8dG",
     "role": "admin",
@@ -15,6 +15,24 @@
       "canManageUsers": true,
       "canExportData": true,
       "canDeleteRecords": true
+    }
+  },
+  {
+    "_id": "0ac89352c28b505a577d620c",
+    "name": "Test User",
+    "email": "test@example.com",
+    "password": "$2a$12$yMSE45qDU1BdUamS.Sqc2eVH2CQJakH34W0ZSAVBCCclCL06pAfuy",
+    "role": "employee",
+    "isActive": true,
+    "createdAt": "2025-08-26T22:59:49.463Z",
+    "lastLogin": null,
+    "permissions": {
+      "canManageInventory": true,
+      "canRegisterClients": true,
+      "canViewReports": true,
+      "canManageUsers": false,
+      "canExportData": false,
+      "canDeleteRecords": false
     }
   }
 ]

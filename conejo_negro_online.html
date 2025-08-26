@@ -1259,7 +1259,10 @@
             document.getElementById('main-app').style.display = 'block';
             document.getElementById('user-name').textContent = currentUser?.email || 'Usuario';
             updateConnectionStatus('online');
-            loadInitialData();
+            // Only load data if we have a valid token
+            if (authToken) {
+                loadInitialData();
+            }
         }
 
         // Variables globales para la orden
@@ -1461,6 +1464,13 @@
         // Cargar datos iniciales
         async function loadInitialData() {
             try {
+                // Check if we have a valid token before making requests
+                if (!authToken) {
+                    console.error('No auth token available for loading data');
+                    showLoginScreen();
+                    return;
+                }
+                
                 updateConnectionStatus('syncing');
                 
                 
@@ -1490,8 +1500,14 @@
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
                 console.error('Error cargando datos:', error);
-                showNotification('Error cargando datos: ' + error.message, 'error');
-                updateConnectionStatus('offline');
+                // If it's an authentication error, redirect to login
+                if (error.message === 'Authentication failed') {
+                    showLoginScreen();
+                    showNotification('Sesión expirada. Por favor inicia sesión nuevamente.', 'warning');
+                } else {
+                    showNotification('Error cargando datos: ' + error.message, 'error');
+                    updateConnectionStatus('offline');
+                }
             }
         }
 

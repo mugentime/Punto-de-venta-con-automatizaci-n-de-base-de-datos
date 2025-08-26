@@ -31,6 +31,13 @@ class DatabaseManager {
         return await fileDatabase.getUsers();
     }
 
+    async getUserById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getUserById(id);
+        }
+        return await fileDatabase.getUserById(id);
+    }
+
     async getUserByEmail(email) {
         if (this.usePostgreSQL) {
             return await database.getUserByUsername(email); // Using username as email
