@@ -202,7 +202,7 @@ class DatabaseManager {
                 total: total,
                 cost: totalCost,
                 drinksCost: drinksCost,
-                profit: total - totalCost - drinksCost,
+                profit: total - totalCost,
                 date: new Date(),
                 createdBy: recordData.createdBy
             };

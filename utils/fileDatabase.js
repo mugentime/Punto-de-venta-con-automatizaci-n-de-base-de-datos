@@ -439,14 +439,17 @@ class FileDatabase {
       const coworkingRate = 58; // $58 per hour
       serviceCharge = coworkingRate * (recordData.hours || 1);
       
-      // Para coworking: solo cobrar las horas, no las bebidas
-      subtotal = 0; // Bebidas no se cobran
-      finalTotal = serviceCharge; // Solo el costo del servicio
+      // Para coworking: separar bebidas de refrigerador de cafetería
+      subtotal = 0;
       
-      // Pero sí agregar el costo de las bebidas para descontarlo del reporte
-      if (recordData.drinksCost) {
-        finalCost += recordData.drinksCost;
+      // Para coworking: solo cobrar productos de refrigerador
+      for (const item of products) {
+        if (item.category === 'refrigerador') {
+          subtotal += (item.price * item.quantity);
+        }
       }
+      
+      finalTotal = subtotal + serviceCharge; // Refrigerador items + service charge
     }
     
     // Agregar propina al total (aplicable a ambos servicios)
