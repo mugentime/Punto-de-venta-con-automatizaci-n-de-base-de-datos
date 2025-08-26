@@ -601,21 +601,30 @@ class FileDatabase {
   }
 
   generateToken(user) {
+    const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
+    console.log('DEBUG TOKEN GENERATION - JWT_SECRET exists:', process.env.JWT_SECRET ? 'YES' : 'NO (using default)');
+    console.log('DEBUG TOKEN GENERATION - Secret preview:', secret.substring(0, 10) + '...');
+    
     return jwt.sign(
       {
         userId: user._id,
         email: user.email,
         role: user.role
       },
-      process.env.JWT_SECRET || 'default-secret-key-change-in-production',
+      secret,
       { expiresIn: '7d' }
     );
   }
 
   verifyToken(token) {
     try {
-      return jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key-change-in-production');
+      const secret = process.env.JWT_SECRET || 'default-secret-key-change-in-production';
+      console.log('DEBUG TOKEN VERIFICATION - JWT_SECRET exists:', process.env.JWT_SECRET ? 'YES' : 'NO (using default)');
+      console.log('DEBUG TOKEN VERIFICATION - Secret preview:', secret.substring(0, 10) + '...');
+      
+      return jwt.verify(token, secret);
     } catch (error) {
+      console.log('DEBUG TOKEN VERIFICATION - Error:', error.message);
       return null;
     }
   }
