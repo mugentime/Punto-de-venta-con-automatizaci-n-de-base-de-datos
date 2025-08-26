@@ -1315,7 +1315,7 @@
                     console.log('User permissions:', currentUser?.permissions);
                     console.log('Can delete records:', currentUser?.permissions?.canDeleteRecords);
                     console.log('Auth token set:', authToken ? 'YES' : 'NO');
-                    console.log('Auth token preview:', authToken ? authToken.substring(0, 20) + '...' : 'NULL');
+                    console.log('Auth token preview:', authToken ? authToken.substring(0, 30) + '...' : 'NULL');
                     console.log('============================');
                     
                     showNotification('Login exitoso', 'success');
@@ -1417,7 +1417,7 @@
             const url = `${API_BASE_URL}${endpoint}`;
             console.log('DEBUG FRONTEND - Making API request to:', endpoint);
             console.log('DEBUG FRONTEND - Auth token exists:', authToken ? 'YES' : 'NO');
-            console.log('DEBUG FRONTEND - Auth token preview:', authToken ? authToken.substring(0, 20) + '...' : 'NULL');
+            console.log('DEBUG FRONTEND - Auth token preview:', authToken ? authToken.substring(0, 30) + '...' : 'NULL');
             
             const headers = {
                 'Content-Type': 'application/json',
