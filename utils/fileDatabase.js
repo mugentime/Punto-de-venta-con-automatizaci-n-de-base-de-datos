@@ -442,14 +442,21 @@ class FileDatabase {
       // Para coworking: separar bebidas de refrigerador de cafetería
       subtotal = 0;
       
+      console.log('DEBUG - Coworking products:', JSON.stringify(products, null, 2));
+      
       // Para coworking: solo cobrar productos de refrigerador
       for (const item of products) {
+        console.log(`DEBUG - Product: ${item.name}, Category: ${item.category}, Price: ${item.price}`);
         if (item.category === 'refrigerador') {
           subtotal += (item.price * item.quantity);
+          console.log(`DEBUG - Added refrigerador item: ${item.name}, subtotal now: ${subtotal}`);
+        } else {
+          console.log(`DEBUG - Skipped cafeteria item: ${item.name}`);
         }
       }
       
       finalTotal = subtotal + serviceCharge; // Refrigerador items + service charge
+      console.log(`DEBUG - Final calculation: subtotal=${subtotal} + serviceCharge=${serviceCharge} = finalTotal=${finalTotal}`);
     }
     
     // Agregar propina al total (aplicable a ambos servicios)
