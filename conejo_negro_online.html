@@ -1413,6 +1413,10 @@
         // Realizar petición autenticada a la API
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE_URL}${endpoint}`;
+            console.log('DEBUG FRONTEND - Making API request to:', endpoint);
+            console.log('DEBUG FRONTEND - Auth token exists:', authToken ? 'YES' : 'NO');
+            console.log('DEBUG FRONTEND - Auth token preview:', authToken ? authToken.substring(0, 20) + '...' : 'NULL');
+            
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`,
