@@ -594,8 +594,8 @@ class FileDatabase {
   }
 
   generateToken(user) {
-    // Use a consistent secret for all environments
-    const secret = process.env.JWT_SECRET || 'conejo-negro-2024-production-key-v2';
+    // Fixed secret key for consistent JWT across all environments
+    const secret = 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
     
     return jwt.sign(
       {
@@ -611,8 +611,8 @@ class FileDatabase {
 
   verifyToken(token) {
     try {
-      // Use the same consistent secret as generation
-      const secret = process.env.JWT_SECRET || 'conejo-negro-2024-production-key-v2';
+      // Fixed secret key - must match generateToken exactly
+      const secret = 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
       return jwt.verify(token, secret);
     } catch (error) {
       return null;
