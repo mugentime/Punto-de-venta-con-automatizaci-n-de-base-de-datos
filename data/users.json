@@ -1,9 +1,9 @@
 [
   {
     "_id": "f933df463d8c3a5a45ddfcd6",
-    "name": "Administrador",
-    "email": "admin@conejonegro.com",
-    "password": "$2a$12$WcfBRqIsGYTVcwxtL/SllOl.LyEbg14JaHz6lFFSO4Z2nRD4uCkSC",
+    "name": "Administrador", 
+    "email": "gerencia@conejonegro.mx",
+    "password": "$2a$12$V9lxdqsBkX4cFLnqQurFw.Crr6VTeoNN9LjLz4DPTRqvu2OFou8dG",
     "role": "admin",
     "isActive": true,
     "createdAt": "2025-08-20T12:38:57.086Z",
