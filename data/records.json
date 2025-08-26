@@ -200,5 +200,34 @@
     "createdAt": "2025-08-26T23:10:29.564Z",
     "drink": "Mokha",
     "drinkProduct": "cafe001mokha2025"
+  },
+  {
+    "_id": "7c4352fb1a2bbcd24cb0bd2c",
+    "client": "Test Cliente",
+    "service": "cafeteria",
+    "products": [
+      {
+        "name": "Café Test",
+        "quantity": 1,
+        "cost": 10,
+        "price": 25,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 25,
+    "serviceCharge": 0,
+    "total": 25,
+    "payment": "efectivo",
+    "cost": 10,
+    "profit": 15,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-08-26T23:27:19.769Z",
+    "time": "17:27:19",
+    "createdBy": "test-user-id",
+    "isDeleted": false,
+    "createdAt": "2025-08-26T23:27:19.769Z",
+    "drink": "Café Test"
   }
 ]

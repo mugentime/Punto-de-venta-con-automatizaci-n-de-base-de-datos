@@ -1,0 +1,45 @@
+[
+  {
+    "cutDate": "2025-08-26T23:28:07.606Z",
+    "cutTime": "17:28",
+    "startDate": "2025-08-26T23:28:06.575Z",
+    "endDate": "2025-08-26T23:28:07.606Z",
+    "cutType": "manual",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "Test manual cash cut",
+    "createdBy": "test-user-id",
+    "id": "1756250887607xx8nbjbju",
+    "createdAt": "2025-08-26T23:28:07.607Z",
+    "updatedAt": "2025-08-26T23:28:07.607Z"
+  }
+]

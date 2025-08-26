@@ -256,6 +256,40 @@ class DatabaseManager {
         return fileDatabase.generateId();
     }
 
+    // CASH CUTS
+    async getCashCuts(limit = 50) {
+        if (this.usePostgreSQL) {
+            return await database.getCashCuts(limit);
+        }
+        return await fileDatabase.getCashCuts(limit);
+    }
+
+    async getCashCutById(id) {
+        if (this.usePostgreSQL) {
+            const cashCuts = await database.getCashCuts();
+            return cashCuts.find(c => c._id === id);
+        }
+        return await fileDatabase.getCashCutById(id);
+    }
+
+    async saveCashCut(cashCutData) {
+        if (this.usePostgreSQL) {
+            return await database.createCashCut(cashCutData);
+        }
+        return await fileDatabase.saveCashCut(cashCutData);
+    }
+
+    async deleteCashCut(id, deletedBy) {
+        if (this.usePostgreSQL) {
+            return await database.updateCashCut(id, { 
+                isDeleted: true, 
+                deletedAt: new Date(),
+                deletedBy: deletedBy 
+            });
+        }
+        return await fileDatabase.deleteCashCut(id, deletedBy);
+    }
+
     async close() {
         if (this.usePostgreSQL) {
             await database.close();

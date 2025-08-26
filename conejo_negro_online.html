@@ -757,6 +757,7 @@
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
                             <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
+                            <li><a href="#" class="nav-link" data-section="corte-caja">Corte de Caja</a></li>
                         </ul>
                     </nav>
                     
@@ -1135,6 +1136,43 @@
                         </div>
                     </div>
                     
+                    <!-- Cortes de Caja del Período -->
+                    <div class="card" style="margin-top: 20px;">
+                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">
+                            <i class="fas fa-cash-register"></i>
+                            Cortes de Caja del Período
+                        </h3>
+                        <div id="report-cash-cuts-loading" style="text-align: center; padding: 20px; display: none;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Cargando cortes de caja...
+                        </div>
+                        <div class="stats-card" id="report-cash-cuts-stats" style="display: none;">
+                            <div class="stat-item">
+                                <div class="stat-value" id="report-cash-cuts-count">0</div>
+                                <div class="stat-label">Total de Cortes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="report-cash-cuts-income">$0.00</div>
+                                <div class="stat-label">Ingresos en Cortes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="report-cash-cuts-profit">$0.00</div>
+                                <div class="stat-label">Ganancia en Cortes</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value" id="report-cash-cuts-avg">$0.00</div>
+                                <div class="stat-label">Promedio por Corte</div>
+                            </div>
+                        </div>
+                        <div id="report-no-cash-cuts" style="text-align: center; padding: 20px; color: var(--text-secondary); display: none;">
+                            <i class="fas fa-info-circle"></i>
+                            No hay cortes de caja en este período
+                        </div>
+                        <div id="report-cash-cuts-list" style="margin-top: 15px; display: none;">
+                            <!-- Cash cuts for this period will be shown here -->
+                        </div>
+                    </div>
+                    
                     <!-- Tabla detallada -->
                     <div class="card" style="margin-top: 20px;">
                         <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">Detalle de Registros</h3>
@@ -1179,6 +1217,88 @@
                             <i class="fas fa-upload"></i>
                             Importar Respaldo
                         </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Corte de Caja -->
+            <section id="corte-caja" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-cash-register"></i>
+                        Corte de Caja
+                    </h2>
+                    
+                    <!-- Manual Cash Cut Button -->
+                    <div class="form-row" style="margin-bottom: 30px;">
+                        <div class="form-group" style="width: 100%;">
+                            <button id="manual-cash-cut-btn" class="btn btn-danger" style="width: 100%; padding: 15px; font-size: 18px;">
+                                <i class="fas fa-scissors"></i>
+                                Finalizar Día - Corte Manual
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Notes for manual cut -->
+                    <div class="form-row" id="manual-cut-notes" style="display: none; margin-bottom: 20px;">
+                        <div class="form-group" style="width: 100%;">
+                            <label for="cut-notes">Notas del corte (opcional)</label>
+                            <textarea id="cut-notes" class="form-control" rows="3" placeholder="Agrega notas sobre este corte de caja..."></textarea>
+                        </div>
+                        <div class="form-group" style="width: 100%; margin-top: 10px;">
+                            <button id="confirm-manual-cut" class="btn btn-success" style="margin-right: 10px;">
+                                <i class="fas fa-check"></i>
+                                Confirmar Corte
+                            </button>
+                            <button id="cancel-manual-cut" class="btn btn-secondary">
+                                <i class="fas fa-times"></i>
+                                Cancelar
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Cash Cut History -->
+                    <div class="stats-card">
+                        <h3 style="margin-bottom: 20px; color: var(--accent-cyan);">
+                            <i class="fas fa-history"></i>
+                            Últimos Cortes de Caja
+                        </h3>
+                        
+                        <div id="cash-cuts-loading" style="text-align: center; padding: 20px;">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            Cargando cortes de caja...
+                        </div>
+                        
+                        <div id="cash-cuts-list" style="display: none;">
+                            <!-- Cash cuts will be loaded here dynamically -->
+                        </div>
+                        
+                        <div id="no-cash-cuts" style="display: none; text-align: center; padding: 20px; color: var(--text-secondary);">
+                            <i class="fas fa-info-circle"></i>
+                            No hay cortes de caja registrados aún
+                        </div>
+                    </div>
+                    
+                    <!-- Service Status -->
+                    <div class="stats-card" style="margin-top: 20px;">
+                        <h3 style="margin-bottom: 15px; color: var(--accent-cyan);">
+                            <i class="fas fa-cog"></i>
+                            Estado del Sistema
+                        </h3>
+                        
+                        <div id="service-status-info">
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Cortes automáticos cada 12 horas:</span>
+                                <span id="auto-cuts-status" class="status-indicator">
+                                    <i class="fas fa-spinner fa-spin"></i>
+                                    Verificando...
+                                </span>
+                            </div>
+                            <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
+                                <span>Último corte automático:</span>
+                                <span id="last-cut-time" class="text-muted">N/A</span>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2535,6 +2655,9 @@
             
             // Actualizar tabla detallada
             updateReportTable();
+            
+            // Cargar cortes de caja del período
+            loadReportCashCuts();
         }
 
         // Actualizar tabla del reporte
@@ -2804,6 +2927,343 @@
                     }
                 }
             }
+        }, 30000); // Verificar cada 30 segundos
+
+        // ===== CASH CUT FUNCTIONALITY =====
+        
+        // Load cash cuts when section is accessed
+        document.addEventListener('DOMContentLoaded', function() {
+            // Listen for section changes to load cash cuts
+            const navLinks = document.querySelectorAll('.nav-link');
+            navLinks.forEach(link => {
+                link.addEventListener('click', function() {
+                    const sectionId = this.getAttribute('data-section');
+                    if (sectionId === 'corte-caja') {
+                        loadCashCuts();
+                        loadServiceStatus();
+                    }
+                });
+            });
+            
+            // Manual cash cut button
+            document.getElementById('manual-cash-cut-btn').addEventListener('click', function() {
+                document.getElementById('manual-cut-notes').style.display = 'block';
+                this.style.display = 'none';
+            });
+            
+            // Cancel manual cut
+            document.getElementById('cancel-manual-cut').addEventListener('click', function() {
+                document.getElementById('manual-cut-notes').style.display = 'none';
+                document.getElementById('manual-cash-cut-btn').style.display = 'block';
+                document.getElementById('cut-notes').value = '';
+            });
+            
+            // Confirm manual cut
+            document.getElementById('confirm-manual-cut').addEventListener('click', async function() {
+                const notes = document.getElementById('cut-notes').value.trim();
+                
+                if (!confirm('¿Estás seguro de que deseas realizar un corte de caja manual? Esta acción no se puede deshacer.')) {
+                    return;
+                }
+                
+                try {
+                    showNotification('Realizando corte de caja...', 'info');
+                    
+                    const response = await apiRequest('/cashcuts/manual', {
+                        method: 'POST',
+                        body: JSON.stringify({ notes })
+                    });
+                    
+                    if (response.success) {
+                        showNotification('Corte de caja realizado exitosamente', 'success');
+                        
+                        // Reset form
+                        document.getElementById('manual-cut-notes').style.display = 'none';
+                        document.getElementById('manual-cash-cut-btn').style.display = 'block';
+                        document.getElementById('cut-notes').value = '';
+                        
+                        // Reload cash cuts
+                        loadCashCuts();
+                        
+                        // Show cut details
+                        showCashCutDetails(response.cashCut);
+                    } else {
+                        showNotification('Error al realizar el corte de caja: ' + response.error, 'error');
+                    }
+                } catch (error) {
+                    console.error('Error performing manual cash cut:', error);
+                    showNotification('Error de conexión al realizar el corte', 'error');
+                }
+            });
+        });
+        
+        // Load cash cuts list
+        async function loadCashCuts() {
+            const loadingEl = document.getElementById('cash-cuts-loading');
+            const listEl = document.getElementById('cash-cuts-list');
+            const noCutsEl = document.getElementById('no-cash-cuts');
+            
+            loadingEl.style.display = 'block';
+            listEl.style.display = 'none';
+            noCutsEl.style.display = 'none';
+            
+            try {
+                const response = await apiRequest('/cashcuts?limit=10');
+                
+                if (response.success && response.cashCuts.length > 0) {
+                    renderCashCuts(response.cashCuts);
+                    listEl.style.display = 'block';
+                } else {
+                    noCutsEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading cash cuts:', error);
+                noCutsEl.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Error al cargar los cortes de caja
+                `;
+                noCutsEl.style.display = 'block';
+            }
+            
+            loadingEl.style.display = 'none';
+        }
+        
+        // Render cash cuts in the list
+        function renderCashCuts(cashCuts) {
+            const listEl = document.getElementById('cash-cuts-list');
+            
+            listEl.innerHTML = cashCuts.map(cut => {
+                const date = new Date(cut.cutDate);
+                const dateStr = date.toLocaleDateString('es-MX');
+                const timeStr = cut.cutTime || date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="cash-cut-item" style="border: 1px solid var(--accent-cyan); border-radius: 8px; padding: 15px; margin-bottom: 15px; background: rgba(0, 217, 255, 0.05);">
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px;">
+                            <div>
+                                <h4 style="color: var(--accent-cyan); margin: 0; font-size: 16px;">
+                                    <i class="fas fa-${cut.cutType === 'manual' ? 'hand-paper' : 'clock'}"></i>
+                                    Corte ${cut.cutType === 'manual' ? 'Manual' : 'Automático'}
+                                </h4>
+                                <p style="margin: 5px 0; color: var(--text-secondary); font-size: 14px;">
+                                    ${dateStr} a las ${timeStr}
+                                </p>
+                            </div>
+                            <div style="text-align: right;">
+                                <div style="font-size: 18px; font-weight: bold; color: var(--success);">
+                                    $${cut.totalIncome.toFixed(2)}
+                                </div>
+                                <div style="font-size: 14px; color: var(--text-secondary);">
+                                    ${cut.totalRecords} ventas
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; margin-bottom: 10px;">
+                            <div>
+                                <small style="color: var(--text-secondary);">Ingresos</small>
+                                <div style="font-weight: bold; color: var(--success);">$${cut.totalIncome.toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <small style="color: var(--text-secondary);">Costos</small>
+                                <div style="font-weight: bold; color: var(--danger);">$${cut.totalCost.toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <small style="color: var(--text-secondary);">Ganancia</small>
+                                <div style="font-weight: bold; color: var(--accent-cyan);">$${cut.totalProfit.toFixed(2)}</div>
+                            </div>
+                            <div>
+                                <small style="color: var(--text-secondary);">Ticket Prom.</small>
+                                <div style="font-weight: bold;">$${cut.averageTicket.toFixed(2)}</div>
+                            </div>
+                        </div>
+                        
+                        ${cut.notes ? `
+                            <div style="background: rgba(0, 217, 255, 0.1); padding: 8px; border-radius: 4px; margin-top: 10px;">
+                                <small style="color: var(--text-secondary);">Notas:</small>
+                                <div style="font-style: italic;">${cut.notes}</div>
+                            </div>
+                        ` : ''}
+                        
+                        <button class="btn btn-sm btn-secondary" onclick="showCashCutDetails('${cut.id}')" 
+                                style="margin-top: 10px; padding: 5px 10px; font-size: 12px;">
+                            <i class="fas fa-eye"></i>
+                            Ver Detalles
+                        </button>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Load service status
+        async function loadServiceStatus() {
+            try {
+                const response = await apiRequest('/cashcuts/service/status');
+                
+                if (response.success) {
+                    const status = response.serviceStatus;
+                    const autoStatus = document.getElementById('auto-cuts-status');
+                    const lastCutTime = document.getElementById('last-cut-time');
+                    
+                    if (status.initialized && status.jobs.twiceDaily && status.jobs.twiceDaily.running) {
+                        autoStatus.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Activo';
+                    } else {
+                        autoStatus.innerHTML = '<i class="fas fa-exclamation-circle" style="color: var(--warning);"></i> Inactivo';
+                    }
+                    
+                    if (status.lastCutTime) {
+                        const lastDate = new Date(status.lastCutTime);
+                        lastCutTime.textContent = lastDate.toLocaleString('es-MX');
+                    } else {
+                        lastCutTime.textContent = 'N/A';
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading service status:', error);
+                document.getElementById('auto-cuts-status').innerHTML = 
+                    '<i class="fas fa-exclamation-triangle" style="color: var(--danger);"></i> Error';
+            }
+        }
+        
+        // Show cash cut details (placeholder - can be expanded)
+        function showCashCutDetails(cutId) {
+            // This could open a modal or expand the item with more details
+            // For now, just show a notification
+            showNotification('Funcionalidad de detalles en desarrollo', 'info');
+        }
+        
+        // Load cash cuts for the current report period
+        async function loadReportCashCuts() {
+            const loadingEl = document.getElementById('report-cash-cuts-loading');
+            const statsEl = document.getElementById('report-cash-cuts-stats');
+            const noCutsEl = document.getElementById('report-no-cash-cuts');
+            const listEl = document.getElementById('report-cash-cuts-list');
+            
+            // Show loading
+            loadingEl.style.display = 'block';
+            statsEl.style.display = 'none';
+            noCutsEl.style.display = 'none';
+            listEl.style.display = 'none';
+            
+            try {
+                // Get date range from current report period
+                let startDate = null;
+                let endDate = null;
+                
+                if (reportData.period === 'custom' && reportData.startDate && reportData.endDate) {
+                    startDate = reportData.startDate;
+                    endDate = reportData.endDate;
+                } else {
+                    // Calculate date range based on period
+                    const now = new Date();
+                    endDate = now.toISOString().split('T')[0];
+                    
+                    switch (reportData.period) {
+                        case 'today':
+                            startDate = endDate;
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(now);
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            startDate = weekAgo.toISOString().split('T')[0];
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(now);
+                            monthAgo.setMonth(monthAgo.getMonth() - 1);
+                            startDate = monthAgo.toISOString().split('T')[0];
+                            break;
+                        default:
+                            startDate = endDate;
+                    }
+                }
+                
+                // Get cash cuts for the period
+                const response = await apiRequest(`/cashcuts?startDate=${startDate}&endDate=${endDate}&limit=100`);
+                
+                if (response.success && response.cashCuts.length > 0) {
+                    // Filter cash cuts within the exact period
+                    const periodCuts = response.cashCuts.filter(cut => {
+                        const cutDate = new Date(cut.cutDate);
+                        const start = new Date(startDate);
+                        const end = new Date(endDate);
+                        end.setHours(23, 59, 59, 999); // Include full end day
+                        
+                        return cutDate >= start && cutDate <= end;
+                    });
+                    
+                    if (periodCuts.length > 0) {
+                        updateReportCashCutsDisplay(periodCuts);
+                        statsEl.style.display = 'block';
+                        listEl.style.display = 'block';
+                    } else {
+                        noCutsEl.style.display = 'block';
+                    }
+                } else {
+                    noCutsEl.style.display = 'block';
+                }
+            } catch (error) {
+                console.error('Error loading report cash cuts:', error);
+                noCutsEl.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    Error al cargar cortes de caja del período
+                `;
+                noCutsEl.style.display = 'block';
+            }
+            
+            loadingEl.style.display = 'none';
+        }
+        
+        // Update cash cuts display in reports
+        function updateReportCashCutsDisplay(cashCuts) {
+            // Calculate summary statistics
+            const totalCuts = cashCuts.length;
+            const totalIncome = cashCuts.reduce((sum, cut) => sum + cut.totalIncome, 0);
+            const totalProfit = cashCuts.reduce((sum, cut) => sum + cut.totalProfit, 0);
+            const avgIncome = totalCuts > 0 ? totalIncome / totalCuts : 0;
+            
+            // Update summary stats
+            document.getElementById('report-cash-cuts-count').textContent = totalCuts;
+            document.getElementById('report-cash-cuts-income').textContent = `$${totalIncome.toFixed(2)}`;
+            document.getElementById('report-cash-cuts-profit').textContent = `$${totalProfit.toFixed(2)}`;
+            document.getElementById('report-cash-cuts-avg').textContent = `$${avgIncome.toFixed(2)}`;
+            
+            // Update cash cuts list
+            const listEl = document.getElementById('report-cash-cuts-list');
+            listEl.innerHTML = `
+                <div style="max-height: 300px; overflow-y: auto;">
+                    ${cashCuts.map(cut => {
+                        const date = new Date(cut.cutDate);
+                        const dateStr = date.toLocaleDateString('es-MX');
+                        const timeStr = cut.cutTime || date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                        
+                        return `
+                            <div style="border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 6px; padding: 10px; margin-bottom: 10px; background: rgba(0, 217, 255, 0.02);">
+                                <div style="display: flex; justify-content: space-between; align-items: center;">
+                                    <div>
+                                        <span style="font-weight: bold; color: var(--accent-cyan);">
+                                            <i class="fas fa-${cut.cutType === 'manual' ? 'hand-paper' : 'clock'}"></i>
+                                            ${cut.cutType === 'manual' ? 'Manual' : 'Automático'}
+                                        </span>
+                                        <br>
+                                        <small style="color: var(--text-secondary);">${dateStr} ${timeStr}</small>
+                                    </div>
+                                    <div style="text-align: right;">
+                                        <div style="font-weight: bold; color: var(--success);">$${cut.totalIncome.toFixed(2)}</div>
+                                        <small style="color: var(--text-secondary);">${cut.totalRecords} ventas</small>
+                                    </div>
+                                </div>
+                                ${cut.notes ? `
+                                    <div style="margin-top: 8px; padding: 6px; background: rgba(0, 217, 255, 0.1); border-radius: 4px; font-size: 12px; font-style: italic;">
+                                        ${cut.notes}
+                                    </div>
+                                ` : ''}
+                            </div>
+                        `;
+                    }).join('')}
+                </div>
+            `;
+        }
+
         }, 30000); // Verificar cada 30 segundos
     </script>
 </body>

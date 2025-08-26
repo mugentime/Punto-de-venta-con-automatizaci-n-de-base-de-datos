@@ -10,6 +10,7 @@ const authRoutes = require('./routes/auth-file');
 const productRoutes = require('./routes/products-file');
 const recordRoutes = require('./routes/records-file');
 const backupRoutes = require('./routes/backup-file');
+const cashCutRoutes = require('./routes/cashcuts-file');
 
 // Import auth middleware
 const { auth } = require('./middleware/auth-file');
@@ -20,6 +21,7 @@ const databaseManager = require('./utils/databaseManager');
 
 // Import scheduled tasks
 require('./utils/scheduler');
+require('./utils/cashCutService');
 
 const app = express();
 
@@ -100,6 +102,7 @@ const requireDatabase = (req, res, next) => {
 app.use('/api/auth', requireDatabase, authRoutes);
 app.use('/api/products', requireDatabase, productRoutes);
 app.use('/api/records', requireDatabase, recordRoutes);
+app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
 app.use('/api/backup', backupRoutes); // Backup can work without DB for file operations
 
 // Export/download endpoint

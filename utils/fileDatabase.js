@@ -20,6 +20,7 @@ class FileDatabase {
     this.productsFile = path.join(this.dataPath, 'products.json');
     this.recordsFile = path.join(this.dataPath, 'records.json');
     this.backupsFile = path.join(this.dataPath, 'backups.json');
+    this.cashCutsFile = path.join(this.dataPath, 'cashcuts.json');
     
     this.initialized = false;
   }
@@ -34,6 +35,7 @@ class FileDatabase {
       await this.initializeFile(this.productsFile, this.getDefaultProducts());
       await this.initializeFile(this.recordsFile, []);
       await this.initializeFile(this.backupsFile, []);
+      await this.initializeFile(this.cashCutsFile, []);
       
       // Create default admin user if no users exist
       const users = await this.getUsers();
@@ -616,6 +618,93 @@ class FileDatabase {
       return jwt.verify(token, secret);
     } catch (error) {
       return null;
+    }
+  }
+
+  // === CASH CUTS METHODS ===
+  async getCashCuts(limit = 50) {
+    try {
+      const data = await fs.readFile(this.cashCutsFile, 'utf8');
+      const cashCuts = JSON.parse(data);
+      
+      return cashCuts
+        .filter(cut => !cut.isDeleted)
+        .sort((a, b) => new Date(b.cutDate) - new Date(a.cutDate))
+        .slice(0, limit);
+    } catch (error) {
+      if (error.code === 'ENOENT') {
+        // File doesn't exist yet, return empty array
+        return [];
+      }
+      console.error('Error reading cash cuts:', error);
+      return [];
+    }
+  }
+
+  async getCashCutById(id) {
+    try {
+      const cashCuts = await this.getCashCuts();
+      return cashCuts.find(cut => cut.id === id);
+    } catch (error) {
+      console.error('Error finding cash cut:', error);
+      return null;
+    }
+  }
+
+  async saveCashCut(cashCutData) {
+    try {
+      let cashCuts = [];
+      
+      try {
+        const data = await fs.readFile(this.cashCutsFile, 'utf8');
+        cashCuts = JSON.parse(data);
+      } catch (error) {
+        if (error.code !== 'ENOENT') {
+          throw error;
+        }
+        // File doesn't exist, start with empty array
+        cashCuts = [];
+      }
+      
+      // Add new cash cut
+      const newCashCut = {
+        ...cashCutData,
+        id: cashCutData.id || this.generateId(),
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+      
+      cashCuts.push(newCashCut);
+      
+      await fs.writeFile(this.cashCutsFile, JSON.stringify(cashCuts, null, 2));
+      return newCashCut;
+    } catch (error) {
+      console.error('Error saving cash cut:', error);
+      throw error;
+    }
+  }
+
+  async deleteCashCut(id, deletedBy) {
+    try {
+      const data = await fs.readFile(this.cashCutsFile, 'utf8');
+      const cashCuts = JSON.parse(data);
+      
+      const cutIndex = cashCuts.findIndex(cut => cut.id === id);
+      if (cutIndex === -1) {
+        throw new Error('Cash cut not found');
+      }
+      
+      // Soft delete
+      cashCuts[cutIndex].isDeleted = true;
+      cashCuts[cutIndex].deletedAt = new Date().toISOString();
+      cashCuts[cutIndex].deletedBy = deletedBy;
+      cashCuts[cutIndex].updatedAt = new Date().toISOString();
+      
+      await fs.writeFile(this.cashCutsFile, JSON.stringify(cashCuts, null, 2));
+      return cashCuts[cutIndex];
+    } catch (error) {
+      console.error('Error deleting cash cut:', error);
+      throw error;
     }
   }
 }
