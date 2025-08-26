@@ -1194,9 +1194,11 @@
             ? 'http://localhost:3000/api' 
             : `${window.location.protocol}//${window.location.host}/api`;
         
-        // Variables globales
-        let authToken = localStorage.getItem('authToken');
-        let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
+        // Variables globales - Force clean start due to JWT secret change
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('currentUser');
+        let authToken = null;
+        let currentUser = null;
         let isOnline = false;
         let data = {
             products: [],

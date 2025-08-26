@@ -594,20 +594,26 @@ class FileDatabase {
   }
 
   generateToken(user) {
+    // Use a consistent secret for all environments
+    const secret = process.env.JWT_SECRET || 'conejo-negro-2024-production-key-v2';
+    
     return jwt.sign(
       {
         userId: user._id,
         email: user.email,
-        role: user.role
+        role: user.role,
+        iat: Math.floor(Date.now() / 1000)
       },
-      process.env.JWT_SECRET || 'default-secret-key-change-in-production',
+      secret,
       { expiresIn: '7d' }
     );
   }
 
   verifyToken(token) {
     try {
-      return jwt.verify(token, process.env.JWT_SECRET || 'default-secret-key-change-in-production');
+      // Use the same consistent secret as generation
+      const secret = process.env.JWT_SECRET || 'conejo-negro-2024-production-key-v2';
+      return jwt.verify(token, secret);
     } catch (error) {
       return null;
     }
