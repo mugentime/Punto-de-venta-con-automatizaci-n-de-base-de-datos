@@ -3,7 +3,7 @@
     "_id": "f933df463d8c3a5a45ddfcd6",
     "name": "Administrador",
     "email": "admin@conejonegro.com",
-    "password": "$2a$12$yojNnCMiOyO6AJV0zyRaQ.qcSGtgC.iEq8ZGdfz8EQiVMwYSjT0ne",
+    "password": "$2a$12$NB9SLvUw6e1fK.c/0e0dkeBHS/l7/kueRh1FXvX2e1bAOgMxRpd8q",
     "role": "admin",
     "isActive": true,
     "createdAt": "2025-08-20T12:38:57.086Z",
