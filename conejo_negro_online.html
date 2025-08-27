@@ -3130,58 +3130,55 @@
             reportData.startDate = startDate;
             reportData.endDate = endDate;
             
-            // NO MÁS DATOS FALSOS - Array vacío hasta que haya datos reales
-            const hardcodedRecords = [];
-            
             try {
-                // Intentar fetch real pero con fallback a datos hardcodeados
-                let url = '/api/records?limit=1000';
+                // First, check if we have local data that matches the period
+                let localRecords = [];
                 
-                if (period === 'today') {
-                    const today = new Date().toISOString().split('T')[0];
-                    url += `&date=${today}`;
-                } else if (startDate && endDate) {
-                    url += `&startDate=${startDate}&endDate=${endDate}`;
-                } else if (period === 'week') {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setDate(end.getDate() - 7);
-                    url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
-                } else if (period === 'month') {
-                    const end = new Date();
-                    const start = new Date();
-                    start.setDate(end.getDate() - 30);
-                    url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
-                }
-                
-                const response = await fetch(url, {
-                    headers: {
-                        'Authorization': `Bearer ${authToken}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const apiData = await response.json();
-                    if (apiData.length > 0) {
-                        reportData.records = apiData;
-                        console.log('Using API data:', apiData.length, 'transactions');
-                    } else {
-                        reportData.records = hardcodedRecords;
-                        console.log('No API data, using hardcoded records');
-                    }
+                if (period === 'today' && data.records && data.records.length > 0) {
+                    // Use already loaded today's records
+                    localRecords = data.records;
+                    console.log('Using local data for today:', localRecords.length, 'records');
                 } else {
-                    console.error('API failed, using hardcoded data:', response.status);
-                    reportData.records = hardcodedRecords;
+                    // For other periods, try to fetch from API
+                    let url = '/api/records?limit=1000';
+                    
+                    if (period === 'today') {
+                        const today = new Date().toISOString().split('T')[0];
+                        url += `&date=${today}`;
+                    } else if (startDate && endDate) {
+                        url += `&startDate=${startDate}&endDate=${endDate}`;
+                    } else if (period === 'week') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(end.getDate() - 7);
+                        url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
+                    } else if (period === 'month') {
+                        const end = new Date();
+                        const start = new Date();
+                        start.setDate(end.getDate() - 30);
+                        url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
+                    }
+                    
+                    console.log('Fetching records from:', url);
+                    const response = await fetch(url, {
+                        headers: {
+                            'Authorization': `Bearer ${authToken}`
+                        }
+                    });
+                    
+                    if (response.ok) {
+                        localRecords = await response.json();
+                        console.log('API returned:', localRecords.length, 'records');
+                    } else {
+                        console.error('API request failed:', response.status, response.statusText);
+                    }
                 }
+                
+                reportData.records = localRecords || [];
+                
             } catch (error) {
-                console.error('Error fetching, using hardcoded data:', error);
-                reportData.records = hardcodedRecords;
-            }
-            
-            // Siempre asegurarse de que hay datos
-            if (!reportData.records || reportData.records.length === 0) {
-                reportData.records = hardcodedRecords;
-                console.log('Forcing hardcoded data as fallback');
+                console.error('Error fetching records:', error);
+                reportData.records = [];
             }
             
             updateReportDisplay();
