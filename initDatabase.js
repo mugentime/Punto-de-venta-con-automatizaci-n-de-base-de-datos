@@ -12,87 +12,8 @@ async function initializeWithSampleData() {
             return;
         }
 
-        // Create default products
-        const defaultProducts = [
-            {
-                name: "Espresso",
-                category: "cafeteria",
-                quantity: 50,
-                cost: 10,
-                price: 35,
-                lowStockAlert: 10,
-                description: "Café espresso tradicional"
-            },
-            {
-                name: "Americano",
-                category: "cafeteria", 
-                quantity: 45,
-                cost: 12,
-                price: 40,
-                lowStockAlert: 10,
-                description: "Café americano suave"
-            },
-            {
-                name: "Capuccino",
-                category: "cafeteria",
-                quantity: 40,
-                cost: 15,
-                price: 45,
-                lowStockAlert: 10,
-                description: "Capuccino cremoso"
-            },
-            {
-                name: "Latte",
-                category: "cafeteria",
-                quantity: 35,
-                cost: 12,
-                price: 40,
-                lowStockAlert: 10,
-                description: "Latte con leche vaporizada"
-            },
-            {
-                name: "Mokha",
-                category: "cafeteria",
-                quantity: 25,
-                cost: 18,
-                price: 50,
-                lowStockAlert: 8,
-                description: "Café mokha con chocolate"
-            },
-            {
-                name: "Coca-Cola",
-                category: "refrigerador",
-                quantity: 24,
-                cost: 15,
-                price: 25,
-                lowStockAlert: 6,
-                description: "Refresco de cola 355ml"
-            },
-            {
-                name: "Agua Mineral",
-                category: "refrigerador",
-                quantity: 30,
-                cost: 8,
-                price: 15,
-                lowStockAlert: 10,
-                description: "Agua mineral 500ml"
-            },
-            {
-                name: "Pepsi",
-                category: "refrigerador",
-                quantity: 20,
-                cost: 14,
-                price: 25,
-                lowStockAlert: 6,
-                description: "Refresco de cola Pepsi 355ml"
-            }
-        ];
-
-        console.log('📦 Creating default products...');
-        for (const product of defaultProducts) {
-            await database.createProduct(product);
-            console.log(`✅ Created product: ${product.name}`);
-        }
+        // NO crear productos por defecto - el usuario los agregará manualmente
+        console.log('📦 Skipping default products creation - user will add their own');
 
         // Create default admin user
         const existingUsers = await database.getUsers();
