@@ -3287,21 +3287,7 @@
         
         // Check if demo data should be used
         function shouldUseDemoData(realRecords) {
-            // Use demo data if no real records exist or if all records are very old (more than 7 days)
-            if (realRecords.length === 0) {
-                return true;
-            }
-            
-            const now = new Date();
-            const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
-            
-            // Check if there are any recent records
-            const recentRecords = realRecords.filter(record => {
-                const recordDate = new Date(record.date || record.createdAt);
-                return recordDate > weekAgo;
-            });
-            
-            return recentRecords.length === 0;
+            return false; // Disable fake demo data
         }
 
         // Initialize all charts
