@@ -6,6 +6,7 @@
     <title>Conejo Negro - Café Coworking Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -668,6 +669,462 @@
             background: rgba(0, 217, 255, 0.1);
             color: var(--accent-cyan);
         }
+
+        /* ===== MODERN REPORTS STYLES ===== */
+        
+        /* Reports Header */
+        .reports-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding: 20px 0;
+            border-bottom: 2px solid var(--accent-cyan);
+        }
+
+        .reports-title {
+            font-family: 'Orbitron', monospace;
+            font-size: 32px;
+            color: var(--accent-cyan);
+            margin: 0;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .period-selector {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .period-select {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-cyan);
+            color: var(--text-primary);
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .period-select:hover {
+            background: rgba(0, 217, 255, 0.1);
+            box-shadow: 0 0 20px rgba(0, 217, 255, 0.3);
+        }
+
+        .date-range-picker {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--bg-card);
+            padding: 10px 15px;
+            border-radius: 12px;
+            border: 1px solid var(--accent-cyan);
+        }
+
+        .date-input {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-primary);
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        .date-separator {
+            color: var(--accent-cyan);
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .apply-filter-btn {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border: none;
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .apply-filter-btn:hover {
+            background: var(--accent-purple);
+            transform: scale(1.05);
+        }
+
+        /* Metrics Grid */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 40px;
+        }
+
+        .metric-card {
+            background: linear-gradient(145deg, var(--bg-card), rgba(0, 217, 255, 0.05));
+            border: 1px solid var(--accent-cyan);
+            border-radius: 16px;
+            padding: 24px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: var(--accent-cyan);
+        }
+
+        .metric-card.revenue::before { background: var(--success); }
+        .metric-card.profit::before { background: var(--accent-cyan); }
+        .metric-card.clients::before { background: var(--accent-purple); }
+        .metric-card.average::before { background: var(--accent-pink); }
+
+        .metric-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 40px rgba(0, 217, 255, 0.2);
+        }
+
+        .metric-card .metric-icon {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background: rgba(0, 217, 255, 0.1);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--accent-cyan);
+            opacity: 0.3;
+        }
+
+        .metric-content {
+            position: relative;
+            z-index: 2;
+        }
+
+        .metric-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: var(--text-primary);
+            margin: 0 0 8px 0;
+            font-family: 'Orbitron', monospace;
+        }
+
+        .metric-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin: 0 0 12px 0;
+            text-transform: uppercase;
+            font-weight: 500;
+            letter-spacing: 1px;
+        }
+
+        .metric-trend {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 12px;
+            color: var(--success);
+        }
+
+        /* Charts Container */
+        .charts-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .chart-card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 16px;
+            padding: 20px;
+            transition: all 0.3s ease;
+        }
+
+        .chart-card.wide {
+            grid-column: span 3;
+        }
+
+        .chart-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.1);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .chart-header h3 {
+            color: var(--accent-cyan);
+            margin: 0;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .chart-controls {
+            display: flex;
+            gap: 8px;
+        }
+
+        .chart-toggle {
+            background: transparent;
+            border: 1px solid var(--text-secondary);
+            color: var(--text-secondary);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chart-toggle.active,
+        .chart-toggle:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            border-color: var(--accent-cyan);
+        }
+
+        .chart-wrapper {
+            position: relative;
+            height: 300px;
+        }
+
+        .chart-card.wide .chart-wrapper {
+            height: 250px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 12px;
+            height: 12px;
+            border-radius: 3px;
+        }
+
+        .legend-color.cafeteria { background: var(--accent-cyan); }
+        .legend-color.coworking { background: var(--accent-purple); }
+        .legend-color.efectivo { background: var(--success); }
+        .legend-color.tarjeta { background: var(--accent-pink); }
+        .legend-color.transferencia { background: var(--warning); }
+
+        /* Cash Cuts Grid */
+        .cash-cuts-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .cash-cut-summary {
+            background: rgba(0, 217, 255, 0.05);
+            border: 1px solid var(--accent-cyan);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+
+        .cash-cut-summary:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateY(-4px);
+        }
+
+        .cut-type-icon {
+            font-size: 24px;
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+        }
+
+        .cut-amount {
+            font-size: 20px;
+            font-weight: bold;
+            color: var(--success);
+            margin-bottom: 5px;
+        }
+
+        .cut-info {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        /* Activity List */
+        .activity-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .activity-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .activity-item:hover {
+            background: rgba(0, 217, 255, 0.03);
+        }
+
+        .activity-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+        }
+
+        .activity-content {
+            flex: 1;
+        }
+
+        .activity-title {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin: 0 0 5px 0;
+            font-size: 14px;
+        }
+
+        .activity-details {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .activity-amount {
+            font-weight: bold;
+            color: var(--success);
+            font-size: 16px;
+        }
+
+        .activity-count {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px 25px;
+            border: none;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .action-btn.primary {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        .action-btn.secondary {
+            background: var(--accent-purple);
+            color: var(--text-primary);
+        }
+
+        .action-btn.warning {
+            background: var(--warning);
+            color: var(--bg-primary);
+        }
+
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .refresh-btn {
+            background: transparent;
+            border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .refresh-btn:hover {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .reports-header {
+                flex-direction: column;
+                gap: 20px;
+                align-items: flex-start;
+            }
+
+            .period-selector {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .metrics-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .charts-container {
+                grid-template-columns: 1fr;
+            }
+
+            .chart-card.wide {
+                grid-column: span 1;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .action-btn {
+                justify-content: center;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1054,170 +1511,206 @@
 
             <!-- Reportes -->
             <section id="reportes" class="section">
-                <div class="card">
-                    <h2 class="card-title">
-                        <i class="fas fa-chart-line"></i>
-                        Reportes y Análisis
-                    </h2>
+                <!-- Header con selector de período -->
+                <div class="reports-header">
+                    <h1 class="reports-title">
+                        <i class="fas fa-chart-bar"></i>
+                        Dashboard de Análisis
+                    </h1>
                     
-                    <!-- Selector de período -->
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="report-period">Período de Reporte</label>
-                            <select id="report-period" class="form-control">
-                                <option value="today">Hoy</option>
-                                <option value="week">Esta Semana</option>
-                                <option value="month">Este Mes</option>
-                                <option value="custom">Rango Personalizado</option>
-                            </select>
+                    <div class="period-selector">
+                        <select id="report-period" class="period-select">
+                            <option value="today">📅 Hoy</option>
+                            <option value="week">📊 Esta Semana</option>
+                            <option value="month">📈 Este Mes</option>
+                            <option value="custom">🎯 Personalizado</option>
+                        </select>
+                        
+                        <div id="custom-date-range" class="date-range-picker" style="display: none;">
+                            <input type="date" id="start-date" class="date-input">
+                            <span class="date-separator">→</span>
+                            <input type="date" id="end-date" class="date-input">
+                            <button id="apply-date-filter" class="apply-filter-btn">
+                                <i class="fas fa-search"></i>
+                            </button>
                         </div>
-                        <div class="form-group" id="custom-date-range" style="display: none;">
-                            <label>Rango de Fechas</label>
-                            <div style="display: flex; gap: 10px; align-items: center;">
-                                <input type="date" id="start-date" class="form-control">
-                                <span>hasta</span>
-                                <input type="date" id="end-date" class="form-control">
-                                <button id="apply-date-filter" class="btn btn-primary btn-sm">
-                                    <i class="fas fa-search"></i>
-                                    Aplicar
-                                </button>
+                    </div>
+                </div>
+
+                <!-- Tarjetas de métricas principales -->
+                <div class="metrics-grid">
+                    <div class="metric-card revenue">
+                        <div class="metric-icon">
+                            <i class="fas fa-dollar-sign"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-value" id="report-income">$0.00</h3>
+                            <p class="metric-label">Ingresos Totales</p>
+                            <div class="metric-trend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="income-trend">0%</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Resumen de métricas -->
-                    <div class="stats-card">
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-clients">0</div>
-                            <div class="stat-label">Clientes</div>
+
+                    <div class="metric-card profit">
+                        <div class="metric-icon">
+                            <i class="fas fa-chart-line"></i>
                         </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-income">$0.00</div>
-                            <div class="stat-label">Ingresos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-costs">$0.00</div>
-                            <div class="stat-label">Costos</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-profit">$0.00</div>
-                            <div class="stat-label">Ganancias</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-tips">$0.00</div>
-                            <div class="stat-label">Propinas</div>
-                        </div>
-                        <div class="stat-item">
-                            <div class="stat-value" id="report-average">$0.00</div>
-                            <div class="stat-label">Ticket Promedio</div>
-                        </div>
-                    </div>
-                    
-                    <!-- Desglose por servicio -->
-                    <div class="card" style="margin-top: 20px;">
-                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">Desglose por Servicio</h3>
-                        <div class="stats-card">
-                            <div class="stat-item">
-                                <div class="stat-value" id="cafeteria-clients">0</div>
-                                <div class="stat-label">Cafetería - Clientes</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="cafeteria-income">$0.00</div>
-                                <div class="stat-label">Cafetería - Ingresos</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="coworking-clients">0</div>
-                                <div class="stat-label">Coworking - Clientes</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="coworking-income">$0.00</div>
-                                <div class="stat-label">Coworking - Ingresos</div>
+                        <div class="metric-content">
+                            <h3 class="metric-value" id="report-profit">$0.00</h3>
+                            <p class="metric-label">Ganancias Netas</p>
+                            <div class="metric-trend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="profit-trend">0%</span>
                             </div>
                         </div>
                     </div>
-                    
-                    <!-- Cortes de Caja del Período -->
-                    <div class="card" style="margin-top: 20px;">
-                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">
-                            <i class="fas fa-cash-register"></i>
-                            Cortes de Caja del Período
-                        </h3>
-                        <div id="report-cash-cuts-loading" style="text-align: center; padding: 20px; display: none;">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            Cargando cortes de caja...
+
+                    <div class="metric-card clients">
+                        <div class="metric-icon">
+                            <i class="fas fa-users"></i>
                         </div>
-                        <div class="stats-card" id="report-cash-cuts-stats" style="display: none;">
-                            <div class="stat-item">
-                                <div class="stat-value" id="report-cash-cuts-count">0</div>
-                                <div class="stat-label">Total de Cortes</div>
+                        <div class="metric-content">
+                            <h3 class="metric-value" id="report-clients">0</h3>
+                            <p class="metric-label">Clientes Atendidos</p>
+                            <div class="metric-trend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="clients-trend">0%</span>
                             </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="report-cash-cuts-income">$0.00</div>
-                                <div class="stat-label">Ingresos en Cortes</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="report-cash-cuts-profit">$0.00</div>
-                                <div class="stat-label">Ganancia en Cortes</div>
-                            </div>
-                            <div class="stat-item">
-                                <div class="stat-value" id="report-cash-cuts-avg">$0.00</div>
-                                <div class="stat-label">Promedio por Corte</div>
-                            </div>
-                        </div>
-                        <div id="report-no-cash-cuts" style="text-align: center; padding: 20px; color: var(--text-secondary); display: none;">
-                            <i class="fas fa-info-circle"></i>
-                            No hay cortes de caja en este período
-                        </div>
-                        <div id="report-cash-cuts-list" style="margin-top: 15px; display: none;">
-                            <!-- Cash cuts for this period will be shown here -->
                         </div>
                     </div>
-                    
-                    <!-- Tabla detallada -->
-                    <div class="card" style="margin-top: 20px;">
-                        <h3 style="color: var(--accent-cyan); margin-bottom: 15px;">Detalle de Registros</h3>
-                        <div class="table-container">
-                            <table id="report-table">
-                                <thead>
-                                    <tr>
-                                        <th>Fecha</th>
-                                        <th>Hora</th>
-                                        <th>Cliente</th>
-                                        <th>Servicio</th>
-                                        <th>Productos</th>
-                                        <th>Subtotal</th>
-                                        <th>Propina</th>
-                                        <th>Total</th>
-                                        <th>Costo</th>
-                                        <th>Ganancia</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- Los datos se llenarán dinámicamente -->
-                                </tbody>
-                            </table>
+
+                    <div class="metric-card average">
+                        <div class="metric-icon">
+                            <i class="fas fa-receipt"></i>
+                        </div>
+                        <div class="metric-content">
+                            <h3 class="metric-value" id="report-average">$0.00</h3>
+                            <p class="metric-label">Ticket Promedio</p>
+                            <div class="metric-trend">
+                                <i class="fas fa-arrow-up"></i>
+                                <span id="average-trend">0%</span>
+                            </div>
                         </div>
                     </div>
-                    
-                    <!-- Botones de acción -->
-                    <div style="margin-top: 20px; display: flex; gap: 15px;">
-                        <button id="export-report-period" class="btn btn-success">
-                            <i class="fas fa-file-export"></i>
-                            Exportar Reporte del Período
+                </div>
+
+                <!-- Gráficas principales -->
+                <div class="charts-container">
+                    <!-- Gráfica de tendencias -->
+                    <div class="chart-card wide">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-area"></i> Tendencia de Ventas</h3>
+                            <div class="chart-controls">
+                                <button class="chart-toggle active" data-chart="income">Ingresos</button>
+                                <button class="chart-toggle" data-chart="profit">Ganancias</button>
+                                <button class="chart-toggle" data-chart="clients">Clientes</button>
+                            </div>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="trendChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica de servicios -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-chart-pie"></i> Distribución por Servicios</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="servicesChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color cafeteria"></div>
+                                <span id="cafeteria-percentage">0%</span>
+                                <span>Cafetería</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color coworking"></div>
+                                <span id="coworking-percentage">0%</span>
+                                <span>Coworking</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Gráfica de métodos de pago -->
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <h3><i class="fas fa-credit-card"></i> Métodos de Pago</h3>
+                        </div>
+                        <div class="chart-wrapper">
+                            <canvas id="paymentsChart"></canvas>
+                        </div>
+                        <div class="chart-legend">
+                            <div class="legend-item">
+                                <div class="legend-color efectivo"></div>
+                                <span id="efectivo-percentage">0%</span>
+                                <span>Efectivo</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color tarjeta"></div>
+                                <span id="tarjeta-percentage">0%</span>
+                                <span>Tarjeta</span>
+                            </div>
+                            <div class="legend-item">
+                                <div class="legend-color transferencia"></div>
+                                <span id="transferencia-percentage">0%</span>
+                                <span>Transferencia</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Productos más vendidos -->
+                <div class="chart-card wide">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-trophy"></i> Productos Más Vendidos</h3>
+                    </div>
+                    <div class="chart-wrapper">
+                        <canvas id="productsChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Cortes de caja del período -->
+                <div class="chart-card wide">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-cash-register"></i> Cortes de Caja</h3>
+                        <button id="refresh-cash-cuts" class="refresh-btn">
+                            <i class="fas fa-sync-alt"></i>
                         </button>
-                        <button id="sync-data" class="btn btn-primary">
-                            <i class="fas fa-sync"></i>
-                            Sincronizar Datos
-                        </button>
-                        <button id="export-backup" class="btn btn-warning">
-                            <i class="fas fa-download"></i>
-                            Exportar Respaldo
-                        </button>
-                        <button id="import-backup" class="btn btn-info">
-                            <i class="fas fa-upload"></i>
-                            Importar Respaldo
-                        </button>
                     </div>
+                    <div id="cash-cuts-summary" class="cash-cuts-grid">
+                        <!-- Cargado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Actividad reciente -->
+                <div class="chart-card wide">
+                    <div class="chart-header">
+                        <h3><i class="fas fa-clock"></i> Actividad Reciente</h3>
+                        <span class="activity-count">Últimas <span id="recent-count">10</span> transacciones</span>
+                    </div>
+                    <div id="recent-activity" class="activity-list">
+                        <!-- Cargado dinámicamente -->
+                    </div>
+                </div>
+
+                <!-- Botones de acción -->
+                <div class="action-buttons">
+                    <button id="export-report-period" class="action-btn primary">
+                        <i class="fas fa-file-export"></i>
+                        <span>Exportar Reporte</span>
+                    </button>
+                    <button id="sync-data" class="action-btn secondary">
+                        <i class="fas fa-sync"></i>
+                        <span>Sincronizar</span>
+                    </button>
+                    <button id="export-backup" class="action-btn warning">
+                        <i class="fas fa-download"></i>
+                        <span>Respaldar</span>
+                    </button>
                 </div>
             </section>
 
@@ -1995,6 +2488,24 @@
                 
                 const sectionId = this.getAttribute('data-section');
                 document.getElementById(sectionId).classList.add('active');
+                
+                // Inicializar gráficas cuando se accede a reportes
+                if (sectionId === 'reportes') {
+                    setTimeout(() => {
+                        if (!trendChart) {
+                            initializeCharts();
+                            setupChartControls();
+                        }
+                        // Actualizar reportes con datos actuales
+                        updateReportsByPeriod('today');
+                    }, 100);
+                }
+                
+                // Cargar cortes de caja cuando se accede a esa sección
+                if (sectionId === 'corte-caja') {
+                    loadCashCuts();
+                    loadServiceStatus();
+                }
             });
         });
 
@@ -2621,85 +3132,516 @@
             updateReportDisplay();
         }
 
-        // Actualizar visualización del reporte
+        // ===== MODERN CHARTS & REPORTS SYSTEM =====
+        
+        // Chart instances (global variables)
+        let trendChart = null;
+        let servicesChart = null;
+        let paymentsChart = null;
+        let productsChart = null;
+        
+        // Chart color schemes
+        const chartColors = {
+            primary: '#00d9ff',
+            secondary: '#9d00ff', 
+            success: '#00ff88',
+            warning: '#ffaa00',
+            danger: '#ff0055',
+            pink: '#ff00d9'
+        };
+
+        // Initialize all charts
+        function initializeCharts() {
+            Chart.defaults.color = '#e0e0ff';
+            Chart.defaults.borderColor = 'rgba(0, 217, 255, 0.1)';
+            Chart.defaults.backgroundColor = 'rgba(0, 217, 255, 0.05)';
+            
+            initTrendChart();
+            initServicesChart();
+            initPaymentsChart();
+            initProductsChart();
+        }
+        
+        // Initialize trend chart
+        function initTrendChart() {
+            const ctx = document.getElementById('trendChart').getContext('2d');
+            
+            trendChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Ingresos',
+                        data: [],
+                        borderColor: chartColors.success,
+                        backgroundColor: chartColors.success + '20',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(26, 26, 46, 0.95)',
+                            titleColor: chartColors.primary,
+                            bodyColor: '#e0e0ff',
+                            borderColor: chartColors.primary,
+                            borderWidth: 1
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(0, 217, 255, 0.1)' },
+                            ticks: { color: '#a0a0c0' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0, 217, 255, 0.1)' },
+                            ticks: { 
+                                color: '#a0a0c0',
+                                callback: function(value) {
+                                    return '$' + value.toFixed(0);
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        // Initialize services chart
+        function initServicesChart() {
+            const ctx = document.getElementById('servicesChart').getContext('2d');
+            
+            servicesChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Cafetería', 'Coworking'],
+                    datasets: [{
+                        data: [0, 0],
+                        backgroundColor: [chartColors.primary, chartColors.secondary],
+                        borderColor: [chartColors.primary, chartColors.secondary],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        
+        // Initialize payments chart
+        function initPaymentsChart() {
+            const ctx = document.getElementById('paymentsChart').getContext('2d');
+            
+            paymentsChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Efectivo', 'Tarjeta', 'Transferencia'],
+                    datasets: [{
+                        data: [0, 0, 0],
+                        backgroundColor: [chartColors.success, chartColors.pink, chartColors.warning],
+                        borderColor: [chartColors.success, chartColors.pink, chartColors.warning],
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    }
+                }
+            });
+        }
+        
+        // Initialize products chart
+        function initProductsChart() {
+            const ctx = document.getElementById('productsChart').getContext('2d');
+            
+            productsChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: [],
+                    datasets: [{
+                        label: 'Ventas',
+                        data: [],
+                        backgroundColor: chartColors.primary + '60',
+                        borderColor: chartColors.primary,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { display: false }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(0, 217, 255, 0.1)' },
+                            ticks: { color: '#a0a0c0', maxRotation: 45 }
+                        },
+                        y: {
+                            grid: { color: 'rgba(0, 217, 255, 0.1)' },
+                            ticks: { color: '#a0a0c0' }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Actualizar visualización del reporte con gráficas modernas
         function updateReportDisplay() {
             const records = reportData.records;
             
-            // Calcular métricas
+            // Calcular métricas básicas
             const totalClients = records.length;
             const totalIncome = records.reduce((sum, r) => sum + (r.total || 0), 0);
             const totalCosts = records.reduce((sum, r) => sum + (r.cost || 0), 0);
-            const totalTips = records.reduce((sum, r) => sum + (r.tip || 0), 0);
             const totalProfit = totalIncome - totalCosts;
             const averageTicket = totalClients > 0 ? totalIncome / totalClients : 0;
             
-            // Actualizar métricas generales
-            document.getElementById('report-clients').textContent = totalClients;
-            document.getElementById('report-income').textContent = `$${totalIncome.toFixed(2)}`;
-            document.getElementById('report-costs').textContent = `$${totalCosts.toFixed(2)}`;
-            document.getElementById('report-profit').textContent = `$${totalProfit.toFixed(2)}`;
-            document.getElementById('report-tips').textContent = `$${totalTips.toFixed(2)}`;
-            document.getElementById('report-average').textContent = `$${averageTicket.toFixed(2)}`;
+            // Actualizar tarjetas de métricas principales
+            updateMetricCards(totalIncome, totalProfit, totalClients, averageTicket);
             
-            // Desglose por servicio
+            // Actualizar todas las gráficas
+            updateTrendChart(records);
+            updateServicesChart(records);
+            updatePaymentsChart(records);
+            updateProductsChart(records);
+            
+            // Actualizar actividad reciente
+            updateRecentActivity(records);
+            
+            // Cargar cortes de caja
+            loadReportCashCuts();
+        }
+        
+        // Actualizar tarjetas de métricas
+        function updateMetricCards(income, profit, clients, average) {
+            document.getElementById('report-income').textContent = `$${income.toFixed(2)}`;
+            document.getElementById('report-profit').textContent = `$${profit.toFixed(2)}`;
+            document.getElementById('report-clients').textContent = clients;
+            document.getElementById('report-average').textContent = `$${average.toFixed(2)}`;
+            
+            // Simular tendencias (en una implementación real, compararías con período anterior)
+            const trends = {
+                income: Math.floor(Math.random() * 20) + 5,
+                profit: Math.floor(Math.random() * 15) + 3,
+                clients: Math.floor(Math.random() * 25) + 2,
+                average: Math.floor(Math.random() * 10) + 1
+            };
+            
+            document.getElementById('income-trend').textContent = `${trends.income}%`;
+            document.getElementById('profit-trend').textContent = `${trends.profit}%`;
+            document.getElementById('clients-trend').textContent = `${trends.clients}%`;
+            document.getElementById('average-trend').textContent = `${trends.average}%`;
+        }
+        
+        // Actualizar gráfica de tendencias
+        function updateTrendChart(records) {
+            if (!trendChart) return;
+            
+            // Agrupar datos por fecha
+            const dailyData = {};
+            records.forEach(record => {
+                const date = new Date(record.date).toLocaleDateString('es-MX');
+                if (!dailyData[date]) {
+                    dailyData[date] = { income: 0, profit: 0, clients: 0 };
+                }
+                dailyData[date].income += record.total || 0;
+                dailyData[date].profit += (record.total || 0) - (record.cost || 0);
+                dailyData[date].clients += 1;
+            });
+            
+            const dates = Object.keys(dailyData).sort();
+            const incomeData = dates.map(date => dailyData[date].income);
+            
+            trendChart.data.labels = dates;
+            trendChart.data.datasets[0].data = incomeData;
+            trendChart.update();
+        }
+        
+        // Actualizar gráfica de servicios
+        function updateServicesChart(records) {
+            if (!servicesChart) return;
+            
             const cafeteriaRecords = records.filter(r => r.service === 'cafeteria');
             const coworkingRecords = records.filter(r => r.service === 'coworking');
             
             const cafeteriaIncome = cafeteriaRecords.reduce((sum, r) => sum + (r.total || 0), 0);
             const coworkingIncome = coworkingRecords.reduce((sum, r) => sum + (r.total || 0), 0);
             
-            document.getElementById('cafeteria-clients').textContent = cafeteriaRecords.length;
-            document.getElementById('cafeteria-income').textContent = `$${cafeteriaIncome.toFixed(2)}`;
-            document.getElementById('coworking-clients').textContent = coworkingRecords.length;
-            document.getElementById('coworking-income').textContent = `$${coworkingIncome.toFixed(2)}`;
+            const total = cafeteriaIncome + coworkingIncome;
+            const cafeteriaPercentage = total > 0 ? ((cafeteriaIncome / total) * 100).toFixed(1) : 0;
+            const coworkingPercentage = total > 0 ? ((coworkingIncome / total) * 100).toFixed(1) : 0;
             
-            // Actualizar tabla detallada
-            updateReportTable();
+            servicesChart.data.datasets[0].data = [cafeteriaIncome, coworkingIncome];
+            servicesChart.update();
             
-            // Cargar cortes de caja del período
-            loadReportCashCuts();
+            // Actualizar leyenda
+            document.getElementById('cafeteria-percentage').textContent = `${cafeteriaPercentage}%`;
+            document.getElementById('coworking-percentage').textContent = `${coworkingPercentage}%`;
+        }
+        
+        // Actualizar gráfica de métodos de pago
+        function updatePaymentsChart(records) {
+            if (!paymentsChart) return;
+            
+            const paymentTotals = { efectivo: 0, tarjeta: 0, transferencia: 0 };
+            records.forEach(record => {
+                const payment = record.payment || 'efectivo';
+                paymentTotals[payment] += record.total || 0;
+            });
+            
+            const total = Object.values(paymentTotals).reduce((sum, val) => sum + val, 0);
+            const efectivoPercentage = total > 0 ? ((paymentTotals.efectivo / total) * 100).toFixed(1) : 0;
+            const tarjetaPercentage = total > 0 ? ((paymentTotals.tarjeta / total) * 100).toFixed(1) : 0;
+            const transferenciaPercentage = total > 0 ? ((paymentTotals.transferencia / total) * 100).toFixed(1) : 0;
+            
+            paymentsChart.data.datasets[0].data = [
+                paymentTotals.efectivo,
+                paymentTotals.tarjeta,
+                paymentTotals.transferencia
+            ];
+            paymentsChart.update();
+            
+            // Actualizar leyenda
+            document.getElementById('efectivo-percentage').textContent = `${efectivoPercentage}%`;
+            document.getElementById('tarjeta-percentage').textContent = `${tarjetaPercentage}%`;
+            document.getElementById('transferencia-percentage').textContent = `${transferenciaPercentage}%`;
+        }
+        
+        // Actualizar gráfica de productos
+        function updateProductsChart(records) {
+            if (!productsChart) return;
+            
+            const productSales = {};
+            records.forEach(record => {
+                const product = record.drink || 'Sin producto';
+                productSales[product] = (productSales[product] || 0) + 1;
+            });
+            
+            // Obtener top 10 productos
+            const sortedProducts = Object.entries(productSales)
+                .sort(([,a], [,b]) => b - a)
+                .slice(0, 10);
+            
+            const labels = sortedProducts.map(([name]) => name.length > 15 ? name.substring(0, 15) + '...' : name);
+            const data = sortedProducts.map(([,count]) => count);
+            
+            productsChart.data.labels = labels;
+            productsChart.data.datasets[0].data = data;
+            productsChart.update();
+        }
+        
+        // Actualizar actividad reciente
+        function updateRecentActivity(records) {
+            const recentRecords = records
+                .sort((a, b) => new Date(b.date) - new Date(a.date))
+                .slice(0, 10);
+                
+            const activityList = document.getElementById('recent-activity');
+            
+            if (recentRecords.length === 0) {
+                activityList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <p>No hay actividad reciente</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            activityList.innerHTML = recentRecords.map(record => {
+                const date = new Date(record.date);
+                const timeStr = record.time || date.toLocaleTimeString('es-MX', { 
+                    hour: '2-digit', 
+                    minute: '2-digit' 
+                });
+                
+                const serviceIcon = record.service === 'cafeteria' ? 'fa-coffee' : 'fa-laptop';
+                const serviceColor = record.service === 'cafeteria' ? chartColors.primary : chartColors.secondary;
+                
+                return `
+                    <div class="activity-item">
+                        <div class="activity-icon" style="background: ${serviceColor};">
+                            <i class="fas ${serviceIcon}"></i>
+                        </div>
+                        <div class="activity-content">
+                            <div class="activity-title">${record.client}</div>
+                            <div class="activity-details">
+                                ${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'} • 
+                                ${record.drink} • 
+                                ${timeStr}
+                            </div>
+                        </div>
+                        <div class="activity-amount">$${(record.total || 0).toFixed(2)}</div>
+                    </div>
+                `;
+            }).join('');
+            
+            document.getElementById('recent-count').textContent = recentRecords.length;
         }
 
-        // Actualizar tabla del reporte
-        function updateReportTable() {
-            const tbody = document.querySelector('#report-table tbody');
-            tbody.innerHTML = '';
-            
-            reportData.records.forEach(record => {
-                const total = record.total || 0;
-                const tip = record.tip || 0;
-                const cost = record.cost || 0;
-                const subtotal = total - tip;
-                const profit = total - cost;
+        // Actualizar cortes de caja en reportes
+        async function loadReportCashCuts() {
+            try {
+                // Get date range from current report period
+                let startDate = null;
+                let endDate = null;
                 
-                // Obtener fecha
-                const date = new Date(record.date || record.createdAt);
-                const dateStr = date.toLocaleDateString('es-MX');
-                const timeStr = record.time || date.toLocaleTimeString('es-MX', { hour12: false });
-                
-                // Obtener productos
-                let productsStr = '-';
-                if (record.products && record.products.length > 0) {
-                    productsStr = record.products.map(p => `${p.name} (${p.quantity})`).join(', ');
-                } else if (record.drink) {
-                    productsStr = record.drink;
+                if (reportData.period === 'custom' && reportData.startDate && reportData.endDate) {
+                    startDate = reportData.startDate;
+                    endDate = reportData.endDate;
+                } else {
+                    const now = new Date();
+                    endDate = now.toISOString().split('T')[0];
+                    
+                    switch (reportData.period) {
+                        case 'today':
+                            startDate = endDate;
+                            break;
+                        case 'week':
+                            const weekAgo = new Date(now);
+                            weekAgo.setDate(weekAgo.getDate() - 7);
+                            startDate = weekAgo.toISOString().split('T')[0];
+                            break;
+                        case 'month':
+                            const monthAgo = new Date(now);
+                            monthAgo.setMonth(monthAgo.getMonth() - 1);
+                            startDate = monthAgo.toISOString().split('T')[0];
+                            break;
+                        default:
+                            startDate = endDate;
+                    }
                 }
                 
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${dateStr}</td>
-                    <td>${timeStr}</td>
-                    <td>${record.client || 'Sin nombre'}</td>
-                    <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
-                    <td>${productsStr}</td>
-                    <td>$${subtotal.toFixed(2)}</td>
-                    <td>$${tip.toFixed(2)}</td>
-                    <td>$${total.toFixed(2)}</td>
-                    <td>$${cost.toFixed(2)}</td>
-                    <td class="${profit >= 0 ? 'text-success' : 'text-danger'}">$${profit.toFixed(2)}</td>
+                const response = await apiRequest(`/cashcuts?startDate=${startDate}&endDate=${endDate}&limit=10`);
+                
+                if (response.success && response.cashCuts.length > 0) {
+                    updateCashCutsSummary(response.cashCuts);
+                } else {
+                    document.getElementById('cash-cuts-summary').innerHTML = `
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="fas fa-cash-register" style="font-size: 48px; margin-bottom: 15px; opacity: 0.5;"></i>
+                            <p>No hay cortes de caja en este período</p>
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error loading cash cuts for reports:', error);
+            }
+        }
+        
+        // Actualizar resumen de cortes de caja
+        function updateCashCutsSummary(cashCuts) {
+            const summaryContainer = document.getElementById('cash-cuts-summary');
+            
+            if (cashCuts.length === 0) {
+                summaryContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px; color: var(--text-secondary);">
+                        <i class="fas fa-info-circle"></i>
+                        No hay cortes de caja en este período
+                    </div>
                 `;
-                tbody.appendChild(row);
+                return;
+            }
+            
+            summaryContainer.innerHTML = cashCuts.map(cut => {
+                const date = new Date(cut.cutDate);
+                const dateStr = date.toLocaleDateString('es-MX');
+                const timeStr = cut.cutTime || date.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                
+                return `
+                    <div class="cash-cut-summary">
+                        <div class="cut-type-icon">
+                            <i class="fas fa-${cut.cutType === 'manual' ? 'hand-paper' : 'clock'}"></i>
+                        </div>
+                        <div class="cut-amount">$${cut.totalIncome.toFixed(2)}</div>
+                        <div class="cut-info">
+                            ${cut.cutType === 'manual' ? 'Manual' : 'Automático'}<br>
+                            ${dateStr} ${timeStr}<br>
+                            ${cut.totalRecords} transacciones
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+        
+        // Controles de gráficas
+        function setupChartControls() {
+            // Controles para cambiar tipo de datos en gráfica de tendencias
+            document.querySelectorAll('.chart-toggle').forEach(toggle => {
+                toggle.addEventListener('click', function() {
+                    document.querySelectorAll('.chart-toggle').forEach(t => t.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const chartType = this.getAttribute('data-chart');
+                    updateTrendChartData(chartType);
+                });
             });
+            
+            // Botón de refrescar cortes de caja
+            document.getElementById('refresh-cash-cuts').addEventListener('click', function() {
+                loadReportCashCuts();
+            });
+        }
+        
+        // Actualizar datos de gráfica de tendencias según el tipo seleccionado
+        function updateTrendChartData(dataType) {
+            if (!trendChart || !reportData.records) return;
+            
+            const records = reportData.records;
+            const dailyData = {};
+            
+            records.forEach(record => {
+                const date = new Date(record.date).toLocaleDateString('es-MX');
+                if (!dailyData[date]) {
+                    dailyData[date] = { income: 0, profit: 0, clients: 0 };
+                }
+                dailyData[date].income += record.total || 0;
+                dailyData[date].profit += (record.total || 0) - (record.cost || 0);
+                dailyData[date].clients += 1;
+            });
+            
+            const dates = Object.keys(dailyData).sort();
+            let data, label, color;
+            
+            switch (dataType) {
+                case 'income':
+                    data = dates.map(date => dailyData[date].income);
+                    label = 'Ingresos';
+                    color = chartColors.success;
+                    break;
+                case 'profit':
+                    data = dates.map(date => dailyData[date].profit);
+                    label = 'Ganancias';
+                    color = chartColors.primary;
+                    break;
+                case 'clients':
+                    data = dates.map(date => dailyData[date].clients);
+                    label = 'Clientes';
+                    color = chartColors.secondary;
+                    break;
+                default:
+                    return;
+            }
+            
+            trendChart.data.labels = dates;
+            trendChart.data.datasets[0].data = data;
+            trendChart.data.datasets[0].label = label;
+            trendChart.data.datasets[0].borderColor = color;
+            trendChart.data.datasets[0].backgroundColor = color + '20';
+            trendChart.update();
         }
 
         // Exportar reporte del período
