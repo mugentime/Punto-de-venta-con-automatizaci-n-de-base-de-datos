@@ -1833,6 +1833,13 @@
                 return false;
             }
 
+            // Si ya tenemos el token Y el usuario, mostrar la app inmediatamente
+            if (authToken && currentUser) {
+                showMainApp();
+                return true;
+            }
+
+            // Solo verificar con el servidor si no tenemos datos del usuario
             try {
                 const response = await fetch(`${API_BASE_URL}/auth/verify`, {
                     headers: {
@@ -1847,13 +1854,18 @@
                     showMainApp();
                     return true;
                 } else {
-                    localStorage.removeItem('authToken');
-                    localStorage.removeItem('currentUser');
+                    // NO borrar token - solo mostrar login si falla
+                    console.log('Token verification failed, but keeping token for retry');
                     showLoginScreen();
                     return false;
                 }
             } catch (error) {
-                console.error('Error verificando autenticación:', error);
+                // Error de red - mantener token y mostrar app offline
+                console.log('Network error during auth check - showing app offline');
+                if (currentUser) {
+                    showMainApp();
+                    return true;
+                }
                 showLoginScreen();
                 return false;
             }
