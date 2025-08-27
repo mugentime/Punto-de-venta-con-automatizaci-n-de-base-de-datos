@@ -2579,7 +2579,10 @@
             try {
                 await apiRequest(`/products/${productId}`, { method: 'DELETE' });
                 
-                data.products = data.products.filter(p => p._id !== productId);
+                // Refresh products from server to ensure consistency
+                const refreshedProducts = await apiRequest('/products');
+                data.products = refreshedProducts;
+                
                 updateProductTables();
                 showNotification('Producto eliminado exitosamente', 'warning');
             } catch (error) {

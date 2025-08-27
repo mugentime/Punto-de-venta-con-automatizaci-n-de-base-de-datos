@@ -9,14 +9,17 @@ router.get('/', auth, async (req, res) => {
   try {
     const { category, active, lowStock } = req.query;
     
-    let query = {};
+    let query = {
+      // By default, only show active products unless explicitly requested otherwise
+      isActive: active === 'false' ? false : true
+    };
     
     // Filter by category
     if (category) {
       query.category = category.toLowerCase();
     }
     
-    // Filter by active status
+    // Override active status if explicitly specified
     if (active !== undefined) {
       query.isActive = active === 'true';
     }
