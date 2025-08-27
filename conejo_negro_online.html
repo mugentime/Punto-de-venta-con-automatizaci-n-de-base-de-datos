@@ -2684,27 +2684,15 @@
                 console.log('Eliminando registro:', recordId); // Debug
                 await apiRequest(`/records/${recordId}`, { method: 'DELETE' });
                 
-                const record = data.records.find(r => (r._id || r.id) === recordId);
-                if (record) {
-                    // Devolver cantidad al producto - soporte para múltiples productos
-                    if (record.products && Array.isArray(record.products)) {
-                        // Nuevo formato multi-producto
-                        record.products.forEach(item => {
-                            const product = data.products.find(p => (p._id || p.id) === item.productId);
-                            if (product) {
-                                product.quantity += item.quantity;
-                            }
-                        });
-                    } else if (record.drinkProduct) {
-                        // Formato legacy
-                        const product = data.products.find(p => (p._id || p.id) === record.drinkProduct);
-                        if (product) {
-                            product.quantity += 1;
-                        }
-                    }
-                }
+                // Refresh records from server to ensure consistency
+                const today = new Date().toISOString().split('T')[0];
+                const refreshedRecords = await apiRequest(`/records?date=${today}`);
+                data.records = refreshedRecords;
                 
-                data.records = data.records.filter(r => (r._id || r.id) !== recordId);
+                // Also refresh products to get updated stock
+                const refreshedProducts = await apiRequest('/products');
+                data.products = refreshedProducts;
+                
                 updateDailyRecordsDisplay();
                 updateProductTables();
                 
