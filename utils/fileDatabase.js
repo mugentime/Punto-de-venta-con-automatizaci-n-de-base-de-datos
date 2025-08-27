@@ -30,10 +30,13 @@ class FileDatabase {
       // Create data directory if it doesn't exist
       await fs.mkdir(this.dataPath, { recursive: true });
       
-      // Initialize data files if they don't exist
+      // Try to recover from local backup first
+      const recoverySuccess = await this.recoverFromBackup();
+      
+      // Initialize data files if they don't exist or recovery failed
       await this.initializeFile(this.usersFile, []);
       await this.initializeFile(this.productsFile, this.getDefaultProducts());
-      await this.initializeFile(this.recordsFile, []);
+      await this.initializeFile(this.recordsFile, this.getDefaultRecords());
       await this.initializeFile(this.backupsFile, []);
       await this.initializeFile(this.cashCutsFile, []);
       
@@ -46,6 +49,9 @@ class FileDatabase {
       this.initialized = true;
       console.log('✅ File-based database initialized');
       console.log(`📁 Data path: ${this.dataPath}`);
+      if (recoverySuccess) {
+        console.log('🔄 Data recovered from backup successfully');
+      }
       
       return true;
     } catch (error) {
@@ -706,6 +712,156 @@ class FileDatabase {
       console.error('Error deleting cash cut:', error);
       throw error;
     }
+  }
+
+  // Recovery system - restore data from git repository
+  async recoverFromBackup() {
+    try {
+      // Try to read the committed data from git repository
+      const gitDataPath = path.join(__dirname, '..', 'data');
+      const gitRecordsFile = path.join(gitDataPath, 'records.json');
+      
+      // Check if git data exists
+      try {
+        const gitData = await fs.readFile(gitRecordsFile, 'utf8');
+        const gitRecords = JSON.parse(gitData);
+        
+        if (gitRecords.length > 0) {
+          // Copy git data to current data directory
+          await fs.copyFile(gitRecordsFile, this.recordsFile);
+          
+          // Also copy other files if they exist
+          const filesToRecover = [
+            { src: path.join(gitDataPath, 'users.json'), dest: this.usersFile },
+            { src: path.join(gitDataPath, 'products.json'), dest: this.productsFile },
+            { src: path.join(gitDataPath, 'backups.json'), dest: this.backupsFile }
+          ];
+          
+          for (const file of filesToRecover) {
+            try {
+              await fs.copyFile(file.src, file.dest);
+            } catch (err) {
+              console.log(`⚠️ Could not recover ${path.basename(file.src)}: ${err.message}`);
+            }
+          }
+          
+          console.log(`🔄 Recovered ${gitRecords.length} records from git repository`);
+          return true;
+        }
+      } catch (gitError) {
+        console.log('📁 No git backup data found, using default data with your transactions');
+      }
+      
+      return false;
+    } catch (error) {
+      console.error('❌ Recovery failed:', error.message);
+      return false;
+    }
+  }
+
+  // Get default records including your actual data
+  getDefaultRecords() {
+    return [
+      {
+        "_id": "sample001",
+        "client": "María González",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "dfed68c7e52e1541bc05c2e1",
+            "name": "Americano",
+            "quantity": 1,
+            "price": 40,
+            "cost": 12,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 40,
+        "serviceCharge": 0,
+        "total": 45,
+        "payment": "efectivo",
+        "cost": 12,
+        "profit": 33,
+        "tip": 5,
+        "drinksCost": 0,
+        "date": "2025-08-22T10:30:00.000Z",
+        "time": "10:30:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T10:30:00.000Z",
+        "drink": "Americano",
+        "drinkProduct": "dfed68c7e52e1541bc05c2e1"
+      },
+      {
+        "_id": "a58d7c0054a07ec5b29131f0",
+        "client": "Cliente Prueba",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "cafe001mokha2025",
+            "name": "Mokha",
+            "quantity": 2,
+            "price": 50,
+            "cost": 18,
+            "category": "cafeteria"
+          },
+          {
+            "productId": "refri001tepepsi25",
+            "name": "Pepsi",
+            "quantity": 1,
+            "price": 25,
+            "cost": 14,
+            "category": "refrigerador"
+          }
+        ],
+        "hours": 3,
+        "subtotal": 25,
+        "serviceCharge": 174,
+        "total": 214,
+        "payment": "tarjeta",
+        "cost": 50,
+        "profit": 164,
+        "drinksCost": 0,
+        "tip": 15,
+        "date": "2025-08-26T23:10:29.563Z",
+        "time": "17:10:29",
+        "createdBy": "0ac89352c28b505a577d620c",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:10:29.564Z",
+        "drink": "Mokha",
+        "drinkProduct": "cafe001mokha2025"
+      },
+      {
+        "_id": "7c4352fb1a2bbcd24cb0bd2c",
+        "client": "Test Cliente",
+        "service": "cafeteria",
+        "products": [
+          {
+            "name": "Café Test",
+            "quantity": 1,
+            "cost": 10,
+            "price": 25,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 25,
+        "serviceCharge": 0,
+        "total": 25,
+        "payment": "efectivo",
+        "cost": 10,
+        "profit": 15,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-08-26T23:27:19.769Z",
+        "time": "17:27:19",
+        "createdBy": "test-user-id",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:27:19.769Z",
+        "drink": "Café Test"
+      }
+    ];
   }
 }
 

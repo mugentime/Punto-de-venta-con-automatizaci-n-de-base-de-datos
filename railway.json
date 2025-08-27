@@ -15,8 +15,9 @@
     "production": {
       "variables": {
         "NODE_ENV": "production",
-        "JWT_SECRET": "generate-secure-key-in-railway",
-        "RAILWAY_VOLUME_MOUNT_PATH": "/app/data"
+        "JWT_SECRET": "conejo-negro-pos-secure-key-2025",
+        "RAILWAY_VOLUME_MOUNT_PATH": "/app/data",
+        "DATA_RECOVERY_ENABLED": "true"
       }
     }
   }
