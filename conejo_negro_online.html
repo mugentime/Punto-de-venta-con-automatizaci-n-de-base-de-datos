@@ -3128,40 +3128,8 @@
             reportData.startDate = startDate;
             reportData.endDate = endDate;
             
-            // SOLO tus transacciones REALES de ayer - NO FAKE DATA
-            const hardcodedRecords = [
-                {
-                    "_id": "a58d7c0054a07ec5b29131f0",
-                    "client": "Cliente Prueba",
-                    "service": "coworking",
-                    "total": 214,
-                    "cost": 50,
-                    "profit": 164,
-                    "payment": "tarjeta",
-                    "date": "2025-08-26T23:10:29.563Z",
-                    "time": "17:10",
-                    "drink": "Mokha, Pepsi",
-                    "products": [
-                        { "name": "Mokha", "quantity": 2, "price": 50 },
-                        { "name": "Pepsi", "quantity": 1, "price": 25 }
-                    ]
-                },
-                {
-                    "_id": "7c4352fb1a2bbcd24cb0bd2c",
-                    "client": "Test Cliente",
-                    "service": "cafeteria",
-                    "total": 25,
-                    "cost": 10,
-                    "profit": 15,
-                    "payment": "efectivo",
-                    "date": "2025-08-26T23:27:19.769Z",
-                    "time": "17:27",
-                    "drink": "Café Test",
-                    "products": [
-                        { "name": "Café Test", "quantity": 1, "price": 25 }
-                    ]
-                }
-            ];
+            // NO MÁS DATOS FALSOS - Array vacío hasta que haya datos reales
+            const hardcodedRecords = [];
             
             try {
                 // Intentar fetch real pero con fallback a datos hardcodeados
