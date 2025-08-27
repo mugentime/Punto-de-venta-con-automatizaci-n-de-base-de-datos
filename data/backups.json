@@ -1,1 +1,21 @@
-[]
+[
+  {
+    "_id": "664fad9a92492e5163b2b106",
+    "type": "daily",
+    "filename": "backup-daily-2025-08-27T08-00-01-004Z.json",
+    "size": 8499,
+    "dateRange": {
+      "from": "2025-08-26T08:00:01.001Z",
+      "to": "2025-08-27T08:00:01.001Z"
+    },
+    "counts": {
+      "users": 2,
+      "products": 14,
+      "records": 2
+    },
+    "createdBy": null,
+    "createdAt": "2025-08-27T08:00:01.007Z",
+    "status": "completed",
+    "checksum": "55afb4f34ad856dacff0086e9d79bbe6ec9f0430e48cec85513aa9214f147175"
+  }
+]

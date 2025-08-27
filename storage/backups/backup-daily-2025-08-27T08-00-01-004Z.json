@@ -1,0 +1,309 @@
+{
+  "metadata": {
+    "type": "daily",
+    "backupId": "backup-1756281601001",
+    "createdBy": null,
+    "dateFrom": "2025-08-26T08:00:01.001Z",
+    "dateTo": "2025-08-27T08:00:01.001Z",
+    "recordCount": 2,
+    "userCount": 2,
+    "productCount": 14,
+    "timestamp": "2025-08-27T08:00:01.004Z",
+    "version": "2.0",
+    "checksum": "55afb4f34ad856dacff0086e9d79bbe6ec9f0430e48cec85513aa9214f147175"
+  },
+  "data": {
+    "users": [
+      {
+        "_id": "f933df463d8c3a5a45ddfcd6",
+        "name": "Administrador",
+        "email": "gerencia@conejonegro.mx",
+        "role": "admin",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:57.086Z",
+        "lastLogin": null,
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": true,
+          "canExportData": true,
+          "canDeleteRecords": true
+        }
+      },
+      {
+        "_id": "0ac89352c28b505a577d620c",
+        "name": "Test User",
+        "email": "test@example.com",
+        "role": "employee",
+        "isActive": true,
+        "createdAt": "2025-08-26T22:59:49.463Z",
+        "lastLogin": null,
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": false,
+          "canExportData": false,
+          "canDeleteRecords": false
+        }
+      }
+    ],
+    "products": [
+      {
+        "_id": "a91a51aece2a6002c1004c63",
+        "name": "Espresso",
+        "category": "cafeteria",
+        "quantity": 50,
+        "cost": 10,
+        "price": 35,
+        "lowStockAlert": 10,
+        "description": "Café espresso tradicional",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "dfed68c7e52e1541bc05c2e1",
+        "name": "Americano",
+        "category": "cafeteria",
+        "quantity": 45,
+        "cost": 12,
+        "price": 40,
+        "lowStockAlert": 10,
+        "description": "Café americano suave",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "da3fbc9738bee30c027d82ab",
+        "name": "Capuccino",
+        "category": "cafeteria",
+        "quantity": 40,
+        "cost": 15,
+        "price": 45,
+        "lowStockAlert": 10,
+        "description": "Capuccino cremoso",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "3b2d5196c49a1c461bedab18",
+        "name": "Latte",
+        "category": "cafeteria",
+        "quantity": 35,
+        "cost": 12,
+        "price": 40,
+        "lowStockAlert": 10,
+        "description": "Latte con leche vaporizada",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "d06e8814c3427a93b899ae34",
+        "name": "Coca-Cola",
+        "category": "refrigerador",
+        "quantity": 24,
+        "cost": 15,
+        "price": 25,
+        "lowStockAlert": 6,
+        "description": "Refresco de cola 355ml",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "36cc34c43984d0254e00858c",
+        "name": "Agua Mineral",
+        "category": "refrigerador",
+        "quantity": 30,
+        "cost": 8,
+        "price": 15,
+        "lowStockAlert": 10,
+        "description": "Agua mineral 500ml",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.780Z"
+      },
+      {
+        "_id": "94254701297d33d3fc12f922",
+        "name": "Jugo de Naranja",
+        "category": "refrigerador",
+        "quantity": 15,
+        "cost": 20,
+        "price": 35,
+        "lowStockAlert": 5,
+        "description": "Jugo de naranja natural 500ml",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:56.781Z"
+      },
+      {
+        "_id": "cafe001mokha2025",
+        "name": "Mokha",
+        "category": "cafeteria",
+        "quantity": 23,
+        "cost": 18,
+        "price": 50,
+        "lowStockAlert": 8,
+        "description": "Café mokha con chocolate",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z",
+        "updatedAt": "2025-08-26T23:10:29.567Z"
+      },
+      {
+        "_id": "cafe002macchiato25",
+        "name": "Macchiato",
+        "category": "cafeteria",
+        "quantity": 30,
+        "cost": 16,
+        "price": 48,
+        "lowStockAlert": 10,
+        "description": "Espresso macchiato con espuma",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z"
+      },
+      {
+        "_id": "refri001tepepsi25",
+        "name": "Pepsi",
+        "category": "refrigerador",
+        "quantity": 19,
+        "cost": 14,
+        "price": 25,
+        "lowStockAlert": 6,
+        "description": "Refresco de cola Pepsi 355ml",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z",
+        "updatedAt": "2025-08-26T23:10:29.569Z"
+      },
+      {
+        "_id": "refri002sprite25",
+        "name": "Sprite",
+        "category": "refrigerador",
+        "quantity": 18,
+        "cost": 14,
+        "price": 25,
+        "lowStockAlert": 6,
+        "description": "Refresco de limón 355ml",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z"
+      },
+      {
+        "_id": "cafe003frappe25",
+        "name": "Frappé",
+        "category": "cafeteria",
+        "quantity": 20,
+        "cost": 22,
+        "price": 55,
+        "lowStockAlert": 5,
+        "description": "Café frío con hielo y crema",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z"
+      },
+      {
+        "_id": "refri003te25",
+        "name": "Té Helado",
+        "category": "refrigerador",
+        "quantity": 12,
+        "cost": 16,
+        "price": 30,
+        "lowStockAlert": 4,
+        "description": "Té helado sabor limón 500ml",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z"
+      },
+      {
+        "_id": "cafe004chocolate25",
+        "name": "Chocolate Caliente",
+        "category": "cafeteria",
+        "quantity": 15,
+        "cost": 20,
+        "price": 45,
+        "lowStockAlert": 5,
+        "description": "Chocolate caliente con marshmallows",
+        "isActive": true,
+        "createdAt": "2025-08-26T23:05:00.000Z"
+      }
+    ],
+    "records": [
+      {
+        "_id": "a58d7c0054a07ec5b29131f0",
+        "client": "Cliente Prueba",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "cafe001mokha2025",
+            "name": "Mokha",
+            "quantity": 2,
+            "price": 50,
+            "cost": 18,
+            "category": "cafeteria"
+          },
+          {
+            "productId": "refri001tepepsi25",
+            "name": "Pepsi",
+            "quantity": 1,
+            "price": 25,
+            "cost": 14,
+            "category": "refrigerador"
+          }
+        ],
+        "hours": 3,
+        "subtotal": 25,
+        "serviceCharge": 174,
+        "total": 214,
+        "payment": "tarjeta",
+        "cost": 50,
+        "profit": 164,
+        "drinksCost": 0,
+        "tip": 15,
+        "date": "2025-08-26T23:10:29.563Z",
+        "time": "17:10:29",
+        "createdBy": "0ac89352c28b505a577d620c",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:10:29.564Z",
+        "drink": "Mokha",
+        "drinkProduct": "cafe001mokha2025"
+      },
+      {
+        "_id": "7c4352fb1a2bbcd24cb0bd2c",
+        "client": "Test Cliente",
+        "service": "cafeteria",
+        "products": [
+          {
+            "name": "Café Test",
+            "quantity": 1,
+            "cost": 10,
+            "price": 25,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 25,
+        "serviceCharge": 0,
+        "total": 25,
+        "payment": "efectivo",
+        "cost": 10,
+        "profit": 15,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-08-26T23:27:19.769Z",
+        "time": "17:27:19",
+        "createdBy": "test-user-id",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:27:19.769Z",
+        "drink": "Café Test"
+      }
+    ],
+    "metadata": {
+      "type": "daily",
+      "dateRange": {
+        "from": "2025-08-26T08:00:01.001Z",
+        "to": "2025-08-27T08:00:01.001Z"
+      },
+      "counts": {
+        "users": 2,
+        "products": 14,
+        "records": 2
+      },
+      "createdBy": null,
+      "backupId": "backup-1756281601001"
+    }
+  }
+}
