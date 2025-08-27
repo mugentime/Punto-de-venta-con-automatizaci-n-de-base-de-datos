@@ -6,7 +6,7 @@
     <title>Conejo Negro - Café Coworking Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -2497,7 +2497,7 @@
                             setupChartControls();
                         }
                         // Actualizar reportes con datos actuales
-                        updateReportsByPeriod('today');
+                        updateReportData('today');
                     }, 100);
                 }
                 
@@ -3152,9 +3152,10 @@
 
         // Initialize all charts
         function initializeCharts() {
+            // Chart.js v3 defaults configuration
             Chart.defaults.color = '#e0e0ff';
-            Chart.defaults.borderColor = 'rgba(0, 217, 255, 0.1)';
-            Chart.defaults.backgroundColor = 'rgba(0, 217, 255, 0.05)';
+            Chart.defaults.elements.line.borderColor = 'rgba(0, 217, 255, 0.3)';
+            Chart.defaults.elements.point.backgroundColor = 'rgba(0, 217, 255, 0.8)';
             
             initTrendChart();
             initServicesChart();
@@ -4205,8 +4206,6 @@
                 </div>
             `;
         }
-
-        }, 30000); // Verificar cada 30 segundos
     </script>
 </body>
 </html>
