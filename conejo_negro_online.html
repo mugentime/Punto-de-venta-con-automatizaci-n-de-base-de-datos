@@ -3156,7 +3156,7 @@
                 
                 const response = await fetch(url, {
                     headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                        'Authorization': `Bearer ${authToken}`
                     }
                 });
                 
@@ -4097,7 +4097,9 @@
         });
 
         // Importar respaldo
-        document.getElementById('import-backup').addEventListener('click', function() {
+        const importBackupBtn = document.getElementById('import-backup');
+        if (importBackupBtn) {
+            importBackupBtn.addEventListener('click', function() {
             // Crear input file temporal
             const input = document.createElement('input');
             input.type = 'file';
@@ -4177,7 +4179,8 @@
             
             document.body.appendChild(input);
             input.click();
-        });
+            });
+        }
 
         // Inicializar reportes cuando se carguen los datos
         function initializeReports() {
@@ -4416,6 +4419,12 @@
             const statsEl = document.getElementById('report-cash-cuts-stats');
             const noCutsEl = document.getElementById('report-no-cash-cuts');
             const listEl = document.getElementById('report-cash-cuts-list');
+            
+            // Check if elements exist before manipulating them
+            if (!loadingEl || !statsEl || !noCutsEl || !listEl) {
+                console.warn('Cash cuts report elements not found in DOM');
+                return;
+            }
             
             // Show loading
             loadingEl.style.display = 'block';
