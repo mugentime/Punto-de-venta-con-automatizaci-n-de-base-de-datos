@@ -8,7 +8,7 @@
     "dev": "nodemon server.js",
     "setup": "node setup.js",
     "build": "echo 'No build step required'",
-    "postinstall": "echo 'Installation complete'"
+    "postinstall": "node initDatabase.js"
   },
   "keywords": ["pos", "cafe", "point-of-sale", "nodejs", "express"],
   "author": "Conejo Negro Cafe",
