@@ -35,8 +35,8 @@ class FileDatabase {
       
       // Initialize data files if they don't exist or recovery failed
       await this.initializeFile(this.usersFile, []);
-      await this.initializeFile(this.productsFile, this.getDefaultProducts());
-      await this.initializeFile(this.recordsFile, this.getDefaultRecords());
+      await this.initializeFile(this.productsFile, []);
+      await this.initializeFile(this.recordsFile, []);
       await this.initializeFile(this.backupsFile, []);
       await this.initializeFile(this.cashCutsFile, []);
       
@@ -292,96 +292,6 @@ class FileDatabase {
     return { success: true };
   }
 
-  getDefaultProducts() {
-    return [
-      // Cafetería products
-      {
-        _id: this.generateId(),
-        name: 'Espresso',
-        category: 'cafeteria',
-        quantity: 50,
-        cost: 10,
-        price: 35,
-        lowStockAlert: 10,
-        description: 'Café espresso tradicional',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        _id: this.generateId(),
-        name: 'Americano',
-        category: 'cafeteria',
-        quantity: 45,
-        cost: 12,
-        price: 40,
-        lowStockAlert: 10,
-        description: 'Café americano suave',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        _id: this.generateId(),
-        name: 'Capuccino',
-        category: 'cafeteria',
-        quantity: 40,
-        cost: 15,
-        price: 45,
-        lowStockAlert: 10,
-        description: 'Capuccino cremoso',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        _id: this.generateId(),
-        name: 'Latte',
-        category: 'cafeteria',
-        quantity: 35,
-        cost: 12,
-        price: 40,
-        lowStockAlert: 10,
-        description: 'Latte con leche vaporizada',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      // Refrigerador products
-      {
-        _id: this.generateId(),
-        name: 'Coca-Cola',
-        category: 'refrigerador',
-        quantity: 24,
-        cost: 15,
-        price: 25,
-        lowStockAlert: 6,
-        description: 'Refresco de cola 355ml',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        _id: this.generateId(),
-        name: 'Agua Mineral',
-        category: 'refrigerador',
-        quantity: 30,
-        cost: 8,
-        price: 15,
-        lowStockAlert: 10,
-        description: 'Agua mineral 500ml',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      },
-      {
-        _id: this.generateId(),
-        name: 'Jugo de Naranja',
-        category: 'refrigerador',
-        quantity: 15,
-        cost: 20,
-        price: 35,
-        lowStockAlert: 5,
-        description: 'Jugo de naranja natural 500ml',
-        isActive: true,
-        createdAt: new Date().toISOString()
-      }
-    ];
-  }
 
   // ============ RECORDS MANAGEMENT ============
 
@@ -759,110 +669,6 @@ class FileDatabase {
     }
   }
 
-  // Get default records including your actual data
-  getDefaultRecords() {
-    return [
-      {
-        "_id": "sample001",
-        "client": "María González",
-        "service": "cafeteria",
-        "products": [
-          {
-            "productId": "dfed68c7e52e1541bc05c2e1",
-            "name": "Americano",
-            "quantity": 1,
-            "price": 40,
-            "cost": 12,
-            "category": "cafeteria"
-          }
-        ],
-        "hours": 1,
-        "subtotal": 40,
-        "serviceCharge": 0,
-        "total": 45,
-        "payment": "efectivo",
-        "cost": 12,
-        "profit": 33,
-        "tip": 5,
-        "drinksCost": 0,
-        "date": "2025-08-22T10:30:00.000Z",
-        "time": "10:30:00",
-        "createdBy": "f933df463d8c3a5a45ddfcd6",
-        "isDeleted": false,
-        "createdAt": "2025-08-22T10:30:00.000Z",
-        "drink": "Americano",
-        "drinkProduct": "dfed68c7e52e1541bc05c2e1"
-      },
-      {
-        "_id": "a58d7c0054a07ec5b29131f0",
-        "client": "Cliente Prueba",
-        "service": "coworking",
-        "products": [
-          {
-            "productId": "cafe001mokha2025",
-            "name": "Mokha",
-            "quantity": 2,
-            "price": 50,
-            "cost": 18,
-            "category": "cafeteria"
-          },
-          {
-            "productId": "refri001tepepsi25",
-            "name": "Pepsi",
-            "quantity": 1,
-            "price": 25,
-            "cost": 14,
-            "category": "refrigerador"
-          }
-        ],
-        "hours": 3,
-        "subtotal": 25,
-        "serviceCharge": 174,
-        "total": 214,
-        "payment": "tarjeta",
-        "cost": 50,
-        "profit": 164,
-        "drinksCost": 0,
-        "tip": 15,
-        "date": "2025-08-26T23:10:29.563Z",
-        "time": "17:10:29",
-        "createdBy": "0ac89352c28b505a577d620c",
-        "isDeleted": false,
-        "createdAt": "2025-08-26T23:10:29.564Z",
-        "drink": "Mokha",
-        "drinkProduct": "cafe001mokha2025"
-      },
-      {
-        "_id": "7c4352fb1a2bbcd24cb0bd2c",
-        "client": "Test Cliente",
-        "service": "cafeteria",
-        "products": [
-          {
-            "name": "Café Test",
-            "quantity": 1,
-            "cost": 10,
-            "price": 25,
-            "category": "cafeteria"
-          }
-        ],
-        "hours": 1,
-        "subtotal": 25,
-        "serviceCharge": 0,
-        "total": 25,
-        "payment": "efectivo",
-        "cost": 10,
-        "profit": 15,
-        "drinksCost": 0,
-        "tip": 0,
-        "date": "2025-08-26T23:27:19.769Z",
-        "time": "17:27:19",
-        "createdBy": "test-user-id",
-        "isDeleted": false,
-        "createdAt": "2025-08-26T23:27:19.769Z",
-        "drink": "Café Test"
-      }
-    ];
-  }
 }
 
 // Export singleton instance
