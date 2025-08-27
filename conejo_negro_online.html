@@ -3128,7 +3128,7 @@
             reportData.startDate = startDate;
             reportData.endDate = endDate;
             
-            // Datos hardcodeados de tus transacciones reales
+            // SOLO tus transacciones REALES de ayer - NO FAKE DATA
             const hardcodedRecords = [
                 {
                     "_id": "a58d7c0054a07ec5b29131f0",
@@ -3139,6 +3139,8 @@
                     "profit": 164,
                     "payment": "tarjeta",
                     "date": "2025-08-26T23:10:29.563Z",
+                    "time": "17:10",
+                    "drink": "Mokha, Pepsi",
                     "products": [
                         { "name": "Mokha", "quantity": 2, "price": 50 },
                         { "name": "Pepsi", "quantity": 1, "price": 25 }
@@ -3153,35 +3155,10 @@
                     "profit": 15,
                     "payment": "efectivo",
                     "date": "2025-08-26T23:27:19.769Z",
+                    "time": "17:27",
+                    "drink": "Café Test",
                     "products": [
                         { "name": "Café Test", "quantity": 1, "price": 25 }
-                    ]
-                },
-                // Más transacciones de ejemplo para completar
-                {
-                    "_id": "sample001",
-                    "client": "María González",
-                    "service": "cafeteria",
-                    "total": 45,
-                    "cost": 12,
-                    "profit": 33,
-                    "payment": "efectivo",
-                    "date": new Date().toISOString(),
-                    "products": [
-                        { "name": "Americano", "quantity": 1, "price": 40 }
-                    ]
-                },
-                {
-                    "_id": "sample002",
-                    "client": "Juan Pérez",
-                    "service": "coworking",
-                    "total": 184,
-                    "cost": 20,
-                    "profit": 164,
-                    "payment": "tarjeta",
-                    "date": new Date().toISOString(),
-                    "products": [
-                        { "name": "Espresso", "quantity": 2, "price": 35 }
                     ]
                 }
             ];
