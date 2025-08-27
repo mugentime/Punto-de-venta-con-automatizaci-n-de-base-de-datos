@@ -2217,7 +2217,7 @@
             const tbody = document.querySelector('#refrigerador-table tbody');
             tbody.innerHTML = '';
             
-            const refrigeradorProducts = data.products.filter(p => p.category === 'refrigerador');
+            const refrigeradorProducts = data.products.filter(p => p.category === 'refrigerador' && p.isActive);
             
             refrigeradorProducts.forEach(product => {
                 const profit = product.price - product.cost;
@@ -2252,7 +2252,7 @@
             const tbody = document.querySelector('#cafeteria-table tbody');
             tbody.innerHTML = '';
             
-            const cafeteriaProducts = data.products.filter(p => p.category === 'cafeteria');
+            const cafeteriaProducts = data.products.filter(p => p.category === 'cafeteria' && p.isActive);
             
             cafeteriaProducts.forEach(product => {
                 const profit = product.price - product.cost;
@@ -2581,15 +2581,26 @@
             }
             
             try {
+                console.log('Deleting product:', productId);
+                console.log('Products before deletion:', data.products.length);
+                
+                // Delete product on server
                 await apiRequest(`/products/${productId}`, { method: 'DELETE' });
+                console.log('Product deleted successfully on server');
                 
                 // Refresh products from server to ensure consistency
                 const refreshedProducts = await apiRequest('/products');
+                console.log('Refreshed products from server:', refreshedProducts.length);
+                
                 data.products = refreshedProducts;
                 
+                // Update all tables and selects
                 updateProductTables();
+                console.log('Product tables updated');
+                
                 showNotification('Producto eliminado exitosamente', 'warning');
             } catch (error) {
+                console.error('Error deleting product:', error);
                 showNotification('Error eliminando producto: ' + error.message, 'error');
             }
         }
