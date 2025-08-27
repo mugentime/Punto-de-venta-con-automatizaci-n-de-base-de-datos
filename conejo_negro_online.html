@@ -2529,13 +2529,15 @@
             };
             
             try {
-                const newProduct = await apiRequest('/products', {
+                const response = await apiRequest('/products', {
                     method: 'POST',
                     body: JSON.stringify(productData)
                 });
                 
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
                 data.products.push(newProduct);
-                updateRefrigeradorTable();
+                updateProductTables(); // Update all tables and selects
                 this.reset();
                 showNotification('Producto agregado al refrigerador', 'success');
             } catch (error) {
@@ -2556,13 +2558,15 @@
             };
             
             try {
-                const newProduct = await apiRequest('/products', {
+                const response = await apiRequest('/products', {
                     method: 'POST',
                     body: JSON.stringify(productData)
                 });
                 
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
                 data.products.push(newProduct);
-                updateCafeteriaTable();
+                updateProductTables(); // Update all tables and selects
                 this.reset();
                 showNotification('Producto agregado a la cafetería', 'success');
             } catch (error) {
