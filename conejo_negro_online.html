@@ -2491,13 +2491,13 @@
                 
                 // Inicializar gráficas cuando se accede a reportes
                 if (sectionId === 'reportes') {
-                    setTimeout(() => {
+                    setTimeout(async () => {
                         if (!trendChart) {
                             initializeCharts();
                             setupChartControls();
                         }
-                        // Actualizar reportes con datos actuales
-                        updateReportData('today');
+                        // Actualizar reportes con datos actuales - AWAIT para esperar datos reales
+                        await updateReportData('today');
                     }, 100);
                 }
                 
@@ -3867,6 +3867,34 @@
         
         // Controles de gráficas
         function setupChartControls() {
+            // Selector de período para reportes
+            const reportPeriod = document.getElementById('report-period');
+            if (reportPeriod) {
+                reportPeriod.addEventListener('change', async function() {
+                    const period = this.value;
+                    console.log('Cambiando período a:', period);
+                    
+                    if (period === 'custom') {
+                        document.getElementById('custom-date-range').style.display = 'flex';
+                    } else {
+                        document.getElementById('custom-date-range').style.display = 'none';
+                        await updateReportData(period);
+                    }
+                });
+            }
+            
+            // Botón aplicar filtro de fechas personalizadas
+            const applyFilter = document.getElementById('apply-date-filter');
+            if (applyFilter) {
+                applyFilter.addEventListener('click', async function() {
+                    const startDate = document.getElementById('start-date').value;
+                    const endDate = document.getElementById('end-date').value;
+                    if (startDate && endDate) {
+                        await updateReportData('custom', startDate, endDate);
+                    }
+                });
+            }
+            
             // Controles para cambiar tipo de datos en gráfica de tendencias
             document.querySelectorAll('.chart-toggle').forEach(toggle => {
                 toggle.addEventListener('click', function() {
@@ -3879,9 +3907,12 @@
             });
             
             // Botón de refrescar cortes de caja
-            document.getElementById('refresh-cash-cuts').addEventListener('click', function() {
-                loadReportCashCuts();
-            });
+            const refreshBtn = document.getElementById('refresh-cash-cuts');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    loadReportCashCuts();
+                });
+            }
         }
         
         // Actualizar datos de gráfica de tendencias según el tipo seleccionado
