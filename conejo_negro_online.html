@@ -1807,12 +1807,7 @@
             ? 'http://localhost:3000/api' 
             : `${window.location.protocol}//${window.location.host}/api`;
         
-        // Variables globales - Clear old tokens once
-        if (localStorage.getItem('authToken') && !localStorage.getItem('authToken_v2')) {
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('currentUser');
-            localStorage.setItem('authToken_v2', 'cleared');
-        }
+        // Variables globales
         let authToken = localStorage.getItem('authToken');
         let currentUser = JSON.parse(localStorage.getItem('currentUser') || 'null');
         let isOnline = false;
