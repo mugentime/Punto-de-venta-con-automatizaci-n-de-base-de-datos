@@ -60,12 +60,21 @@ class DatabaseManager {
     async validateUserPassword(email, password) {
         if (this.usePostgreSQL) {
             // For PostgreSQL, we need to implement password validation
+            console.log('🔍 PostgreSQL login attempt:', { email, timestamp: new Date().toISOString() });
             const user = await database.getUserByUsername(email);
-            if (!user) return null;
+            if (!user) {
+                console.log('❌ User not found:', email);
+                return null;
+            }
+            console.log('✅ User found:', { username: user.username, role: user.role });
             
             const bcrypt = require('bcryptjs');
             const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) return null;
+            if (!isValid) {
+                console.log('❌ Password validation failed for:', email);
+                return null;
+            }
+            console.log('✅ Password validated for:', email);
             
             // Return user without password
             const { password: _, ...safeUser } = user;

@@ -126,13 +126,15 @@ class Database {
             // Check if any users exist
             const result = await this.pool.query('SELECT COUNT(*) FROM users WHERE is_active = true');
             const userCount = parseInt(result.rows[0].count);
+            console.log(`📊 Current user count in database: ${userCount}`);
             
             if (userCount === 0) {
                 console.log('👤 Creating default admin user...');
                 const bcrypt = require('bcryptjs');
                 const hashedPassword = await bcrypt.hash('admin123', 12);
+                console.log('🔒 Password hashed successfully');
                 
-                await this.createUser({
+                const adminUser = await this.createUser({
                     username: 'admin@conejonegro.com',
                     password: hashedPassword,
                     role: 'admin',
@@ -145,7 +147,14 @@ class Database {
                         canDeleteRecords: true
                     }
                 });
-                console.log('✅ Created admin user (email: admin@conejonegro.com, password: admin123)');
+                console.log('✅ Created admin user:', { 
+                    id: adminUser._id, 
+                    username: adminUser.username, 
+                    role: adminUser.role 
+                });
+                console.log('🔑 Admin login: admin@conejonegro.com / admin123');
+            } else {
+                console.log('👥 Users already exist, skipping admin creation');
             }
         }
     }
