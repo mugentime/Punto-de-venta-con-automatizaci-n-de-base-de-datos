@@ -1221,6 +1221,7 @@
                             <li><a href="#" class="nav-link" data-section="registro-historico">Registro Histórico</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
+                            <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
                             <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
                             <li><a href="#" class="nav-link" data-section="corte-caja">Corte de Caja</a></li>
                         </ul>
@@ -1511,6 +1512,70 @@
                             </thead>
                             <tbody>
                                 <!-- Los productos se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Inventario Alimentos -->
+            <section id="inventario-alimentos" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-utensils"></i>
+                        Inventario de Alimentos Preparados
+                    </h2>
+                    
+                    <form id="alimentos-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alimentos-name">Nombre del Alimento</label>
+                                <input type="text" id="alimentos-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="alimentos-quantity">Cantidad</label>
+                                <input type="number" id="alimentos-quantity" class="form-control" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alimentos-cost">Costo de Preparación</label>
+                                <input type="number" id="alimentos-cost" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="alimentos-price">Precio de Venta</label>
+                                <input type="number" id="alimentos-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Agregar Alimento
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-drumstick-bite"></i>
+                        Alimentos Preparados
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="alimentos-table">
+                            <thead>
+                                <tr>
+                                    <th>Alimento</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Preparación</th>
+                                    <th>Precio Venta</th>
+                                    <th>Ganancia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los alimentos se agregarán aquí dinámicamente -->
                             </tbody>
                         </table>
                     </div>
@@ -2351,6 +2416,7 @@
         function updateProductTables() {
             updateRefrigeradorTable();
             updateCafeteriaTable();
+            updateAlimentosTable();
             updateProductSelects();
         }
 
@@ -2701,6 +2767,11 @@
                     loadCashCuts();
                     loadServiceStatus();
                 }
+                
+                // Load historical records when accessing historical section
+                if (sectionId === 'registro-historico') {
+                    loadHistoricalRecords();
+                }
             });
         });
 
@@ -2759,6 +2830,35 @@
                 showNotification('Producto agregado a la cafetería', 'success');
             } catch (error) {
                 showNotification('Error agregando producto: ' + error.message, 'error');
+            }
+        });
+
+        // Agregar alimento preparado
+        document.getElementById('alimentos-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('alimentos-name').value,
+                quantity: parseInt(document.getElementById('alimentos-quantity').value),
+                cost: parseFloat(document.getElementById('alimentos-cost').value),
+                price: parseFloat(document.getElementById('alimentos-price').value),
+                category: 'alimentos'
+            };
+            
+            try {
+                const response = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
+                data.products.push(newProduct);
+                updateProductTables(); // Update all tables and selects
+                this.reset();
+                showNotification('Alimento agregado al inventario', 'success');
+            } catch (error) {
+                showNotification('Error agregando alimento: ' + error.message, 'error');
             }
         });
 
