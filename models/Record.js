@@ -88,7 +88,7 @@ const recordSchema = new mongoose.Schema({
     name: String,
     category: {
       type: String,
-      enum: ['cafeteria', 'refrigerador']
+      enum: ['cafeteria', 'refrigerador', 'alimentos']
     },
     quantity: {
       type: Number,

@@ -578,4 +578,193 @@ router.get('/stats/daily/:days', auth, async (req, res) => {
   }
 });
 
+// New endpoint for creating historical records
+router.post('/historical', auth, canRegisterClients, async (req, res) => {
+  try {
+    const { 
+      client, 
+      service, 
+      products,
+      drinkId, 
+      hours = 1, 
+      payment, 
+      notes,
+      tip = 0,
+      historicalDate // Required for this endpoint
+    } = req.body;
+
+    // Validation
+    if (!historicalDate) {
+      return res.status(400).json({
+        error: 'Historical date is required for this endpoint'
+      });
+    }
+
+    // Validate historical date is not in the future
+    const targetDate = new Date(historicalDate);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999); // End of today
+    
+    if (targetDate > today) {
+      return res.status(400).json({
+        error: 'Historical date cannot be in the future'
+      });
+    }
+
+    // Common validation
+    if (!client || !service || !payment) {
+      return res.status(400).json({
+        error: 'Client, service, and payment method are required'
+      });
+    }
+
+    if (!['cafeteria', 'coworking'].includes(service.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Service must be either "cafeteria" or "coworking"'
+      });
+    }
+
+    if (!['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Payment method must be "efectivo", "tarjeta", or "transferencia"'
+      });
+    }
+
+    let record;
+    
+    if (products && Array.isArray(products) && products.length > 0) {
+      // Multi-product system
+      let recordProducts = [];
+      let totalCost = 0;
+      let total = 0;
+      
+      for (const orderProduct of products) {
+        const product = await Product.findOne({
+          _id: orderProduct.productId,
+          isActive: true
+        });
+
+        if (!product) {
+          return res.status(404).json({
+            error: `Product ${orderProduct.productId} not found or inactive`
+          });
+        }
+
+        recordProducts.push({
+          productId: product._id,
+          name: product.name,
+          category: product.category,
+          quantity: orderProduct.quantity,
+          cost: product.cost,
+          price: product.price
+        });
+      }
+
+      // Calculate totals
+      if (service.toLowerCase() === 'cafeteria') {
+        total = recordProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
+        totalCost = recordProducts.reduce((sum, p) => sum + (p.quantity * p.cost), 0);
+      } else {
+        const coworkingRate = 58;
+        total = coworkingRate * parseInt(hours);
+        
+        const refrigeradorTotal = recordProducts
+          .filter(p => p.category === 'refrigerador')
+          .reduce((sum, p) => sum + (p.quantity * p.price), 0);
+        total += refrigeradorTotal;
+        
+        totalCost = recordProducts.reduce((sum, p) => sum + (p.quantity * p.cost), 0);
+      }
+
+      total += tip;
+
+      record = new Record({
+        client: client.trim(),
+        service: service.toLowerCase(),
+        products: recordProducts,
+        hours: parseInt(hours),
+        total: Number(total),
+        payment: payment.toLowerCase(),
+        cost: totalCost,
+        tip: Number(tip),
+        notes: notes?.trim(),
+        createdBy: req.user.userId,
+        date: targetDate
+      });
+
+    } else {
+      // Legacy single product
+      if (!drinkId) {
+        return res.status(400).json({
+          error: 'Product is required'
+        });
+      }
+
+      const product = await Product.findOne({
+        _id: drinkId,
+        isActive: true
+      });
+
+      if (!product) {
+        return res.status(404).json({
+          error: 'Product not found or inactive'
+        });
+      }
+
+      let total = 0;
+      if (service.toLowerCase() === 'cafeteria') {
+        total = product.price;
+      } else {
+        const coworkingRate = 58;
+        total = coworkingRate * parseInt(hours);
+      }
+
+      record = new Record({
+        client: client.trim(),
+        service: service.toLowerCase(),
+        drink: product.name,
+        drinkProduct: product._id,
+        hours: parseInt(hours),
+        total: Number(total),
+        payment: payment.toLowerCase(),
+        cost: product.cost,
+        notes: notes?.trim(),
+        createdBy: req.user.userId,
+        date: targetDate
+      });
+    }
+
+    await record.save();
+
+    // Populate the saved record
+    let savedRecord;
+    if (products && Array.isArray(products) && products.length > 0) {
+      savedRecord = await Record.findById(record._id).populate('createdBy', 'name email');
+    } else {
+      savedRecord = await Record.findById(record._id)
+        .populate('drinkProduct', 'name category price cost')
+        .populate('createdBy', 'name email');
+    }
+
+    res.status(201).json({
+      message: 'Historical record created successfully',
+      record: savedRecord
+    });
+
+  } catch (error) {
+    console.error('Historical record creation error:', error);
+
+    if (error.name === 'ValidationError') {
+      const messages = Object.values(error.errors).map(err => err.message);
+      return res.status(400).json({
+        error: messages.join(', ')
+      });
+    }
+
+    res.status(500).json({
+      error: 'Historical record creation failed'
+    });
+  }
+});
+
 module.exports = router;
