@@ -49,12 +49,22 @@ class DatabaseManager {
 
     async createUser(userData) {
         if (this.usePostgreSQL) {
-            // Convert email to username for PostgreSQL
-            return await database.createUser({
+            // Convert email to username for PostgreSQL and ensure role is passed
+            const userDataForPostgres = {
                 ...userData,
-                username: userData.email,
+                username: userData.email || userData.username,
+                role: userData.role || 'employee', // Explicitly pass role
                 permissions: fileDatabase.getPermissionsByRole(userData.role || 'employee')
+            };
+            
+            console.log('🔧 Creating PostgreSQL user with data:', {
+                username: userDataForPostgres.username,
+                role: userDataForPostgres.role,
+                hasPassword: !!userDataForPostgres.password,
+                permissions: userDataForPostgres.permissions
             });
+            
+            return await database.createUser(userDataForPostgres);
         }
         return await fileDatabase.createUser(userData);
     }
