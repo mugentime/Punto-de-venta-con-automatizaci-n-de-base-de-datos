@@ -259,4 +259,60 @@ router.get('/reset-admin', async (req, res) => {
   }
 });
 
+// Token diagnostics endpoint
+router.get('/debug-token', async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    console.log('🔍 TOKEN DEBUG - Token received:', token ? 'YES' : 'NO');
+    console.log('🔍 TOKEN DEBUG - Token preview:', token ? token.substring(0, 20) + '...' : 'N/A');
+    
+    if (!token) {
+      return res.json({ error: 'No token provided' });
+    }
+    
+    // Verify token
+    const decoded = databaseManager.verifyToken(token);
+    console.log('🔍 TOKEN DEBUG - Decoded:', decoded);
+    
+    if (!decoded) {
+      return res.json({ error: 'Invalid token', token_preview: token.substring(0, 50) });
+    }
+    
+    // Look up user
+    console.log('🔍 TOKEN DEBUG - Looking up user ID:', decoded.userId);
+    const user = await databaseManager.getUserById(decoded.userId);
+    console.log('🔍 TOKEN DEBUG - User found:', user ? 'YES' : 'NO');
+    
+    if (user) {
+      console.log('🔍 TOKEN DEBUG - User details:', {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive
+      });
+    }
+    
+    res.json({
+      token_valid: !!decoded,
+      user_found: !!user,
+      decoded: decoded,
+      user: user ? {
+        id: user._id,
+        username: user.username || user.email,
+        role: user.role,
+        isActive: user.isActive
+      } : null
+    });
+    
+  } catch (error) {
+    console.error('💥 TOKEN DEBUG ERROR:', error);
+    res.json({
+      error: true,
+      message: error.message,
+      stack: error.stack
+    });
+  }
+});
+
 module.exports = router;
