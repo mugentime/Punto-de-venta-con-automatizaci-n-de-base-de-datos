@@ -190,4 +190,48 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
+// Emergency admin creation endpoint (for production setup)
+router.post('/create-admin', async (req, res) => {
+  try {
+    console.log('🚨 EMERGENCY ADMIN CREATION REQUESTED');
+    
+    // Check if any users exist first
+    const existingUsers = await databaseManager.getUsers();
+    console.log('👥 Existing users count:', existingUsers.length);
+    
+    if (existingUsers.length > 0) {
+      console.log('❌ Users already exist, admin creation blocked');
+      return res.status(403).json({
+        error: 'Admin user can only be created when no users exist'
+      });
+    }
+    
+    console.log('👤 Creating emergency admin user...');
+    const bcrypt = require('bcryptjs');
+    const hashedPassword = await bcrypt.hash('admin123', 12);
+    
+    const adminUser = await databaseManager.createUser({
+      name: 'Administrator',
+      email: 'admin@conejonegro.com',
+      password: hashedPassword,
+      role: 'admin'
+    });
+    
+    console.log('✅ Emergency admin created:', adminUser.email);
+    
+    res.json({
+      message: 'Admin user created successfully',
+      email: 'admin@conejonegro.com',
+      password: 'admin123'
+    });
+    
+  } catch (error) {
+    console.error('💥 ADMIN CREATION ERROR:', error);
+    res.status(500).json({
+      error: 'Failed to create admin user',
+      details: error.message
+    });
+  }
+});
+
 module.exports = router;
