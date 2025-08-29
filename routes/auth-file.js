@@ -259,6 +259,42 @@ router.get('/reset-admin', async (req, res) => {
   }
 });
 
+// Quick login test endpoint
+router.post('/quick-login', async (req, res) => {
+  try {
+    const email = 'admin@conejonegro.com';
+    const password = 'admin123';
+    
+    console.log('🚀 QUICK LOGIN TEST');
+    
+    const user = await databaseManager.validateUserPassword(email, password);
+    
+    if (!user) {
+      return res.json({
+        success: false,
+        message: 'Login failed - invalid credentials'
+      });
+    }
+    
+    const token = databaseManager.generateToken(user);
+    
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token: token,
+      user: user,
+      instructions: 'Copy this token and use it in Authorization header'
+    });
+    
+  } catch (error) {
+    console.error('💥 QUICK LOGIN ERROR:', error);
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
 // Token diagnostics endpoint
 router.get('/debug-token', async (req, res) => {
   try {
