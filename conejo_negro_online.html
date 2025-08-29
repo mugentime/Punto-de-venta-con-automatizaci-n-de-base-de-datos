@@ -1930,16 +1930,22 @@
                 
                 const data = await response.json();
                 
+                console.log('🔍 LOGIN DEBUG - Response status:', response.status);
+                console.log('🔍 LOGIN DEBUG - Response ok:', response.ok);
+                console.log('🔍 LOGIN DEBUG - Response data:', data);
+                
                 if (response.ok) {
+                    console.log('✅ LOGIN SUCCESS - Token received:', !!data.token);
                     authToken = data.token;
                     currentUser = data.user;
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
+                    console.log('✅ LOGIN SUCCESS - Token saved to localStorage');
                     
                     showNotification('Login exitoso', 'success');
                     showMainApp();
                 } else {
+                    console.log('❌ LOGIN FAILED - Status:', response.status, 'Error:', data.error);
                     showNotification(data.error || 'Error en login', 'error');
                     updateConnectionStatus('offline');
                 }
