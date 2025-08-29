@@ -12,6 +12,7 @@ class DatabaseManager {
 
         if (this.usePostgreSQL) {
             console.log('🐘 Initializing PostgreSQL database...');
+            console.log('🔗 DATABASE_URL present:', !!process.env.DATABASE_URL);
             await database.init();
             console.log('✅ PostgreSQL database ready');
         } else {
@@ -21,6 +22,7 @@ class DatabaseManager {
         }
 
         this.initialized = true;
+        console.log('🎯 DatabaseManager initialized, usePostgreSQL:', this.usePostgreSQL);
     }
 
     // USERS

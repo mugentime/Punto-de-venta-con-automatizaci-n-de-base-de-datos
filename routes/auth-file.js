@@ -58,26 +58,40 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    console.log('🔐 LOGIN REQUEST:', { 
+      body: req.body, 
+      timestamp: new Date().toISOString(),
+      ip: req.ip 
+    });
+    
     const { email, password } = req.body;
     
     // Validation
     if (!email || !password) {
+      console.log('❌ LOGIN VALIDATION FAILED: Missing email or password');
       return res.status(400).json({
         error: 'Email and password are required'
       });
     }
     
+    console.log('🔍 VALIDATING CREDENTIALS for:', email);
+    
     // Validate credentials
     const user = await databaseManager.validateUserPassword(email, password);
     
     if (!user) {
+      console.log('❌ LOGIN FAILED: Invalid credentials for', email);
       return res.status(401).json({
         error: 'Invalid email or password'
       });
     }
     
+    console.log('✅ LOGIN SUCCESS: Generating token for', email);
+    
     // Generate token
     const token = databaseManager.generateToken(user);
+    
+    console.log('🎟️ TOKEN GENERATED successfully for', email);
     
     res.json({
       message: 'Login successful',
@@ -86,9 +100,10 @@ router.post('/login', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('💥 LOGIN EXCEPTION:', error);
     res.status(500).json({
-      error: 'Login failed'
+      error: 'Login failed',
+      details: error.message
     });
   }
 });
