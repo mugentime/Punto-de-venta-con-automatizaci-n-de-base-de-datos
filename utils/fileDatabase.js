@@ -412,6 +412,24 @@ class FileDatabase {
     return record;
   }
 
+  async updateRecord(id, updateData) {
+    const records = await this.getRecords();
+    const index = records.findIndex(r => r._id === id);
+    
+    if (index === -1) {
+      throw new Error('Record not found');
+    }
+    
+    records[index] = {
+      ...records[index],
+      ...updateData,
+      updatedAt: new Date().toISOString()
+    };
+    
+    await fs.writeFile(this.recordsFile, JSON.stringify(records, null, 2));
+    return records[index];
+  }
+
   async deleteRecord(id, deletedBy) {
     const records = await this.getRecords();
     const index = records.findIndex(r => r._id === id);

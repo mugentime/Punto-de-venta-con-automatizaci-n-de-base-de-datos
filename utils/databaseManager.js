@@ -260,6 +260,13 @@ class DatabaseManager {
         return await fileDatabase.deleteRecord(id, deletedBy);
     }
 
+    async updateRecord(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateRecord(id, updateData);
+        }
+        return await fileDatabase.updateRecord(id, updateData);
+    }
+
     // UTILITIES
     generateToken(user) {
         if (this.usePostgreSQL) {

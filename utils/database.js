@@ -444,6 +444,109 @@ class Database {
         return record;
     }
 
+    async updateRecord(id, updateData) {
+        if (this.useDatabase) {
+            const updates = [];
+            const values = [];
+            let valueIndex = 1;
+
+            // Handle different field mappings
+            Object.keys(updateData).forEach(key => {
+                let dbKey = key;
+                let value = updateData[key];
+
+                // Convert camelCase to snake_case for database fields
+                switch (key) {
+                    case 'serviceCharge':
+                        dbKey = 'service_charge';
+                        break;
+                    case 'drinksCost':
+                        dbKey = 'drinks_cost';
+                        break;
+                    case 'createdBy':
+                        dbKey = 'created_by';
+                        break;
+                    case 'isDeleted':
+                        dbKey = 'is_deleted';
+                        break;
+                    case 'createdAt':
+                        dbKey = 'created_at';
+                        break;
+                    case 'updatedAt':
+                        dbKey = 'updated_at';
+                        break;
+                }
+
+                // Special handling for products (JSON)
+                if (key === 'products') {
+                    value = JSON.stringify(value);
+                }
+
+                if (key !== 'createdAt') { // Don't update created_at
+                    updates.push(`${dbKey} = $${valueIndex}`);
+                    values.push(value);
+                    valueIndex++;
+                }
+            });
+
+            // Always update updated_at
+            if (!updateData.updatedAt) {
+                updates.push(`updated_at = $${valueIndex}`);
+                values.push(new Date());
+                valueIndex++;
+            }
+
+            values.push(id);
+
+            const result = await this.pool.query(`
+                UPDATE records SET ${updates.join(', ')} WHERE _id = $${valueIndex} RETURNING *
+            `, values);
+
+            if (result.rows.length === 0) {
+                throw new Error('Record not found');
+            }
+
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                client: row.client,
+                service: row.service,
+                products: row.products,
+                hours: row.hours,
+                payment: row.payment,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                serviceCharge: parseFloat(row.service_charge),
+                tip: parseFloat(row.tip),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                drinksCost: parseFloat(row.drinks_cost || 0),
+                profit: parseFloat(row.profit),
+                date: row.date,
+                isDeleted: row.is_deleted,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const records = await this.getRecords();
+            const recordIndex = records.findIndex(r => r._id === id);
+            
+            if (recordIndex === -1) {
+                throw new Error('Record not found');
+            }
+
+            records[recordIndex] = {
+                ...records[recordIndex],
+                ...updateData,
+                updatedAt: new Date()
+            };
+
+            await fs.writeFile(path.join(this.dataDir, 'records.json'), JSON.stringify(records, null, 2));
+            return records[recordIndex];
+        }
+    }
+
     // CASH CUTS
     async getCashCuts(limit = 50) {
         if (this.useDatabase) {

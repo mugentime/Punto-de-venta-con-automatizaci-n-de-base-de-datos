@@ -595,6 +595,13 @@
             transform: scale(1.1);
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+
         .total-display {
             background: rgba(0, 217, 255, 0.1);
             border-radius: 8px;
@@ -2451,10 +2458,17 @@
                     <td>$${tip.toFixed(2)}</td>
                     <td>${record.payment || 'efectivo'}</td>
                     <td>
-                        ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
-                            `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>` : 
+                        ${currentUser && currentUser.permissions && (currentUser.permissions.canManageInventory || currentUser.permissions.canDeleteRecords) ? 
+                            `<div class="action-buttons">
+                                <button class="btn btn-primary btn-sm action-btn edit-record-btn" data-record-id="${record._id || record.id}" title="Editar productos">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                ${currentUser.permissions.canDeleteRecords ? 
+                                    `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}" title="Eliminar registro">
+                                        <i class="fas fa-trash"></i>
+                                    </button>` : ''
+                                }
+                            </div>` : 
                             `<span class="text-muted">Sin permisos</span>`
                         }
                     </td>
@@ -2477,12 +2491,20 @@
             document.getElementById('daily-income').textContent = `$${totalIncome.toFixed(2)}`;
             document.getElementById('daily-profit').textContent = `$${(totalIncome - totalCost).toFixed(2)}`;
             
-            // Agregar event listeners para botones de eliminar (CSP compliant)
+            // Agregar event listeners para botones de acción (CSP compliant)
             document.querySelectorAll('.delete-record-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const recordId = this.getAttribute('data-record-id');
                     deleteRecord(recordId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-record-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const recordId = this.getAttribute('data-record-id');
+                    editRecordProducts(recordId);
                 });
             });
         }
@@ -2679,6 +2701,170 @@
         });
 
         // Eliminar registro
+        async function editRecordProducts(recordId) {
+            // Verificar permisos
+            if (!currentUser || !currentUser.permissions || !currentUser.permissions.canManageInventory) {
+                showNotification('No tienes permisos para editar registros', 'error');
+                return;
+            }
+            
+            try {
+                // Obtener el registro específico
+                const record = await apiRequest(`/records/${recordId}`);
+                
+                if (!record || !record.products) {
+                    showNotification('No se pudo cargar el registro', 'error');
+                    return;
+                }
+                
+                // Filtrar solo productos de refrigerador
+                const refrigeradorProducts = record.products.filter(p => p.category === 'refrigerador');
+                
+                if (refrigeradorProducts.length === 0) {
+                    showNotification('Este registro no tiene productos de refrigerador para editar', 'info');
+                    return;
+                }
+                
+                // Crear modal de edición
+                showEditProductsModal(recordId, refrigeradorProducts, record);
+                
+            } catch (error) {
+                console.error('Error cargando registro para editar:', error);
+                showNotification('Error al cargar el registro', 'error');
+            }
+        }
+
+        function showEditProductsModal(recordId, refrigeradorProducts, record) {
+            // Crear modal dinámico para editar productos
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 70vh;
+                overflow-y: auto;
+            `;
+
+            let productsHtml = refrigeradorProducts.map(product => `
+                <div class="edit-product-item" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong>${product.name}</strong>
+                        <span>$${product.price.toFixed(2)} c/u</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="quantity-${product._id}">Cantidad:</label>
+                        <input type="number" id="quantity-${product._id}" min="0" max="50" 
+                               value="${product.quantity}" style="width: 80px; padding: 5px;">
+                        <span>Stock actual: <span id="stock-${product._id}">-</span></span>
+                    </div>
+                </div>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <h3 style="margin-top: 0; color: #333;">Editar Productos de Refrigerador</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Cliente: <strong>${record.client}</strong><br>
+                    Fecha: <strong>${new Date(record.date).toLocaleDateString()}</strong>
+                </p>
+                <div id="products-list">
+                    ${productsHtml}
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+                    <button id="cancel-edit" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Cancelar
+                    </button>
+                    <button id="save-edit" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Cargar stocks actuales de productos
+            loadCurrentStocks(refrigeradorProducts);
+
+            // Event listeners
+            document.getElementById('cancel-edit').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            document.getElementById('save-edit').addEventListener('click', () => {
+                saveProductChanges(recordId, refrigeradorProducts, modal);
+            });
+
+            // Cerrar al hacer click fuera del modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        async function loadCurrentStocks(products) {
+            try {
+                const allProducts = await apiRequest('/products');
+                
+                products.forEach(product => {
+                    const currentProduct = allProducts.find(p => p._id === product._id);
+                    const stockSpan = document.getElementById(`stock-${product._id}`);
+                    if (stockSpan && currentProduct) {
+                        stockSpan.textContent = currentProduct.quantity;
+                    }
+                });
+            } catch (error) {
+                console.error('Error cargando stocks:', error);
+            }
+        }
+
+        async function saveProductChanges(recordId, originalProducts, modal) {
+            try {
+                const updatedProducts = originalProducts.map(product => {
+                    const input = document.getElementById(`quantity-${product._id}`);
+                    const newQuantity = parseInt(input.value) || 0;
+                    return {
+                        ...product,
+                        quantity: newQuantity
+                    };
+                });
+
+                // Enviar cambios al servidor
+                await apiRequest(`/records/${recordId}/products`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ 
+                        products: updatedProducts.filter(p => p.category === 'refrigerador')
+                    })
+                });
+
+                showNotification('Productos actualizados correctamente', 'success');
+                document.body.removeChild(modal);
+                
+                // Recargar datos
+                loadTodayRecords();
+                
+            } catch (error) {
+                console.error('Error guardando cambios:', error);
+                showNotification('Error al guardar los cambios', 'error');
+            }
+        }
+
         async function deleteRecord(recordId) {
             // Debug logging for permissions
             console.log('=== DELETE RECORD DEBUG ===');
