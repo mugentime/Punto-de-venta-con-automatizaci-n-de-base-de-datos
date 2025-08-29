@@ -116,6 +116,38 @@ class Database {
         `);
 
         console.log('✅ PostgreSQL database initialized');
+        
+        // Create default admin user if no users exist
+        await this.createDefaultAdminUser();
+    }
+    
+    async createDefaultAdminUser() {
+        if (this.useDatabase) {
+            // Check if any users exist
+            const result = await this.pool.query('SELECT COUNT(*) FROM users WHERE is_active = true');
+            const userCount = parseInt(result.rows[0].count);
+            
+            if (userCount === 0) {
+                console.log('👤 Creating default admin user...');
+                const bcrypt = require('bcryptjs');
+                const hashedPassword = await bcrypt.hash('admin123', 12);
+                
+                await this.createUser({
+                    username: 'admin@conejonegro.com',
+                    password: hashedPassword,
+                    role: 'admin',
+                    permissions: {
+                        canManageInventory: true,
+                        canRegisterClients: true,
+                        canViewReports: true,
+                        canManageUsers: true,
+                        canExportData: true,
+                        canDeleteRecords: true
+                    }
+                });
+                console.log('✅ Created admin user (email: admin@conejonegro.com, password: admin123)');
+            }
+        }
     }
 
     async initFileSystem() {
