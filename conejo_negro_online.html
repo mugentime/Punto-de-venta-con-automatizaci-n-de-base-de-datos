@@ -2242,20 +2242,33 @@
                     <td>$${product.price.toFixed(2)}</td>
                     <td>$${profit.toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm action-btn edit-product-btn" data-product-id="${product._id}" title="Editar cantidad">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}" title="Eliminar producto">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
             
-            // Agregar event listeners para botones de eliminar productos refrigerador (CSP compliant)
+            // Agregar event listeners para botones de productos refrigerador (CSP compliant)
             document.querySelectorAll('#refrigerador-table .delete-product-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const productId = this.getAttribute('data-product-id');
                     deleteProduct(productId);
+                });
+            });
+            
+            document.querySelectorAll('#refrigerador-table .edit-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    editProductStock(productId);
                 });
             });
         }
@@ -2603,6 +2616,138 @@
         });
 
         // Eliminar producto
+        async function editProductStock(productId) {
+            try {
+                // Obtener información actual del producto
+                const products = await apiRequest('/products');
+                const product = products.find(p => p._id === productId);
+                
+                if (!product) {
+                    showNotification('Producto no encontrado', 'error');
+                    return;
+                }
+                
+                // Crear modal para editar cantidad
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 8px;
+                    padding: 25px;
+                    max-width: 400px;
+                    width: 90%;
+                `;
+
+                modalContent.innerHTML = `
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                        Editar Stock
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="margin: 0; font-weight: bold; color: #495057;">${product.name}</p>
+                        <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 14px;">
+                            Precio: $${product.price.toFixed(2)} | 
+                            Costo: $${product.cost.toFixed(2)}
+                        </p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">
+                            Cantidad actual: <span style="color: #007bff;">${product.quantity}</span>
+                        </label>
+                        <input type="number" id="new-quantity" min="0" max="999" 
+                               value="${product.quantity}" 
+                               style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 6px; font-size: 16px;">
+                        <small style="color: #6c757d; font-size: 12px;">
+                            Ingresa la nueva cantidad de stock
+                        </small>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button id="cancel-edit-stock" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Cancelar
+                        </button>
+                        <button id="save-edit-stock" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                `;
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                // Focus en el input
+                setTimeout(() => {
+                    document.getElementById('new-quantity').select();
+                }, 100);
+
+                // Event listeners
+                document.getElementById('cancel-edit-stock').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+
+                document.getElementById('save-edit-stock').addEventListener('click', async () => {
+                    await saveStockChange(productId, modal);
+                });
+
+                // Enter para guardar
+                document.getElementById('new-quantity').addEventListener('keypress', async (e) => {
+                    if (e.key === 'Enter') {
+                        await saveStockChange(productId, modal);
+                    }
+                });
+
+                // Cerrar al hacer click fuera
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error editando producto:', error);
+                showNotification('Error al cargar producto', 'error');
+            }
+        }
+
+        async function saveStockChange(productId, modal) {
+            try {
+                const newQuantity = parseInt(document.getElementById('new-quantity').value);
+                
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                    showNotification('Cantidad inválida', 'error');
+                    return;
+                }
+
+                // Actualizar stock via API
+                await apiRequest(`/products/${productId}/stock`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ quantity: newQuantity })
+                });
+
+                showNotification('Stock actualizado correctamente', 'success');
+                document.body.removeChild(modal);
+                
+                // Recargar inventario
+                loadInitialData();
+
+            } catch (error) {
+                console.error('Error guardando stock:', error);
+                showNotification('Error al actualizar stock', 'error');
+            }
+        }
+
         async function deleteProduct(productId) {
             if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
                 return;
