@@ -229,6 +229,27 @@ class Database {
         return user;
     }
 
+    async getUserById(id) {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM users WHERE _id = $1 AND is_active = true', [id]);
+            if (result.rows.length === 0) return null;
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                username: row.username,
+                password: row.password,
+                role: row.role,
+                permissions: row.permissions,
+                isActive: row.is_active,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const users = await this.getUsers();
+            return users.find(u => u._id === id && u.isActive);
+        }
+    }
+
     async getUserByUsername(username) {
         if (this.useDatabase) {
             const result = await this.pool.query('SELECT * FROM users WHERE username = $1 AND is_active = true', [username]);
