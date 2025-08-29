@@ -241,10 +241,16 @@ class DatabaseManager {
 
     // UTILITIES
     generateToken(user) {
+        if (this.usePostgreSQL) {
+            return database.generateToken(user);
+        }
         return fileDatabase.generateToken(user);
     }
 
     verifyToken(token) {
+        if (this.usePostgreSQL) {
+            return database.verifyToken(token);
+        }
         return fileDatabase.verifyToken(token);
     }
 

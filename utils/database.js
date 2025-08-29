@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const fs = require('fs').promises;
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 class Database {
     constructor() {
@@ -441,7 +442,7 @@ class Database {
 
             Object.keys(updateData).forEach(key => {
                 const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-                updates.push(`${dbKey} = ${valueIndex}`);
+                updates.push(`${dbKey} = $${valueIndex}`);
                 values.push(updateData[key]);
                 valueIndex++;
             });
@@ -449,7 +450,7 @@ class Database {
             values.push(id);
 
             const result = await this.pool.query(`
-                UPDATE cashcuts SET ${updates.join(', ')} WHERE _id = ${valueIndex} RETURNING *
+                UPDATE cashcuts SET ${updates.join(', ')} WHERE _id = $${valueIndex} RETURNING *
             `, values);
 
             if (result.rows.length === 0) {
@@ -471,6 +472,33 @@ class Database {
 
             await fs.writeFile(path.join(this.dataDir, 'cashcuts.json'), JSON.stringify(cashCuts, null, 2));
             return cashCuts[cashCutIndex];
+        }
+    }
+
+    // JWT Token Methods
+    generateToken(user) {
+        // Use environment JWT_SECRET or fallback to hardcoded one for consistency
+        const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+        
+        return jwt.sign(
+            {
+                userId: user._id,
+                email: user.email || user.username,
+                role: user.role,
+                iat: Math.floor(Date.now() / 1000)
+            },
+            secret,
+            { expiresIn: '7d' }
+        );
+    }
+
+    verifyToken(token) {
+        try {
+            // Use environment JWT_SECRET or fallback to hardcoded one for consistency
+            const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+            return jwt.verify(token, secret);
+        } catch (error) {
+            return null;
         }
     }
 
