@@ -3372,11 +3372,50 @@
             }
         });
 
-        // Finalizar día (limpiar registros del día)
-        document.getElementById('finish-day').addEventListener('click', function() {
-            if (confirm('¿Estás seguro de que deseas finalizar el día? Esto archivará los registros actuales.')) {
-                // Esta funcionalidad se puede implementar más tarde según necesidades
-                showNotification('Función de finalizar día pendiente de implementación', 'warning');
+        // Finalizar día (realizar corte de caja automático)
+        document.getElementById('finish-day').addEventListener('click', async function() {
+            if (confirm('¿Estás seguro de que deseas finalizar el día? Esto realizará un corte de caja automático y archivará los registros del día.')) {
+                try {
+                    showNotification('Finalizando día y realizando corte de caja...', 'info');
+                    
+                    const response = await apiRequest('/cashcuts/manual', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            notes: 'Corte automático - Finalizar día'
+                        })
+                    });
+
+                    if (response.success) {
+                        showNotification('Día finalizado exitosamente. Corte de caja realizado.', 'success');
+                        
+                        // Limpiar registros del día actual de la interfaz
+                        data.records = data.records.filter(record => {
+                            const recordDate = new Date(record.date).toDateString();
+                            const today = new Date().toDateString();
+                            return recordDate !== today;
+                        });
+                        
+                        // Actualizar la interfaz
+                        updateDailyRecordsDisplay();
+                        updateProductTables();
+                        initializeReports();
+                        
+                        // Mostrar detalles del corte si es necesario
+                        if (response.cashCut) {
+                            const cutInfo = `
+                                Total de ingresos: $${response.cashCut.totalIncome?.toFixed(2) || '0.00'}
+                                Total de ganancia: $${response.cashCut.totalProfit?.toFixed(2) || '0.00'}
+                                Registros procesados: ${response.cashCut.totalRecords || 0}
+                            `;
+                            showNotification(`Resumen del corte:\n${cutInfo}`, 'info');
+                        }
+                    } else {
+                        showNotification('Error al finalizar el día: ' + (response.error || 'Error desconocido'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Error finishing day:', error);
+                    showNotification('Error de conexión al finalizar el día', 'error');
+                }
             }
         });
 
