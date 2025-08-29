@@ -2521,6 +2521,39 @@
             });
         }
 
+        function updateAlimentosTable() {
+            const tbody = document.querySelector('#alimentos-table tbody');
+            tbody.innerHTML = '';
+            
+            const alimentosProducts = data.products.filter(p => p.category === 'alimentos' && p.isActive);
+            
+            alimentosProducts.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Agregar event listeners para botones de eliminar productos alimentos (CSP compliant)
+            document.querySelectorAll('#alimentos-table .delete-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
+            });
+        }
 
         // Mostrar nota detallada del cliente
         function showClientNote(clientName, note) {
