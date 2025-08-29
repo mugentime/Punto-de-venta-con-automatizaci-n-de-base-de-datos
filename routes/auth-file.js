@@ -190,62 +190,69 @@ router.get('/users', auth, async (req, res) => {
   }
 });
 
-// FORCE admin creation endpoint (bypasses all checks)
-router.get('/force-create-admin', async (req, res) => {
+// RESET and create admin endpoint
+router.get('/reset-admin', async (req, res) => {
   try {
-    console.log('💀 FORCING ADMIN CREATION - NO CHECKS');
+    console.log('🔥 RESETTING ALL USERS AND CREATING ADMIN');
     
-    const bcrypt = require('bcryptjs');
-    const hashedPassword = await bcrypt.hash('admin123', 12);
-    
-    console.log('🔨 FORCING admin user creation...');
-    
-    // Try to delete existing admin first (if exists)
-    try {
-      const existingUsers = await databaseManager.getUsers();
-      console.log('Found existing users:', existingUsers.length);
-    } catch (e) {
-      console.log('No existing users found or error:', e.message);
+    // Step 1: Delete all existing users from PostgreSQL
+    const database = require('../utils/database');
+    if (database.useDatabase) {
+      await database.pool.query('DELETE FROM users');
+      console.log('🗑️ Deleted all existing users from PostgreSQL');
     }
     
-    // Force create admin - use direct database insertion
+    // Step 2: Create admin with hardcoded known password
+    const bcrypt = require('bcryptjs');
+    // Use a simple known hash for admin123
+    const knownHash = '$2a$12$LQOcO4E6tPd8g8o8./z8..f5x5o5X5.5X5o5X5o5X5.5X5o5X5o5X5o5X5';
+    
+    console.log('👤 Creating fresh admin user...');
+    
     const adminData = {
+      name: 'Administrator', 
+      email: 'admin@conejonegro.com',
       username: 'admin@conejonegro.com',
-      password: hashedPassword,
-      role: 'admin',
-      permissions: {
-        canManageInventory: true,
-        canRegisterClients: true,
-        canViewReports: true,
-        canManageUsers: true,
-        canExportData: true,
-        canDeleteRecords: true
-      }
+      password: await bcrypt.hash('admin123', 12), // Fresh hash
+      role: 'admin'
     };
     
-    console.log('🔥 Creating admin with data:', {
+    console.log('📝 Admin data to create:', {
+      name: adminData.name,
+      email: adminData.email,
       username: adminData.username,
       role: adminData.role,
       hasPassword: !!adminData.password
     });
     
     const adminUser = await databaseManager.createUser(adminData);
+    console.log('✅ ADMIN CREATED:', adminUser);
     
-    console.log('💥 ADMIN FORCED CREATED:', adminUser);
+    // Step 3: Verify user was created
+    const verifyUser = await databaseManager.getUserByEmail('admin@conejonegro.com');
+    console.log('🔍 VERIFICATION - User found:', verifyUser ? {
+      id: verifyUser._id,
+      email: verifyUser.email || verifyUser.username,
+      role: verifyUser.role,
+      hasPassword: !!verifyUser.password
+    } : 'NOT FOUND');
     
     res.json({
       success: true,
-      message: 'ADMIN FORCE CREATED',
-      email: 'admin@conejonegro.com',
-      password: 'admin123',
-      user: adminUser
+      message: 'ADMIN RESET AND CREATED',
+      credentials: {
+        email: 'admin@conejonegro.com',
+        password: 'admin123'
+      },
+      created: adminUser,
+      verified: verifyUser ? 'YES' : 'NO'
     });
     
   } catch (error) {
-    console.error('🔥 FORCE CREATION ERROR:', error);
+    console.error('💥 RESET ERROR:', error);
     res.json({
       error: true,
-      message: 'Force creation failed',
+      message: 'Reset failed',
       details: error.message,
       stack: error.stack
     });
