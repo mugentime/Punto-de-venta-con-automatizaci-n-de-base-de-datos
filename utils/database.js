@@ -92,6 +92,28 @@ class Database {
             )
         `);
 
+        await this.pool.query(`
+            CREATE TABLE IF NOT EXISTS cashcuts (
+                id SERIAL PRIMARY KEY,
+                _id VARCHAR(24) UNIQUE NOT NULL,
+                performed_by VARCHAR(24),
+                start_date TIMESTAMP,
+                end_date TIMESTAMP,
+                sales_summary JSONB DEFAULT '{}',
+                product_summary JSONB DEFAULT '[]',
+                totals JSONB DEFAULT '{}',
+                expected_cash DECIMAL(10,2) DEFAULT 0,
+                actual_cash DECIMAL(10,2) DEFAULT 0,
+                difference DECIMAL(10,2) DEFAULT 0,
+                notes TEXT,
+                is_automatic BOOLEAN DEFAULT false,
+                is_deleted BOOLEAN DEFAULT false,
+                deleted_by VARCHAR(24),
+                deleted_at TIMESTAMP,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
         console.log('✅ PostgreSQL database initialized');
     }
 
@@ -357,6 +379,99 @@ class Database {
         }
 
         return record;
+    }
+
+    // CASH CUTS
+    async getCashCuts(limit = 50) {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM cashcuts WHERE is_deleted = false ORDER BY created_at DESC LIMIT $1', [limit]);
+            return result.rows.map(row => ({
+                _id: row._id,
+                performedBy: row.performed_by,
+                startDate: row.start_date,
+                endDate: row.end_date,
+                salesSummary: row.sales_summary,
+                productSummary: row.product_summary,
+                totals: row.totals,
+                expectedCash: parseFloat(row.expected_cash),
+                actualCash: parseFloat(row.actual_cash),
+                difference: parseFloat(row.difference),
+                notes: row.notes,
+                isAutomatic: row.is_automatic,
+                isDeleted: row.is_deleted,
+                deletedBy: row.deleted_by,
+                deletedAt: row.deleted_at,
+                createdAt: row.created_at
+            }));
+        } else {
+            const data = await fs.readFile(path.join(this.dataDir, 'cashcuts.json'), 'utf8').catch(() => '[]');
+            const cashCuts = JSON.parse(data);
+            return cashCuts.filter(c => !c.isDeleted).slice(0, limit);
+        }
+    }
+
+    async createCashCut(cashCutData) {
+        const id = this.generateId();
+        const cashCut = {
+            _id: id,
+            ...cashCutData,
+            isDeleted: false,
+            createdAt: new Date()
+        };
+
+        if (this.useDatabase) {
+            await this.pool.query(`
+                INSERT INTO cashcuts (_id, performed_by, start_date, end_date, sales_summary, product_summary, totals, expected_cash, actual_cash, difference, notes, is_automatic, is_deleted, created_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
+            `, [cashCut._id, cashCut.performedBy, cashCut.startDate, cashCut.endDate, JSON.stringify(cashCut.salesSummary), JSON.stringify(cashCut.productSummary), JSON.stringify(cashCut.totals), cashCut.expectedCash, cashCut.actualCash, cashCut.difference, cashCut.notes, cashCut.isAutomatic, cashCut.isDeleted, cashCut.createdAt]);
+        } else {
+            const cashCuts = await this.getCashCuts(1000);
+            cashCuts.push(cashCut);
+            await fs.writeFile(path.join(this.dataDir, 'cashcuts.json'), JSON.stringify(cashCuts, null, 2));
+        }
+
+        return cashCut;
+    }
+
+    async updateCashCut(id, updateData) {
+        if (this.useDatabase) {
+            const updates = [];
+            const values = [];
+            let valueIndex = 1;
+
+            Object.keys(updateData).forEach(key => {
+                const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+                updates.push(`${dbKey} = ${valueIndex}`);
+                values.push(updateData[key]);
+                valueIndex++;
+            });
+
+            values.push(id);
+
+            const result = await this.pool.query(`
+                UPDATE cashcuts SET ${updates.join(', ')} WHERE _id = ${valueIndex} RETURNING *
+            `, values);
+
+            if (result.rows.length === 0) {
+                throw new Error('Cash cut not found');
+            }
+
+            return result.rows[0];
+        } else {
+            const cashCuts = await this.getCashCuts(1000);
+            const cashCutIndex = cashCuts.findIndex(c => c._id === id);
+            if (cashCutIndex === -1) {
+                throw new Error('Cash cut not found');
+            }
+
+            cashCuts[cashCutIndex] = {
+                ...cashCuts[cashCutIndex],
+                ...updateData
+            };
+
+            await fs.writeFile(path.join(this.dataDir, 'cashcuts.json'), JSON.stringify(cashCuts, null, 2));
+            return cashCuts[cashCutIndex];
+        }
     }
 
     async close() {
