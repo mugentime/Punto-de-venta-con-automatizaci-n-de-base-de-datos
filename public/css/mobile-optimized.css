@@ -10,7 +10,7 @@
 
 /* MOBILE HAMBURGER MENU - VISIBLE MOBILE ENHANCEMENT */
 .hamburger-menu {
-  display: none;
+  display: none !important;
   position: fixed;
   top: 15px;
   right: 15px;
@@ -34,10 +34,17 @@
   color: var(--bg-primary, #0a0a0f);
 }
 
+/* Hide hamburger on desktop */
+@media (min-width: 769px) {
+  .hamburger-menu {
+    display: none !important;
+  }
+}
+
 /* Show hamburger on mobile */
 @media (max-width: 768px) {
   .hamburger-menu {
-    display: block !important;
+    display: flex !important;
   }
   
   /* Move connection status to avoid hamburger menu overlap */
