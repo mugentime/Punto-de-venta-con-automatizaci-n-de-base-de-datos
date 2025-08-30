@@ -1,0 +1,625 @@
+/**
+ * Mobile-Optimized CSS for POS Conejo Negro
+ * Combines all mobile optimizations into a single file
+ * Critical fixes for touch targets, navigation, and responsive design
+ */
+
+/* Critical Mobile Fixes - Override existing styles */
+
+/* Mobile CSS confirmed working - test colors removed */
+
+/* MOBILE HAMBURGER MENU - VISIBLE MOBILE ENHANCEMENT */
+.hamburger-menu {
+  display: none;
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  z-index: 1001;
+  background: var(--bg-card, #1a1a2e);
+  padding: 15px;
+  border-radius: 8px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0, 217, 255, 0.3);
+  border: 2px solid var(--accent-cyan, #00d9ff);
+}
+
+.hamburger-menu:hover {
+  background: var(--accent-cyan, #00d9ff);
+  color: var(--bg-primary, #0a0a0f);
+}
+
+/* Show hamburger on mobile */
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: block !important;
+  }
+  
+  /* Hide regular navigation on mobile */
+  nav {
+    display: none;
+  }
+  
+  nav.mobile-nav-active {
+    display: block !important;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: auto;
+    max-height: 40vh;
+    background: rgba(10, 10, 15, 0.98);
+    z-index: 1000;
+    padding: 80px 20px 20px;
+    border-bottom: 2px solid var(--accent-cyan, #00d9ff);
+    box-shadow: 0 8px 32px rgba(0, 217, 255, 0.3);
+    overflow-y: auto;
+  }
+  
+  nav.mobile-nav-active ul {
+    flex-direction: column !important;
+    gap: 20px !important;
+  }
+  
+  nav.mobile-nav-active a {
+    padding: 20px !important;
+    display: block !important;
+    border-radius: 8px !important;
+    background: var(--bg-card, #1a1a2e) !important;
+    border: 1px solid var(--accent-cyan, #00d9ff) !important;
+    text-align: center !important;
+    font-size: 18px !important;
+  }
+}
+
+/* MOBILE BOTTOM NAVIGATION */
+.mobile-bottom-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-card, #1a1a2e);
+  border-top: 2px solid var(--accent-cyan, #00d9ff);
+  z-index: 999;
+  padding: 8px;
+  height: 60px;
+  box-shadow: 0 -4px 20px rgba(0, 217, 255, 0.2);
+}
+
+@media (max-width: 768px) {
+  .mobile-bottom-nav {
+    display: flex !important;
+    justify-content: space-around;
+  }
+  
+  .mobile-bottom-nav .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+    color: var(--text-secondary, #a0a0c0);
+    text-decoration: none;
+    font-size: 12px;
+    min-width: 44px;
+    min-height: 44px;
+    justify-content: center;
+  }
+  
+  .mobile-bottom-nav .nav-item.active,
+  .mobile-bottom-nav .nav-item:hover {
+    color: var(--accent-cyan, #00d9ff);
+  }
+  
+  .mobile-bottom-nav .nav-item i {
+    font-size: 18px;
+    margin-bottom: 4px;
+  }
+  
+  /* Add bottom padding to body to account for fixed bottom nav */
+  body {
+    padding-bottom: 60px !important;
+  }
+}
+
+/* CRITICAL FIX FOR BETTER MOBILE VISUAL FEEDBACK */
+@media (max-width: 768px) {
+  /* Make all buttons larger and more touch-friendly */
+  .btn, button, input[type="submit"] {
+    padding: 16px 24px !important;
+    font-size: 18px !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 217, 255, 0.2) !important;
+  }
+  
+  /* Mobile mode indicator - hidden by default */
+  body::before {
+    display: none;
+  }
+}
+
+/* CRITICAL FIX 1: Ensure all buttons meet touch target minimums */
+.btn,
+button,
+[role="button"],
+input[type="button"],
+input[type="submit"],
+input[type="reset"],
+.button {
+  min-height: 44px !important; /* Apple HIG minimum */
+  min-width: 44px !important;
+  padding: 12px 24px !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+  font-size: max(16px, 1rem) !important; /* Prevent iOS zoom */
+}
+
+/* Small buttons still need to meet minimum touch targets */
+.btn-sm,
+.btn.small,
+.button-small {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  padding: 8px 16px !important;
+}
+
+/* CRITICAL FIX 2: Fix form inputs to prevent zoom and improve usability */
+input,
+textarea,
+select {
+  font-size: max(16px, 1rem) !important; /* Prevents zoom on iOS */
+  min-height: 44px !important;
+  padding: 12px 16px !important;
+  touch-action: manipulation !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  appearance: none !important;
+}
+
+/* Input type optimizations */
+input[type="email"] {
+  inputmode: email !important;
+  autocomplete: email !important;
+}
+
+input[type="tel"] {
+  inputmode: tel !important;
+  autocomplete: tel !important;
+}
+
+input[type="number"] {
+  inputmode: numeric !important;
+}
+
+input[type="search"] {
+  inputmode: search !important;
+}
+
+input[type="url"] {
+  inputmode: url !important;
+  autocomplete: url !important;
+}
+
+input[type="password"] {
+  autocomplete: current-password !important;
+}
+
+/* CRITICAL FIX 3: Mobile viewport and safe areas */
+body {
+  /* Mobile viewport handling */
+  min-height: 100vh !important;
+  min-height: var(--vh-actual, 100vh) !important;
+  
+  /* Safe area support for notched displays */
+  padding-left: env(safe-area-inset-left, 0) !important;
+  padding-right: env(safe-area-inset-right, 0) !important;
+  
+  /* Improve mobile scrolling */
+  -webkit-overflow-scrolling: touch !important;
+  overscroll-behavior-y: contain !important;
+  
+  /* Prevent text size adjustment */
+  -webkit-text-size-adjust: 100% !important;
+}
+
+/* CRITICAL FIX 4: Add mobile navigation spacing */
+.main-content,
+main {
+  /* Account for bottom navigation on mobile */
+  padding-bottom: calc(64px + env(safe-area-inset-bottom, 0)) !important;
+}
+
+/* CRITICAL FIX 5: Fix table responsiveness */
+@media (max-width: 768px) {
+  /* Convert tables to card layout on mobile */
+  .table-responsive table,
+  .data-table,
+  table:not(.desktop-only) {
+    display: block !important;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .table-responsive thead,
+  .data-table thead,
+  table:not(.desktop-only) thead {
+    display: none !important;
+  }
+  
+  .table-responsive tbody,
+  .data-table tbody,
+  table:not(.desktop-only) tbody {
+    display: block !important;
+  }
+  
+  .table-responsive tr,
+  .data-table tr,
+  table:not(.desktop-only) tr {
+    display: block !important;
+    background: var(--bg-card, #1a1a2e) !important;
+    border: 1px solid rgba(0, 217, 255, 0.2) !important;
+    border-radius: 8px !important;
+    margin-bottom: 16px !important;
+    padding: 16px !important;
+    box-shadow: 0 2px 4px rgba(0, 217, 255, 0.1) !important;
+  }
+  
+  .table-responsive td,
+  .data-table td,
+  table:not(.desktop-only) td {
+    display: flex !important;
+    justify-content: space-between !important;
+    align-items: center !important;
+    border: none !important;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important;
+    padding: 12px 0 !important;
+    min-height: 44px !important;
+  }
+  
+  .table-responsive td:last-child,
+  .data-table td:last-child,
+  table:not(.desktop-only) td:last-child {
+    border-bottom: none !important;
+  }
+  
+  /* Add data labels for mobile tables */
+  .table-responsive td::before,
+  .data-table td::before,
+  table:not(.desktop-only) td::before {
+    content: attr(data-label) ": " !important;
+    font-weight: 600 !important;
+    color: var(--text-secondary, #a0a0c0) !important;
+    font-size: 14px !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.5px !important;
+  }
+}
+
+/* CRITICAL FIX 6: Improve spacing between interactive elements */
+.button-group,
+.btn-group,
+.action-buttons {
+  gap: 12px !important;
+}
+
+.button-group > *,
+.btn-group > *,
+.action-buttons > * {
+  margin: 4px !important;
+}
+
+/* CRITICAL FIX 7: Fix modal and popup touch interactions */
+.modal,
+.popup,
+.dropdown {
+  touch-action: manipulation !important;
+}
+
+.modal-backdrop,
+.overlay {
+  touch-action: none !important;
+}
+
+/* CRITICAL FIX 8: Improve link touch targets */
+a {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px 12px !important;
+  margin: -8px -12px !important;
+  border-radius: 4px !important;
+  touch-action: manipulation !important;
+}
+
+/* Don't affect text links in paragraphs */
+p a,
+.text-content a {
+  display: inline !important;
+  min-height: auto !important;
+  min-width: auto !important;
+  padding: 2px 4px !important;
+  margin: -2px -4px !important;
+}
+
+/* CRITICAL FIX 9: Fix select dropdown on mobile */
+select {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%2300d9ff' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e") !important;
+  background-position: right 12px center !important;
+  background-repeat: no-repeat !important;
+  background-size: 16px 16px !important;
+  padding-right: 40px !important;
+}
+
+/* CRITICAL FIX 10: Add bottom navigation */
+.bottom-nav {
+  position: fixed !important;
+  bottom: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  height: 64px !important;
+  background: var(--bg-card, #1a1a2e) !important;
+  border-top: 1px solid rgba(0, 217, 255, 0.2) !important;
+  backdrop-filter: blur(10px) !important;
+  z-index: 1020 !important;
+  padding-bottom: env(safe-area-inset-bottom, 0) !important;
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .bottom-nav {
+    display: flex !important;
+  }
+}
+
+.nav-tabs {
+  display: flex !important;
+  height: 64px !important;
+  align-items: center !important;
+  justify-content: space-around !important;
+  padding: 0 8px !important;
+  width: 100% !important;
+}
+
+.nav-tab {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: center !important;
+  justify-content: center !important;
+  min-width: 48px !important;
+  min-height: 48px !important;
+  padding: 8px !important;
+  color: var(--text-secondary, #a0a0c0) !important;
+  background: transparent !important;
+  border: none !important;
+  border-radius: 8px !important;
+  cursor: pointer !important;
+  transition: all 250ms ease !important;
+  touch-action: manipulation !important;
+  -webkit-tap-highlight-color: transparent !important;
+}
+
+.nav-tab:hover,
+.nav-tab:focus {
+  color: var(--accent-cyan, #00d9ff) !important;
+  background: rgba(0, 217, 255, 0.1) !important;
+  outline: none !important;
+}
+
+.nav-tab.active {
+  color: var(--accent-cyan, #00d9ff) !important;
+  background: rgba(0, 217, 255, 0.15) !important;
+}
+
+.nav-tab i {
+  font-size: 20px !important;
+  margin-bottom: 2px !important;
+}
+
+.nav-tab span {
+  font-size: 12px !important;
+  font-weight: 500 !important;
+}
+
+/* CRITICAL FIX 11: Add hamburger menu */
+.hamburger-menu {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: block !important;
+  }
+}
+
+.hamburger-toggle {
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  align-items: center !important;
+  width: 48px !important;
+  height: 48px !important;
+  background: transparent !important;
+  border: none !important;
+  cursor: pointer !important;
+  padding: 12px !important;
+  border-radius: 8px !important;
+  transition: all 250ms ease !important;
+  touch-action: manipulation !important;
+}
+
+.hamburger-line {
+  width: 24px !important;
+  height: 3px !important;
+  background: var(--text-primary, #e0e0ff) !important;
+  border-radius: 2px !important;
+  transition: all 250ms ease !important;
+  transform-origin: center !important;
+}
+
+.hamburger-line:not(:last-child) {
+  margin-bottom: 4px !important;
+}
+
+.hamburger-toggle.active .hamburger-line:nth-child(1) {
+  transform: rotate(45deg) translate(6px, 6px) !important;
+}
+
+.hamburger-toggle.active .hamburger-line:nth-child(2) {
+  opacity: 0 !important;
+  transform: rotate(180deg) !important;
+}
+
+.hamburger-toggle.active .hamburger-line:nth-child(3) {
+  transform: rotate(-45deg) translate(6px, -6px) !important;
+}
+
+/* CRITICAL FIX 12: Improve focus visibility */
+*:focus {
+  outline: 2px solid var(--accent-cyan, #00d9ff) !important;
+  outline-offset: 2px !important;
+}
+
+*:focus:not(:focus-visible) {
+  outline: none !important;
+}
+
+*:focus-visible {
+  outline: 2px solid var(--accent-cyan, #00d9ff) !important;
+  outline-offset: 2px !important;
+}
+
+/* CRITICAL FIX 13: Landscape orientation optimizations */
+@media (orientation: landscape) and (max-height: 500px) {
+  .bottom-nav {
+    height: 56px !important;
+  }
+  
+  .nav-tabs {
+    height: 56px !important;
+  }
+  
+  .nav-tab {
+    min-height: 40px !important;
+    padding: 6px !important;
+  }
+  
+  .nav-tab i {
+    font-size: 18px !important;
+    margin-bottom: 1px !important;
+  }
+  
+  .nav-tab span {
+    font-size: 11px !important;
+  }
+  
+  .main-content,
+  main {
+    padding-bottom: calc(56px + env(safe-area-inset-bottom, 0)) !important;
+  }
+}
+
+/* CRITICAL FIX 14: Improve loading states for mobile */
+.loading,
+.spinner {
+  touch-action: none !important;
+  pointer-events: none !important;
+}
+
+/* CRITICAL FIX 15: Fix checkbox and radio button touch targets */
+input[type="checkbox"],
+input[type="radio"] {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  margin: 4px !important;
+}
+
+/* Wrapper for better touch target */
+.checkbox-wrapper,
+.radio-wrapper {
+  min-height: 44px !important;
+  min-width: 44px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 8px !important;
+  margin: 4px !important;
+  border-radius: 8px !important;
+  touch-action: manipulation !important;
+  cursor: pointer !important;
+}
+
+/* CRITICAL FIX 16: Accessibility improvements */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: high) {
+  button,
+  input,
+  select,
+  textarea {
+    border-width: 3px !important;
+  }
+  
+  .btn {
+    font-weight: 700 !important;
+  }
+}
+
+/* CRITICAL FIX 17: Print optimizations */
+@media print {
+  .bottom-nav,
+  .hamburger-menu,
+  .mobile-sidebar,
+  .sidebar-overlay,
+  .fab {
+    display: none !important;
+  }
+  
+  .main-content,
+  main {
+    padding-bottom: 0 !important;
+  }
+  
+  button {
+    background: white !important;
+    color: black !important;
+    border: 2px solid black !important;
+  }
+}
+
+/* JavaScript-based viewport height fix */
+html {
+  height: 100%;
+}
+
+html.js-vh-fix {
+  height: var(--vh-actual, 100vh);
+}
+
+/* Hide elements that require JavaScript until loaded */
+.js-required {
+  display: none;
+}
+
+.js-loaded .js-required {
+  display: block;
+}
+
+/* Critical above-the-fold optimizations */
+.above-fold {
+  contain: layout style paint;
+}
+
+.below-fold {
+  content-visibility: auto;
+  contain-intrinsic-size: 1px 500px;
+}
