@@ -6,7 +6,12 @@
     <title>Conejo Negro - Café Coworking Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mobile Optimizations - CRITICAL for touch devices -->
+    <link rel="stylesheet" href="/css/mobile-optimized.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Mobile Enhancement JavaScript - Load early for critical fixes -->
+    <script src="/js/mobile-enhancements.js"></script>
+    <script src="/js/mobile-menu-simple.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -1135,6 +1140,31 @@
     </style>
 </head>
 <body>
+    <!-- Mobile Hamburger Menu -->
+    <div class="hamburger-menu" onclick="toggleMobileNav()">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="#pos-section" class="nav-item" onclick="showSection('pos')">
+            <i class="fas fa-cash-register"></i>
+            <span>POS</span>
+        </a>
+        <a href="#inventory-section" class="nav-item" onclick="showSection('inventory')">
+            <i class="fas fa-boxes"></i>
+            <span>Inventario</span>
+        </a>
+        <a href="#reports-section" class="nav-item" onclick="showSection('reports')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Reportes</span>
+        </a>
+        <a href="#members-section" class="nav-item" onclick="showSection('members')">
+            <i class="fas fa-users"></i>
+            <span>Miembros</span>
+        </a>
+    </div>
+    
     <div class="cyber-grid"></div>
     
     <!-- Pantalla de Login -->
@@ -1162,10 +1192,10 @@
             
             <form id="login-form">
                 <div class="form-group">
-                    <input type="email" id="login-email" class="form-control" placeholder="Email" required>
+                    <input type="email" id="login-email" class="form-control" placeholder="Email" required inputmode="email" autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required>
+                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-sign-in-alt"></i>
@@ -1178,10 +1208,10 @@
                     <input type="text" id="register-name" class="form-control" placeholder="Nombre completo" required>
                 </div>
                 <div class="form-group">
-                    <input type="email" id="register-email" class="form-control" placeholder="Email" required>
+                    <input type="email" id="register-email" class="form-control" placeholder="Email" required inputmode="email" autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="register-password" class="form-control" placeholder="Contraseña" required>
+                    <input type="password" id="register-password" class="form-control" placeholder="Contraseña" required autocomplete="new-password">
                 </div>
                 <div class="form-group">
                     <select id="register-role" class="form-control">
@@ -1271,7 +1301,7 @@
                                     <select id="product-select" class="form-control" style="flex: 2;">
                                         <option value="">Seleccionar producto</option>
                                     </select>
-                                    <input type="number" id="product-quantity" class="form-control" placeholder="Cantidad" min="1" value="1" style="flex: 1; margin: 0 5px;">
+                                    <input type="number" id="product-quantity" class="form-control" placeholder="Cantidad" min="1" value="1" style="flex: 1; margin: 0 5px;" inputmode="numeric">
                                     <button type="button" id="add-product-btn" class="btn btn-secondary" style="flex: 0 0 auto;">
                                         <i class="fas fa-plus"></i> Agregar
                                     </button>
