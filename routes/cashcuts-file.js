@@ -65,7 +65,7 @@ router.get('/:id', auth, async (req, res) => {
 router.post('/manual', auth, async (req, res) => {
   try {
     const { notes = '' } = req.body;
-    const userId = req.user.id;
+    const userId = req.user.userId;
 
     const cashCut = await cashCutService.triggerManualCut(userId, notes);
 

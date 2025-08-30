@@ -52,4 +52,87 @@ const auth = async (req, res, next) => {
   }
 };
 
-module.exports = { auth };
+// Permission middleware functions
+const canManageClients = (req, res, next) => {
+  try {
+    // Use permissions from user object (set during authentication)
+    const permissions = req.user.permissions;
+    
+    // Check both canManageClients (for memberships) and canRegisterClients (legacy)
+    if (!permissions.canRegisterClients && !permissions.canManageClients) {
+      return res.status(403).json({ 
+        error: 'Access denied', 
+        message: 'You do not have permission to manage clients' 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Permission check error:', error);
+    res.status(500).json({ error: 'Permission check failed' });
+  }
+};
+
+const canViewReports = (req, res, next) => {
+  try {
+    // Use permissions from user object (set during authentication)
+    const permissions = req.user.permissions;
+    
+    if (!permissions.canViewReports) {
+      return res.status(403).json({ 
+        error: 'Access denied', 
+        message: 'You do not have permission to view reports' 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Permission check error:', error);
+    res.status(500).json({ error: 'Permission check failed' });
+  }
+};
+
+const canManageInventory = (req, res, next) => {
+  try {
+    // Use permissions from user object (set during authentication)
+    const permissions = req.user.permissions;
+    
+    if (!permissions.canManageInventory) {
+      return res.status(403).json({ 
+        error: 'Access denied', 
+        message: 'You do not have permission to manage inventory' 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Permission check error:', error);
+    res.status(500).json({ error: 'Permission check failed' });
+  }
+};
+
+const canCreateRecords = (req, res, next) => {
+  try {
+    const permissions = databaseManager.getPermissionsByRole(req.user.role);
+    
+    if (!permissions.canCreateRecords) {
+      return res.status(403).json({ 
+        error: 'Access denied', 
+        message: 'You do not have permission to create records' 
+      });
+    }
+    
+    next();
+  } catch (error) {
+    console.error('Permission check error:', error);
+    res.status(500).json({ error: 'Permission check failed' });
+  }
+};
+
+module.exports = { 
+  auth, 
+  canManageClients,
+  canViewReports,
+  canManageInventory,
+  canCreateRecords
+};

@@ -34,5 +34,23 @@
       "canExportData": false,
       "canDeleteRecords": false
     }
+  },
+  {
+    "_id": "2e420e3ace8d6f19da4ccb8a",
+    "name": "Test Admin",
+    "email": "testadmin@test.com",
+    "password": "$2a$12$i3OgLD2AZWpgKicOjUucuuvPY6hfFB2bbyI2Ypx7OOoXFKUIEWX3a",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "2025-08-30T15:10:31.867Z",
+    "lastLogin": "2025-08-30T15:14:07.831Z",
+    "permissions": {
+      "canManageInventory": true,
+      "canRegisterClients": true,
+      "canViewReports": true,
+      "canManageUsers": true,
+      "canExportData": true,
+      "canDeleteRecords": true
+    }
   }
 ]

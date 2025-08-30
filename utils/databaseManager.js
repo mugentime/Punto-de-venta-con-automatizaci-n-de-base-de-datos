@@ -324,6 +324,49 @@ class DatabaseManager {
         return await fileDatabase.deleteCashCut(id, deletedBy);
     }
 
+    // MEMBERSHIPS
+    async getMemberships(filters = {}, options = {}) {
+        if (this.usePostgreSQL) {
+            return await database.getMemberships(filters, options);
+        }
+        return await fileDatabase.getMemberships(filters, options);
+    }
+
+    async getMembershipById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getMembershipById(id);
+        }
+        return await fileDatabase.getMembershipById(id);
+    }
+
+    async createMembership(membershipData) {
+        if (this.usePostgreSQL) {
+            return await database.createMembership(membershipData);
+        }
+        return await fileDatabase.createMembership(membershipData);
+    }
+
+    async updateMembership(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateMembership(id, updateData);
+        }
+        return await fileDatabase.updateMembership(id, updateData);
+    }
+
+    async deleteMembership(id) {
+        if (this.usePostgreSQL) {
+            return await database.deleteMembership(id);
+        }
+        return await fileDatabase.deleteMembership(id);
+    }
+
+    async getMembershipStats() {
+        if (this.usePostgreSQL) {
+            return await database.getMembershipStats();
+        }
+        return await fileDatabase.getMembershipStats();
+    }
+
     async close() {
         if (this.usePostgreSQL) {
             await database.close();

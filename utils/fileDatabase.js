@@ -21,6 +21,7 @@ class FileDatabase {
     this.recordsFile = path.join(this.dataPath, 'records.json');
     this.backupsFile = path.join(this.dataPath, 'backups.json');
     this.cashCutsFile = path.join(this.dataPath, 'cashcuts.json');
+    this.membershipsFile = path.join(this.dataPath, 'memberships.json');
     
     this.initialized = false;
   }
@@ -39,6 +40,7 @@ class FileDatabase {
       await this.initializeFile(this.recordsFile, []);
       await this.initializeFile(this.backupsFile, []);
       await this.initializeFile(this.cashCutsFile, []);
+      await this.initializeFile(this.membershipsFile, []);
       
       // Create default admin user if no users exist
       const users = await this.getUsers();
@@ -684,6 +686,171 @@ class FileDatabase {
     } catch (error) {
       console.error('❌ Recovery failed:', error.message);
       return false;
+    }
+  }
+
+  // MEMBERSHIP METHODS
+  async getMemberships(filters = {}, options = {}) {
+    try {
+      await this.initializeFile(this.membershipsFile, []);
+      const data = await fs.readFile(this.membershipsFile, 'utf8');
+      let memberships = JSON.parse(data);
+      
+      // Apply filters
+      if (Object.keys(filters).length > 0) {
+        memberships = memberships.filter(membership => {
+          if (membership.isDeleted) return false;
+          
+          for (const [key, value] of Object.entries(filters)) {
+            if (key === 'clientName' && value instanceof RegExp) {
+              if (!value.test(membership.clientName)) return false;
+            } else if (key === 'endDate' && typeof value === 'object' && value.$lte) {
+              if (new Date(membership.endDate) > value.$lte) return false;
+            } else if (membership[key] !== value) {
+              return false;
+            }
+          }
+          return true;
+        });
+      }
+      
+      // Apply sorting
+      if (options.sortBy) {
+        memberships.sort((a, b) => {
+          const aVal = a[options.sortBy];
+          const bVal = b[options.sortBy];
+          
+          if (options.sortOrder === 'desc') {
+            return aVal < bVal ? 1 : aVal > bVal ? -1 : 0;
+          } else {
+            return aVal > bVal ? 1 : aVal < bVal ? -1 : 0;
+          }
+        });
+      }
+      
+      // Apply pagination
+      const page = options.page || 1;
+      const limit = options.limit || 20;
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+      
+      const paginatedMemberships = memberships.slice(startIndex, endIndex);
+      
+      return {
+        data: paginatedMemberships,
+        totalCount: memberships.length,
+        currentPage: page,
+        totalPages: Math.ceil(memberships.length / limit),
+        hasNext: endIndex < memberships.length,
+        hasPrev: page > 1
+      };
+    } catch (error) {
+      console.error('Error getting memberships:', error);
+      return { data: [], totalCount: 0, currentPage: 1, totalPages: 0, hasNext: false, hasPrev: false };
+    }
+  }
+
+  async getMembershipById(id) {
+    try {
+      await this.initializeFile(this.membershipsFile, []);
+      const data = await fs.readFile(this.membershipsFile, 'utf8');
+      const memberships = JSON.parse(data);
+      return memberships.find(m => m.id === id && !m.isDeleted);
+    } catch (error) {
+      console.error('Error getting membership by ID:', error);
+      return null;
+    }
+  }
+
+  async createMembership(membershipData) {
+    try {
+      await this.initializeFile(this.membershipsFile, []);
+      const data = await fs.readFile(this.membershipsFile, 'utf8');
+      const memberships = JSON.parse(data);
+      
+      memberships.push(membershipData);
+      await fs.writeFile(this.membershipsFile, JSON.stringify(memberships, null, 2));
+      
+      return membershipData;
+    } catch (error) {
+      console.error('Error creating membership:', error);
+      throw error;
+    }
+  }
+
+  async updateMembership(id, updateData) {
+    try {
+      await this.initializeFile(this.membershipsFile, []);
+      const data = await fs.readFile(this.membershipsFile, 'utf8');
+      const memberships = JSON.parse(data);
+      
+      const membershipIndex = memberships.findIndex(m => m.id === id && !m.isDeleted);
+      if (membershipIndex === -1) {
+        throw new Error('Membership not found');
+      }
+      
+      memberships[membershipIndex] = { ...memberships[membershipIndex], ...updateData };
+      await fs.writeFile(this.membershipsFile, JSON.stringify(memberships, null, 2));
+      
+      return memberships[membershipIndex];
+    } catch (error) {
+      console.error('Error updating membership:', error);
+      throw error;
+    }
+  }
+
+  async deleteMembership(id) {
+    try {
+      const updateData = { isDeleted: true, updatedAt: new Date() };
+      return await this.updateMembership(id, updateData);
+    } catch (error) {
+      console.error('Error deleting membership:', error);
+      throw error;
+    }
+  }
+
+  async getMembershipStats() {
+    try {
+      await this.initializeFile(this.membershipsFile, []);
+      const data = await fs.readFile(this.membershipsFile, 'utf8');
+      const memberships = JSON.parse(data).filter(m => !m.isDeleted);
+      
+      const now = new Date();
+      const threeDaysFromNow = new Date();
+      threeDaysFromNow.setDate(now.getDate() + 3);
+      
+      const stats = {
+        total: memberships.length,
+        active: memberships.filter(m => m.status === 'active').length,
+        expired: memberships.filter(m => m.status === 'expired').length,
+        cancelled: memberships.filter(m => m.status === 'cancelled').length,
+        pending: memberships.filter(m => m.status === 'pending').length,
+        expiring: memberships.filter(m => 
+          m.status === 'active' && new Date(m.endDate) <= threeDaysFromNow
+        ).length,
+        byType: {
+          daily: memberships.filter(m => m.membershipType === 'daily').length,
+          weekly: memberships.filter(m => m.membershipType === 'weekly').length,
+          monthly: memberships.filter(m => m.membershipType === 'monthly').length
+        },
+        totalRevenue: memberships.reduce((sum, m) => sum + (m.price || 0), 0),
+        monthlyRevenue: memberships
+          .filter(m => {
+            const membershipDate = new Date(m.createdAt);
+            return membershipDate.getMonth() === now.getMonth() && 
+                   membershipDate.getFullYear() === now.getFullYear();
+          })
+          .reduce((sum, m) => sum + (m.price || 0), 0)
+      };
+      
+      return stats;
+    } catch (error) {
+      console.error('Error getting membership stats:', error);
+      return {
+        total: 0, active: 0, expired: 0, cancelled: 0, pending: 0, expiring: 0,
+        byType: { daily: 0, weekly: 0, monthly: 0 },
+        totalRevenue: 0, monthlyRevenue: 0
+      };
     }
   }
 

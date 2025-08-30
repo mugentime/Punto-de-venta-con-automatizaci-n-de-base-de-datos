@@ -1,0 +1,44 @@
+[
+  {
+    "id": "175656685732731k9vfkp7",
+    "clientName": "Juan P�rez",
+    "email": "juan@email.com",
+    "phone": "123456789",
+    "membershipType": "monthly",
+    "plan": "Plan B�sico",
+    "price": 500,
+    "startDate": "2025-08-30T15:14:17.327Z",
+    "endDate": "2025-09-30T15:14:17.327Z",
+    "status": "active",
+    "autoRenew": false,
+    "paymentMethod": "efectivo",
+    "notes": "Cliente de prueba",
+    "lastPayment": {
+      "date": "2025-08-30T15:14:17.327Z",
+      "amount": 500,
+      "method": "efectivo"
+    },
+    "paymentHistory": [
+      {
+        "date": "2025-08-30T15:14:17.327Z",
+        "amount": 500,
+        "method": "efectivo",
+        "notes": "Pago inicial de membresía"
+      }
+    ],
+    "services": {
+      "coworking": true,
+      "cafeteria": true,
+      "printing": false,
+      "meeting_room": false
+    },
+    "usage": {
+      "totalHours": 0,
+      "currentMonthHours": 0,
+      "lastUsed": null
+    },
+    "isDeleted": false,
+    "createdAt": "2025-08-30T15:14:17.327Z",
+    "updatedAt": "2025-08-30T15:14:17.327Z"
+  }
+]
