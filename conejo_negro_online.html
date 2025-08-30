@@ -2342,6 +2342,9 @@
                 updateDailyRecordsDisplay();
                 initializeReports();
                 
+                // Initialize historical records after data is loaded
+                initHistoricalRecords();
+                
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -2804,6 +2807,8 @@
                 // Load historical records when accessing historical section
                 if (sectionId === 'registro-historico') {
                     loadHistoricalRecords();
+                    // Reload products to ensure they're available
+                    loadHistoricalProducts();
                 }
             });
         });
@@ -4858,50 +4863,71 @@
         function initHistoricalRecords() {
             // Set max date to today
             const today = new Date().toISOString().split('T')[0];
-            document.getElementById('historical-date').max = today;
+            const dateInput = document.getElementById('historical-date');
+            if (dateInput) {
+                dateInput.max = today;
+            }
             
             // Load products
             loadHistoricalProducts();
             
             // Service change handler
-            document.getElementById('historical-service').addEventListener('change', function() {
-                const isCoworking = this.value === 'coworking';
-                const hoursGroup = document.getElementById('historical-hours-group');
-                hoursGroup.style.display = isCoworking ? 'block' : 'none';
-                updateHistoricalTotal();
-            });
+            const serviceSelect = document.getElementById('historical-service');
+            if (serviceSelect) {
+                serviceSelect.addEventListener('change', function() {
+                    const isCoworking = this.value === 'coworking';
+                    const hoursGroup = document.getElementById('historical-hours-group');
+                    if (hoursGroup) {
+                        hoursGroup.style.display = isCoworking ? 'block' : 'none';
+                    }
+                    updateHistoricalTotal();
+                });
+            }
             
             // Hours change handler
-            document.getElementById('historical-hours').addEventListener('input', updateHistoricalTotal);
+            const hoursInput = document.getElementById('historical-hours');
+            if (hoursInput) {
+                hoursInput.addEventListener('input', updateHistoricalTotal);
+            }
             
             // Tip change handler
-            document.getElementById('historical-tip').addEventListener('input', function() {
-                document.getElementById('historical-tip-display').textContent = parseFloat(this.value || 0).toFixed(2);
-                updateHistoricalTotal();
-            });
+            const tipInput = document.getElementById('historical-tip');
+            if (tipInput) {
+                tipInput.addEventListener('input', function() {
+                    const tipDisplay = document.getElementById('historical-tip-display');
+                    if (tipDisplay) {
+                        tipDisplay.textContent = parseFloat(this.value || 0).toFixed(2);
+                    }
+                    updateHistoricalTotal();
+                });
+            }
             
             // Add product handler
-            document.getElementById('historical-add-product-btn').addEventListener('click', addHistoricalProduct);
+            const addBtn = document.getElementById('historical-add-product-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', addHistoricalProduct);
+            }
             
             // Form submit handler
-            document.getElementById('historical-record-form').addEventListener('submit', submitHistoricalRecord);
+            const form = document.getElementById('historical-record-form');
+            if (form) {
+                form.addEventListener('submit', submitHistoricalRecord);
+            }
         }
         
-        async function loadHistoricalProducts() {
+        function loadHistoricalProducts() {
             try {
-                const response = await fetch('/api/products', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                // Use the global data.products that's already loaded
+                const select = document.getElementById('historical-product-select');
+                if (!select) return;
                 
-                if (response.ok) {
-                    const products = await response.json();
-                    const select = document.getElementById('historical-product-select');
-                    select.innerHTML = '<option value="">Seleccionar producto</option>';
-                    
-                    products.forEach(product => {
-                        if (product.isActive && product.quantity > 0) {
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                // Use products from the global data object (already loaded)
+                if (data && data.products && data.products.length > 0) {
+                    data.products.forEach(product => {
+                        // For historical records, allow products even with 0 stock since we're not affecting current inventory
+                        if (product.isActive) {
                             const option = document.createElement('option');
                             option.value = JSON.stringify({
                                 id: product._id,
@@ -4914,9 +4940,42 @@
                             select.appendChild(option);
                         }
                     });
+                } else {
+                    // Fallback: try to load products via API if data.products is not available
+                    loadProductsFromAPI();
                 }
             } catch (error) {
-                console.error('Error loading products:', error);
+                console.error('Error loading historical products:', error);
+                // Fallback to API load
+                loadProductsFromAPI();
+            }
+        }
+        
+        async function loadProductsFromAPI() {
+            try {
+                const products = await apiRequest('/products');
+                const select = document.getElementById('historical-product-select');
+                if (!select) return;
+                
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                products.forEach(product => {
+                    if (product.isActive) {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({
+                            id: product._id,
+                            name: product.name,
+                            price: product.price,
+                            category: product.category,
+                            stock: product.quantity
+                        });
+                        option.textContent = `${product.name} - $${product.price} (Stock: ${product.quantity})`;
+                        select.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading products from API:', error);
+                showNotification('Error cargando productos', 'error');
             }
         }
         
@@ -4932,9 +4991,17 @@
             const productData = JSON.parse(select.value);
             const quantity = parseInt(quantityInput.value);
             
-            if (quantity <= 0 || quantity > productData.stock) {
-                alert(`Cantidad inválida. Stock disponible: ${productData.stock}`);
+            if (quantity <= 0) {
+                alert('La cantidad debe ser mayor a 0');
                 return;
+            }
+            
+            // For historical records, we don't check stock since we're not affecting current inventory
+            // Just warn if the quantity seems high
+            if (quantity > productData.stock && productData.stock > 0) {
+                if (!confirm(`La cantidad (${quantity}) es mayor al stock actual (${productData.stock}). ¿Continuar?`)) {
+                    return;
+                }
             }
             
             // Check if product already exists
@@ -4943,9 +5010,11 @@
             if (existingIndex >= 0) {
                 // Update quantity
                 const newQuantity = historicalSelectedProducts[existingIndex].quantity + quantity;
-                if (newQuantity > productData.stock) {
-                    alert(`Cantidad total excede el stock disponible: ${productData.stock}`);
-                    return;
+                // For historical records, just warn if quantity is high but don't prevent
+                if (newQuantity > productData.stock && productData.stock > 0) {
+                    if (!confirm(`La cantidad total (${newQuantity}) excede el stock actual (${productData.stock}). ¿Continuar?`)) {
+                        return;
+                    }
                 }
                 historicalSelectedProducts[existingIndex].quantity = newQuantity;
             } else {
