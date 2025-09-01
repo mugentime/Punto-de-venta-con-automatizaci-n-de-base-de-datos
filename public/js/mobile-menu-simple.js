@@ -88,4 +88,19 @@ document.addEventListener('click', function(e) {
   }
 });
 
+// Add event listener to hamburger menu (fix for CSP inline onclick restriction)
+document.addEventListener('DOMContentLoaded', function() {
+  const hamburger = document.querySelector('.hamburger-menu');
+  if (hamburger) {
+    hamburger.addEventListener('click', function(e) {
+      e.preventDefault();
+      e.stopPropagation();
+      toggleMobileNav();
+    });
+    console.log('✅ Hamburger click listener added');
+  } else {
+    console.log('⚠️ Hamburger element not found for event listener');
+  }
+});
+
 console.log('Simple mobile menu initialized');
