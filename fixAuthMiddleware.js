@@ -1,4 +1,9 @@
-const jwt = require('jsonwebtoken');
+// Fix para el problema de autenticación JWT
+const fs = require('fs');
+const path = require('path');
+
+// Contenido corregido del middleware de autenticación
+const authMiddleware = `const jwt = require('jsonwebtoken');
 const databaseManager = require('../utils/databaseManager');
 
 // Usar siempre el mismo JWT_SECRET
@@ -68,3 +73,14 @@ const adminAuth = async (req, res, next) => {
 };
 
 module.exports = { auth, adminAuth };
+`;
+
+// Guardar el archivo corregido
+fs.writeFileSync(
+    path.join(__dirname, 'middleware', 'auth-file.js'),
+    authMiddleware
+);
+
+console.log('✅ Auth middleware fixed!');
+console.log('📝 JWT_SECRET configurado: conejo-negro-pos-2025');
+console.log('🚀 Deploy con: git add -A && git commit -m "Fix JWT auth" && git push origin main');
