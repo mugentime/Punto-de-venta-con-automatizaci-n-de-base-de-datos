@@ -14,7 +14,7 @@
   position: fixed;
   top: 15px;
   right: 15px;
-  z-index: 1001;
+  z-index: 9999 !important; /* Highest priority */
   background: var(--bg-card, #1a1a2e);
   padding: 12px;
   border-radius: 50%;
@@ -27,6 +27,8 @@
   justify-content: center;
   transition: all 0.3s ease;
   font-size: 16px;
+  pointer-events: auto !important; /* Ensure it can receive clicks */
+  touch-action: manipulation !important; /* Better mobile interaction */
 }
 
 .hamburger-menu:hover {
@@ -49,11 +51,13 @@
   
   /* Move connection status to avoid hamburger menu overlap */
   .connection-status {
-    top: 15px !important;
-    right: 70px !important;
+    top: 70px !important; /* Move below hamburger */
+    right: 15px !important;
     font-size: 12px !important;
-    padding: 6px 10px !important;
-    z-index: 1000 !important;
+    padding: 4px 8px !important;
+    z-index: 900 !important; /* Lower than hamburger */
+    pointer-events: none !important; /* Don't block clicks */
+    opacity: 0.8 !important; /* Less intrusive */
   }
   
   /* Adjust header content for mobile */
@@ -121,7 +125,7 @@
     width: 280px;
     height: 100vh;
     background: var(--bg-card, #1a1a2e);
-    z-index: 1000;
+    z-index: 9998 !important; /* Just below hamburger */
     padding: 80px 20px 20px;
     border-left: 3px solid var(--accent-cyan, #00d9ff);
     box-shadow: -8px 0 32px rgba(0, 217, 255, 0.3);
