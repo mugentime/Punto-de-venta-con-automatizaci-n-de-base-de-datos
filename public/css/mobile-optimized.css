@@ -52,15 +52,30 @@
     display: flex !important;
   }
   
-  /* Move connection status to avoid hamburger menu overlap */
+  /* Replace connection status with discrete green light */
   .connection-status {
-    top: 70px !important; /* Move below hamburger */
-    right: 15px !important;
-    font-size: 12px !important;
-    padding: 4px 8px !important;
-    z-index: 900 !important; /* Lower than hamburger */
-    pointer-events: none !important; /* Don't block clicks */
-    opacity: 0.8 !important; /* Less intrusive */
+    top: 20px !important; /* Near hamburger */
+    right: 70px !important; /* Next to hamburger */
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #00ff00 !important; /* Green light */
+    box-shadow: 0 0 4px rgba(0, 255, 0, 0.6) !important;
+    font-size: 0 !important; /* Hide text */
+    padding: 0 !important;
+    z-index: 1000 !important;
+    pointer-events: none !important;
+    opacity: 0.7 !important; /* Very discrete */
+  }
+  
+  /* Hide connection text completely on mobile */
+  .connection-status::before,
+  .connection-status::after {
+    display: none !important;
+  }
+  
+  .connection-status * {
+    display: none !important; /* Hide all child text */
   }
   
   /* Adjust header content for mobile */
