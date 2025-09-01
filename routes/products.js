@@ -89,9 +89,9 @@ router.post('/', auth, canManageInventory, async (req, res) => {
       });
     }
 
-    if (!['cafeteria', 'refrigerador'].includes(category.toLowerCase())) {
+    if (!['cafeteria', 'refrigerador', 'alimentos'].includes(category.toLowerCase())) {
       return res.status(400).json({
-        error: 'Category must be either "cafeteria" or "refrigerador"'
+        error: 'Category must be "cafeteria", "refrigerador", or "alimentos"'
       });
     }
 
@@ -161,9 +161,9 @@ router.put('/:id', auth, canManageInventory, async (req, res) => {
     const { name, category, quantity, cost, price, lowStockAlert, description, barcode, isActive } = req.body;
 
     // Validation
-    if (category && !['cafeteria', 'refrigerador'].includes(category.toLowerCase())) {
+    if (category && !['cafeteria', 'refrigerador', 'alimentos'].includes(category.toLowerCase())) {
       return res.status(400).json({
-        error: 'Category must be either "cafeteria" or "refrigerador"'
+        error: 'Category must be "cafeteria", "refrigerador", or "alimentos"'
       });
     }
 

@@ -10,7 +10,7 @@ const productSchema = new mongoose.Schema({
   category: {
     type: String,
     required: [true, 'Category is required'],
-    enum: ['cafeteria', 'refrigerador'],
+    enum: ['cafeteria', 'refrigerador', 'alimentos'],
     lowercase: true
   },
   quantity: {

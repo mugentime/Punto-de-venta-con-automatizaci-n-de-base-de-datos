@@ -482,4 +482,91 @@ router.get('/stats/daily/:days', auth, async (req, res) => {
   }
 });
 
+// Get specific record by ID
+router.get('/:id', auth, async (req, res) => {
+  try {
+    const record = await databaseManager.getRecordById(req.params.id);
+    
+    if (!record || record.isDeleted) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+    
+    res.json(record);
+  } catch (error) {
+    console.error('Get record error:', error);
+    res.status(500).json({ error: 'Failed to fetch record' });
+  }
+});
+
+// Update products in a specific record
+router.patch('/:id/products', auth, async (req, res) => {
+  try {
+    // Check permissions
+    if (!req.user.permissions?.canManageInventory) {
+      return res.status(403).json({ error: 'Insufficient permissions' });
+    }
+    
+    const recordId = req.params.id;
+    const { products } = req.body;
+    
+    if (!products || !Array.isArray(products)) {
+      return res.status(400).json({ error: 'Products array is required' });
+    }
+    
+    // Get current record
+    const currentRecord = await databaseManager.getRecordById(recordId);
+    if (!currentRecord || currentRecord.isDeleted) {
+      return res.status(404).json({ error: 'Record not found' });
+    }
+    
+    // Update only refrigerador products, keep others unchanged
+    const updatedProducts = currentRecord.products.map(currentProduct => {
+      const updatedProduct = products.find(p => p._id === currentProduct._id && p.category === 'refrigerador');
+      return updatedProduct || currentProduct;
+    });
+    
+    // Recalculate totals
+    let subtotal = 0;
+    let totalCost = 0;
+    
+    updatedProducts.forEach(product => {
+      const productTotal = product.price * product.quantity;
+      const productCost = (product.cost || 0) * product.quantity;
+      
+      if (currentRecord.service === 'coworking' && product.category === 'cafeteria') {
+        // Cafeteria items are free in coworking, don't add to subtotal
+        totalCost += productCost;
+      } else {
+        subtotal += productTotal;
+        totalCost += productCost;
+      }
+    });
+    
+    const serviceCharge = currentRecord.serviceCharge || 0;
+    const tip = currentRecord.tip || 0;
+    const total = subtotal + serviceCharge + tip;
+    
+    // Update record
+    const updateData = {
+      products: updatedProducts,
+      subtotal: subtotal,
+      total: total,
+      cost: totalCost,
+      profit: total - totalCost,
+      updatedAt: new Date()
+    };
+    
+    await databaseManager.updateRecord(recordId, updateData);
+    
+    res.json({ 
+      message: 'Products updated successfully',
+      record: await databaseManager.getRecordById(recordId)
+    });
+    
+  } catch (error) {
+    console.error('Update products error:', error);
+    res.status(500).json({ error: 'Failed to update products' });
+  }
+});
+
 module.exports = router;

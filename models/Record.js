@@ -78,6 +78,36 @@ const recordSchema = new mongoose.Schema({
     type: String,
     maxlength: [500, 'Notes cannot be longer than 500 characters'],
     trim: true
+  },
+  // New multi-product support
+  products: [{
+    productId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: 'Product'
+    },
+    name: String,
+    category: {
+      type: String,
+      enum: ['cafeteria', 'refrigerador', 'alimentos']
+    },
+    quantity: {
+      type: Number,
+      min: 1
+    },
+    cost: {
+      type: Number,
+      min: 0
+    },
+    price: {
+      type: Number,
+      min: 0
+    }
+  }],
+  // Tip amount
+  tip: {
+    type: Number,
+    default: 0,
+    min: 0
   }
 }, {
   timestamps: true

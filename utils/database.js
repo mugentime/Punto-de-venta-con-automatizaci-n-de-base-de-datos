@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const fs = require('fs').promises;
 const path = require('path');
+const jwt = require('jsonwebtoken');
 
 class Database {
     constructor() {
@@ -115,6 +116,47 @@ class Database {
         `);
 
         console.log('✅ PostgreSQL database initialized');
+        
+        // Create default admin user if no users exist
+        await this.createDefaultAdminUser();
+    }
+    
+    async createDefaultAdminUser() {
+        if (this.useDatabase) {
+            // Check if any users exist
+            const result = await this.pool.query('SELECT COUNT(*) FROM users WHERE is_active = true');
+            const userCount = parseInt(result.rows[0].count);
+            console.log(`📊 Current user count in database: ${userCount}`);
+            
+            if (userCount === 0) {
+                console.log('👤 Creating default admin user...');
+                const bcrypt = require('bcryptjs');
+                const hashedPassword = await bcrypt.hash('admin123', 12);
+                console.log('🔒 Password hashed successfully');
+                
+                const adminUser = await this.createUser({
+                    username: 'admin@conejonegro.com',
+                    password: hashedPassword,
+                    role: 'admin',
+                    permissions: {
+                        canManageInventory: true,
+                        canRegisterClients: true,
+                        canViewReports: true,
+                        canManageUsers: true,
+                        canExportData: true,
+                        canDeleteRecords: true
+                    }
+                });
+                console.log('✅ Created admin user:', { 
+                    id: adminUser._id, 
+                    username: adminUser.username, 
+                    role: adminUser.role 
+                });
+                console.log('🔑 Admin login: admin@conejonegro.com / admin123');
+            } else {
+                console.log('👥 Users already exist, skipping admin creation');
+            }
+        }
     }
 
     async initFileSystem() {
@@ -185,6 +227,27 @@ class Database {
         }
 
         return user;
+    }
+
+    async getUserById(id) {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM users WHERE _id = $1 AND is_active = true', [id]);
+            if (result.rows.length === 0) return null;
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                username: row.username,
+                password: row.password,
+                role: row.role,
+                permissions: row.permissions,
+                isActive: row.is_active,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const users = await this.getUsers();
+            return users.find(u => u._id === id && u.isActive);
+        }
     }
 
     async getUserByUsername(username) {
@@ -381,6 +444,109 @@ class Database {
         return record;
     }
 
+    async updateRecord(id, updateData) {
+        if (this.useDatabase) {
+            const updates = [];
+            const values = [];
+            let valueIndex = 1;
+
+            // Handle different field mappings
+            Object.keys(updateData).forEach(key => {
+                let dbKey = key;
+                let value = updateData[key];
+
+                // Convert camelCase to snake_case for database fields
+                switch (key) {
+                    case 'serviceCharge':
+                        dbKey = 'service_charge';
+                        break;
+                    case 'drinksCost':
+                        dbKey = 'drinks_cost';
+                        break;
+                    case 'createdBy':
+                        dbKey = 'created_by';
+                        break;
+                    case 'isDeleted':
+                        dbKey = 'is_deleted';
+                        break;
+                    case 'createdAt':
+                        dbKey = 'created_at';
+                        break;
+                    case 'updatedAt':
+                        dbKey = 'updated_at';
+                        break;
+                }
+
+                // Special handling for products (JSON)
+                if (key === 'products') {
+                    value = JSON.stringify(value);
+                }
+
+                if (key !== 'createdAt') { // Don't update created_at
+                    updates.push(`${dbKey} = $${valueIndex}`);
+                    values.push(value);
+                    valueIndex++;
+                }
+            });
+
+            // Always update updated_at
+            if (!updateData.updatedAt) {
+                updates.push(`updated_at = $${valueIndex}`);
+                values.push(new Date());
+                valueIndex++;
+            }
+
+            values.push(id);
+
+            const result = await this.pool.query(`
+                UPDATE records SET ${updates.join(', ')} WHERE _id = $${valueIndex} RETURNING *
+            `, values);
+
+            if (result.rows.length === 0) {
+                throw new Error('Record not found');
+            }
+
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                client: row.client,
+                service: row.service,
+                products: row.products,
+                hours: row.hours,
+                payment: row.payment,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                serviceCharge: parseFloat(row.service_charge),
+                tip: parseFloat(row.tip),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                drinksCost: parseFloat(row.drinks_cost || 0),
+                profit: parseFloat(row.profit),
+                date: row.date,
+                isDeleted: row.is_deleted,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const records = await this.getRecords();
+            const recordIndex = records.findIndex(r => r._id === id);
+            
+            if (recordIndex === -1) {
+                throw new Error('Record not found');
+            }
+
+            records[recordIndex] = {
+                ...records[recordIndex],
+                ...updateData,
+                updatedAt: new Date()
+            };
+
+            await fs.writeFile(path.join(this.dataDir, 'records.json'), JSON.stringify(records, null, 2));
+            return records[recordIndex];
+        }
+    }
+
     // CASH CUTS
     async getCashCuts(limit = 50) {
         if (this.useDatabase) {
@@ -441,7 +607,7 @@ class Database {
 
             Object.keys(updateData).forEach(key => {
                 const dbKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
-                updates.push(`${dbKey} = ${valueIndex}`);
+                updates.push(`${dbKey} = $${valueIndex}`);
                 values.push(updateData[key]);
                 valueIndex++;
             });
@@ -449,7 +615,7 @@ class Database {
             values.push(id);
 
             const result = await this.pool.query(`
-                UPDATE cashcuts SET ${updates.join(', ')} WHERE _id = ${valueIndex} RETURNING *
+                UPDATE cashcuts SET ${updates.join(', ')} WHERE _id = $${valueIndex} RETURNING *
             `, values);
 
             if (result.rows.length === 0) {
@@ -471,6 +637,33 @@ class Database {
 
             await fs.writeFile(path.join(this.dataDir, 'cashcuts.json'), JSON.stringify(cashCuts, null, 2));
             return cashCuts[cashCutIndex];
+        }
+    }
+
+    // JWT Token Methods
+    generateToken(user) {
+        // Use environment JWT_SECRET or fallback to hardcoded one for consistency
+        const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+        
+        return jwt.sign(
+            {
+                userId: user._id,
+                email: user.email || user.username,
+                role: user.role,
+                iat: Math.floor(Date.now() / 1000)
+            },
+            secret,
+            { expiresIn: '7d' }
+        );
+    }
+
+    verifyToken(token) {
+        try {
+            // Use environment JWT_SECRET or fallback to hardcoded one for consistency
+            const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+            return jwt.verify(token, secret);
+        } catch (error) {
+            return null;
         }
     }
 

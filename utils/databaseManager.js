@@ -12,6 +12,7 @@ class DatabaseManager {
 
         if (this.usePostgreSQL) {
             console.log('🐘 Initializing PostgreSQL database...');
+            console.log('🔗 DATABASE_URL present:', !!process.env.DATABASE_URL);
             await database.init();
             console.log('✅ PostgreSQL database ready');
         } else {
@@ -21,6 +22,7 @@ class DatabaseManager {
         }
 
         this.initialized = true;
+        console.log('🎯 DatabaseManager initialized, usePostgreSQL:', this.usePostgreSQL);
     }
 
     // USERS
@@ -47,12 +49,22 @@ class DatabaseManager {
 
     async createUser(userData) {
         if (this.usePostgreSQL) {
-            // Convert email to username for PostgreSQL
-            return await database.createUser({
+            // Convert email to username for PostgreSQL and ensure role is passed
+            const userDataForPostgres = {
                 ...userData,
-                username: userData.email,
+                username: userData.email || userData.username,
+                role: userData.role || 'employee', // Explicitly pass role
                 permissions: fileDatabase.getPermissionsByRole(userData.role || 'employee')
+            };
+            
+            console.log('🔧 Creating PostgreSQL user with data:', {
+                username: userDataForPostgres.username,
+                role: userDataForPostgres.role,
+                hasPassword: !!userDataForPostgres.password,
+                permissions: userDataForPostgres.permissions
             });
+            
+            return await database.createUser(userDataForPostgres);
         }
         return await fileDatabase.createUser(userData);
     }
@@ -60,12 +72,21 @@ class DatabaseManager {
     async validateUserPassword(email, password) {
         if (this.usePostgreSQL) {
             // For PostgreSQL, we need to implement password validation
+            console.log('🔍 PostgreSQL login attempt:', { email, timestamp: new Date().toISOString() });
             const user = await database.getUserByUsername(email);
-            if (!user) return null;
+            if (!user) {
+                console.log('❌ User not found:', email);
+                return null;
+            }
+            console.log('✅ User found:', { username: user.username, role: user.role });
             
             const bcrypt = require('bcryptjs');
             const isValid = await bcrypt.compare(password, user.password);
-            if (!isValid) return null;
+            if (!isValid) {
+                console.log('❌ Password validation failed for:', email);
+                return null;
+            }
+            console.log('✅ Password validated for:', email);
             
             // Return user without password
             const { password: _, ...safeUser } = user;
@@ -239,12 +260,25 @@ class DatabaseManager {
         return await fileDatabase.deleteRecord(id, deletedBy);
     }
 
+    async updateRecord(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateRecord(id, updateData);
+        }
+        return await fileDatabase.updateRecord(id, updateData);
+    }
+
     // UTILITIES
     generateToken(user) {
+        if (this.usePostgreSQL) {
+            return database.generateToken(user);
+        }
         return fileDatabase.generateToken(user);
     }
 
     verifyToken(token) {
+        if (this.usePostgreSQL) {
+            return database.verifyToken(token);
+        }
         return fileDatabase.verifyToken(token);
     }
 
@@ -288,6 +322,49 @@ class DatabaseManager {
             });
         }
         return await fileDatabase.deleteCashCut(id, deletedBy);
+    }
+
+    // MEMBERSHIPS
+    async getMemberships(filters = {}, options = {}) {
+        if (this.usePostgreSQL) {
+            return await database.getMemberships(filters, options);
+        }
+        return await fileDatabase.getMemberships(filters, options);
+    }
+
+    async getMembershipById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getMembershipById(id);
+        }
+        return await fileDatabase.getMembershipById(id);
+    }
+
+    async createMembership(membershipData) {
+        if (this.usePostgreSQL) {
+            return await database.createMembership(membershipData);
+        }
+        return await fileDatabase.createMembership(membershipData);
+    }
+
+    async updateMembership(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateMembership(id, updateData);
+        }
+        return await fileDatabase.updateMembership(id, updateData);
+    }
+
+    async deleteMembership(id) {
+        if (this.usePostgreSQL) {
+            return await database.deleteMembership(id);
+        }
+        return await fileDatabase.deleteMembership(id);
+    }
+
+    async getMembershipStats() {
+        if (this.usePostgreSQL) {
+            return await database.getMembershipStats();
+        }
+        return await fileDatabase.getMembershipStats();
     }
 
     async close() {

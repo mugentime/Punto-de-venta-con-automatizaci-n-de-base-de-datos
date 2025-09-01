@@ -6,7 +6,12 @@
     <title>Conejo Negro - Café Coworking Online</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mobile Optimizations - CRITICAL for touch devices -->
+    <link rel="stylesheet" href="/css/mobile-optimized.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <!-- Mobile Enhancement JavaScript - Load early for critical fixes -->
+    <script src="/js/mobile-enhancements.js"></script>
+    <script src="/js/mobile-menu-simple.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -595,6 +600,13 @@
             transform: scale(1.1);
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+            justify-content: center;
+            align-items: center;
+        }
+
         .total-display {
             background: rgba(0, 217, 255, 0.1);
             border-radius: 8px;
@@ -1128,6 +1140,31 @@
     </style>
 </head>
 <body>
+    <!-- Mobile Hamburger Menu -->
+    <div class="hamburger-menu" onclick="toggleMobileNav()">
+        <i class="fas fa-bars"></i>
+    </div>
+    
+    <!-- Mobile Bottom Navigation -->
+    <div class="mobile-bottom-nav">
+        <a href="#pos-section" class="nav-item" onclick="showSection('pos')">
+            <i class="fas fa-cash-register"></i>
+            <span>POS</span>
+        </a>
+        <a href="#inventory-section" class="nav-item" onclick="showSection('inventory')">
+            <i class="fas fa-boxes"></i>
+            <span>Inventario</span>
+        </a>
+        <a href="#reports-section" class="nav-item" onclick="showSection('reports')">
+            <i class="fas fa-chart-bar"></i>
+            <span>Reportes</span>
+        </a>
+        <a href="#members-section" class="nav-item" onclick="showSection('members')">
+            <i class="fas fa-users"></i>
+            <span>Miembros</span>
+        </a>
+    </div>
+    
     <div class="cyber-grid"></div>
     
     <!-- Pantalla de Login -->
@@ -1155,10 +1192,10 @@
             
             <form id="login-form">
                 <div class="form-group">
-                    <input type="email" id="login-email" class="form-control" placeholder="Email" required>
+                    <input type="email" id="login-email" class="form-control" placeholder="Email" required inputmode="email" autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required>
+                    <input type="password" id="login-password" class="form-control" placeholder="Contraseña" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn btn-primary btn-block">
                     <i class="fas fa-sign-in-alt"></i>
@@ -1171,10 +1208,10 @@
                     <input type="text" id="register-name" class="form-control" placeholder="Nombre completo" required>
                 </div>
                 <div class="form-group">
-                    <input type="email" id="register-email" class="form-control" placeholder="Email" required>
+                    <input type="email" id="register-email" class="form-control" placeholder="Email" required inputmode="email" autocomplete="email">
                 </div>
                 <div class="form-group">
-                    <input type="password" id="register-password" class="form-control" placeholder="Contraseña" required>
+                    <input type="password" id="register-password" class="form-control" placeholder="Contraseña" required autocomplete="new-password">
                 </div>
                 <div class="form-group">
                     <select id="register-role" class="form-control">
@@ -1211,8 +1248,10 @@
                     <nav>
                         <ul>
                             <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
+                            <li><a href="#" class="nav-link" data-section="registro-historico">Registro Histórico</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
+                            <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
                             <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
                             <li><a href="#" class="nav-link" data-section="corte-caja">Corte de Caja</a></li>
                         </ul>
@@ -1262,7 +1301,7 @@
                                     <select id="product-select" class="form-control" style="flex: 2;">
                                         <option value="">Seleccionar producto</option>
                                     </select>
-                                    <input type="number" id="product-quantity" class="form-control" placeholder="Cantidad" min="1" value="1" style="flex: 1; margin: 0 5px;">
+                                    <input type="number" id="product-quantity" class="form-control" placeholder="Cantidad" min="1" value="1" style="flex: 1; margin: 0 5px;" inputmode="numeric">
                                     <button type="button" id="add-product-btn" class="btn btn-secondary" style="flex: 0 0 auto;">
                                         <i class="fas fa-plus"></i> Agregar
                                     </button>
@@ -1509,6 +1548,70 @@
                 </div>
             </section>
 
+            <!-- Inventario Alimentos -->
+            <section id="inventario-alimentos" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-utensils"></i>
+                        Inventario de Alimentos Preparados
+                    </h2>
+                    
+                    <form id="alimentos-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alimentos-name">Nombre del Alimento</label>
+                                <input type="text" id="alimentos-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="alimentos-quantity">Cantidad</label>
+                                <input type="number" id="alimentos-quantity" class="form-control" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="alimentos-cost">Costo de Preparación</label>
+                                <input type="number" id="alimentos-cost" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="alimentos-price">Precio de Venta</label>
+                                <input type="number" id="alimentos-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Agregar Alimento
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-drumstick-bite"></i>
+                        Alimentos Preparados
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="alimentos-table">
+                            <thead>
+                                <tr>
+                                    <th>Alimento</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Preparación</th>
+                                    <th>Precio Venta</th>
+                                    <th>Ganancia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los alimentos se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- Reportes -->
             <section id="reportes" class="section">
                 <!-- Header con selector de período -->
@@ -1711,6 +1814,152 @@
                         <i class="fas fa-download"></i>
                         <span>Respaldar</span>
                     </button>
+                </div>
+            </section>
+
+            <!-- Registro Histórico -->
+            <section id="registro-historico" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-history"></i>
+                        Registro de Ventas Históricas
+                    </h2>
+                    <p class="card-subtitle">Registra ventas de fechas anteriores al día actual</p>
+                    
+                    <form id="historical-record-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="historical-date">Fecha Histórica *</label>
+                                <input type="date" id="historical-date" name="historicalDate" required>
+                                <small class="form-text">La fecha debe ser anterior o igual al día de hoy</small>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="historical-client">Cliente *</label>
+                                <input type="text" id="historical-client" name="client" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="historical-service">Tipo de Servicio *</label>
+                                <select id="historical-service" name="service" required>
+                                    <option value="">Seleccionar servicio</option>
+                                    <option value="cafeteria">Cafetería</option>
+                                    <option value="coworking">Coworking</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group" id="historical-hours-group" style="display: none;">
+                                <label for="historical-hours">Horas</label>
+                                <input type="number" id="historical-hours" name="hours" min="1" max="24" value="1">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Productos de la Orden</label>
+                            <div class="products-section">
+                                <div class="add-product-row">
+                                    <select id="historical-product-select">
+                                        <option value="">Seleccionar producto</option>
+                                    </select>
+                                    <input type="number" id="historical-quantity-input" placeholder="Cantidad" min="1" value="1">
+                                    <button type="button" id="historical-add-product-btn" class="btn btn-add">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                
+                                <div class="selected-products">
+                                    <div class="products-header">
+                                        <span>Producto</span>
+                                        <span>Cantidad</span>
+                                        <span>Precio Unit.</span>
+                                        <span>Total</span>
+                                        <span>Acción</span>
+                                    </div>
+                                    <div id="historical-products-list"></div>
+                                </div>
+                                
+                                <div class="products-total">
+                                    <strong>Total Productos: $<span id="historical-products-total">0.00</span></strong>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="historical-payment">Método de Pago *</label>
+                                <select id="historical-payment" name="payment" required>
+                                    <option value="">Seleccionar método</option>
+                                    <option value="efectivo">Efectivo</option>
+                                    <option value="tarjeta">Tarjeta</option>
+                                    <option value="transferencia">Transferencia</option>
+                                </select>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="historical-tip">Propina</label>
+                                <input type="number" id="historical-tip" name="tip" min="0" step="0.01" value="0">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="historical-notes">Notas</label>
+                            <textarea id="historical-notes" name="notes" rows="3"></textarea>
+                        </div>
+                        
+                        <div class="order-total">
+                            <div class="total-breakdown">
+                                <div class="total-line">
+                                    <span>Subtotal Productos:</span>
+                                    <span>$<span id="historical-subtotal">0.00</span></span>
+                                </div>
+                                <div class="total-line" id="historical-coworking-line" style="display: none;">
+                                    <span>Coworking (<span id="historical-coworking-hours">1</span> hrs):</span>
+                                    <span>$<span id="historical-coworking-cost">0.00</span></span>
+                                </div>
+                                <div class="total-line">
+                                    <span>Propina:</span>
+                                    <span>$<span id="historical-tip-display">0.00</span></span>
+                                </div>
+                                <div class="total-line total-final">
+                                    <span><strong>Total Final:</strong></span>
+                                    <span><strong>$<span id="historical-final-total">0.00</span></strong></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save"></i>
+                            Registrar Venta Histórica
+                        </button>
+                    </form>
+                </div>
+                
+                <!-- Recent Historical Records -->
+                <div class="card" style="margin-top: 20px;">
+                    <h3 class="card-title">
+                        <i class="fas fa-list"></i>
+                        Registros Históricos Recientes
+                    </h3>
+                    
+                    <div class="table-container">
+                        <table id="historical-records-table">
+                            <thead>
+                                <tr>
+                                    <th>Fecha</th>
+                                    <th>Cliente</th>
+                                    <th>Servicio</th>
+                                    <th>Total</th>
+                                    <th>Pago</th>
+                                    <th>Usuario</th>
+                                </tr>
+                            </thead>
+                            <tbody id="historical-records-list">
+                                <!-- Records will be loaded here -->
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
             </section>
 
@@ -1930,16 +2179,22 @@
                 
                 const data = await response.json();
                 
+                console.log('🔍 LOGIN DEBUG - Response status:', response.status);
+                console.log('🔍 LOGIN DEBUG - Response ok:', response.ok);
+                console.log('🔍 LOGIN DEBUG - Response data:', data);
+                
                 if (response.ok) {
+                    console.log('✅ LOGIN SUCCESS - Token received:', !!data.token);
                     authToken = data.token;
                     currentUser = data.user;
                     localStorage.setItem('authToken', authToken);
                     localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    
+                    console.log('✅ LOGIN SUCCESS - Token saved to localStorage');
                     
                     showNotification('Login exitoso', 'success');
                     showMainApp();
                 } else {
+                    console.log('❌ LOGIN FAILED - Status:', response.status, 'Error:', data.error);
                     showNotification(data.error || 'Error en login', 'error');
                     updateConnectionStatus('offline');
                 }
@@ -2117,6 +2372,9 @@
                 updateDailyRecordsDisplay();
                 initializeReports();
                 
+                // Initialize historical records after data is loaded
+                initHistoricalRecords();
+                
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -2191,6 +2449,7 @@
         function updateProductTables() {
             updateRefrigeradorTable();
             updateCafeteriaTable();
+            updateAlimentosTable();
             updateProductSelects();
         }
 
@@ -2229,20 +2488,33 @@
                     <td>$${product.price.toFixed(2)}</td>
                     <td>$${profit.toFixed(2)}</td>
                     <td>
-                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm action-btn edit-product-btn" data-product-id="${product._id}" title="Editar cantidad">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}" title="Eliminar producto">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
                     </td>
                 `;
                 tbody.appendChild(row);
             });
             
-            // Agregar event listeners para botones de eliminar productos refrigerador (CSP compliant)
+            // Agregar event listeners para botones de productos refrigerador (CSP compliant)
             document.querySelectorAll('#refrigerador-table .delete-product-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const productId = this.getAttribute('data-product-id');
                     deleteProduct(productId);
+                });
+            });
+            
+            document.querySelectorAll('#refrigerador-table .edit-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    editProductStock(productId);
                 });
             });
         }
@@ -2282,6 +2554,39 @@
             });
         }
 
+        function updateAlimentosTable() {
+            const tbody = document.querySelector('#alimentos-table tbody');
+            tbody.innerHTML = '';
+            
+            const alimentosProducts = data.products.filter(p => p.category === 'alimentos' && p.isActive);
+            
+            alimentosProducts.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Agregar event listeners para botones de eliminar productos alimentos (CSP compliant)
+            document.querySelectorAll('#alimentos-table .delete-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
+            });
+        }
 
         // Mostrar nota detallada del cliente
         function showClientNote(clientName, note) {
@@ -2445,10 +2750,17 @@
                     <td>$${tip.toFixed(2)}</td>
                     <td>${record.payment || 'efectivo'}</td>
                     <td>
-                        ${currentUser && currentUser.permissions && currentUser.permissions.canDeleteRecords ? 
-                            `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}">
-                                <i class="fas fa-trash"></i>
-                            </button>` : 
+                        ${currentUser && currentUser.permissions && (currentUser.permissions.canManageInventory || currentUser.permissions.canDeleteRecords) ? 
+                            `<div class="action-buttons">
+                                <button class="btn btn-primary btn-sm action-btn edit-record-btn" data-record-id="${record._id || record.id}" title="Editar productos">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                ${currentUser.permissions.canDeleteRecords ? 
+                                    `<button class="btn btn-danger btn-sm action-btn delete-record-btn" data-record-id="${record._id || record.id}" title="Eliminar registro">
+                                        <i class="fas fa-trash"></i>
+                                    </button>` : ''
+                                }
+                            </div>` : 
                             `<span class="text-muted">Sin permisos</span>`
                         }
                     </td>
@@ -2471,12 +2783,20 @@
             document.getElementById('daily-income').textContent = `$${totalIncome.toFixed(2)}`;
             document.getElementById('daily-profit').textContent = `$${(totalIncome - totalCost).toFixed(2)}`;
             
-            // Agregar event listeners para botones de eliminar (CSP compliant)
+            // Agregar event listeners para botones de acción (CSP compliant)
             document.querySelectorAll('.delete-record-btn').forEach(button => {
                 button.addEventListener('click', function(e) {
                     e.preventDefault();
                     const recordId = this.getAttribute('data-record-id');
                     deleteRecord(recordId);
+                });
+            });
+            
+            document.querySelectorAll('.edit-record-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const recordId = this.getAttribute('data-record-id');
+                    editRecordProducts(recordId);
                 });
             });
         }
@@ -2512,6 +2832,13 @@
                 if (sectionId === 'corte-caja') {
                     loadCashCuts();
                     loadServiceStatus();
+                }
+                
+                // Load historical records when accessing historical section
+                if (sectionId === 'registro-historico') {
+                    loadHistoricalRecords();
+                    // Reload products to ensure they're available
+                    loadHistoricalProducts();
                 }
             });
         });
@@ -2574,7 +2901,168 @@
             }
         });
 
+        // Agregar alimento preparado
+        document.getElementById('alimentos-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('alimentos-name').value,
+                quantity: parseInt(document.getElementById('alimentos-quantity').value),
+                cost: parseFloat(document.getElementById('alimentos-cost').value),
+                price: parseFloat(document.getElementById('alimentos-price').value),
+                category: 'alimentos'
+            };
+            
+            try {
+                const response = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
+                data.products.push(newProduct);
+                updateProductTables(); // Update all tables and selects
+                this.reset();
+                showNotification('Alimento agregado al inventario', 'success');
+            } catch (error) {
+                showNotification('Error agregando alimento: ' + error.message, 'error');
+            }
+        });
+
         // Eliminar producto
+        async function editProductStock(productId) {
+            try {
+                // Obtener información actual del producto
+                const products = await apiRequest('/products');
+                const product = products.find(p => p._id === productId);
+                
+                if (!product) {
+                    showNotification('Producto no encontrado', 'error');
+                    return;
+                }
+                
+                // Crear modal para editar cantidad
+                const modal = document.createElement('div');
+                modal.style.cssText = `
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    background: rgba(0, 0, 0, 0.5);
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    z-index: 1000;
+                `;
+
+                const modalContent = document.createElement('div');
+                modalContent.style.cssText = `
+                    background: white;
+                    border-radius: 8px;
+                    padding: 25px;
+                    max-width: 400px;
+                    width: 90%;
+                `;
+
+                modalContent.innerHTML = `
+                    <h3 style="margin-top: 0; color: #333; text-align: center;">
+                        <i class="fas fa-edit" style="color: #007bff;"></i>
+                        Editar Stock
+                    </h3>
+                    <div style="background: #f8f9fa; padding: 15px; border-radius: 6px; margin-bottom: 20px;">
+                        <p style="margin: 0; font-weight: bold; color: #495057;">${product.name}</p>
+                        <p style="margin: 5px 0 0 0; color: #6c757d; font-size: 14px;">
+                            Precio: $${product.price.toFixed(2)} | 
+                            Costo: $${product.cost.toFixed(2)}
+                        </p>
+                    </div>
+                    <div style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: bold; color: #495057;">
+                            Cantidad actual: <span style="color: #007bff;">${product.quantity}</span>
+                        </label>
+                        <input type="number" id="new-quantity" min="0" max="999" 
+                               value="${product.quantity}" 
+                               style="width: 100%; padding: 10px; border: 2px solid #dee2e6; border-radius: 6px; font-size: 16px;">
+                        <small style="color: #6c757d; font-size: 12px;">
+                            Ingresa la nueva cantidad de stock
+                        </small>
+                    </div>
+                    <div style="display: flex; gap: 10px; justify-content: flex-end;">
+                        <button id="cancel-edit-stock" style="padding: 10px 20px; background: #6c757d; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            Cancelar
+                        </button>
+                        <button id="save-edit-stock" style="padding: 10px 20px; background: #28a745; color: white; border: none; border-radius: 6px; cursor: pointer;">
+                            <i class="fas fa-save"></i> Guardar
+                        </button>
+                    </div>
+                `;
+
+                modal.appendChild(modalContent);
+                document.body.appendChild(modal);
+
+                // Focus en el input
+                setTimeout(() => {
+                    document.getElementById('new-quantity').select();
+                }, 100);
+
+                // Event listeners
+                document.getElementById('cancel-edit-stock').addEventListener('click', () => {
+                    document.body.removeChild(modal);
+                });
+
+                document.getElementById('save-edit-stock').addEventListener('click', async () => {
+                    await saveStockChange(productId, modal);
+                });
+
+                // Enter para guardar
+                document.getElementById('new-quantity').addEventListener('keypress', async (e) => {
+                    if (e.key === 'Enter') {
+                        await saveStockChange(productId, modal);
+                    }
+                });
+
+                // Cerrar al hacer click fuera
+                modal.addEventListener('click', (e) => {
+                    if (e.target === modal) {
+                        document.body.removeChild(modal);
+                    }
+                });
+
+            } catch (error) {
+                console.error('Error editando producto:', error);
+                showNotification('Error al cargar producto', 'error');
+            }
+        }
+
+        async function saveStockChange(productId, modal) {
+            try {
+                const newQuantity = parseInt(document.getElementById('new-quantity').value);
+                
+                if (isNaN(newQuantity) || newQuantity < 0) {
+                    showNotification('Cantidad inválida', 'error');
+                    return;
+                }
+
+                // Actualizar stock via API
+                await apiRequest(`/products/${productId}/stock`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ quantity: newQuantity })
+                });
+
+                showNotification('Stock actualizado correctamente', 'success');
+                document.body.removeChild(modal);
+                
+                // Recargar inventario
+                loadInitialData();
+
+            } catch (error) {
+                console.error('Error guardando stock:', error);
+                showNotification('Error al actualizar stock', 'error');
+            }
+        }
+
         async function deleteProduct(productId) {
             if (!confirm('¿Estás seguro de que deseas eliminar este producto?')) {
                 return;
@@ -2673,6 +3161,170 @@
         });
 
         // Eliminar registro
+        async function editRecordProducts(recordId) {
+            // Verificar permisos
+            if (!currentUser || !currentUser.permissions || !currentUser.permissions.canManageInventory) {
+                showNotification('No tienes permisos para editar registros', 'error');
+                return;
+            }
+            
+            try {
+                // Obtener el registro específico
+                const record = await apiRequest(`/records/${recordId}`);
+                
+                if (!record || !record.products) {
+                    showNotification('No se pudo cargar el registro', 'error');
+                    return;
+                }
+                
+                // Filtrar solo productos de refrigerador
+                const refrigeradorProducts = record.products.filter(p => p.category === 'refrigerador');
+                
+                if (refrigeradorProducts.length === 0) {
+                    showNotification('Este registro no tiene productos de refrigerador para editar', 'info');
+                    return;
+                }
+                
+                // Crear modal de edición
+                showEditProductsModal(recordId, refrigeradorProducts, record);
+                
+            } catch (error) {
+                console.error('Error cargando registro para editar:', error);
+                showNotification('Error al cargar el registro', 'error');
+            }
+        }
+
+        function showEditProductsModal(recordId, refrigeradorProducts, record) {
+            // Crear modal dinámico para editar productos
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.5);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 1000;
+            `;
+
+            const modalContent = document.createElement('div');
+            modalContent.style.cssText = `
+                background: white;
+                border-radius: 8px;
+                padding: 20px;
+                max-width: 500px;
+                width: 90%;
+                max-height: 70vh;
+                overflow-y: auto;
+            `;
+
+            let productsHtml = refrigeradorProducts.map(product => `
+                <div class="edit-product-item" style="margin-bottom: 15px; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                        <strong>${product.name}</strong>
+                        <span>$${product.price.toFixed(2)} c/u</span>
+                    </div>
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <label for="quantity-${product._id}">Cantidad:</label>
+                        <input type="number" id="quantity-${product._id}" min="0" max="50" 
+                               value="${product.quantity}" style="width: 80px; padding: 5px;">
+                        <span>Stock actual: <span id="stock-${product._id}">-</span></span>
+                    </div>
+                </div>
+            `).join('');
+
+            modalContent.innerHTML = `
+                <h3 style="margin-top: 0; color: #333;">Editar Productos de Refrigerador</h3>
+                <p style="color: #666; margin-bottom: 20px;">
+                    Cliente: <strong>${record.client}</strong><br>
+                    Fecha: <strong>${new Date(record.date).toLocaleDateString()}</strong>
+                </p>
+                <div id="products-list">
+                    ${productsHtml}
+                </div>
+                <div style="display: flex; gap: 10px; margin-top: 20px; justify-content: flex-end;">
+                    <button id="cancel-edit" style="padding: 8px 16px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Cancelar
+                    </button>
+                    <button id="save-edit" style="padding: 8px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Guardar Cambios
+                    </button>
+                </div>
+            `;
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            // Cargar stocks actuales de productos
+            loadCurrentStocks(refrigeradorProducts);
+
+            // Event listeners
+            document.getElementById('cancel-edit').addEventListener('click', () => {
+                document.body.removeChild(modal);
+            });
+
+            document.getElementById('save-edit').addEventListener('click', () => {
+                saveProductChanges(recordId, refrigeradorProducts, modal);
+            });
+
+            // Cerrar al hacer click fuera del modal
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    document.body.removeChild(modal);
+                }
+            });
+        }
+
+        async function loadCurrentStocks(products) {
+            try {
+                const allProducts = await apiRequest('/products');
+                
+                products.forEach(product => {
+                    const currentProduct = allProducts.find(p => p._id === product._id);
+                    const stockSpan = document.getElementById(`stock-${product._id}`);
+                    if (stockSpan && currentProduct) {
+                        stockSpan.textContent = currentProduct.quantity;
+                    }
+                });
+            } catch (error) {
+                console.error('Error cargando stocks:', error);
+            }
+        }
+
+        async function saveProductChanges(recordId, originalProducts, modal) {
+            try {
+                const updatedProducts = originalProducts.map(product => {
+                    const input = document.getElementById(`quantity-${product._id}`);
+                    const newQuantity = parseInt(input.value) || 0;
+                    return {
+                        ...product,
+                        quantity: newQuantity
+                    };
+                });
+
+                // Enviar cambios al servidor
+                await apiRequest(`/records/${recordId}/products`, {
+                    method: 'PATCH',
+                    body: JSON.stringify({ 
+                        products: updatedProducts.filter(p => p.category === 'refrigerador')
+                    })
+                });
+
+                showNotification('Productos actualizados correctamente', 'success');
+                document.body.removeChild(modal);
+                
+                // Recargar datos
+                loadTodayRecords();
+                
+            } catch (error) {
+                console.error('Error guardando cambios:', error);
+                showNotification('Error al guardar los cambios', 'error');
+            }
+        }
+
         async function deleteRecord(recordId) {
             // Debug logging for permissions
             console.log('=== DELETE RECORD DEBUG ===');
@@ -3035,11 +3687,50 @@
             }
         });
 
-        // Finalizar día (limpiar registros del día)
-        document.getElementById('finish-day').addEventListener('click', function() {
-            if (confirm('¿Estás seguro de que deseas finalizar el día? Esto archivará los registros actuales.')) {
-                // Esta funcionalidad se puede implementar más tarde según necesidades
-                showNotification('Función de finalizar día pendiente de implementación', 'warning');
+        // Finalizar día (realizar corte de caja automático)
+        document.getElementById('finish-day').addEventListener('click', async function() {
+            if (confirm('¿Estás seguro de que deseas finalizar el día? Esto realizará un corte de caja automático y archivará los registros del día.')) {
+                try {
+                    showNotification('Finalizando día y realizando corte de caja...', 'info');
+                    
+                    const response = await apiRequest('/cashcuts/manual', {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            notes: 'Corte automático - Finalizar día'
+                        })
+                    });
+
+                    if (response.success) {
+                        showNotification('Día finalizado exitosamente. Corte de caja realizado.', 'success');
+                        
+                        // Limpiar registros del día actual de la interfaz
+                        data.records = data.records.filter(record => {
+                            const recordDate = new Date(record.date).toDateString();
+                            const today = new Date().toDateString();
+                            return recordDate !== today;
+                        });
+                        
+                        // Actualizar la interfaz
+                        updateDailyRecordsDisplay();
+                        updateProductTables();
+                        initializeReports();
+                        
+                        // Mostrar detalles del corte si es necesario
+                        if (response.cashCut) {
+                            const cutInfo = `
+                                Total de ingresos: $${response.cashCut.totalIncome?.toFixed(2) || '0.00'}
+                                Total de ganancia: $${response.cashCut.totalProfit?.toFixed(2) || '0.00'}
+                                Registros procesados: ${response.cashCut.totalRecords || 0}
+                            `;
+                            showNotification(`Resumen del corte:\n${cutInfo}`, 'info');
+                        }
+                    } else {
+                        showNotification('Error al finalizar el día: ' + (response.error || 'Error desconocido'), 'error');
+                    }
+                } catch (error) {
+                    console.error('Error finishing day:', error);
+                    showNotification('Error de conexión al finalizar el día', 'error');
+                }
             }
         });
 
@@ -4196,8 +4887,371 @@
         }
 
         // Inicializar aplicación
+        // Historical Records Functionality
+        let historicalSelectedProducts = [];
+        
+        function initHistoricalRecords() {
+            // Set max date to today
+            const today = new Date().toISOString().split('T')[0];
+            const dateInput = document.getElementById('historical-date');
+            if (dateInput) {
+                dateInput.max = today;
+            }
+            
+            // Load products
+            loadHistoricalProducts();
+            
+            // Service change handler
+            const serviceSelect = document.getElementById('historical-service');
+            if (serviceSelect) {
+                serviceSelect.addEventListener('change', function() {
+                    const isCoworking = this.value === 'coworking';
+                    const hoursGroup = document.getElementById('historical-hours-group');
+                    if (hoursGroup) {
+                        hoursGroup.style.display = isCoworking ? 'block' : 'none';
+                    }
+                    updateHistoricalTotal();
+                });
+            }
+            
+            // Hours change handler
+            const hoursInput = document.getElementById('historical-hours');
+            if (hoursInput) {
+                hoursInput.addEventListener('input', updateHistoricalTotal);
+            }
+            
+            // Tip change handler
+            const tipInput = document.getElementById('historical-tip');
+            if (tipInput) {
+                tipInput.addEventListener('input', function() {
+                    const tipDisplay = document.getElementById('historical-tip-display');
+                    if (tipDisplay) {
+                        tipDisplay.textContent = parseFloat(this.value || 0).toFixed(2);
+                    }
+                    updateHistoricalTotal();
+                });
+            }
+            
+            // Add product handler
+            const addBtn = document.getElementById('historical-add-product-btn');
+            if (addBtn) {
+                addBtn.addEventListener('click', addHistoricalProduct);
+            }
+            
+            // Form submit handler
+            const form = document.getElementById('historical-record-form');
+            if (form) {
+                form.addEventListener('submit', submitHistoricalRecord);
+            }
+        }
+        
+        function loadHistoricalProducts() {
+            try {
+                // Use the global data.products that's already loaded
+                const select = document.getElementById('historical-product-select');
+                if (!select) return;
+                
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                // Use products from the global data object (already loaded)
+                if (data && data.products && data.products.length > 0) {
+                    data.products.forEach(product => {
+                        // For historical records, allow products even with 0 stock since we're not affecting current inventory
+                        if (product.isActive) {
+                            const option = document.createElement('option');
+                            option.value = JSON.stringify({
+                                id: product._id,
+                                name: product.name,
+                                price: product.price,
+                                category: product.category,
+                                stock: product.quantity
+                            });
+                            option.textContent = `${product.name} - $${product.price} (Stock: ${product.quantity})`;
+                            select.appendChild(option);
+                        }
+                    });
+                } else {
+                    // Fallback: try to load products via API if data.products is not available
+                    loadProductsFromAPI();
+                }
+            } catch (error) {
+                console.error('Error loading historical products:', error);
+                // Fallback to API load
+                loadProductsFromAPI();
+            }
+        }
+        
+        async function loadProductsFromAPI() {
+            try {
+                const products = await apiRequest('/products');
+                const select = document.getElementById('historical-product-select');
+                if (!select) return;
+                
+                select.innerHTML = '<option value="">Seleccionar producto</option>';
+                
+                products.forEach(product => {
+                    if (product.isActive) {
+                        const option = document.createElement('option');
+                        option.value = JSON.stringify({
+                            id: product._id,
+                            name: product.name,
+                            price: product.price,
+                            category: product.category,
+                            stock: product.quantity
+                        });
+                        option.textContent = `${product.name} - $${product.price} (Stock: ${product.quantity})`;
+                        select.appendChild(option);
+                    }
+                });
+            } catch (error) {
+                console.error('Error loading products from API:', error);
+                showNotification('Error cargando productos', 'error');
+            }
+        }
+        
+        function addHistoricalProduct() {
+            const select = document.getElementById('historical-product-select');
+            const quantityInput = document.getElementById('historical-quantity-input');
+            
+            if (!select.value || !quantityInput.value) {
+                alert('Selecciona un producto y especifica la cantidad');
+                return;
+            }
+            
+            const productData = JSON.parse(select.value);
+            const quantity = parseInt(quantityInput.value);
+            
+            if (quantity <= 0) {
+                alert('La cantidad debe ser mayor a 0');
+                return;
+            }
+            
+            // For historical records, we don't check stock since we're not affecting current inventory
+            // Just warn if the quantity seems high
+            if (quantity > productData.stock && productData.stock > 0) {
+                if (!confirm(`La cantidad (${quantity}) es mayor al stock actual (${productData.stock}). ¿Continuar?`)) {
+                    return;
+                }
+            }
+            
+            // Check if product already exists
+            const existingIndex = historicalSelectedProducts.findIndex(p => p.id === productData.id);
+            
+            if (existingIndex >= 0) {
+                // Update quantity
+                const newQuantity = historicalSelectedProducts[existingIndex].quantity + quantity;
+                // For historical records, just warn if quantity is high but don't prevent
+                if (newQuantity > productData.stock && productData.stock > 0) {
+                    if (!confirm(`La cantidad total (${newQuantity}) excede el stock actual (${productData.stock}). ¿Continuar?`)) {
+                        return;
+                    }
+                }
+                historicalSelectedProducts[existingIndex].quantity = newQuantity;
+            } else {
+                // Add new product
+                historicalSelectedProducts.push({
+                    id: productData.id,
+                    name: productData.name,
+                    price: productData.price,
+                    category: productData.category,
+                    quantity: quantity
+                });
+            }
+            
+            // Reset form
+            select.value = '';
+            quantityInput.value = '1';
+            
+            renderHistoricalProducts();
+            updateHistoricalTotal();
+        }
+        
+        function renderHistoricalProducts() {
+            const container = document.getElementById('historical-products-list');
+            container.innerHTML = '';
+            
+            historicalSelectedProducts.forEach((product, index) => {
+                const row = document.createElement('div');
+                row.className = 'product-row';
+                
+                const total = product.quantity * product.price;
+                
+                row.innerHTML = `
+                    <span class="product-name">${product.name}</span>
+                    <span class="product-quantity">
+                        <button type="button" onclick="updateHistoricalProductQuantity(${index}, -1)">-</button>
+                        ${product.quantity}
+                        <button type="button" onclick="updateHistoricalProductQuantity(${index}, 1)">+</button>
+                    </span>
+                    <span class="product-price">$${product.price.toFixed(2)}</span>
+                    <span class="product-total">$${total.toFixed(2)}</span>
+                    <span class="product-actions">
+                        <button type="button" onclick="removeHistoricalProduct(${index})" class="btn-remove">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </span>
+                `;
+                
+                container.appendChild(row);
+            });
+        }
+        
+        function updateHistoricalProductQuantity(index, change) {
+            const product = historicalSelectedProducts[index];
+            const newQuantity = product.quantity + change;
+            
+            if (newQuantity <= 0) {
+                removeHistoricalProduct(index);
+                return;
+            }
+            
+            // Note: We're not checking stock here since this is historical
+            product.quantity = newQuantity;
+            renderHistoricalProducts();
+            updateHistoricalTotal();
+        }
+        
+        function removeHistoricalProduct(index) {
+            historicalSelectedProducts.splice(index, 1);
+            renderHistoricalProducts();
+            updateHistoricalTotal();
+        }
+        
+        function updateHistoricalTotal() {
+            const service = document.getElementById('historical-service').value;
+            const hours = parseInt(document.getElementById('historical-hours').value) || 1;
+            const tip = parseFloat(document.getElementById('historical-tip').value) || 0;
+            
+            // Calculate products total
+            const productsTotal = historicalSelectedProducts.reduce((sum, product) => {
+                return sum + (product.quantity * product.price);
+            }, 0);
+            
+            let subtotal = 0;
+            let coworkingCost = 0;
+            
+            if (service === 'cafeteria') {
+                subtotal = productsTotal;
+            } else if (service === 'coworking') {
+                coworkingCost = 58 * hours;
+                // Add only refrigerador products to subtotal
+                const refrigeradorTotal = historicalSelectedProducts
+                    .filter(p => p.category === 'refrigerador')
+                    .reduce((sum, p) => sum + (p.quantity * p.price), 0);
+                subtotal = refrigeradorTotal;
+            }
+            
+            const finalTotal = subtotal + coworkingCost + tip;
+            
+            // Update display
+            document.getElementById('historical-subtotal').textContent = subtotal.toFixed(2);
+            document.getElementById('historical-products-total').textContent = productsTotal.toFixed(2);
+            document.getElementById('historical-coworking-hours').textContent = hours;
+            document.getElementById('historical-coworking-cost').textContent = coworkingCost.toFixed(2);
+            document.getElementById('historical-final-total').textContent = finalTotal.toFixed(2);
+            
+            // Show/hide coworking line
+            const coworkingLine = document.getElementById('historical-coworking-line');
+            coworkingLine.style.display = service === 'coworking' ? 'block' : 'none';
+        }
+        
+        async function submitHistoricalRecord(event) {
+            event.preventDefault();
+            
+            const formData = new FormData(event.target);
+            const data = Object.fromEntries(formData.entries());
+            
+            // Validate date
+            const selectedDate = new Date(data.historicalDate);
+            const today = new Date();
+            today.setHours(23, 59, 59, 999);
+            
+            if (selectedDate > today) {
+                alert('La fecha histórica no puede ser futura');
+                return;
+            }
+            
+            // Validate products
+            if (historicalSelectedProducts.length === 0) {
+                alert('Selecciona al menos un producto');
+                return;
+            }
+            
+            // Prepare request data
+            const requestData = {
+                ...data,
+                products: historicalSelectedProducts.map(p => ({
+                    productId: p.id,
+                    quantity: p.quantity
+                }))
+            };
+            
+            try {
+                const response = await fetch('/api/records/historical', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    },
+                    body: JSON.stringify(requestData)
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok) {
+                    alert('Registro histórico creado exitosamente');
+                    // Reset form
+                    event.target.reset();
+                    historicalSelectedProducts = [];
+                    renderHistoricalProducts();
+                    updateHistoricalTotal();
+                    // Load recent records
+                    loadHistoricalRecords();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error creating historical record:', error);
+                alert('Error al crear el registro');
+            }
+        }
+        
+        async function loadHistoricalRecords() {
+            try {
+                const response = await fetch('/api/records?limit=10', {
+                    headers: {
+                        'Authorization': `Bearer ${localStorage.getItem('token')}`
+                    }
+                });
+                
+                if (response.ok) {
+                    const records = await response.json();
+                    const tbody = document.getElementById('historical-records-list');
+                    tbody.innerHTML = '';
+                    
+                    records.forEach(record => {
+                        const row = document.createElement('tr');
+                        const recordDate = new Date(record.date);
+                        
+                        row.innerHTML = `
+                            <td>${recordDate.toLocaleDateString('es-MX')}</td>
+                            <td>${record.client}</td>
+                            <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
+                            <td>$${record.total.toFixed(2)}</td>
+                            <td>${record.payment}</td>
+                            <td>${record.createdBy?.name || 'N/A'}</td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.error('Error loading historical records:', error);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
+            initHistoricalRecords();
         });
 
         // Verificar conexión periódicamente

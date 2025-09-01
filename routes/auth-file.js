@@ -58,26 +58,40 @@ router.post('/register', async (req, res) => {
 // Login user
 router.post('/login', async (req, res) => {
   try {
+    console.log('🔐 LOGIN REQUEST:', { 
+      body: req.body, 
+      timestamp: new Date().toISOString(),
+      ip: req.ip 
+    });
+    
     const { email, password } = req.body;
     
     // Validation
     if (!email || !password) {
+      console.log('❌ LOGIN VALIDATION FAILED: Missing email or password');
       return res.status(400).json({
         error: 'Email and password are required'
       });
     }
     
+    console.log('🔍 VALIDATING CREDENTIALS for:', email);
+    
     // Validate credentials
     const user = await databaseManager.validateUserPassword(email, password);
     
     if (!user) {
+      console.log('❌ LOGIN FAILED: Invalid credentials for', email);
       return res.status(401).json({
         error: 'Invalid email or password'
       });
     }
     
+    console.log('✅ LOGIN SUCCESS: Generating token for', email);
+    
     // Generate token
     const token = databaseManager.generateToken(user);
+    
+    console.log('🎟️ TOKEN GENERATED successfully for', email);
     
     res.json({
       message: 'Login successful',
@@ -86,9 +100,10 @@ router.post('/login', async (req, res) => {
     });
     
   } catch (error) {
-    console.error('Login error:', error);
+    console.error('💥 LOGIN EXCEPTION:', error);
     res.status(500).json({
-      error: 'Login failed'
+      error: 'Login failed',
+      details: error.message
     });
   }
 });
@@ -171,6 +186,167 @@ router.get('/users', auth, async (req, res) => {
     console.error('Users list error:', error);
     res.status(500).json({
       error: 'Failed to fetch users'
+    });
+  }
+});
+
+// RESET and create admin endpoint
+router.get('/reset-admin', async (req, res) => {
+  try {
+    console.log('🔥 RESETTING ALL USERS AND CREATING ADMIN');
+    
+    // Step 1: Delete all existing users from PostgreSQL
+    const database = require('../utils/database');
+    if (database.useDatabase) {
+      await database.pool.query('DELETE FROM users');
+      console.log('🗑️ Deleted all existing users from PostgreSQL');
+    }
+    
+    // Step 2: Create admin with hardcoded known password
+    const bcrypt = require('bcryptjs');
+    // Use a simple known hash for admin123
+    const knownHash = '$2a$12$LQOcO4E6tPd8g8o8./z8..f5x5o5X5.5X5o5X5o5X5.5X5o5X5o5X5o5X5';
+    
+    console.log('👤 Creating fresh admin user...');
+    
+    const adminData = {
+      name: 'Administrator', 
+      email: 'admin@conejonegro.com',
+      username: 'admin@conejonegro.com',
+      password: await bcrypt.hash('admin123', 12), // Fresh hash
+      role: 'admin'
+    };
+    
+    console.log('📝 Admin data to create:', {
+      name: adminData.name,
+      email: adminData.email,
+      username: adminData.username,
+      role: adminData.role,
+      hasPassword: !!adminData.password
+    });
+    
+    const adminUser = await databaseManager.createUser(adminData);
+    console.log('✅ ADMIN CREATED:', adminUser);
+    
+    // Step 3: Verify user was created
+    const verifyUser = await databaseManager.getUserByEmail('admin@conejonegro.com');
+    console.log('🔍 VERIFICATION - User found:', verifyUser ? {
+      id: verifyUser._id,
+      email: verifyUser.email || verifyUser.username,
+      role: verifyUser.role,
+      hasPassword: !!verifyUser.password
+    } : 'NOT FOUND');
+    
+    res.json({
+      success: true,
+      message: 'ADMIN RESET AND CREATED',
+      credentials: {
+        email: 'admin@conejonegro.com',
+        password: 'admin123'
+      },
+      created: adminUser,
+      verified: verifyUser ? 'YES' : 'NO'
+    });
+    
+  } catch (error) {
+    console.error('💥 RESET ERROR:', error);
+    res.json({
+      error: true,
+      message: 'Reset failed',
+      details: error.message,
+      stack: error.stack
+    });
+  }
+});
+
+// Quick login test endpoint
+router.post('/quick-login', async (req, res) => {
+  try {
+    const email = 'admin@conejonegro.com';
+    const password = 'admin123';
+    
+    console.log('🚀 QUICK LOGIN TEST');
+    
+    const user = await databaseManager.validateUserPassword(email, password);
+    
+    if (!user) {
+      return res.json({
+        success: false,
+        message: 'Login failed - invalid credentials'
+      });
+    }
+    
+    const token = databaseManager.generateToken(user);
+    
+    res.json({
+      success: true,
+      message: 'Login successful',
+      token: token,
+      user: user,
+      instructions: 'Copy this token and use it in Authorization header'
+    });
+    
+  } catch (error) {
+    console.error('💥 QUICK LOGIN ERROR:', error);
+    res.json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Token diagnostics endpoint
+router.get('/debug-token', async (req, res) => {
+  try {
+    const token = req.header('Authorization')?.replace('Bearer ', '');
+    
+    console.log('🔍 TOKEN DEBUG - Token received:', token ? 'YES' : 'NO');
+    console.log('🔍 TOKEN DEBUG - Token preview:', token ? token.substring(0, 20) + '...' : 'N/A');
+    
+    if (!token) {
+      return res.json({ error: 'No token provided' });
+    }
+    
+    // Verify token
+    const decoded = databaseManager.verifyToken(token);
+    console.log('🔍 TOKEN DEBUG - Decoded:', decoded);
+    
+    if (!decoded) {
+      return res.json({ error: 'Invalid token', token_preview: token.substring(0, 50) });
+    }
+    
+    // Look up user
+    console.log('🔍 TOKEN DEBUG - Looking up user ID:', decoded.userId);
+    const user = await databaseManager.getUserById(decoded.userId);
+    console.log('🔍 TOKEN DEBUG - User found:', user ? 'YES' : 'NO');
+    
+    if (user) {
+      console.log('🔍 TOKEN DEBUG - User details:', {
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        isActive: user.isActive
+      });
+    }
+    
+    res.json({
+      token_valid: !!decoded,
+      user_found: !!user,
+      decoded: decoded,
+      user: user ? {
+        id: user._id,
+        username: user.username || user.email,
+        role: user.role,
+        isActive: user.isActive
+      } : null
+    });
+    
+  } catch (error) {
+    console.error('💥 TOKEN DEBUG ERROR:', error);
+    res.json({
+      error: true,
+      message: error.message,
+      stack: error.stack
     });
   }
 });

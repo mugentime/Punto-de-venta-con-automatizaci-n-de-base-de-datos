@@ -356,4 +356,4 @@ To update the system:
 
 ---
 
-**🏪 Conejo Negro POS System** - Built with ❤️ for efficient café management
+**🏪 Conejo Negro POS System** - Built with ❤️ for efficient café managementForce redeploy
