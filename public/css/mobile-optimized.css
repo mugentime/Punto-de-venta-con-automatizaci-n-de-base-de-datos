@@ -272,6 +272,123 @@
   }
 }
 
+/* REPORTS SECTION - MOBILE CENTERING AND SYMMETRY */
+@media (max-width: 768px) {
+  /* Reports header mobile layout */
+  .reports-header {
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 15px 0 !important;
+  }
+  
+  .reports-title {
+    text-align: center !important;
+    margin-bottom: 15px !important;
+    width: 100% !important;
+  }
+  
+  .period-selector {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  
+  /* Metrics grid centering */
+  .metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    justify-items: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    max-width: 350px !important; /* Consistent card width */
+  }
+  
+  .metric-card {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+  
+  .metric-content {
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Charts container mobile centering */
+  .charts-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    justify-items: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+  
+  .chart-card {
+    width: 100% !important;
+    max-width: 350px !important;
+    margin: 0 auto !important;
+  }
+  
+  .chart-card.wide {
+    width: 100% !important;
+    max-width: 350px !important;
+    grid-column: span 1 !important;
+  }
+  
+  /* Chart headers centering */
+  .chart-header {
+    text-align: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .chart-header h3 {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .chart-controls {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+  
+  /* Action buttons centering */
+  .action-buttons {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  /* Cash cuts section centering */
+  .cash-cuts-section {
+    text-align: center !important;
+  }
+  
+  .cash-cuts-section h3 {
+    text-align: center !important;
+  }
+  
+  #cash-cuts-list {
+    text-align: center !important;
+  }
+  
+  /* Recent records section centering */
+  .recent-records-section {
+    text-align: center !important;
+  }
+  
+  .recent-records-section h3 {
+    text-align: center !important;
+  }
+}
+
 /* CRITICAL FIX FOR BETTER MOBILE VISUAL FEEDBACK */
 @media (max-width: 768px) {
   /* Make all buttons larger and more touch-friendly */
