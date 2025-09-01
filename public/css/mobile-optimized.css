@@ -14,7 +14,7 @@
   position: fixed;
   top: 15px;
   right: 15px;
-  z-index: 9999 !important; /* Highest priority */
+  z-index: 99999 !important; /* Maximum priority to prevent click interception */
   background: var(--bg-card, #1a1a2e);
   padding: 12px;
   border-radius: 50%;
@@ -27,8 +27,11 @@
   justify-content: center;
   transition: all 0.3s ease;
   font-size: 16px;
-  pointer-events: auto !important; /* Ensure it can receive clicks */
-  touch-action: manipulation !important; /* Better mobile interaction */
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  user-select: none !important; /* Prevent text selection */
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important; /* Remove tap highlight */
 }
 
 .hamburger-menu:hover {
@@ -218,6 +221,39 @@
   /* Add bottom padding to body to account for fixed bottom nav */
   body {
     padding-bottom: 60px !important;
+  }
+  
+  /* FIX: Prevent report metrics from intercepting clicks on mobile navigation */
+  .metric-value, 
+  .metric-icon, 
+  #report-clients,
+  .metrics-container > *,
+  .report-card > * {
+    pointer-events: none !important; /* Don't intercept touch events */
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+  
+  /* Ensure mobile nav buttons always work */
+  .mobile-nav-btn, 
+  .mobile-bottom-nav .nav-item {
+    pointer-events: auto !important; /* Always receive clicks */
+    touch-action: manipulation !important;
+    z-index: 1000 !important; /* Above report elements */
+    position: relative !important;
+  }
+  
+  /* Ensure critical buttons work without interception */
+  #finish-day,
+  #manual-cash-cut-btn,
+  button[onclick*="finalizar"] {
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+    position: relative !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
   }
 }
 
