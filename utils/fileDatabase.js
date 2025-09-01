@@ -392,8 +392,8 @@ class FileDatabase {
       profit: finalTotal - finalCost,
       drinksCost: recordData.drinksCost || 0, // Para tracking en coworking
       tip: tip, // Propina
-      date: new Date().toISOString(),
-      time: new Date().toLocaleTimeString('es-MX', { hour12: false }),
+      date: recordData.historicalDate ? recordData.historicalDate.toISOString() : new Date().toISOString(),
+      time: recordData.historicalDate ? recordData.historicalDate.toLocaleTimeString('es-MX', { hour12: false }) : new Date().toLocaleTimeString('es-MX', { hour12: false }),
       createdBy: recordData.createdBy,
       isDeleted: false,
       createdAt: new Date().toISOString(),
