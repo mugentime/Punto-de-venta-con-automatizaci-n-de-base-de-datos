@@ -1147,19 +1147,19 @@
     
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">
-        <a href="#pos-section" class="nav-item" onclick="showSection('pos')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="registro">
             <i class="fas fa-cash-register"></i>
             <span>POS</span>
         </a>
-        <a href="#inventory-section" class="nav-item" onclick="showSection('inventory')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-refrigerador">
             <i class="fas fa-boxes"></i>
             <span>Inventario</span>
         </a>
-        <a href="#reports-section" class="nav-item" onclick="showSection('reports')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="reportes">
             <i class="fas fa-chart-bar"></i>
             <span>Reportes</span>
         </a>
-        <a href="#members-section" class="nav-item" onclick="showSection('members')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="memberships">
             <i class="fas fa-users"></i>
             <span>Miembros</span>
         </a>
@@ -5612,6 +5612,56 @@
                 </div>
             `;
         }
+        // Mobile Navigation Fix - Agregar función showSection y event handlers móviles
+        window.showSection = function(sectionName) {
+            // Mapear nombres cortos a IDs de sección
+            const sectionMap = {
+                'pos': 'registro',
+                'inventory': 'inventario-refrigerador',
+                'reports': 'reportes',
+                'members': 'memberships'
+            };
+            
+            const actualSection = sectionMap[sectionName] || sectionName;
+            
+            // Buscar y hacer click en el nav-link correspondiente
+            const targetLink = document.querySelector(`.nav-link[data-section="${actualSection}"]`);
+            if (targetLink) {
+                targetLink.click();
+            }
+        };
+        
+        // Agregar event listeners para botones móviles después de que el DOM esté listo
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile navigation buttons con data-section
+            const mobileNavButtons = document.querySelectorAll('.mobile-nav-btn');
+            if (mobileNavButtons.length > 0) {
+                mobileNavButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const section = this.getAttribute('data-section');
+                        
+                        // Remove active class from all mobile buttons
+                        document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Find and click the corresponding nav-link
+                        const targetLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+                        if (targetLink) {
+                            targetLink.click();
+                        } else {
+                            // If no nav-link, handle section change directly
+                            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+                            const targetSection = document.getElementById(section);
+                            if (targetSection) {
+                                targetSection.style.display = 'block';
+                            }
+                        }
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>
