@@ -118,7 +118,7 @@ userSchema.pre('save', function(next) {
           canViewReports: true,
           canManageUsers: false,
           canExportData: false,
-          canDeleteRecords: false
+          canDeleteRecords: true
         };
         break;
     }
