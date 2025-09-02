@@ -103,7 +103,9 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       payment, 
       notes,
       drinksCost = 0,
-      tip = 0
+      tip = 0,
+      date,
+      historicalDate
     } = req.body;
 
     // Validation (common)
@@ -187,7 +189,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       total += tip; // Add tip to total
 
       // Create multi-product record
-      record = new Record({
+      const recordData = {
         client: client.trim(),
         service: service.toLowerCase(),
         products: recordProducts,
@@ -198,7 +200,14 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         tip: Number(tip),
         notes: notes?.trim(),
         createdBy: req.user.userId
-      });
+      };
+      
+      // Add custom date if provided
+      if (date || historicalDate) {
+        recordData.date = new Date(date || historicalDate);
+      }
+      
+      record = new Record(recordData);
 
       await record.save();
 
@@ -234,7 +243,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         total = coworkingRate * parseInt(hours);
       }
 
-      record = new Record({
+      const recordData = {
         client: client.trim(),
         service: service.toLowerCase(),
         drink: product.name,
@@ -245,7 +254,14 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         cost: product.cost,
         notes: notes?.trim(),
         createdBy: req.user.userId
-      });
+      };
+      
+      // Add custom date if provided
+      if (date || historicalDate) {
+        recordData.date = new Date(date || historicalDate);
+      }
+      
+      record = new Record(recordData);
 
       await record.save();
       await product.updateStock(1, 'subtract');

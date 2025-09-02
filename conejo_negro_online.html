@@ -3017,10 +3017,10 @@
                 tip: currentOrder.tip || 0
             };
             
-            // Use standard records endpoint with date parameter
+            // Si hay una fecha personalizada, incluir en los datos del record
             let endpoint = '/records';
             if (customDate) {
-                endpoint = `/records?date=${customDate}`;
+                recordData.historicalDate = customDate;
             }
             
             try {
