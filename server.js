@@ -102,6 +102,15 @@ const requireDatabase = (req, res, next) => {
   next();
 };
 
+// EMERGENCY TEST - NO MIDDLEWARE
+app.get('/api/emergency-test', (req, res) => {
+  res.json({ 
+    message: 'EMERGENCY TEST WORKING',
+    timestamp: new Date().toISOString(),
+    railway_deployed: true 
+  });
+});
+
 // Routes (with database requirement)
 app.use('/api/auth', requireDatabase, authRoutes);
 app.use('/api/products', requireDatabase, productRoutes);
