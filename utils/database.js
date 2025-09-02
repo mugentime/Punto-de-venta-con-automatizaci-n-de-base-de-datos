@@ -115,6 +115,29 @@ class Database {
             )
         `);
 
+        await this.pool.query(`
+            CREATE TABLE IF NOT EXISTS coworking_sessions (
+                id SERIAL PRIMARY KEY,
+                _id VARCHAR(24) UNIQUE NOT NULL,
+                client VARCHAR(255) NOT NULL,
+                start_time TIMESTAMP NOT NULL,
+                end_time TIMESTAMP,
+                status VARCHAR(20) DEFAULT 'active',
+                hourly_rate DECIMAL(10,2) DEFAULT 58,
+                products JSONB DEFAULT '[]',
+                notes TEXT,
+                subtotal DECIMAL(10,2) DEFAULT 0,
+                time_charge DECIMAL(10,2) DEFAULT 0,
+                total DECIMAL(10,2) DEFAULT 0,
+                cost DECIMAL(10,2) DEFAULT 0,
+                profit DECIMAL(10,2) DEFAULT 0,
+                payment VARCHAR(50),
+                created_by VARCHAR(24),
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )
+        `);
+
         console.log('✅ PostgreSQL database initialized');
         
         // Create default admin user if no users exist
@@ -637,6 +660,253 @@ class Database {
 
             await fs.writeFile(path.join(this.dataDir, 'cashcuts.json'), JSON.stringify(cashCuts, null, 2));
             return cashCuts[cashCutIndex];
+        }
+    }
+
+    // COWORKING SESSIONS
+    async getCoworkingSessions() {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM coworking_sessions ORDER BY created_at DESC');
+            return result.rows.map(row => ({
+                _id: row._id,
+                client: row.client,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                status: row.status,
+                hourlyRate: parseFloat(row.hourly_rate),
+                products: row.products,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                timeCharge: parseFloat(row.time_charge),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                profit: parseFloat(row.profit),
+                payment: row.payment,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            }));
+        } else {
+            const data = await fs.readFile(path.join(this.dataDir, 'coworking_sessions.json'), 'utf8').catch(() => '[]');
+            return JSON.parse(data);
+        }
+    }
+
+    async getActiveCoworkingSessions() {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM coworking_sessions WHERE status = $1 ORDER BY created_at DESC', ['active']);
+            return result.rows.map(row => ({
+                _id: row._id,
+                client: row.client,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                status: row.status,
+                hourlyRate: parseFloat(row.hourly_rate),
+                products: row.products,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                timeCharge: parseFloat(row.time_charge),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                profit: parseFloat(row.profit),
+                payment: row.payment,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            }));
+        } else {
+            const sessions = await this.getCoworkingSessions();
+            return sessions.filter(s => s.status === 'active');
+        }
+    }
+
+    async getCoworkingSessionById(id) {
+        if (this.useDatabase) {
+            const result = await this.pool.query('SELECT * FROM coworking_sessions WHERE _id = $1', [id]);
+            if (result.rows.length === 0) return null;
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                client: row.client,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                status: row.status,
+                hourlyRate: parseFloat(row.hourly_rate),
+                products: row.products,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                timeCharge: parseFloat(row.time_charge),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                profit: parseFloat(row.profit),
+                payment: row.payment,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const sessions = await this.getCoworkingSessions();
+            return sessions.find(s => s._id === id);
+        }
+    }
+
+    async createCoworkingSession(sessionData) {
+        const id = this.generateId();
+        const session = {
+            _id: id,
+            client: sessionData.client,
+            startTime: sessionData.startTime || new Date(),
+            endTime: sessionData.endTime || null,
+            status: sessionData.status || 'active',
+            hourlyRate: sessionData.hourlyRate || 58,
+            products: sessionData.products || [],
+            notes: sessionData.notes || '',
+            subtotal: sessionData.subtotal || 0,
+            timeCharge: sessionData.timeCharge || 0,
+            total: sessionData.total || 0,
+            cost: sessionData.cost || 0,
+            profit: sessionData.profit || 0,
+            payment: sessionData.payment || null,
+            createdBy: sessionData.createdBy,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        if (this.useDatabase) {
+            await this.pool.query(`
+                INSERT INTO coworking_sessions (_id, client, start_time, end_time, status, hourly_rate, products, notes, subtotal, time_charge, total, cost, profit, payment, created_by, created_at, updated_at)
+                VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17)
+            `, [session._id, session.client, session.startTime, session.endTime, session.status, session.hourlyRate, JSON.stringify(session.products), session.notes, session.subtotal, session.timeCharge, session.total, session.cost, session.profit, session.payment, session.createdBy, session.createdAt, session.updatedAt]);
+        } else {
+            const sessions = await this.getCoworkingSessions();
+            sessions.push(session);
+            await fs.writeFile(path.join(this.dataDir, 'coworking_sessions.json'), JSON.stringify(sessions, null, 2));
+        }
+
+        return session;
+    }
+
+    async updateCoworkingSession(id, updateData) {
+        if (this.useDatabase) {
+            const updates = [];
+            const values = [];
+            let valueIndex = 1;
+
+            Object.keys(updateData).forEach(key => {
+                let dbKey = key;
+                let value = updateData[key];
+
+                // Convert camelCase to snake_case for database fields
+                switch (key) {
+                    case 'startTime':
+                        dbKey = 'start_time';
+                        break;
+                    case 'endTime':
+                        dbKey = 'end_time';
+                        break;
+                    case 'hourlyRate':
+                        dbKey = 'hourly_rate';
+                        break;
+                    case 'timeCharge':
+                        dbKey = 'time_charge';
+                        break;
+                    case 'createdBy':
+                        dbKey = 'created_by';
+                        break;
+                    case 'createdAt':
+                        dbKey = 'created_at';
+                        break;
+                    case 'updatedAt':
+                        dbKey = 'updated_at';
+                        break;
+                }
+
+                // Special handling for products (JSON)
+                if (key === 'products') {
+                    value = JSON.stringify(value);
+                }
+
+                if (key !== 'createdAt') { // Don't update created_at
+                    updates.push(`${dbKey} = $${valueIndex}`);
+                    values.push(value);
+                    valueIndex++;
+                }
+            });
+
+            // Always update updated_at
+            if (!updateData.updatedAt) {
+                updates.push(`updated_at = $${valueIndex}`);
+                values.push(new Date());
+                valueIndex++;
+            }
+
+            values.push(id);
+
+            const result = await this.pool.query(`
+                UPDATE coworking_sessions SET ${updates.join(', ')} WHERE _id = $${valueIndex} RETURNING *
+            `, values);
+
+            if (result.rows.length === 0) {
+                throw new Error('Coworking session not found');
+            }
+
+            const row = result.rows[0];
+            return {
+                _id: row._id,
+                client: row.client,
+                startTime: row.start_time,
+                endTime: row.end_time,
+                status: row.status,
+                hourlyRate: parseFloat(row.hourly_rate),
+                products: row.products,
+                notes: row.notes,
+                subtotal: parseFloat(row.subtotal),
+                timeCharge: parseFloat(row.time_charge),
+                total: parseFloat(row.total),
+                cost: parseFloat(row.cost),
+                profit: parseFloat(row.profit),
+                payment: row.payment,
+                createdBy: row.created_by,
+                createdAt: row.created_at,
+                updatedAt: row.updated_at
+            };
+        } else {
+            const sessions = await this.getCoworkingSessions();
+            const sessionIndex = sessions.findIndex(s => s._id === id);
+            
+            if (sessionIndex === -1) {
+                throw new Error('Coworking session not found');
+            }
+
+            sessions[sessionIndex] = {
+                ...sessions[sessionIndex],
+                ...updateData,
+                updatedAt: new Date()
+            };
+
+            await fs.writeFile(path.join(this.dataDir, 'coworking_sessions.json'), JSON.stringify(sessions, null, 2));
+            return sessions[sessionIndex];
+        }
+    }
+
+    async deleteCoworkingSession(id) {
+        if (this.useDatabase) {
+            const result = await this.pool.query('DELETE FROM coworking_sessions WHERE _id = $1 RETURNING *', [id]);
+            if (result.rows.length === 0) {
+                throw new Error('Coworking session not found');
+            }
+            return true;
+        } else {
+            const sessions = await this.getCoworkingSessions();
+            const sessionIndex = sessions.findIndex(s => s._id === id);
+            
+            if (sessionIndex === -1) {
+                throw new Error('Coworking session not found');
+            }
+
+            sessions.splice(sessionIndex, 1);
+            await fs.writeFile(path.join(this.dataDir, 'coworking_sessions.json'), JSON.stringify(sessions, null, 2));
+            return true;
         }
     }
 

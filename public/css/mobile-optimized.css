@@ -14,7 +14,7 @@
   position: fixed;
   top: 15px;
   right: 15px;
-  z-index: 1001;
+  z-index: 99999 !important; /* Maximum priority to prevent click interception */
   background: var(--bg-card, #1a1a2e);
   padding: 12px;
   border-radius: 50%;
@@ -27,6 +27,11 @@
   justify-content: center;
   transition: all 0.3s ease;
   font-size: 16px;
+  pointer-events: auto !important;
+  touch-action: manipulation !important;
+  user-select: none !important; /* Prevent text selection */
+  -webkit-user-select: none !important;
+  -webkit-tap-highlight-color: transparent !important; /* Remove tap highlight */
 }
 
 .hamburger-menu:hover {
@@ -47,13 +52,30 @@
     display: flex !important;
   }
   
-  /* Move connection status to avoid hamburger menu overlap */
+  /* Replace connection status with discrete green light */
   .connection-status {
-    top: 15px !important;
-    right: 70px !important;
-    font-size: 12px !important;
-    padding: 6px 10px !important;
+    top: 20px !important; /* Near hamburger */
+    right: 70px !important; /* Next to hamburger */
+    width: 8px !important;
+    height: 8px !important;
+    border-radius: 50% !important;
+    background: #00ff00 !important; /* Green light */
+    box-shadow: 0 0 4px rgba(0, 255, 0, 0.6) !important;
+    font-size: 0 !important; /* Hide text */
+    padding: 0 !important;
     z-index: 1000 !important;
+    pointer-events: none !important;
+    opacity: 0.7 !important; /* Very discrete */
+  }
+  
+  /* Hide connection text completely on mobile */
+  .connection-status::before,
+  .connection-status::after {
+    display: none !important;
+  }
+  
+  .connection-status * {
+    display: none !important; /* Hide all child text */
   }
   
   /* Adjust header content for mobile */
@@ -121,7 +143,7 @@
     width: 280px;
     height: 100vh;
     background: var(--bg-card, #1a1a2e);
-    z-index: 1000;
+    z-index: 9998 !important; /* Just below hamburger */
     padding: 80px 20px 20px;
     border-left: 3px solid var(--accent-cyan, #00d9ff);
     box-shadow: -8px 0 32px rgba(0, 217, 255, 0.3);
@@ -214,6 +236,156 @@
   /* Add bottom padding to body to account for fixed bottom nav */
   body {
     padding-bottom: 60px !important;
+  }
+  
+  /* FIX: Prevent report metrics from intercepting clicks on mobile navigation */
+  .metric-value, 
+  .metric-icon, 
+  #report-clients,
+  .metrics-container > *,
+  .report-card > * {
+    pointer-events: none !important; /* Don't intercept touch events */
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+  
+  /* Ensure mobile nav buttons always work */
+  .mobile-nav-btn, 
+  .mobile-bottom-nav .nav-item {
+    pointer-events: auto !important; /* Always receive clicks */
+    touch-action: manipulation !important;
+    z-index: 1000 !important; /* Above report elements */
+    position: relative !important;
+  }
+  
+  /* Ensure critical buttons work without interception */
+  #finish-day,
+  #manual-cash-cut-btn,
+  button[onclick*="finalizar"] {
+    pointer-events: auto !important;
+    z-index: 1000 !important;
+    position: relative !important;
+    touch-action: manipulation !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-tap-highlight-color: transparent !important;
+  }
+}
+
+/* REPORTS SECTION - MOBILE CENTERING AND SYMMETRY */
+@media (max-width: 768px) {
+  /* Reports header mobile layout */
+  .reports-header {
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+    padding: 15px 0 !important;
+  }
+  
+  .reports-title {
+    text-align: center !important;
+    margin-bottom: 15px !important;
+    width: 100% !important;
+  }
+  
+  .period-selector {
+    justify-content: center !important;
+    align-items: center !important;
+    width: 100% !important;
+  }
+  
+  /* Metrics grid centering */
+  .metrics-grid {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 15px !important;
+    justify-items: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+    max-width: 350px !important; /* Consistent card width */
+  }
+  
+  .metric-card {
+    width: 100% !important;
+    max-width: 320px !important;
+    margin: 0 auto !important;
+    text-align: center !important;
+  }
+  
+  .metric-content {
+    text-align: center !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* Charts container mobile centering */
+  .charts-container {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    gap: 20px !important;
+    justify-items: center !important;
+    align-items: center !important;
+    margin: 0 auto !important;
+  }
+  
+  .chart-card {
+    width: 100% !important;
+    max-width: 350px !important;
+    margin: 0 auto !important;
+  }
+  
+  .chart-card.wide {
+    width: 100% !important;
+    max-width: 350px !important;
+    grid-column: span 1 !important;
+  }
+  
+  /* Chart headers centering */
+  .chart-header {
+    text-align: center !important;
+    justify-content: center !important;
+    flex-direction: column !important;
+    gap: 10px !important;
+  }
+  
+  .chart-header h3 {
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  .chart-controls {
+    justify-content: center !important;
+    width: 100% !important;
+  }
+  
+  /* Action buttons centering */
+  .action-buttons {
+    justify-content: center !important;
+    align-items: center !important;
+    text-align: center !important;
+    width: 100% !important;
+  }
+  
+  /* Cash cuts section centering */
+  .cash-cuts-section {
+    text-align: center !important;
+  }
+  
+  .cash-cuts-section h3 {
+    text-align: center !important;
+  }
+  
+  #cash-cuts-list {
+    text-align: center !important;
+  }
+  
+  /* Recent records section centering */
+  .recent-records-section {
+    text-align: center !important;
+  }
+  
+  .recent-records-section h3 {
+    text-align: center !important;
   }
 }
 

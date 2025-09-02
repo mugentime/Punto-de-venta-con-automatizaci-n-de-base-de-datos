@@ -22,6 +22,7 @@ class FileDatabase {
     this.backupsFile = path.join(this.dataPath, 'backups.json');
     this.cashCutsFile = path.join(this.dataPath, 'cashcuts.json');
     this.membershipsFile = path.join(this.dataPath, 'memberships.json');
+    this.coworkingSessionsFile = path.join(this.dataPath, 'coworking_sessions.json');
     
     this.initialized = false;
   }
@@ -41,6 +42,7 @@ class FileDatabase {
       await this.initializeFile(this.backupsFile, []);
       await this.initializeFile(this.cashCutsFile, []);
       await this.initializeFile(this.membershipsFile, []);
+      await this.initializeFile(this.coworkingSessionsFile, []);
       
       // Create default admin user if no users exist
       const users = await this.getUsers();
@@ -392,8 +394,8 @@ class FileDatabase {
       profit: finalTotal - finalCost,
       drinksCost: recordData.drinksCost || 0, // Para tracking en coworking
       tip: tip, // Propina
-      date: new Date().toISOString(),
-      time: new Date().toLocaleTimeString('es-MX', { hour12: false }),
+      date: recordData.historicalDate ? recordData.historicalDate.toISOString() : new Date().toISOString(),
+      time: recordData.historicalDate ? recordData.historicalDate.toLocaleTimeString('es-MX', { hour12: false }) : new Date().toLocaleTimeString('es-MX', { hour12: false }),
       createdBy: recordData.createdBy,
       isDeleted: false,
       createdAt: new Date().toISOString(),
@@ -851,6 +853,113 @@ class FileDatabase {
         byType: { daily: 0, weekly: 0, monthly: 0 },
         totalRevenue: 0, monthlyRevenue: 0
       };
+    }
+  }
+
+  // COWORKING SESSIONS
+  async getCoworkingSessions() {
+    try {
+      await this.initializeFile(this.coworkingSessionsFile, []);
+      const data = await fs.readFile(this.coworkingSessionsFile, 'utf8');
+      return JSON.parse(data);
+    } catch (error) {
+      console.error('Error reading coworking sessions:', error);
+      return [];
+    }
+  }
+
+  async getActiveCoworkingSessions() {
+    try {
+      const sessions = await this.getCoworkingSessions();
+      return sessions.filter(s => s.status === 'active');
+    } catch (error) {
+      console.error('Error getting active coworking sessions:', error);
+      return [];
+    }
+  }
+
+  async getCoworkingSessionById(id) {
+    try {
+      const sessions = await this.getCoworkingSessions();
+      return sessions.find(s => s._id === id);
+    } catch (error) {
+      console.error('Error getting coworking session by ID:', error);
+      return null;
+    }
+  }
+
+  async createCoworkingSession(sessionData) {
+    try {
+      const sessions = await this.getCoworkingSessions();
+      
+      const newSession = {
+        _id: sessionData._id || this.generateId(),
+        client: sessionData.client,
+        startTime: sessionData.startTime || new Date(),
+        endTime: sessionData.endTime || null,
+        status: sessionData.status || 'active',
+        hourlyRate: sessionData.hourlyRate || 58,
+        products: sessionData.products || [],
+        notes: sessionData.notes || '',
+        subtotal: sessionData.subtotal || 0,
+        timeCharge: sessionData.timeCharge || 0,
+        total: sessionData.total || 0,
+        cost: sessionData.cost || 0,
+        profit: sessionData.profit || 0,
+        payment: sessionData.payment || null,
+        createdBy: sessionData.createdBy,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+
+      sessions.push(newSession);
+      await fs.writeFile(this.coworkingSessionsFile, JSON.stringify(sessions, null, 2));
+      
+      return newSession;
+    } catch (error) {
+      console.error('Error creating coworking session:', error);
+      throw error;
+    }
+  }
+
+  async updateCoworkingSession(id, updateData) {
+    try {
+      const sessions = await this.getCoworkingSessions();
+      const sessionIndex = sessions.findIndex(s => s._id === id);
+
+      if (sessionIndex === -1) {
+        throw new Error('Coworking session not found');
+      }
+
+      sessions[sessionIndex] = {
+        ...sessions[sessionIndex],
+        ...updateData,
+        updatedAt: new Date()
+      };
+
+      await fs.writeFile(this.coworkingSessionsFile, JSON.stringify(sessions, null, 2));
+      return sessions[sessionIndex];
+    } catch (error) {
+      console.error('Error updating coworking session:', error);
+      throw error;
+    }
+  }
+
+  async deleteCoworkingSession(id) {
+    try {
+      const sessions = await this.getCoworkingSessions();
+      const sessionIndex = sessions.findIndex(s => s._id === id);
+
+      if (sessionIndex === -1) {
+        throw new Error('Coworking session not found');
+      }
+
+      sessions.splice(sessionIndex, 1);
+      await fs.writeFile(this.coworkingSessionsFile, JSON.stringify(sessions, null, 2));
+      return true;
+    } catch (error) {
+      console.error('Error deleting coworking session:', error);
+      throw error;
     }
   }
 

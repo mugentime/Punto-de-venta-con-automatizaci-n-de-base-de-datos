@@ -81,6 +81,155 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Get historical records endpoint - MUST come before /:id route
+router.get('/historical', auth, async (req, res) => {
+  try {
+    const { startDate, endDate, limit = 100 } = req.query;
+    
+    let records = await databaseManager.getRecords();
+    
+    // Filter out deleted records
+    records = records.filter(r => !r.isDeleted);
+    
+    // If date range is provided, filter by it
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Include the entire end date
+      
+      records = records.filter(r => {
+        const recordDate = new Date(r.date || r.createdAt);
+        return recordDate >= start && recordDate <= end;
+      });
+    }
+    
+    // Sort by date (newest first)
+    records.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+    
+    // Limit results
+    records = records.slice(0, parseInt(limit));
+    
+    res.json({
+      records,
+      total: records.length,
+      startDate: startDate || null,
+      endDate: endDate || null
+    });
+    
+  } catch (error) {
+    console.error('Historical records fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch historical records'
+    });
+  }
+});
+
+// Historical records endpoint (for creating records with custom dates)
+router.post('/historical', auth, canRegisterClients, async (req, res) => {
+  try {
+    const { 
+      client, 
+      service, 
+      products,
+      hours = 1, 
+      payment, 
+      notes,
+      drinksCost = 0,
+      tip = 0,
+      historicalDate
+    } = req.body;
+
+    // Validación
+    if (!client || !service || !payment) {
+      return res.status(400).json({
+        error: 'Client, service, and payment method are required'
+      });
+    }
+
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        error: 'At least one product is required'
+      });
+    }
+
+    if (!['cafeteria', 'coworking'].includes(service.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Service must be either "cafeteria" or "coworking"'
+      });
+    }
+
+    if (!['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Payment method must be "efectivo", "tarjeta", or "transferencia"'
+      });
+    }
+
+    // Preparar productos
+    let productsArray = [];
+    for (const item of products) {
+      if (!item.productId || !item.quantity || item.quantity <= 0) {
+        return res.status(400).json({
+          error: 'Each product must have a valid productId and quantity > 0'
+        });
+      }
+
+      const product = await databaseManager.getProductById(item.productId);
+      if (!product || !product.isActive) {
+        return res.status(404).json({
+          error: `Product ${item.productId} not found or inactive`
+        });
+      }
+
+      productsArray.push({
+        productId: product._id,
+        name: product.name,
+        quantity: parseInt(item.quantity),
+        price: product.price,
+        cost: product.cost,
+        category: product.category
+      });
+    }
+
+    // Crear record con fecha personalizada
+    const recordData = {
+      client: client.trim(),
+      service: service.toLowerCase(),
+      products: productsArray,
+      hours: parseInt(hours),
+      payment: payment.toLowerCase(),
+      notes: notes?.trim(),
+      drinksCost: parseFloat(drinksCost),
+      tip: parseFloat(tip),
+      createdBy: req.user.userId
+    };
+
+    // Si hay fecha histórica, usarla
+    if (historicalDate) {
+      const customDate = new Date(historicalDate);
+      if (isNaN(customDate.getTime())) {
+        return res.status(400).json({
+          error: 'Invalid historical date format'
+        });
+      }
+      recordData.date = customDate.toISOString();
+      recordData.createdAt = customDate.toISOString();
+    }
+
+    const record = await databaseManager.createRecord(recordData);
+
+    res.status(201).json({
+      message: 'Historical record created successfully',
+      record
+    });
+
+  } catch (error) {
+    console.error('Historical record creation error:', error);
+    res.status(500).json({
+      error: 'Historical record creation failed'
+    });
+  }
+});
+
 // Get record by ID
 router.get('/:id', auth, async (req, res) => {
   try {
@@ -484,21 +633,6 @@ router.get('/stats/daily/:days', auth, async (req, res) => {
   }
 });
 
-// Get specific record by ID
-router.get('/:id', auth, async (req, res) => {
-  try {
-    const record = await databaseManager.getRecordById(req.params.id);
-    
-    if (!record || record.isDeleted) {
-      return res.status(404).json({ error: 'Record not found' });
-    }
-    
-    res.json(record);
-  } catch (error) {
-    console.error('Get record error:', error);
-    res.status(500).json({ error: 'Failed to fetch record' });
-  }
-});
 
 // Update products in a specific record
 router.patch('/:id/products', auth, async (req, res) => {
@@ -568,131 +702,6 @@ router.patch('/:id/products', auth, async (req, res) => {
   } catch (error) {
     console.error('Update products error:', error);
     res.status(500).json({ error: 'Failed to update products' });
-  }
-});
-
-// Historical records endpoint
-router.post('/historical', auth, canRegisterClients, async (req, res) => {
-  try {
-    const { 
-      client, 
-      service, 
-      products,
-      drinkId, 
-      hours = 1, 
-      payment, 
-      notes,
-      tip = 0,
-      historicalDate
-    } = req.body;
-
-    // Validation
-    if (!historicalDate) {
-      return res.status(400).json({
-        error: 'Historical date is required for this endpoint'
-      });
-    }
-
-    // Validate historical date is not in the future
-    const targetDate = new Date(historicalDate);
-    const today = new Date();
-    today.setHours(23, 59, 59, 999);
-    
-    if (targetDate > today) {
-      return res.status(400).json({
-        error: 'Historical date cannot be in the future'
-      });
-    }
-
-    // Common validation
-    if (!client || !service || !payment) {
-      return res.status(400).json({
-        error: 'Client, service, and payment method are required'
-      });
-    }
-
-    if (!['cafeteria', 'coworking'].includes(service.toLowerCase())) {
-      return res.status(400).json({
-        error: 'Service must be either "cafeteria" or "coworking"'
-      });
-    }
-
-    if (!['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
-      return res.status(400).json({
-        error: 'Payment method must be "efectivo", "tarjeta", or "transferencia"'
-      });
-    }
-
-    let productsArray = [];
-    
-    if (products && Array.isArray(products) && products.length > 0) {
-      // Multi-product system
-      for (const orderProduct of products) {
-        const product = await databaseManager.getProductById(orderProduct.productId);
-
-        if (!product || !product.isActive) {
-          return res.status(404).json({
-            error: `Product ${orderProduct.productId} not found or inactive`
-          });
-        }
-
-        productsArray.push({
-          productId: product.id,
-          name: product.name,
-          category: product.category,
-          quantity: orderProduct.quantity,
-          price: product.price,
-          cost: product.cost
-        });
-      }
-    } else if (drinkId) {
-      // Legacy single product
-      const product = await databaseManager.getProductById(drinkId);
-
-      if (!product || !product.isActive) {
-        return res.status(404).json({
-          error: 'Product not found or inactive'
-        });
-      }
-
-      productsArray = [{
-        productId: product.id,
-        name: product.name,
-        quantity: 1,
-        price: product.price,
-        cost: product.cost,
-        category: product.category
-      }];
-    } else {
-      return res.status(400).json({
-        error: 'At least one product is required'
-      });
-    }
-
-    // Create historical record with custom date
-    const record = await databaseManager.createRecord({
-      client: client.trim(),
-      service: service.toLowerCase(),
-      products: productsArray,
-      hours: parseInt(hours),
-      payment: payment.toLowerCase(),
-      notes: notes?.trim(),
-      drinksCost: 0,
-      tip: parseFloat(tip),
-      createdBy: req.user.userId,
-      customDate: targetDate  // Pass custom date for historical records
-    });
-
-    res.status(201).json({
-      message: 'Historical record created successfully',
-      record
-    });
-
-  } catch (error) {
-    console.error('Historical record creation error:', error);
-    res.status(500).json({
-      error: 'Historical record creation failed'
-    });
   }
 });
 

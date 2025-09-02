@@ -1141,27 +1141,35 @@
 </head>
 <body>
     <!-- Mobile Hamburger Menu -->
-    <div class="hamburger-menu" onclick="toggleMobileNav()">
+    <div class="hamburger-menu">
         <i class="fas fa-bars"></i>
     </div>
     
     <!-- Mobile Bottom Navigation -->
     <div class="mobile-bottom-nav">
-        <a href="#pos-section" class="nav-item" onclick="showSection('pos')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="registro">
             <i class="fas fa-cash-register"></i>
-            <span>POS</span>
+            <span>Registro</span>
         </a>
-        <a href="#inventory-section" class="nav-item" onclick="showSection('inventory')">
-            <i class="fas fa-boxes"></i>
-            <span>Inventario</span>
+        <a href="/coworking" class="nav-item">
+            <i class="fas fa-laptop"></i>
+            <span>Coworking</span>
         </a>
-        <a href="#reports-section" class="nav-item" onclick="showSection('reports')">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-refrigerador">
+            <i class="fas fa-snowflake"></i>
+            <span>Refriger.</span>
+        </a>
+        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-cafeteria">
+            <i class="fas fa-coffee"></i>
+            <span>Cafetería</span>
+        </a>
+        <a href="#" class="nav-item mobile-nav-btn" data-section="reportes">
             <i class="fas fa-chart-bar"></i>
             <span>Reportes</span>
         </a>
-        <a href="#members-section" class="nav-item" onclick="showSection('members')">
-            <i class="fas fa-users"></i>
-            <span>Miembros</span>
+        <a href="#" class="nav-item mobile-nav-btn" data-section="corte-caja">
+            <i class="fas fa-cut"></i>
+            <span>Corte</span>
         </a>
     </div>
     
@@ -1177,8 +1185,8 @@
             <p style="color: var(--text-secondary); margin-bottom: 15px;">Café Coworking Online</p>
             <div style="background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 20px; font-size: 14px;">
                 <strong>Credenciales de acceso:</strong><br>
-                Email: gerencia@conejonegro.mx<br>
-                Contraseña: conejonegro2024<br>
+                Email: admin@conejo.com<br>
+                Contraseña: admin123<br>
                 <button id="auto-fill-btn" 
                         style="margin-top: 8px; padding: 5px 10px; background: #00d9ff; color: #0a0a0a; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
                     🚀 Auto-completar
@@ -1248,7 +1256,7 @@
                     <nav>
                         <ul>
                             <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
-                            <li><a href="#" class="nav-link" data-section="registro-historico">Registro Histórico</a></li>
+                            <li><a href="/coworking" class="nav-link">Coworking</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
@@ -1290,6 +1298,14 @@
                                     <option value="cafeteria">Cafetería</option>
                                     <option value="coworking">Coworking</option>
                                 </select>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="record-date">Fecha del Registro</label>
+                                <input type="date" id="record-date" class="form-control" max="">
+                                <small class="form-text text-muted">Deja vacío para usar la fecha actual</small>
                             </div>
                         </div>
                         
@@ -1817,151 +1833,6 @@
                 </div>
             </section>
 
-            <!-- Registro Histórico -->
-            <section id="registro-historico" class="section">
-                <div class="card">
-                    <h2 class="card-title">
-                        <i class="fas fa-history"></i>
-                        Registro de Ventas Históricas
-                    </h2>
-                    <p class="card-subtitle">Registra ventas de fechas anteriores al día actual</p>
-                    
-                    <form id="historical-record-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="historical-date">Fecha Histórica *</label>
-                                <input type="date" id="historical-date" name="historicalDate" required>
-                                <small class="form-text">La fecha debe ser anterior o igual al día de hoy</small>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="historical-client">Cliente *</label>
-                                <input type="text" id="historical-client" name="client" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="historical-service">Tipo de Servicio *</label>
-                                <select id="historical-service" name="service" required>
-                                    <option value="">Seleccionar servicio</option>
-                                    <option value="cafeteria">Cafetería</option>
-                                    <option value="coworking">Coworking</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group" id="historical-hours-group" style="display: none;">
-                                <label for="historical-hours">Horas</label>
-                                <input type="number" id="historical-hours" name="hours" min="1" max="24" value="1">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label>Productos de la Orden</label>
-                            <div class="products-section">
-                                <div class="add-product-row">
-                                    <select id="historical-product-select">
-                                        <option value="">Seleccionar producto</option>
-                                    </select>
-                                    <input type="number" id="historical-quantity-input" placeholder="Cantidad" min="1" value="1">
-                                    <button type="button" id="historical-add-product-btn" class="btn btn-add">
-                                        <i class="fas fa-plus"></i>
-                                    </button>
-                                </div>
-                                
-                                <div class="selected-products">
-                                    <div class="products-header">
-                                        <span>Producto</span>
-                                        <span>Cantidad</span>
-                                        <span>Precio Unit.</span>
-                                        <span>Total</span>
-                                        <span>Acción</span>
-                                    </div>
-                                    <div id="historical-products-list"></div>
-                                </div>
-                                
-                                <div class="products-total">
-                                    <strong>Total Productos: $<span id="historical-products-total">0.00</span></strong>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="historical-payment">Método de Pago *</label>
-                                <select id="historical-payment" name="payment" required>
-                                    <option value="">Seleccionar método</option>
-                                    <option value="efectivo">Efectivo</option>
-                                    <option value="tarjeta">Tarjeta</option>
-                                    <option value="transferencia">Transferencia</option>
-                                </select>
-                            </div>
-                            
-                            <div class="form-group">
-                                <label for="historical-tip">Propina</label>
-                                <input type="number" id="historical-tip" name="tip" min="0" step="0.01" value="0">
-                            </div>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="historical-notes">Notas</label>
-                            <textarea id="historical-notes" name="notes" rows="3"></textarea>
-                        </div>
-                        
-                        <div class="order-total">
-                            <div class="total-breakdown">
-                                <div class="total-line">
-                                    <span>Subtotal Productos:</span>
-                                    <span>$<span id="historical-subtotal">0.00</span></span>
-                                </div>
-                                <div class="total-line" id="historical-coworking-line" style="display: none;">
-                                    <span>Coworking (<span id="historical-coworking-hours">1</span> hrs):</span>
-                                    <span>$<span id="historical-coworking-cost">0.00</span></span>
-                                </div>
-                                <div class="total-line">
-                                    <span>Propina:</span>
-                                    <span>$<span id="historical-tip-display">0.00</span></span>
-                                </div>
-                                <div class="total-line total-final">
-                                    <span><strong>Total Final:</strong></span>
-                                    <span><strong>$<span id="historical-final-total">0.00</span></strong></span>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-save"></i>
-                            Registrar Venta Histórica
-                        </button>
-                    </form>
-                </div>
-                
-                <!-- Recent Historical Records -->
-                <div class="card" style="margin-top: 20px;">
-                    <h3 class="card-title">
-                        <i class="fas fa-list"></i>
-                        Registros Históricos Recientes
-                    </h3>
-                    
-                    <div class="table-container">
-                        <table id="historical-records-table">
-                            <thead>
-                                <tr>
-                                    <th>Fecha</th>
-                                    <th>Cliente</th>
-                                    <th>Servicio</th>
-                                    <th>Total</th>
-                                    <th>Pago</th>
-                                    <th>Usuario</th>
-                                </tr>
-                            </thead>
-                            <tbody id="historical-records-list">
-                                <!-- Records will be loaded here -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
 
             <!-- Corte de Caja -->
             <section id="corte-caja" class="section">
@@ -2132,6 +2003,8 @@
             if (authToken) {
                 loadInitialData();
             }
+            // Initialize date input since registro is the default active section
+            setTimeout(initializeDateInput, 100);
         }
 
         // Variables globales para la orden
@@ -2156,8 +2029,8 @@
 
         // Auto-fill credentials button
         document.getElementById('auto-fill-btn').addEventListener('click', function() {
-            document.getElementById('login-email').value = 'gerencia@conejonegro.mx';
-            document.getElementById('login-password').value = 'conejonegro2024';
+            document.getElementById('login-email').value = 'admin@conejo.com';
+            document.getElementById('login-password').value = 'admin123';
         });
 
         // Login
@@ -2290,6 +2163,18 @@
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE_URL}${endpoint}`;
             
+            // Ensure we have a valid token
+            if (!authToken) {
+                authToken = localStorage.getItem('authToken');
+            }
+            
+            console.log('🌐 API REQUEST DEBUG:', {
+                endpoint,
+                url,
+                hasAuthToken: !!authToken,
+                authTokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'null'
+            });
+            
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`,
@@ -2372,8 +2257,7 @@
                 updateDailyRecordsDisplay();
                 initializeReports();
                 
-                // Initialize historical records after data is loaded
-                initHistoricalRecords();
+                // Data loading complete
                 
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
@@ -2451,6 +2335,17 @@
             updateCafeteriaTable();
             updateAlimentosTable();
             updateProductSelects();
+            initializeDateInput();
+        }
+        
+        // Inicializar input de fecha con fecha máxima de hoy
+        function initializeDateInput() {
+            const dateInput = document.getElementById('record-date');
+            if (dateInput) {
+                const today = new Date();
+                const todayString = today.toISOString().split('T')[0];
+                dateInput.max = todayString;
+            }
         }
 
         function updateProductSelects() {
@@ -2814,7 +2709,21 @@
                 });
                 
                 const sectionId = this.getAttribute('data-section');
-                document.getElementById(sectionId).classList.add('active');
+                const targetSection = document.getElementById(sectionId);
+                if (!targetSection) {
+                    console.warn('Sección no encontrada para data-section:', sectionId);
+                    return; // Evitar error de classList cuando no existe el elemento
+                }
+                
+                // Check if targetSection exists before accessing classList
+                if (targetSection && targetSection.classList) {
+                    targetSection.classList.add('active');
+                }
+                
+                // Inicializar input de fecha cuando se accede a registro
+                if (sectionId === 'registro') {
+                    initializeDateInput();
+                }
                 
                 // Inicializar gráficas cuando se accede a reportes
                 if (sectionId === 'reportes') {
@@ -2834,12 +2743,6 @@
                     loadServiceStatus();
                 }
                 
-                // Load historical records when accessing historical section
-                if (sectionId === 'registro-historico') {
-                    loadHistoricalRecords();
-                    // Reload products to ensure they're available
-                    loadHistoricalProducts();
-                }
             });
         });
 
@@ -3103,6 +3006,9 @@
                 return;
             }
             
+            const recordDateInput = document.getElementById('record-date');
+            const customDate = recordDateInput.value;
+            
             const recordData = {
                 client: document.getElementById('client-name').value,
                 service: document.getElementById('service-type').value,
@@ -3115,8 +3021,14 @@
                 tip: currentOrder.tip || 0
             };
             
+            // Si hay una fecha personalizada, incluir en los datos del record
+            let endpoint = '/records';
+            if (customDate) {
+                recordData.historicalDate = customDate;
+            }
+            
             try {
-                const response = await apiRequest('/records', {
+                const response = await apiRequest(endpoint, {
                     method: 'POST',
                     body: JSON.stringify(recordData)
                 });
@@ -4236,7 +4148,7 @@
             updateRecentActivity(records);
             
             // Cargar cortes de caja
-            loadReportCashCuts();
+            // loadReportCashCuts(); // Disabled
         }
         
         // Actualizar tarjetas de métricas
@@ -4626,7 +4538,7 @@
             const refreshBtn = document.getElementById('refresh-cash-cuts');
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', function() {
-                    loadReportCashCuts();
+                    // loadReportCashCuts(); // Disabled
                 });
             }
         }
@@ -4887,371 +4799,9 @@
         }
 
         // Inicializar aplicación
-        // Historical Records Functionality
-        let historicalSelectedProducts = [];
-        
-        function initHistoricalRecords() {
-            // Set max date to today
-            const today = new Date().toISOString().split('T')[0];
-            const dateInput = document.getElementById('historical-date');
-            if (dateInput) {
-                dateInput.max = today;
-            }
-            
-            // Load products
-            loadHistoricalProducts();
-            
-            // Service change handler
-            const serviceSelect = document.getElementById('historical-service');
-            if (serviceSelect) {
-                serviceSelect.addEventListener('change', function() {
-                    const isCoworking = this.value === 'coworking';
-                    const hoursGroup = document.getElementById('historical-hours-group');
-                    if (hoursGroup) {
-                        hoursGroup.style.display = isCoworking ? 'block' : 'none';
-                    }
-                    updateHistoricalTotal();
-                });
-            }
-            
-            // Hours change handler
-            const hoursInput = document.getElementById('historical-hours');
-            if (hoursInput) {
-                hoursInput.addEventListener('input', updateHistoricalTotal);
-            }
-            
-            // Tip change handler
-            const tipInput = document.getElementById('historical-tip');
-            if (tipInput) {
-                tipInput.addEventListener('input', function() {
-                    const tipDisplay = document.getElementById('historical-tip-display');
-                    if (tipDisplay) {
-                        tipDisplay.textContent = parseFloat(this.value || 0).toFixed(2);
-                    }
-                    updateHistoricalTotal();
-                });
-            }
-            
-            // Add product handler
-            const addBtn = document.getElementById('historical-add-product-btn');
-            if (addBtn) {
-                addBtn.addEventListener('click', addHistoricalProduct);
-            }
-            
-            // Form submit handler
-            const form = document.getElementById('historical-record-form');
-            if (form) {
-                form.addEventListener('submit', submitHistoricalRecord);
-            }
-        }
-        
-        function loadHistoricalProducts() {
-            try {
-                // Use the global data.products that's already loaded
-                const select = document.getElementById('historical-product-select');
-                if (!select) return;
-                
-                select.innerHTML = '<option value="">Seleccionar producto</option>';
-                
-                // Use products from the global data object (already loaded)
-                if (data && data.products && data.products.length > 0) {
-                    data.products.forEach(product => {
-                        // For historical records, allow products even with 0 stock since we're not affecting current inventory
-                        if (product.isActive) {
-                            const option = document.createElement('option');
-                            option.value = JSON.stringify({
-                                id: product._id,
-                                name: product.name,
-                                price: product.price,
-                                category: product.category,
-                                stock: product.quantity
-                            });
-                            option.textContent = `${product.name} - $${product.price} (Stock: ${product.quantity})`;
-                            select.appendChild(option);
-                        }
-                    });
-                } else {
-                    // Fallback: try to load products via API if data.products is not available
-                    loadProductsFromAPI();
-                }
-            } catch (error) {
-                console.error('Error loading historical products:', error);
-                // Fallback to API load
-                loadProductsFromAPI();
-            }
-        }
-        
-        async function loadProductsFromAPI() {
-            try {
-                const products = await apiRequest('/products');
-                const select = document.getElementById('historical-product-select');
-                if (!select) return;
-                
-                select.innerHTML = '<option value="">Seleccionar producto</option>';
-                
-                products.forEach(product => {
-                    if (product.isActive) {
-                        const option = document.createElement('option');
-                        option.value = JSON.stringify({
-                            id: product._id,
-                            name: product.name,
-                            price: product.price,
-                            category: product.category,
-                            stock: product.quantity
-                        });
-                        option.textContent = `${product.name} - $${product.price} (Stock: ${product.quantity})`;
-                        select.appendChild(option);
-                    }
-                });
-            } catch (error) {
-                console.error('Error loading products from API:', error);
-                showNotification('Error cargando productos', 'error');
-            }
-        }
-        
-        function addHistoricalProduct() {
-            const select = document.getElementById('historical-product-select');
-            const quantityInput = document.getElementById('historical-quantity-input');
-            
-            if (!select.value || !quantityInput.value) {
-                alert('Selecciona un producto y especifica la cantidad');
-                return;
-            }
-            
-            const productData = JSON.parse(select.value);
-            const quantity = parseInt(quantityInput.value);
-            
-            if (quantity <= 0) {
-                alert('La cantidad debe ser mayor a 0');
-                return;
-            }
-            
-            // For historical records, we don't check stock since we're not affecting current inventory
-            // Just warn if the quantity seems high
-            if (quantity > productData.stock && productData.stock > 0) {
-                if (!confirm(`La cantidad (${quantity}) es mayor al stock actual (${productData.stock}). ¿Continuar?`)) {
-                    return;
-                }
-            }
-            
-            // Check if product already exists
-            const existingIndex = historicalSelectedProducts.findIndex(p => p.id === productData.id);
-            
-            if (existingIndex >= 0) {
-                // Update quantity
-                const newQuantity = historicalSelectedProducts[existingIndex].quantity + quantity;
-                // For historical records, just warn if quantity is high but don't prevent
-                if (newQuantity > productData.stock && productData.stock > 0) {
-                    if (!confirm(`La cantidad total (${newQuantity}) excede el stock actual (${productData.stock}). ¿Continuar?`)) {
-                        return;
-                    }
-                }
-                historicalSelectedProducts[existingIndex].quantity = newQuantity;
-            } else {
-                // Add new product
-                historicalSelectedProducts.push({
-                    id: productData.id,
-                    name: productData.name,
-                    price: productData.price,
-                    category: productData.category,
-                    quantity: quantity
-                });
-            }
-            
-            // Reset form
-            select.value = '';
-            quantityInput.value = '1';
-            
-            renderHistoricalProducts();
-            updateHistoricalTotal();
-        }
-        
-        function renderHistoricalProducts() {
-            const container = document.getElementById('historical-products-list');
-            container.innerHTML = '';
-            
-            historicalSelectedProducts.forEach((product, index) => {
-                const row = document.createElement('div');
-                row.className = 'product-row';
-                
-                const total = product.quantity * product.price;
-                
-                row.innerHTML = `
-                    <span class="product-name">${product.name}</span>
-                    <span class="product-quantity">
-                        <button type="button" onclick="updateHistoricalProductQuantity(${index}, -1)">-</button>
-                        ${product.quantity}
-                        <button type="button" onclick="updateHistoricalProductQuantity(${index}, 1)">+</button>
-                    </span>
-                    <span class="product-price">$${product.price.toFixed(2)}</span>
-                    <span class="product-total">$${total.toFixed(2)}</span>
-                    <span class="product-actions">
-                        <button type="button" onclick="removeHistoricalProduct(${index})" class="btn-remove">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </span>
-                `;
-                
-                container.appendChild(row);
-            });
-        }
-        
-        function updateHistoricalProductQuantity(index, change) {
-            const product = historicalSelectedProducts[index];
-            const newQuantity = product.quantity + change;
-            
-            if (newQuantity <= 0) {
-                removeHistoricalProduct(index);
-                return;
-            }
-            
-            // Note: We're not checking stock here since this is historical
-            product.quantity = newQuantity;
-            renderHistoricalProducts();
-            updateHistoricalTotal();
-        }
-        
-        function removeHistoricalProduct(index) {
-            historicalSelectedProducts.splice(index, 1);
-            renderHistoricalProducts();
-            updateHistoricalTotal();
-        }
-        
-        function updateHistoricalTotal() {
-            const service = document.getElementById('historical-service').value;
-            const hours = parseInt(document.getElementById('historical-hours').value) || 1;
-            const tip = parseFloat(document.getElementById('historical-tip').value) || 0;
-            
-            // Calculate products total
-            const productsTotal = historicalSelectedProducts.reduce((sum, product) => {
-                return sum + (product.quantity * product.price);
-            }, 0);
-            
-            let subtotal = 0;
-            let coworkingCost = 0;
-            
-            if (service === 'cafeteria') {
-                subtotal = productsTotal;
-            } else if (service === 'coworking') {
-                coworkingCost = 58 * hours;
-                // Add only refrigerador products to subtotal
-                const refrigeradorTotal = historicalSelectedProducts
-                    .filter(p => p.category === 'refrigerador')
-                    .reduce((sum, p) => sum + (p.quantity * p.price), 0);
-                subtotal = refrigeradorTotal;
-            }
-            
-            const finalTotal = subtotal + coworkingCost + tip;
-            
-            // Update display
-            document.getElementById('historical-subtotal').textContent = subtotal.toFixed(2);
-            document.getElementById('historical-products-total').textContent = productsTotal.toFixed(2);
-            document.getElementById('historical-coworking-hours').textContent = hours;
-            document.getElementById('historical-coworking-cost').textContent = coworkingCost.toFixed(2);
-            document.getElementById('historical-final-total').textContent = finalTotal.toFixed(2);
-            
-            // Show/hide coworking line
-            const coworkingLine = document.getElementById('historical-coworking-line');
-            coworkingLine.style.display = service === 'coworking' ? 'block' : 'none';
-        }
-        
-        async function submitHistoricalRecord(event) {
-            event.preventDefault();
-            
-            const formData = new FormData(event.target);
-            const data = Object.fromEntries(formData.entries());
-            
-            // Validate date
-            const selectedDate = new Date(data.historicalDate);
-            const today = new Date();
-            today.setHours(23, 59, 59, 999);
-            
-            if (selectedDate > today) {
-                alert('La fecha histórica no puede ser futura');
-                return;
-            }
-            
-            // Validate products
-            if (historicalSelectedProducts.length === 0) {
-                alert('Selecciona al menos un producto');
-                return;
-            }
-            
-            // Prepare request data
-            const requestData = {
-                ...data,
-                products: historicalSelectedProducts.map(p => ({
-                    productId: p.id,
-                    quantity: p.quantity
-                }))
-            };
-            
-            try {
-                const response = await fetch('/api/records/historical', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
-                    body: JSON.stringify(requestData)
-                });
-                
-                const result = await response.json();
-                
-                if (response.ok) {
-                    alert('Registro histórico creado exitosamente');
-                    // Reset form
-                    event.target.reset();
-                    historicalSelectedProducts = [];
-                    renderHistoricalProducts();
-                    updateHistoricalTotal();
-                    // Load recent records
-                    loadHistoricalRecords();
-                } else {
-                    alert('Error: ' + result.error);
-                }
-            } catch (error) {
-                console.error('Error creating historical record:', error);
-                alert('Error al crear el registro');
-            }
-        }
-        
-        async function loadHistoricalRecords() {
-            try {
-                const response = await fetch('/api/records?limit=10', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
-                
-                if (response.ok) {
-                    const records = await response.json();
-                    const tbody = document.getElementById('historical-records-list');
-                    tbody.innerHTML = '';
-                    
-                    records.forEach(record => {
-                        const row = document.createElement('tr');
-                        const recordDate = new Date(record.date);
-                        
-                        row.innerHTML = `
-                            <td>${recordDate.toLocaleDateString('es-MX')}</td>
-                            <td>${record.client}</td>
-                            <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
-                            <td>$${record.total.toFixed(2)}</td>
-                            <td>${record.payment}</td>
-                            <td>${record.createdBy?.name || 'N/A'}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
-            } catch (error) {
-                console.error('Error loading historical records:', error);
-            }
-        }
 
         document.addEventListener('DOMContentLoaded', function() {
             checkAuth();
-            initHistoricalRecords();
         });
 
         // Verificar conexión periódicamente
@@ -5477,16 +5027,10 @@
         
         // Load cash cuts for the current report period
         async function loadReportCashCuts() {
-            const loadingEl = document.getElementById('report-cash-cuts-loading');
-            const statsEl = document.getElementById('report-cash-cuts-stats');
-            const noCutsEl = document.getElementById('report-no-cash-cuts');
-            const listEl = document.getElementById('report-cash-cuts-list');
-            
-            // Check if elements exist before manipulating them
-            if (!loadingEl || !statsEl || !noCutsEl || !listEl) {
-                console.warn('Cash cuts report elements not found in DOM');
-                return;
-            }
+            // Cash cuts functionality has been removed - skip silently
+            console.log('Cash cuts functionality disabled');
+            return;
+        }
             
             // Show loading
             loadingEl.style.display = 'block';
@@ -5597,8 +5141,8 @@
                                         <small style="color: var(--text-secondary);">${dateStr} ${timeStr}</small>
                                     </div>
                                     <div style="text-align: right;">
-                                        <div style="font-weight: bold; color: var(--success);">$${cut.totalIncome.toFixed(2)}</div>
-                                        <small style="color: var(--text-secondary);">${cut.totalRecords} ventas</small>
+                                        <div style="font-weight: bold; color: var(--success);">$${Number(cut.totalIncome || 0).toFixed(2)}</div>
+                                        <small style="color: var(--text-secondary);">${cut.totalRecords ?? 0} ventas</small>
                                     </div>
                                 </div>
                                 ${cut.notes ? `
@@ -5612,6 +5156,80 @@
                 </div>
             `;
         }
+        // ===========================================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // ===========================================
+        
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Iniciando aplicación POS...');
+            
+            // Initialize authentication check first
+            try {
+                const isAuthenticated = await checkAuth();
+                console.log('🔐 Estado de autenticación:', isAuthenticated);
+            } catch (error) {
+                console.error('❌ Error durante verificación de auth:', error);
+                showLoginScreen();
+            }
+            
+            // Initialize charts and other components
+            try {
+                initializeCharts();
+                console.log('📊 Charts inicializados');
+            } catch (error) {
+                console.error('❌ Error inicializando charts:', error);
+            }
+        
+        // Mobile Navigation Fix - Agregar función showSection y event handlers móviles
+        window.showSection = function(sectionName) {
+            // Mapear nombres cortos a IDs de sección actuales
+            const sectionMap = {
+                'pos': 'registro',
+                'inventory': 'inventario-refrigerador',
+                'cafeteria': 'inventario-cafeteria',
+                'alimentos': 'inventario-alimentos',
+                'reports': 'reportes',
+                'cashcut': 'corte-caja',
+            };
+            
+            const actualSection = sectionMap[sectionName] || sectionName;
+            
+            // Buscar y hacer click en el nav-link correspondiente
+            const targetLink = document.querySelector(`.nav-link[data-section="${actualSection}"]`);
+            if (targetLink) {
+                targetLink.click();
+            }
+        };
+            // Mobile navigation buttons con data-section
+            const mobileNavButtons = document.querySelectorAll('.mobile-nav-btn');
+            if (mobileNavButtons.length > 0) {
+                mobileNavButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const section = this.getAttribute('data-section');
+                        
+                        // Remove active class from all mobile buttons
+                        document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Find and click the corresponding nav-link
+                        const targetLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+                        if (targetLink) {
+                            targetLink.click();
+                        } else {
+                            // If no nav-link, handle section change directly
+                            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
+                            const targetSection = document.getElementById(section);
+                            if (targetSection) {
+                                targetSection.style.display = 'block';
+                            }
+                        }
+                    });
+                });
+            }
+        });
     </script>
 </body>
 </html>

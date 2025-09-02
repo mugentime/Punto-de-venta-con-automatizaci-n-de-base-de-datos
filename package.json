@@ -3,12 +3,36 @@
   "version": "1.0.0",
   "description": "Point of Sale system for Conejo Negro Cafe with cloud backup",
   "main": "server.js",
+  "engines": {
+    "node": ">=18.0.0",
+    "npm": ">=8.0.0"
+  },
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
     "setup": "node setup.js",
-    "build": "echo 'No build step required'",
-    "postinstall": "node initDatabase.js"
+    "build": "echo 'Build completed successfully'",
+    "postinstall": "node initDatabase.js",
+    "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
+    "test:unit": "jest --config=tests/config/jest.config.js tests/unit",
+    "test:integration": "jest --config=tests/config/jest.config.js tests/integration --runInBand",
+    "test:e2e": "playwright test --config=tests/config/playwright.config.js",
+    "test:e2e:chromium": "playwright test --config=tests/config/playwright.config.js --project=chromium",
+    "test:e2e:firefox": "playwright test --config=tests/config/playwright.config.js --project=firefox",
+    "test:e2e:webkit": "playwright test --config=tests/config/playwright.config.js --project=webkit",
+    "test:e2e:mobile": "playwright test --config=tests/config/playwright.config.js --project='Mobile Chrome' --project='Mobile Safari'",
+    "test:coverage": "jest --config=tests/config/jest.config.js --coverage",
+    "test:watch": "jest --config=tests/config/jest.config.js --watch",
+    "test:security": "npm audit && node tests/security/security-tests.js",
+    "test:performance": "node tests/performance/load-tests.js",
+    "test:performance:memory": "clinic doctor --on-port='curl http://localhost:$PORT/health' -- node server.js",
+    "test:lint": "eslint . --ext .js",
+    "test:lint:security": "eslint . --ext .js --config .eslintrc.security.json",
+    "mcp": "npx @playwright/mcp --port 3001",
+    "mcp:headless": "npx @playwright/mcp --port 3001 --headless",
+    "mcp:dev": "npx @playwright/mcp --port 3001 --browser chromium --device \"iPhone 15\"",
+    "test:visual": "npm run test:e2e -- --grep \"@visual\"",
+    "test:visual:update": "UPDATE_SCREENSHOTS=1 npm run test:visual"
   },
   "keywords": [
     "pos",
@@ -32,6 +56,6 @@
   },
   "devDependencies": {
     "nodemon": "^3.0.1",
-    "puppeteer-core": "^24.17.1"
+    "playwright": "^1.55.0"
   }
 }
