@@ -6,7 +6,8 @@ const router = express.Router();
 
 // Simple permission middleware
 const canRegisterClients = (req, res, next) => {
-  if (req.user.permissions?.canRegisterClients) {
+  // Allow admin users or users with specific permissions
+  if (req.user.role === 'admin' || req.user.permissions?.canRegisterClients) {
     next();
   } else {
     res.status(403).json({ error: 'Insufficient permissions for client registration' });
@@ -14,7 +15,8 @@ const canRegisterClients = (req, res, next) => {
 };
 
 const canDeleteRecords = (req, res, next) => {
-  if (req.user.permissions?.canDeleteRecords) {
+  // Allow admin users or users with specific permissions
+  if (req.user.role === 'admin' || req.user.permissions?.canDeleteRecords) {
     next();
   } else {
     res.status(403).json({ error: 'Insufficient permissions for record deletion' });
@@ -566,6 +568,131 @@ router.patch('/:id/products', auth, async (req, res) => {
   } catch (error) {
     console.error('Update products error:', error);
     res.status(500).json({ error: 'Failed to update products' });
+  }
+});
+
+// Historical records endpoint
+router.post('/historical', auth, canRegisterClients, async (req, res) => {
+  try {
+    const { 
+      client, 
+      service, 
+      products,
+      drinkId, 
+      hours = 1, 
+      payment, 
+      notes,
+      tip = 0,
+      historicalDate
+    } = req.body;
+
+    // Validation
+    if (!historicalDate) {
+      return res.status(400).json({
+        error: 'Historical date is required for this endpoint'
+      });
+    }
+
+    // Validate historical date is not in the future
+    const targetDate = new Date(historicalDate);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    if (targetDate > today) {
+      return res.status(400).json({
+        error: 'Historical date cannot be in the future'
+      });
+    }
+
+    // Common validation
+    if (!client || !service || !payment) {
+      return res.status(400).json({
+        error: 'Client, service, and payment method are required'
+      });
+    }
+
+    if (!['cafeteria', 'coworking'].includes(service.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Service must be either "cafeteria" or "coworking"'
+      });
+    }
+
+    if (!['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Payment method must be "efectivo", "tarjeta", or "transferencia"'
+      });
+    }
+
+    let productsArray = [];
+    
+    if (products && Array.isArray(products) && products.length > 0) {
+      // Multi-product system
+      for (const orderProduct of products) {
+        const product = await databaseManager.getProductById(orderProduct.productId);
+
+        if (!product || !product.isActive) {
+          return res.status(404).json({
+            error: `Product ${orderProduct.productId} not found or inactive`
+          });
+        }
+
+        productsArray.push({
+          productId: product.id,
+          name: product.name,
+          category: product.category,
+          quantity: orderProduct.quantity,
+          price: product.price,
+          cost: product.cost
+        });
+      }
+    } else if (drinkId) {
+      // Legacy single product
+      const product = await databaseManager.getProductById(drinkId);
+
+      if (!product || !product.isActive) {
+        return res.status(404).json({
+          error: 'Product not found or inactive'
+        });
+      }
+
+      productsArray = [{
+        productId: product.id,
+        name: product.name,
+        quantity: 1,
+        price: product.price,
+        cost: product.cost,
+        category: product.category
+      }];
+    } else {
+      return res.status(400).json({
+        error: 'At least one product is required'
+      });
+    }
+
+    // Create historical record with custom date
+    const record = await databaseManager.createRecord({
+      client: client.trim(),
+      service: service.toLowerCase(),
+      products: productsArray,
+      hours: parseInt(hours),
+      payment: payment.toLowerCase(),
+      notes: notes?.trim(),
+      drinksCost: 0,
+      tip: parseFloat(tip),
+      createdBy: req.user.userId,
+      customDate: targetDate  // Pass custom date for historical records
+    });
+
+    res.status(201).json({
+      message: 'Historical record created successfully',
+      record
+    });
+
+  } catch (error) {
+    console.error('Historical record creation error:', error);
+    res.status(500).json({
+      error: 'Historical record creation failed'
+    });
   }
 });
 
