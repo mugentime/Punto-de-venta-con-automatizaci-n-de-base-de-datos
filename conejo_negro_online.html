@@ -2002,9 +2002,9 @@
             // Only load data if we have a valid token
             if (authToken) {
                 loadInitialData();
-                // Reload historical products now that we have auth
-                loadHistoricalProducts();
             }
+            // Initialize date input since registro is the default active section
+            setTimeout(initializeDateInput, 100);
         }
 
         // Variables globales para la orden
@@ -2710,6 +2710,11 @@
                 
                 const sectionId = this.getAttribute('data-section');
                 document.getElementById(sectionId).classList.add('active');
+                
+                // Inicializar input de fecha cuando se accede a registro
+                if (sectionId === 'registro') {
+                    initializeDateInput();
+                }
                 
                 // Inicializar gráficas cuando se accede a reportes
                 if (sectionId === 'reportes') {
