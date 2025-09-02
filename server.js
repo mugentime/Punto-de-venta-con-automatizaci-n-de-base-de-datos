@@ -104,7 +104,7 @@ const requireDatabase = (req, res, next) => {
 // Routes (with database requirement)
 app.use('/api/auth', requireDatabase, authRoutes);
 app.use('/api/products', requireDatabase, productRoutes);
-app.use('/api/records', requireDatabase, recordRoutes);
+app.use('/api/records', requireDatabase, recordRoutes); // Includes /historical endpoint
 app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
 app.use('/api/memberships', requireDatabase, membershipRoutes);
 app.use('/api/sessions', requireDatabase, sessionRoutes);
