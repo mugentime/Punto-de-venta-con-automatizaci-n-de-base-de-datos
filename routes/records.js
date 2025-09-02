@@ -594,8 +594,14 @@ router.get('/stats/daily/:days', auth, async (req, res) => {
   }
 });
 
-// New endpoint for creating historical records
-router.post('/historical', auth, canRegisterClients, async (req, res) => {
+// Test endpoint to verify route is working
+router.get('/test-historical', (req, res) => {
+  res.json({ message: 'Historical endpoint route is working', timestamp: new Date().toISOString() });
+});
+
+// New endpoint for creating historical records (SIMPLIFIED FOR DEBUGGING)
+router.post('/historical', async (req, res) => {
+  console.log('🔥 HISTORICAL ENDPOINT HIT!', req.body);
   try {
     const { 
       client, 
@@ -768,17 +774,13 @@ router.post('/historical', auth, canRegisterClients, async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Historical record creation error:', error);
-
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        error: messages.join(', ')
-      });
-    }
-
+    console.error('🔥 HISTORICAL RECORD ERROR:', error);
+    
+    // Return more detailed error info for debugging
     res.status(500).json({
-      error: 'Historical record creation failed'
+      error: 'Historical record creation failed',
+      details: error.message,
+      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
     });
   }
 });
