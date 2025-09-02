@@ -17,7 +17,11 @@
         "NODE_ENV": "production",
         "JWT_SECRET": "conejo-negro-pos-secure-key-2025",
         "RAILWAY_VOLUME_MOUNT_PATH": "/app/data",
-        "DATA_RECOVERY_ENABLED": "true"
+        "DATA_RECOVERY_ENABLED": "true",
+        "PLAYWRIGHT_BASE_URL": "https://pos-conejonegro-production.up.railway.app",
+        "MCP_ENDPOINT": "http://localhost:3001/mcp",
+        "MCP_HEADLESS": "true",
+        "MCP_PORT": "3001"
       }
     }
   }

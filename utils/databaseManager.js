@@ -367,6 +367,130 @@ class DatabaseManager {
         return await fileDatabase.getMembershipStats();
     }
 
+    // COWORKING SESSIONS
+    async getCoworkingSessions() {
+        if (this.usePostgreSQL) {
+            return await database.getCoworkingSessions();
+        }
+        return await fileDatabase.getCoworkingSessions();
+    }
+
+    async getActiveCoworkingSessions() {
+        if (this.usePostgreSQL) {
+            return await database.getActiveCoworkingSessions();
+        }
+        return await fileDatabase.getActiveCoworkingSessions();
+    }
+
+    async getCoworkingSessionById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getCoworkingSessionById(id);
+        }
+        return await fileDatabase.getCoworkingSessionById(id);
+    }
+
+    async createCoworkingSession(sessionData) {
+        if (this.usePostgreSQL) {
+            return await database.createCoworkingSession(sessionData);
+        }
+        return await fileDatabase.createCoworkingSession(sessionData);
+    }
+
+    async updateCoworkingSession(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateCoworkingSession(id, updateData);
+        }
+        return await fileDatabase.updateCoworkingSession(id, updateData);
+    }
+
+    async deleteCoworkingSession(id) {
+        if (this.usePostgreSQL) {
+            return await database.deleteCoworkingSession(id);
+        }
+        return await fileDatabase.deleteCoworkingSession(id);
+    }
+
+    async closeCoworkingSession(id, paymentMethod) {
+        const session = await this.getCoworkingSessionById(id);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        // Calculate final totals
+        const CoworkingSession = require('../models/CoworkingSession');
+        const sessionObj = new CoworkingSession(session);
+        sessionObj.closeSession(paymentMethod);
+
+        // Update the session in database
+        const updatedSession = await this.updateCoworkingSession(id, sessionObj.toJSON());
+
+        // Create a record for the closed session
+        const recordData = {
+            client: sessionObj.client,
+            service: 'coworking',
+            products: sessionObj.products,
+            hours: Math.ceil(sessionObj.getElapsedHours()),
+            payment: paymentMethod,
+            notes: sessionObj.notes,
+            subtotal: sessionObj.subtotal,
+            serviceCharge: sessionObj.timeCharge,
+            tip: 0,
+            total: sessionObj.total,
+            cost: sessionObj.cost,
+            drinksCost: sessionObj.products.reduce((sum, p) => 
+                p.category === 'cafeteria' ? sum + (p.cost * p.quantity) : sum, 0
+            ),
+            profit: sessionObj.profit,
+            date: new Date(),
+            createdBy: session.createdBy
+        };
+
+        const record = await this.createRecord(recordData);
+
+        return {
+            session: updatedSession,
+            record: record
+        };
+    }
+
+    async addProductToCoworkingSession(sessionId, productData) {
+        const session = await this.getCoworkingSessionById(sessionId);
+        if (!session) {
+            throw new Error('Session not found');
+        }
+
+        // Get product details
+        const product = await this.getProductById(productData.productId);
+        if (!product || !product.isActive) {
+            throw new Error('Product not found or inactive');
+        }
+
+        // Check stock
+        if (product.quantity < productData.quantity) {
+            throw new Error(`Insufficient stock for ${product.name}. Available: ${product.quantity}, Requested: ${productData.quantity}`);
+        }
+
+        // Add product to session
+        const CoworkingSession = require('../models/CoworkingSession');
+        const sessionObj = new CoworkingSession(session);
+        sessionObj.addProduct({
+            productId: product._id,
+            name: product.name,
+            quantity: productData.quantity,
+            price: product.price,
+            cost: product.cost,
+            category: product.category
+        });
+
+        // Update session
+        const updatedSession = await this.updateCoworkingSession(sessionId, sessionObj.toJSON());
+
+        // Update product stock
+        await this.updateProductStock(product._id, productData.quantity, 'subtract');
+
+        return updatedSession;
+    }
+
     async close() {
         if (this.usePostgreSQL) {
             await database.close();

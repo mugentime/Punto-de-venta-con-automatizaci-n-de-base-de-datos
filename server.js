@@ -12,6 +12,7 @@ const recordRoutes = require('./routes/records-file');
 const backupRoutes = require('./routes/backup-file');
 const cashCutRoutes = require('./routes/cashcuts-file');
 const membershipRoutes = require('./routes/memberships-file');
+const sessionRoutes = require('./routes/sessions-file');
 
 // Import auth middleware
 const { auth } = require('./middleware/auth-file');
@@ -106,6 +107,7 @@ app.use('/api/products', requireDatabase, productRoutes);
 app.use('/api/records', requireDatabase, recordRoutes);
 app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
 app.use('/api/memberships', requireDatabase, membershipRoutes);
+app.use('/api/sessions', requireDatabase, sessionRoutes);
 app.use('/api/backup', backupRoutes); // Backup can work without DB for file operations
 
 // Export/download endpoint
@@ -291,6 +293,15 @@ app.get('/online', (req, res) => {
   } catch (error) {
     console.error('Error serving online.html:', error);
     res.status(500).send('Error loading online version');
+  }
+});
+
+app.get('/coworking', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'coworking.html'));
+  } catch (error) {
+    console.error('Error serving coworking.html:', error);
+    res.status(500).send('Error loading coworking page');
   }
 });
 

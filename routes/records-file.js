@@ -570,4 +570,110 @@ router.patch('/:id/products', auth, async (req, res) => {
 });
 
 
+// Historical records endpoint (for creating records with custom dates)
+router.post('/historical', auth, canRegisterClients, async (req, res) => {
+  try {
+    const { 
+      client, 
+      service, 
+      products,
+      hours = 1, 
+      payment, 
+      notes,
+      drinksCost = 0,
+      tip = 0,
+      historicalDate
+    } = req.body;
+
+    // Validación
+    if (!client || !service || !payment) {
+      return res.status(400).json({
+        error: 'Client, service, and payment method are required'
+      });
+    }
+
+    if (!products || !Array.isArray(products) || products.length === 0) {
+      return res.status(400).json({
+        error: 'At least one product is required'
+      });
+    }
+
+    if (!['cafeteria', 'coworking'].includes(service.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Service must be either "cafeteria" or "coworking"'
+      });
+    }
+
+    if (!['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
+      return res.status(400).json({
+        error: 'Payment method must be "efectivo", "tarjeta", or "transferencia"'
+      });
+    }
+
+    // Preparar productos
+    let productsArray = [];
+    for (const item of products) {
+      if (!item.productId || !item.quantity || item.quantity <= 0) {
+        return res.status(400).json({
+          error: 'Each product must have a valid productId and quantity > 0'
+        });
+      }
+
+      const product = await databaseManager.getProductById(item.productId);
+      if (!product || !product.isActive) {
+        return res.status(404).json({
+          error: `Product ${item.productId} not found or inactive`
+        });
+      }
+
+      productsArray.push({
+        productId: product._id,
+        name: product.name,
+        quantity: parseInt(item.quantity),
+        price: product.price,
+        cost: product.cost,
+        category: product.category
+      });
+    }
+
+    // Crear record con fecha personalizada
+    const recordData = {
+      client: client.trim(),
+      service: service.toLowerCase(),
+      products: productsArray,
+      hours: parseInt(hours),
+      payment: payment.toLowerCase(),
+      notes: notes?.trim(),
+      drinksCost: parseFloat(drinksCost),
+      tip: parseFloat(tip),
+      createdBy: req.user.userId
+    };
+
+    // Si hay fecha histórica, usarla
+    if (historicalDate) {
+      const customDate = new Date(historicalDate);
+      if (isNaN(customDate.getTime())) {
+        return res.status(400).json({
+          error: 'Invalid historical date format'
+        });
+      }
+      recordData.date = customDate.toISOString();
+      recordData.createdAt = customDate.toISOString();
+    }
+
+    const record = await databaseManager.createRecord(recordData);
+
+    res.status(201).json({
+      message: 'Historical record created successfully',
+      record
+    });
+
+  } catch (error) {
+    console.error('Historical record creation error:', error);
+    res.status(500).json({
+      error: 'Historical record creation failed'
+    });
+  }
+});
+
 module.exports = router;

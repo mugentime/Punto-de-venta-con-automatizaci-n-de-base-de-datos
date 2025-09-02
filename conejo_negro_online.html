@@ -2709,7 +2709,12 @@
                 });
                 
                 const sectionId = this.getAttribute('data-section');
-                document.getElementById(sectionId).classList.add('active');
+                const targetSection = document.getElementById(sectionId);
+                if (!targetSection) {
+                    console.warn('Sección no encontrada para data-section:', sectionId);
+                    return; // Evitar error de classList cuando no existe el elemento
+                }
+                targetSection.classList.add('active');
                 
                 // Inicializar input de fecha cuando se accede a registro
                 if (sectionId === 'registro') {
@@ -5139,8 +5144,8 @@
                                         <small style="color: var(--text-secondary);">${dateStr} ${timeStr}</small>
                                     </div>
                                     <div style="text-align: right;">
-                                        <div style="font-weight: bold; color: var(--success);">$${cut.totalIncome.toFixed(2)}</div>
-                                        <small style="color: var(--text-secondary);">${cut.totalRecords} ventas</small>
+                                        <div style="font-weight: bold; color: var(--success);">$${Number(cut.totalIncome || 0).toFixed(2)}</div>
+                                        <small style="color: var(--text-secondary);">${cut.totalRecords ?? 0} ventas</small>
                                     </div>
                                 </div>
                                 ${cut.notes ? `
@@ -5154,6 +5159,31 @@
                 </div>
             `;
         }
+        // ===========================================
+        // INICIALIZACIÓN DE LA APLICACIÓN
+        // ===========================================
+        
+        // Initialize the application when page loads
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Iniciando aplicación POS...');
+            
+            // Initialize authentication check first
+            try {
+                const isAuthenticated = await checkAuth();
+                console.log('🔐 Estado de autenticación:', isAuthenticated);
+            } catch (error) {
+                console.error('❌ Error durante verificación de auth:', error);
+                showLoginScreen();
+            }
+            
+            // Initialize charts and other components
+            try {
+                initializeCharts();
+                console.log('📊 Charts inicializados');
+            } catch (error) {
+                console.error('❌ Error inicializando charts:', error);
+            }
+        
         // Mobile Navigation Fix - Agregar función showSection y event handlers móviles
         window.showSection = function(sectionName) {
             // Mapear nombres cortos a IDs de sección actuales
@@ -5174,9 +5204,6 @@
                 targetLink.click();
             }
         };
-        
-        // Agregar event listeners para botones móviles después de que el DOM esté listo
-        document.addEventListener('DOMContentLoaded', function() {
             // Mobile navigation buttons con data-section
             const mobileNavButtons = document.querySelectorAll('.mobile-nav-btn');
             if (mobileNavButtons.length > 0) {
