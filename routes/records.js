@@ -5,6 +5,15 @@ const { auth, canRegisterClients, canDeleteRecords } = require('../middleware/au
 
 const router = express.Router();
 
+// EMERGENCY ROUTE - DEPLOY TEST
+router.get('/deploy-test', (req, res) => {
+  res.json({ 
+    message: 'DEPLOY WORKING',
+    timestamp: new Date().toISOString(),
+    version: '2024-09-02-EMERGENCY' 
+  });
+});
+
 // Get records with filtering
 router.get('/', auth, async (req, res) => {
   try {
