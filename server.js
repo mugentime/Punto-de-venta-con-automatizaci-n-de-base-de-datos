@@ -8,7 +8,7 @@ require('dotenv').config();
 // Import routes - using PostgreSQL system for production
 const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products');
-const recordRoutes = require('./routes/records'); // Contains /historical endpoint
+const recordRoutes = require('./routes/records-new'); // FORCED UPDATE - Contains /historical endpoint
 const backupRoutes = require('./routes/backup');
 // File-based routes for features not yet migrated to PostgreSQL
 const cashCutRoutes = require('./routes/cashcuts-file');
