@@ -1,12 +1,104 @@
+/**
+ * PostgreSQL-Compatible Authentication Routes
+ * CRITICAL FIX: Replace routes/auth.js with this file to fix authentication
+ */
+
 const express = require('express');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const User = require('../models/User');
-const { auth, adminAuth } = require('../middleware/auth');
+const databaseManager = require('../utils/databaseManager');
+const { auth } = require('../middleware/auth');
 
 const router = express.Router();
 
-// Register new user (admin only for creating other users)
+// Login user (FIXED for PostgreSQL)
+router.post('/login', async (req, res) => {
+  try {
+    console.log('🔐 LOGIN ATTEMPT:', req.body.email);
+    
+    const { email, password } = req.body;
+
+    // Validation
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'Email and password are required'
+      });
+    }
+
+    // Find user using databaseManager (PostgreSQL compatible)
+    const user = await databaseManager.getUserByEmail(email.toLowerCase());
+    
+    console.log('🔍 User lookup result:', user ? 'FOUND' : 'NOT FOUND');
+
+    if (!user || !user.isActive) {
+      return res.status(401).json({
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Check password using bcrypt directly
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+    
+    console.log('🔑 Password validation:', isPasswordValid ? 'VALID' : 'INVALID');
+    
+    if (!isPasswordValid) {
+      return res.status(401).json({
+        error: 'Invalid email or password'
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        userId: user.id,
+        email: user.email,
+        role: user.role 
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    console.log('🎫 Token generated:', token ? 'SUCCESS' : 'FAILED');
+
+    // Update last login
+    await databaseManager.updateUser(user.id, {
+      lastLogin: new Date()
+    });
+
+    // CRITICAL: Return both token and authToken for frontend compatibility
+    const response = {
+      message: 'Login successful',
+      token,
+      authToken: token,  // Frontend expects this field specifically
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions || {
+          canManageInventory: true,
+          canRegisterClients: true,
+          canViewReports: true,
+          canManageUsers: user.role === 'admin',
+          canExportData: user.role === 'admin' || user.role === 'manager',
+          canDeleteRecords: user.role === 'admin'
+        }
+      }
+    };
+    
+    console.log('✅ LOGIN SUCCESS - Token preview:', token.substring(0, 20) + '...');
+    res.json(response);
+
+  } catch (error) {
+    console.error('❌ LOGIN ERROR:', error);
+    res.status(500).json({
+      error: 'Login failed',
+      details: process.env.NODE_ENV !== 'production' ? error.message : undefined
+    });
+  }
+});
+
+// Register new user (FIXED for PostgreSQL)
 router.post('/register', async (req, res) => {
   try {
     const { name, email, password, role } = req.body;
@@ -25,7 +117,7 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if user already exists
-    const existingUser = await User.findOne({ email: email.toLowerCase() });
+    const existingUser = await databaseManager.getUserByEmail(email.toLowerCase());
     if (existingUser) {
       return res.status(409).json({
         error: 'User with this email already exists'
@@ -33,23 +125,37 @@ router.post('/register', async (req, res) => {
     }
 
     // Check if this is the first user (make them admin)
-    const userCount = await User.countDocuments();
-    const userRole = userCount === 0 ? 'admin' : (role || 'employee');
+    const allUsers = await databaseManager.getUsers();
+    const userRole = allUsers.length === 0 ? 'admin' : (role || 'employee');
 
-    // Create user
-    const user = new User({
+    // Hash password
+    const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Create user data
+    const userData = {
       name: name.trim(),
       email: email.toLowerCase().trim(),
-      password,
-      role: userRole
-    });
+      password: hashedPassword,
+      role: userRole,
+      isActive: true,
+      permissions: {
+        canManageInventory: true,
+        canRegisterClients: true,
+        canViewReports: true,
+        canManageUsers: userRole === 'admin',
+        canExportData: userRole === 'admin' || userRole === 'manager',
+        canDeleteRecords: userRole === 'admin'
+      }
+    };
 
-    await user.save();
+    // Create user using databaseManager
+    const user = await databaseManager.createUser(userData);
 
     // Generate JWT token
     const token = jwt.sign(
       { 
-        userId: user._id,
+        userId: user.id,
         email: user.email,
         role: user.role 
       },
@@ -57,29 +163,25 @@ router.post('/register', async (req, res) => {
       { expiresIn: '7d' }
     );
 
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save();
-
     res.status(201).json({
       message: 'User registered successfully',
       token,
-      user: user.toSafeObject()
+      authToken: token,  // Frontend compatibility
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions
+      }
     });
 
   } catch (error) {
     console.error('Registration error:', error);
     
-    if (error.code === 11000) {
+    if (error.message && error.message.includes('duplicate')) {
       return res.status(409).json({
         error: 'Email already in use'
-      });
-    }
-
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        error: messages.join(', ')
       });
     }
 
@@ -89,71 +191,10 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// Login user
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-
-    // Validation
-    if (!email || !password) {
-      return res.status(400).json({
-        error: 'Email and password are required'
-      });
-    }
-
-    // Find user and include password
-    const user = await User.findOne({ 
-      email: email.toLowerCase(),
-      isActive: true 
-    }).select('+password');
-
-    if (!user) {
-      return res.status(401).json({
-        error: 'Invalid email or password'
-      });
-    }
-
-    // Check password
-    const isPasswordValid = await user.comparePassword(password);
-    if (!isPasswordValid) {
-      return res.status(401).json({
-        error: 'Invalid email or password'
-      });
-    }
-
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user._id,
-        email: user.email,
-        role: user.role 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
-
-    // Update last login
-    user.lastLogin = new Date();
-    await user.save();
-
-    res.json({
-      message: 'Login successful',
-      token,
-      user: user.toSafeObject()
-    });
-
-  } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
-      error: 'Login failed'
-    });
-  }
-});
-
-// Verify token
+// Verify token (FIXED for PostgreSQL)
 router.get('/verify', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await databaseManager.getUserById(req.user.userId);
     
     if (!user || !user.isActive) {
       return res.status(401).json({
@@ -163,7 +204,13 @@ router.get('/verify', auth, async (req, res) => {
 
     res.json({
       valid: true,
-      user: user.toSafeObject()
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions
+      }
     });
 
   } catch (error) {
@@ -177,7 +224,7 @@ router.get('/verify', auth, async (req, res) => {
 // Get current user profile
 router.get('/profile', auth, async (req, res) => {
   try {
-    const user = await User.findById(req.user.userId);
+    const user = await databaseManager.getUserById(req.user.userId);
     
     if (!user) {
       return res.status(404).json({
@@ -186,7 +233,13 @@ router.get('/profile', auth, async (req, res) => {
     }
 
     res.json({
-      user: user.toSafeObject()
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions
+      }
     });
 
   } catch (error) {
@@ -208,39 +261,29 @@ router.put('/profile', auth, async (req, res) => {
 
     // Check if email is already taken by another user
     if (email) {
-      const existingUser = await User.findOne({ 
-        email: email.toLowerCase(),
-        _id: { $ne: req.user.userId }
-      });
-      
-      if (existingUser) {
+      const existingUser = await databaseManager.getUserByEmail(email.toLowerCase());
+      if (existingUser && existingUser.id !== req.user.userId) {
         return res.status(409).json({
           error: 'Email already in use'
         });
       }
     }
 
-    const user = await User.findByIdAndUpdate(
-      req.user.userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
+    const user = await databaseManager.updateUser(req.user.userId, updateData);
 
     res.json({
       message: 'Profile updated successfully',
-      user: user.toSafeObject()
+      user: {
+        id: user.id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        permissions: user.permissions
+      }
     });
 
   } catch (error) {
     console.error('Profile update error:', error);
-    
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        error: messages.join(', ')
-      });
-    }
-
     res.status(500).json({
       error: 'Profile update failed'
     });
@@ -266,7 +309,7 @@ router.put('/change-password', auth, async (req, res) => {
     }
 
     // Get user with password
-    const user = await User.findById(req.user.userId).select('+password');
+    const user = await databaseManager.getUserById(req.user.userId);
     
     if (!user) {
       return res.status(404).json({
@@ -275,16 +318,21 @@ router.put('/change-password', auth, async (req, res) => {
     }
 
     // Verify current password
-    const isCurrentPasswordValid = await user.comparePassword(currentPassword);
+    const isCurrentPasswordValid = await bcrypt.compare(currentPassword, user.password);
     if (!isCurrentPasswordValid) {
       return res.status(401).json({
         error: 'Current password is incorrect'
       });
     }
 
+    // Hash new password
+    const saltRounds = parseInt(process.env.BCRYPT_ROUNDS) || 12;
+    const hashedPassword = await bcrypt.hash(newPassword, saltRounds);
+
     // Update password
-    user.password = newPassword;
-    await user.save();
+    await databaseManager.updateUser(req.user.userId, {
+      password: hashedPassword
+    });
 
     res.json({
       message: 'Password changed successfully'
@@ -294,116 +342,6 @@ router.put('/change-password', auth, async (req, res) => {
     console.error('Password change error:', error);
     res.status(500).json({
       error: 'Password change failed'
-    });
-  }
-});
-
-// Admin: List all users
-router.get('/users', auth, adminAuth, async (req, res) => {
-  try {
-    const users = await User.find({})
-      .select('-password')
-      .populate('createdBy', 'name email')
-      .sort({ createdAt: -1 });
-
-    res.json({
-      users,
-      total: users.length
-    });
-
-  } catch (error) {
-    console.error('Users list error:', error);
-    res.status(500).json({
-      error: 'Failed to fetch users'
-    });
-  }
-});
-
-// Admin: Update user
-router.put('/users/:userId', auth, adminAuth, async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { name, email, role, isActive, permissions } = req.body;
-
-    // Prevent admin from deactivating themselves
-    if (userId === req.user.userId && isActive === false) {
-      return res.status(400).json({
-        error: 'Cannot deactivate your own account'
-      });
-    }
-
-    const updateData = {};
-    if (name) updateData.name = name.trim();
-    if (email) updateData.email = email.toLowerCase().trim();
-    if (role) updateData.role = role;
-    if (typeof isActive === 'boolean') updateData.isActive = isActive;
-    if (permissions) updateData.permissions = permissions;
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      updateData,
-      { new: true, runValidators: true }
-    );
-
-    if (!user) {
-      return res.status(404).json({
-        error: 'User not found'
-      });
-    }
-
-    res.json({
-      message: 'User updated successfully',
-      user: user.toSafeObject()
-    });
-
-  } catch (error) {
-    console.error('User update error:', error);
-    
-    if (error.name === 'ValidationError') {
-      const messages = Object.values(error.errors).map(err => err.message);
-      return res.status(400).json({
-        error: messages.join(', ')
-      });
-    }
-
-    res.status(500).json({
-      error: 'User update failed'
-    });
-  }
-});
-
-// Admin: Delete user (soft delete by deactivating)
-router.delete('/users/:userId', auth, adminAuth, async (req, res) => {
-  try {
-    const { userId } = req.params;
-
-    // Prevent admin from deleting themselves
-    if (userId === req.user.userId) {
-      return res.status(400).json({
-        error: 'Cannot delete your own account'
-      });
-    }
-
-    const user = await User.findByIdAndUpdate(
-      userId,
-      { isActive: false },
-      { new: true }
-    );
-
-    if (!user) {
-      return res.status(404).json({
-        error: 'User not found'
-      });
-    }
-
-    res.json({
-      message: 'User deactivated successfully'
-    });
-
-  } catch (error) {
-    console.error('User deletion error:', error);
-    res.status(500).json({
-      error: 'User deletion failed'
     });
   }
 });
