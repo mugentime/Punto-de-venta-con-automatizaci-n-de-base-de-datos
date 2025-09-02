@@ -5,17 +5,18 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-// Import routes - using file-based system
-const authRoutes = require('./routes/auth-file');
-const productRoutes = require('./routes/products-file');
-const recordRoutes = require('./routes/records-file');
-const backupRoutes = require('./routes/backup-file');
+// Import routes - using PostgreSQL system for production
+const authRoutes = require('./routes/auth');
+const productRoutes = require('./routes/products');
+const recordRoutes = require('./routes/records'); // Contains /historical endpoint
+const backupRoutes = require('./routes/backup');
+// File-based routes for features not yet migrated to PostgreSQL
 const cashCutRoutes = require('./routes/cashcuts-file');
 const membershipRoutes = require('./routes/memberships-file');
 const sessionRoutes = require('./routes/sessions-file');
 
 // Import auth middleware
-const { auth } = require('./middleware/auth-file');
+const { auth } = require('./middleware/auth');
 
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
