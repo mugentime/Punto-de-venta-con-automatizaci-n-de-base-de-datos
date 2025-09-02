@@ -5191,18 +5191,12 @@
             };
             
             try {
-                const response = await fetch('/api/records/historical', {
+                const result = await apiRequest('/records/historical', {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    },
                     body: JSON.stringify(requestData)
                 });
                 
-                const result = await response.json();
-                
-                if (response.ok) {
+                if (result && result.message) {
                     alert('Registro histórico creado exitosamente');
                     // Reset form
                     event.target.reset();
@@ -5212,7 +5206,7 @@
                     // Load recent records
                     loadHistoricalRecords();
                 } else {
-                    alert('Error: ' + result.error);
+                    alert('Error: ' + (result.error || 'Error desconocido'));
                 }
             } catch (error) {
                 console.error('Error creating historical record:', error);
@@ -5222,32 +5216,24 @@
         
         async function loadHistoricalRecords() {
             try {
-                const response = await fetch('/api/records?limit=10', {
-                    headers: {
-                        'Authorization': `Bearer ${localStorage.getItem('token')}`
-                    }
-                });
+                const records = await apiRequest('/records?limit=10');
+                const tbody = document.getElementById('historical-records-list');
+                tbody.innerHTML = '';
                 
-                if (response.ok) {
-                    const records = await response.json();
-                    const tbody = document.getElementById('historical-records-list');
-                    tbody.innerHTML = '';
+                records.forEach(record => {
+                    const row = document.createElement('tr');
+                    const recordDate = new Date(record.date);
                     
-                    records.forEach(record => {
-                        const row = document.createElement('tr');
-                        const recordDate = new Date(record.date);
-                        
-                        row.innerHTML = `
-                            <td>${recordDate.toLocaleDateString('es-MX')}</td>
-                            <td>${record.client}</td>
-                            <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
-                            <td>$${record.total.toFixed(2)}</td>
-                            <td>${record.payment}</td>
-                            <td>${record.createdBy?.name || 'N/A'}</td>
-                        `;
-                        tbody.appendChild(row);
-                    });
-                }
+                    row.innerHTML = `
+                        <td>${recordDate.toLocaleDateString('es-MX')}</td>
+                        <td>${record.client}</td>
+                        <td>${record.service === 'cafeteria' ? 'Cafetería' : 'Coworking'}</td>
+                        <td>$${record.total.toFixed(2)}</td>
+                        <td>${record.payment}</td>
+                        <td>${record.createdBy?.name || 'N/A'}</td>
+                    `;
+                    tbody.appendChild(row);
+                });
             } catch (error) {
                 console.error('Error loading historical records:', error);
             }
