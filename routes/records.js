@@ -5,7 +5,7 @@ const { auth, canRegisterClients, canDeleteRecords } = require('../middleware/au
 
 const router = express.Router();
 
-// EMERGENCY ROUTE - DEPLOY TEST
+// EMERGENCY ROUTE - DEPLOY TEST (NO AUTH)
 router.get('/deploy-test', (req, res) => {
   res.json({ 
     message: 'DEPLOY WORKING',
