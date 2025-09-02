@@ -111,6 +111,75 @@ app.get('/api/emergency-test', (req, res) => {
   });
 });
 
+// EMERGENCY HISTORICAL ENDPOINT - DIRECT IN SERVER.JS
+app.post('/api/records/historical', requireDatabase, async (req, res) => {
+  console.log('🔥 HISTORICAL ENDPOINT HIT DIRECTLY!', req.body);
+  try {
+    const { 
+      client, 
+      service, 
+      products,
+      hours = 1, 
+      payment, 
+      tip = 0,
+      historicalDate
+    } = req.body;
+
+    if (!historicalDate) {
+      return res.status(400).json({
+        error: 'Historical date is required for this endpoint'
+      });
+    }
+
+    // Validate historical date is not in the future
+    const targetDate = new Date(historicalDate);
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    
+    if (targetDate > today) {
+      return res.status(400).json({
+        error: 'Historical date cannot be in the future'
+      });
+    }
+
+    if (!client || !service || !products || !payment) {
+      return res.status(400).json({
+        error: 'Missing required fields: client, service, products, payment'
+      });
+    }
+
+    // Create record data
+    const recordData = {
+      client,
+      service: service.toLowerCase(),
+      products,
+      hours: parseInt(hours),
+      payment: payment.toLowerCase(),
+      tip: parseFloat(tip) || 0,
+      date: targetDate,
+      total: products.reduce((sum, p) => sum + (p.price * p.quantity), 0) + (parseFloat(tip) || 0)
+    };
+
+    console.log('📝 Creating historical record:', recordData);
+
+    // Save using database manager
+    const newRecord = await databaseManager.createRecord(recordData);
+    console.log('✅ Historical record created:', newRecord.id);
+
+    res.status(201).json({
+      message: 'Historical record created successfully',
+      record: newRecord
+    });
+
+  } catch (error) {
+    console.error('❌ Historical endpoint error:', error);
+    res.status(500).json({
+      error: 'Failed to create historical record',
+      message: error.message
+    });
+  }
+});
+
 // Routes (with database requirement)
 app.use('/api/auth', requireDatabase, authRoutes);
 app.use('/api/products', requireDatabase, productRoutes);
