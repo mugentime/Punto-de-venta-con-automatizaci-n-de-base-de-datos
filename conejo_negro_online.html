@@ -3017,11 +3017,10 @@
                 tip: currentOrder.tip || 0
             };
             
-            // Si hay una fecha personalizada, usar el endpoint histórico
+            // Use standard records endpoint with date parameter
             let endpoint = '/records';
             if (customDate) {
-                recordData.historicalDate = customDate;
-                endpoint = '/records/historical';
+                endpoint = `/records?date=${customDate}`;
             }
             
             try {
@@ -5024,14 +5023,8 @@
         
         // Load cash cuts for the current report period
         async function loadReportCashCuts() {
-            const loadingEl = document.getElementById('report-cash-cuts-loading');
-            const statsEl = document.getElementById('report-cash-cuts-stats');
-            const noCutsEl = document.getElementById('report-no-cash-cuts');
-            const listEl = document.getElementById('report-cash-cuts-list');
-            
-            // Check if elements exist before manipulating them
-            if (!loadingEl || !statsEl || !noCutsEl || !listEl) {
-                console.warn('Cash cuts report elements not found in DOM');
+            // Cash cuts functionality has been removed - skip silently
+            console.log('Cash cuts functionality disabled');
                 return;
             }
             
