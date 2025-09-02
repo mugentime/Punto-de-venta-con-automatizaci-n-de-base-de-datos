@@ -79,6 +79,49 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
+// Get historical records endpoint - MUST come before /:id route
+router.get('/historical', auth, async (req, res) => {
+  try {
+    const { startDate, endDate, limit = 100 } = req.query;
+    
+    let records = await databaseManager.getRecords();
+    
+    // Filter out deleted records
+    records = records.filter(r => !r.isDeleted);
+    
+    // If date range is provided, filter by it
+    if (startDate && endDate) {
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      end.setHours(23, 59, 59, 999); // Include the entire end date
+      
+      records = records.filter(r => {
+        const recordDate = new Date(r.date || r.createdAt);
+        return recordDate >= start && recordDate <= end;
+      });
+    }
+    
+    // Sort by date (newest first)
+    records.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
+    
+    // Limit results
+    records = records.slice(0, parseInt(limit));
+    
+    res.json({
+      records,
+      total: records.length,
+      startDate: startDate || null,
+      endDate: endDate || null
+    });
+    
+  } catch (error) {
+    console.error('Historical records fetch error:', error);
+    res.status(500).json({
+      error: 'Failed to fetch historical records'
+    });
+  }
+});
+
 // Get record by ID
 router.get('/:id', auth, async (req, res) => {
   try {
@@ -551,50 +594,6 @@ router.patch('/:id/products', auth, async (req, res) => {
   } catch (error) {
     console.error('Update products error:', error);
     res.status(500).json({ error: 'Failed to update products' });
-  }
-});
-
-
-// Get historical records endpoint
-router.get('/historical', auth, async (req, res) => {
-  try {
-    const { startDate, endDate, limit = 100 } = req.query;
-    
-    let records = await databaseManager.getRecords();
-    
-    // Filter out deleted records
-    records = records.filter(r => !r.isDeleted);
-    
-    // If date range is provided, filter by it
-    if (startDate && endDate) {
-      const start = new Date(startDate);
-      const end = new Date(endDate);
-      end.setHours(23, 59, 59, 999); // Include the entire end date
-      
-      records = records.filter(r => {
-        const recordDate = new Date(r.date || r.createdAt);
-        return recordDate >= start && recordDate <= end;
-      });
-    }
-    
-    // Sort by date (newest first)
-    records.sort((a, b) => new Date(b.date || b.createdAt) - new Date(a.date || a.createdAt));
-    
-    // Limit results
-    records = records.slice(0, parseInt(limit));
-    
-    res.json({
-      records,
-      total: records.length,
-      startDate: startDate || null,
-      endDate: endDate || null
-    });
-    
-  } catch (error) {
-    console.error('Historical records fetch error:', error);
-    res.status(500).json({
-      error: 'Failed to fetch historical records'
-    });
   }
 });
 
