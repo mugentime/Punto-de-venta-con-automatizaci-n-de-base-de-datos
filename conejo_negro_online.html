@@ -2135,6 +2135,8 @@
             // Only load data if we have a valid token
             if (authToken) {
                 loadInitialData();
+                // Reload historical products now that we have auth
+                loadHistoricalProducts();
             }
         }
 
@@ -2294,6 +2296,11 @@
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE_URL}${endpoint}`;
             
+            // Ensure we have a valid token
+            if (!authToken) {
+                authToken = localStorage.getItem('authToken');
+            }
+            
             console.log('🌐 API REQUEST DEBUG:', {
                 endpoint,
                 url,
@@ -2385,6 +2392,8 @@
                 
                 // Initialize historical records after data is loaded
                 initHistoricalRecords();
+                // Reload historical products now that data.products is available
+                loadHistoricalProducts();
                 
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
@@ -4981,14 +4990,20 @@
                             select.appendChild(option);
                         }
                     });
-                } else {
-                    // Fallback: try to load products via API if data.products is not available
+                } else if (authToken) {
+                    // Only try to load from API if we have auth token
                     loadProductsFromAPI();
+                } else {
+                    // No auth token yet, wait for authentication
+                    console.log('Historical products: Waiting for authentication...');
+                    // Will be loaded when auth completes
                 }
             } catch (error) {
                 console.error('Error loading historical products:', error);
-                // Fallback to API load
-                loadProductsFromAPI();
+                // Only fallback to API if we have auth
+                if (authToken) {
+                    loadProductsFromAPI();
+                }
             }
         }
         
@@ -5202,6 +5217,17 @@
                 console.log('🔑 HISTORICAL DEBUG: authToken exists:', !!authToken);
                 console.log('🔑 HISTORICAL DEBUG: localStorage authToken:', !!localStorage.getItem('authToken'));
                 console.log('📦 HISTORICAL DEBUG: requestData:', requestData);
+                
+                // Ensure we have a valid token
+                if (!authToken) {
+                    authToken = localStorage.getItem('authToken');
+                    console.log('🔄 HISTORICAL DEBUG: Retrieved token from localStorage:', !!authToken);
+                }
+                
+                if (!authToken) {
+                    alert('Error: No hay sesión activa. Por favor, refresca la página e inicia sesión nuevamente.');
+                    return;
+                }
                 
                 const result = await apiRequest('/records/historical', {
                     method: 'POST',
