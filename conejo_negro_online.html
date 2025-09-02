@@ -2714,7 +2714,11 @@
                     console.warn('Sección no encontrada para data-section:', sectionId);
                     return; // Evitar error de classList cuando no existe el elemento
                 }
-                targetSection.classList.add('active');
+                
+                // Check if targetSection exists before accessing classList
+                if (targetSection && targetSection.classList) {
+                    targetSection.classList.add('active');
+                }
                 
                 // Inicializar input de fecha cuando se accede a registro
                 if (sectionId === 'registro') {
@@ -5025,8 +5029,8 @@
         async function loadReportCashCuts() {
             // Cash cuts functionality has been removed - skip silently
             console.log('Cash cuts functionality disabled');
-                return;
-            }
+            return;
+        }
             
             // Show loading
             loadingEl.style.display = 'block';

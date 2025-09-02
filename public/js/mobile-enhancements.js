@@ -158,9 +158,9 @@ window.addEventListener('offline', () => {
   updateConnectionStatus();
 });
 
-// Enhanced error handling for mobile
+// Enhanced error handling for mobile - disabled for cleaner console
 window.addEventListener('error', function(e) {
-  if (window.location.hostname !== 'localhost') {
+  if (window.location.hostname !== 'localhost' && false) { // Disabled
     // Only log errors in production for mobile debugging
     console.error('Mobile Error:', {
       message: e.message,
