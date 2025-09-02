@@ -2294,6 +2294,13 @@
         async function apiRequest(endpoint, options = {}) {
             const url = `${API_BASE_URL}${endpoint}`;
             
+            console.log('🌐 API REQUEST DEBUG:', {
+                endpoint,
+                url,
+                hasAuthToken: !!authToken,
+                authTokenPreview: authToken ? authToken.substring(0, 20) + '...' : 'null'
+            });
+            
             const headers = {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${authToken}`,
@@ -5191,10 +5198,17 @@
             };
             
             try {
+                console.log('🚀 HISTORICAL DEBUG: Attempting to call apiRequest');
+                console.log('🔑 HISTORICAL DEBUG: authToken exists:', !!authToken);
+                console.log('🔑 HISTORICAL DEBUG: localStorage authToken:', !!localStorage.getItem('authToken'));
+                console.log('📦 HISTORICAL DEBUG: requestData:', requestData);
+                
                 const result = await apiRequest('/records/historical', {
                     method: 'POST',
                     body: JSON.stringify(requestData)
                 });
+                
+                console.log('✅ HISTORICAL DEBUG: apiRequest result:', result);
                 
                 if (result && result.message) {
                     alert('Registro histórico creado exitosamente');
