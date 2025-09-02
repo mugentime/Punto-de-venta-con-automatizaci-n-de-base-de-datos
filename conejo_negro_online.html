@@ -2257,7 +2257,7 @@
                 updateDailyRecordsDisplay();
                 initializeReports();
                 
-                // Initialize historical records after data is loaded
+                // Data loading complete
                 
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
@@ -4144,7 +4144,7 @@
             updateRecentActivity(records);
             
             // Cargar cortes de caja
-            loadReportCashCuts();
+            // loadReportCashCuts(); // Disabled
         }
         
         // Actualizar tarjetas de métricas
@@ -4534,7 +4534,7 @@
             const refreshBtn = document.getElementById('refresh-cash-cuts');
             if (refreshBtn) {
                 refreshBtn.addEventListener('click', function() {
-                    loadReportCashCuts();
+                    // loadReportCashCuts(); // Disabled
                 });
             }
         }
