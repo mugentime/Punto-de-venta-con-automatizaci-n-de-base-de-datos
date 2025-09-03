@@ -4,6 +4,14 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
+// 🚨 EMERGENCY: Force PostgreSQL for Railway deployment
+console.log('🔍 Checking DATABASE_URL...', !!process.env.DATABASE_URL);
+if (!process.env.DATABASE_URL && (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production')) {
+    console.log('🚨 FORCING DATABASE_URL for Railway...');
+    process.env.DATABASE_URL = 'postgresql://postgres:aezVREfCHRpQHBfwweXHEaANsbeIMeno@postgres.railway.internal:5432/railway';
+    console.log('✅ DATABASE_URL set for Railway deployment');
+}
+
 
 // Import routes - using PostgreSQL system for production
 const authRoutes = require('./routes/auth');
