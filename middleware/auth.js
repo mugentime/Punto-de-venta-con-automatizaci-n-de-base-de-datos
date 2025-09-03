@@ -1,7 +1,8 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const databaseManager = require('../utils/databaseManager');
 
-// Basic authentication middleware
+// CRITICAL FIX: PostgreSQL-Compatible Authentication Middleware
+// Fixed infinite loop by replacing MongoDB User.findById with databaseManager
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
@@ -15,8 +16,9 @@ const auth = async (req, res, next) => {
     // Verify token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Check if user still exists and is active
-    const user = await User.findById(decoded.userId);
+    // CRITICAL FIX: Use databaseManager instead of MongoDB User model
+    // This prevents the infinite loop caused by MongoDB dependency
+    const user = await databaseManager.getUserById(decoded.userId);
     if (!user || !user.isActive) {
       return res.status(401).json({
         error: 'Invalid token. User not found or inactive.'
@@ -26,9 +28,16 @@ const auth = async (req, res, next) => {
     // Add user info to request
     req.user = {
       userId: decoded.userId,
-      email: decoded.email,
-      role: decoded.role,
-      permissions: user.permissions
+      email: decoded.email || user.email,
+      role: decoded.role || user.role,
+      permissions: user.permissions || {
+        canManageInventory: true,
+        canRegisterClients: true,
+        canViewReports: true,
+        canManageUsers: user.role === 'admin',
+        canExportData: ['admin', 'manager'].includes(user.role),
+        canDeleteRecords: user.role === 'admin'
+      }
     };
 
     next();
@@ -52,9 +61,10 @@ const auth = async (req, res, next) => {
   }
 };
 
-// Admin authentication middleware
+// FIXED: Admin authentication middleware
 const adminAuth = (req, res, next) => {
-  if (req.user.role !== 'admin') {
+  // Ensure user exists and has admin role
+  if (!req.user || req.user.role !== 'admin') {
     return res.status(403).json({
       error: 'Access denied. Admin privileges required.'
     });

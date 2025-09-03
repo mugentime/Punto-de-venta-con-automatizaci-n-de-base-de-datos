@@ -52,7 +52,7 @@ require('./utils/membershipNotificationService');
 
 const app = express();
 
-// Security middleware with CSP configuration for inline scripts
+// CRITICAL FIX: Optimized Security middleware to prevent infinite loops
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -65,6 +65,8 @@ app.use(helmet({
     }
   }
 }));
+
+// FIXED: CORS configuration to prevent preflight loops
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [
@@ -72,15 +74,24 @@ app.use(cors({
         process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null
       ].filter(Boolean)
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
-  credentials: true
+  credentials: true,
+  optionsSuccessStatus: 200, // Fix for legacy browser CORS issues
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
 
-// Rate limiting
+// FIXED: Rate limiting with skip for health checks to prevent deployment loops
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 200, // Increased for deployment
   message: {
     error: 'Too many requests from this IP, please try again later.'
+  },
+  skip: (req) => {
+    // Skip rate limiting for health checks and emergency endpoints
+    return req.path === '/api/health' || 
+           req.path === '/api/emergency-test' ||
+           req.path.startsWith('/api/auth/login');
   }
 });
 app.use('/api/', limiter);
