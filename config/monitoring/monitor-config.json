@@ -1,0 +1,46 @@
+{
+  "appUrl": "https://pos-conejonegro-production.up.railway.app",
+  "healthEndpoint": "/api/health",
+  "checkInterval": 60000,
+  "timeout": 10000,
+  "retries": 3,
+  "alertThreshold": 3,
+  "enableDashboard": true,
+  "enableAlerts": true,
+  "dashboardRefreshInterval": 30000,
+  "webhookUrls": [],
+  "notifications": {
+    "console": true,
+    "file": true,
+    "webhook": false,
+    "email": false
+  },
+  "alertRules": {
+    "consecutiveFailures": {
+      "threshold": 3,
+      "severity": "high"
+    },
+    "responseTime": {
+      "warningThreshold": 5000,
+      "criticalThreshold": 10000
+    },
+    "uptime": {
+      "criticalThreshold": 95.0
+    }
+  },
+  "dashboard": {
+    "title": "POS Conejo Negro - Railway Monitor",
+    "historyDays": 7,
+    "autoRefresh": true,
+    "showResponseTimes": true,
+    "showAlerts": true
+  },
+  "logging": {
+    "level": "info",
+    "rotation": {
+      "enabled": true,
+      "maxFiles": 30,
+      "maxSize": "100MB"
+    }
+  }
+}

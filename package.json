@@ -32,7 +32,16 @@
     "mcp:headless": "npx @playwright/mcp --port 3001 --headless",
     "mcp:dev": "npx @playwright/mcp --port 3001 --browser chromium --device \"iPhone 15\"",
     "test:visual": "npm run test:e2e -- --grep \"@visual\"",
-    "test:visual:update": "UPDATE_SCREENSHOTS=1 npm run test:visual"
+    "test:visual:update": "UPDATE_SCREENSHOTS=1 npm run test:visual",
+    "monitor:start": "node scripts/monitoring/monitor-service.js start",
+    "monitor:stop": "node scripts/monitoring/monitor-service.js stop",
+    "monitor:restart": "node scripts/monitoring/monitor-service.js restart",
+    "monitor:status": "node scripts/monitoring/monitor-service.js status",
+    "monitor:test": "node scripts/monitoring/monitor-service.js test",
+    "monitor:dashboard": "node scripts/monitoring/health-dashboard.js generate",
+    "monitor:dashboard:serve": "node scripts/monitoring/health-dashboard.js serve",
+    "monitor:alerts": "node scripts/monitoring/alert-system.js test",
+    "monitor:install": "node scripts/monitoring/install-service.js"
   },
   "keywords": [
     "pos",
