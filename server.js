@@ -4,6 +4,21 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
+// RAILWAY ENVIRONMENT DETECTION
+if (process.env.RAILWAY_ENVIRONMENT) {
+    console.log('🚀 Railway environment detected');
+    console.log('📊 DATABASE_URL present:', !!process.env.DATABASE_URL);
+    if (process.env.DATABASE_URL) {
+        console.log('🔗 Using PostgreSQL from Railway');
+    } else {
+        console.log('⚠️ DATABASE_URL missing in Railway environment!');
+    }
+} else {
+    console.log('🏠 Local development environment');
+}
+
+// FORCE REDEPLOY: 2025-09-03T15:20:01.476Z - Ensure DATABASE_URL is loaded
+
 // 🚨 EMERGENCY: Force PostgreSQL for Railway deployment
 console.log('🔍 Checking DATABASE_URL...', !!process.env.DATABASE_URL);
 if (!process.env.DATABASE_URL && (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production')) {
