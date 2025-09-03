@@ -1,10 +1,32 @@
 const jwt = require('jsonwebtoken');
 const databaseManager = require('../utils/databaseManager');
 
-// CRITICAL FIX: PostgreSQL-Compatible Authentication Middleware
+// Circuit breaker to prevent infinite auth loops
+let authRequestCount = 0;
+let lastReset = Date.now();
+const CIRCUIT_BREAKER_LIMIT = 50;
+const CIRCUIT_BREAKER_WINDOW = 10000; // 10 seconds
+
+// CRITICAL FIX: PostgreSQL-Compatible Authentication Middleware with Circuit Breaker
 // Fixed infinite loop by replacing MongoDB User.findById with databaseManager
 const auth = async (req, res, next) => {
   try {
+    // Circuit breaker check
+    const now = Date.now();
+    if (now - lastReset > CIRCUIT_BREAKER_WINDOW) {
+      authRequestCount = 0;
+      lastReset = now;
+    }
+    
+    authRequestCount++;
+    if (authRequestCount > CIRCUIT_BREAKER_LIMIT) {
+      console.error(`🚨 CIRCUIT BREAKER: Auth middleware triggered ${authRequestCount} times in ${CIRCUIT_BREAKER_WINDOW}ms`);
+      return res.status(429).json({
+        error: 'Authentication circuit breaker activated. Too many auth requests.',
+        retryAfter: Math.ceil((CIRCUIT_BREAKER_WINDOW - (now - lastReset)) / 1000)
+      });
+    }
+
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if (!token) {
