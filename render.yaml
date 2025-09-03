@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: pos-conejo-negro
+    env: node
+    plan: starter
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: JWT_SECRET
+        generateValue: true
+      - key: RATE_LIMIT_WINDOW_MS
+        value: 900000
+      - key: RATE_LIMIT_MAX_REQUESTS
+        value: 100
+
+databases:
+  - name: pos-conejo-negro-db
+    databaseName: pos_conejo_negro
+    user: pos_user
