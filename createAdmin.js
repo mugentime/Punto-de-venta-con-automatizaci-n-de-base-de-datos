@@ -16,11 +16,11 @@ async function createAdminUser() {
         const hashedPassword = await bcrypt.hash('admin123', 10);
         
         // Check if admin exists
-        const checkResult = await pool.query('SELECT * FROM users WHERE username = $1', ['admin@conejo.com']);
+        const checkResult = await pool.query('SELECT * FROM users WHERE username = $1', ['admin@conejonegro.com']);
         
         if (checkResult.rows.length > 0) {
             console.log('Admin user already exists!');
-            console.log('Email: admin@conejo.com');
+            console.log('Email: admin@conejonegro.com');
             console.log('Password: admin123');
         } else {
             // Create admin user
@@ -29,7 +29,7 @@ async function createAdminUser() {
                 VALUES ($1, $2, $3, $4, $5, $6)
             `, [
                 adminId,
-                'admin@conejo.com',
+                'admin@conejonegro.com',
                 hashedPassword,
                 'admin',
                 JSON.stringify({
@@ -43,7 +43,7 @@ async function createAdminUser() {
             ]);
             
             console.log('✅ Admin user created successfully!');
-            console.log('Email: admin@conejo.com');
+            console.log('Email: admin@conejonegro.com');
             console.log('Password: admin123');
         }
 

@@ -7,11 +7,11 @@
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Mobile Optimizations - CRITICAL for touch devices -->
-    <link rel="stylesheet" href="/css/mobile-optimized.css">
+    <link rel="stylesheet" href="css/mobile-optimized.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <!-- Mobile Enhancement JavaScript - Load early for critical fixes -->
-    <script src="/js/mobile-enhancements.js"></script>
-    <script src="/js/mobile-menu-simple.js"></script>
+    <script src="js/mobile-enhancements.js"></script>
+    <script src="js/mobile-menu-simple.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -1151,7 +1151,7 @@
             <i class="fas fa-cash-register"></i>
             <span>Registro</span>
         </a>
-        <a href="/coworking" class="nav-item">
+        <a href="#" class="nav-item mobile-nav-btn" data-section="coworking">
             <i class="fas fa-laptop"></i>
             <span>Coworking</span>
         </a>
@@ -1185,7 +1185,7 @@
             <p style="color: var(--text-secondary); margin-bottom: 15px;">Café Coworking Online</p>
             <div style="background: rgba(0, 217, 255, 0.1); border: 1px solid rgba(0, 217, 255, 0.3); border-radius: 8px; padding: 10px; margin-bottom: 20px; font-size: 14px;">
                 <strong>Credenciales de acceso:</strong><br>
-                Email: admin@conejo.com<br>
+                Email: admin@conejonegro.com<br>
                 Contraseña: admin123<br>
                 <button id="auto-fill-btn" 
                         style="margin-top: 8px; padding: 5px 10px; background: #00d9ff; color: #0a0a0a; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
@@ -1256,7 +1256,7 @@
                     <nav>
                         <ul>
                             <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
-                            <li><a href="/coworking" class="nav-link">Coworking</a></li>
+                            <li><a href="#" class="nav-link" data-section="coworking">Coworking</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
@@ -1432,6 +1432,58 @@
                             <i class="fas fa-calendar-check"></i>
                             Finalizar Día
                         </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Coworking Section -->
+            <section id="coworking" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-laptop"></i>
+                        Gestión de Coworking
+                    </h2>
+                    
+                    <div class="stats-card">
+                        <div class="stat-item">
+                            <div class="stat-value" id="coworking-active">0</div>
+                            <div class="stat-label">Espacios Activos</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="coworking-today">0</div>
+                            <div class="stat-label">Clientes Hoy</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="coworking-revenue">$0.00</div>
+                            <div class="stat-label">Ingresos Coworking</div>
+                        </div>
+                    </div>
+                    
+                    <div class="table-container">
+                        <table id="coworking-table">
+                            <thead>
+                                <tr>
+                                    <th>Cliente</th>
+                                    <th>Hora Inicio</th>
+                                    <th>Duración</th>
+                                    <th>Estado</th>
+                                    <th>Total</th>
+                                    <th>Bebidas Incluidas</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los registros de coworking se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div style="margin-top: 20px;">
+                        <p style="color: var(--text-secondary); font-size: 14px;">
+                            <i class="fas fa-info-circle"></i>
+                            Los servicios de coworking se registran desde la sección "Registro" seleccionando "Coworking" como tipo de servicio.
+                            Esta sección muestra un resumen de la actividad de coworking del día.
+                        </p>
                     </div>
                 </div>
             </section>
@@ -2027,11 +2079,31 @@
             });
         });
 
-        // Auto-fill credentials button
-        document.getElementById('auto-fill-btn').addEventListener('click', function() {
-            document.getElementById('login-email').value = 'admin@conejo.com';
-            document.getElementById('login-password').value = 'admin123';
-        });
+        // Auto-fill credentials button - Ensure DOM is ready
+        function setupAutoFill() {
+            const autoFillBtn = document.getElementById('auto-fill-btn');
+            if (autoFillBtn) {
+                autoFillBtn.addEventListener('click', function() {
+                    console.log('Auto-fill button clicked');
+                    const emailField = document.getElementById('login-email');
+                    const passwordField = document.getElementById('login-password');
+                    
+                    if (emailField && passwordField) {
+                        emailField.value = 'admin@conejo.com';
+                        passwordField.value = 'admin123';
+                        console.log('Auto-fill completed: Email and Password set');
+                        
+                        // Trigger input events to ensure the values are properly registered
+                        emailField.dispatchEvent(new Event('input', { bubbles: true }));
+                        passwordField.dispatchEvent(new Event('input', { bubbles: true }));
+                    } else {
+                        console.error('Auto-fill error: Could not find email or password fields');
+                    }
+                });
+            } else {
+                console.error('Auto-fill button not found');
+            }
+        }
 
         // Login
         document.getElementById('login-form').addEventListener('submit', async function(e) {
@@ -2286,23 +2358,28 @@
         }
 
         // Sincronizar datos manualmente
-        document.getElementById('sync-data').addEventListener('click', async function() {
-            try {
-                updateConnectionStatus('syncing');
-                const syncData = await apiRequest('/sync');
-                
-                data.products = syncData.products;
-                data.records = syncData.records;
-                data.reports = syncData.reports;
-                
-                updateConnectionStatus('online');
-                updateProductTables();
-                updateDailyRecordsDisplay();
-                initializeReports();
-                
-                showNotification('Sincronización completada', 'success');
-            } catch (error) {
-                showNotification('Error en sincronización: ' + error.message, 'error');
+        document.addEventListener('DOMContentLoaded', function() {
+            const syncButton = document.getElementById('sync-data');
+            if (syncButton) {
+                syncButton.addEventListener('click', async function() {
+                    try {
+                        updateConnectionStatus('syncing');
+                        const syncData = await apiRequest('/sync');
+                        
+                        data.products = syncData.products;
+                        data.records = syncData.records;
+                        data.reports = syncData.reports;
+                        
+                        updateConnectionStatus('online');
+                        updateProductTables();
+                        updateDailyRecordsDisplay();
+                        initializeReports();
+                        
+                        showNotification('Sincronización completada', 'success');
+                    } catch (error) {
+                        showNotification('Error en sincronización: ' + error.message, 'error');
+                    }
+                });
             }
         });
 
@@ -5163,6 +5240,9 @@
         // Initialize the application when page loads
         document.addEventListener('DOMContentLoaded', async function() {
             console.log('🚀 Iniciando aplicación POS...');
+            
+            // Setup auto-fill functionality BEFORE auth check
+            setupAutoFill();
             
             // Initialize authentication check first
             try {
