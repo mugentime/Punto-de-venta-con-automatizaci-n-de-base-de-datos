@@ -67,5 +67,6 @@
   "devDependencies": {
     "nodemon": "^3.0.1",
     "playwright": "^1.55.0"
-  }
+  },
+  "railway_restart_trigger": "2025-09-03T15:23:36.524Z"
 }
