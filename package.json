@@ -41,7 +41,13 @@
     "monitor:dashboard": "node scripts/monitoring/health-dashboard.js generate",
     "monitor:dashboard:serve": "node scripts/monitoring/health-dashboard.js serve",
     "monitor:alerts": "node scripts/monitoring/alert-system.js test",
-    "monitor:install": "node scripts/monitoring/install-service.js"
+    "monitor:install": "node scripts/monitoring/install-service.js",
+    "hive:init": "node hive-init.js",
+    "hive:track": "node trigger-deployment.js track-push",
+    "hive:status": "node trigger-deployment.js check-status",
+    "hive:stats": "node trigger-deployment.js deployment-stats",
+    "hive:query": "node trigger-deployment.js query-deployments",
+    "hive:install-hooks": "node trigger-deployment.js install-hooks"
   },
   "keywords": [
     "pos",
