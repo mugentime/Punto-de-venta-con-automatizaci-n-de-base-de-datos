@@ -5680,10 +5680,17 @@
                     showNotification('Producto agregado exitosamente', 'success');
                     productSelect.value = '';
                     quantityInput.value = '1';
-                    await Promise.all([loadCoworkingSessions(), loadData()]);
+                    await Promise.all([loadCoworkingSessions(), loadInitialData()]);
                 } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Error al agregar producto', 'error');
+                    let errorMessage = 'Error al agregar producto';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || errorMessage;
+                    } catch (parseError) {
+                        console.error('Error parsing JSON response:', parseError);
+                        errorMessage = `Error del servidor (${response.status})`;
+                    }
+                    showNotification(errorMessage, 'error');
                 }
             } catch (error) {
                 console.error('Error adding product:', error);
@@ -5737,10 +5744,17 @@
                 if (response.ok) {
                     const result = await response.json();
                     showNotification(`Sesión finalizada. Total: $${result.total.toFixed(2)}`, 'success');
-                    await Promise.all([loadCoworkingSessions(), loadData()]);
+                    await Promise.all([loadCoworkingSessions(), loadInitialData()]);
                 } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Error al finalizar sesión', 'error');
+                    let errorMessage = 'Error al finalizar sesión';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || errorMessage;
+                    } catch (parseError) {
+                        console.error('Error parsing JSON response:', parseError);
+                        errorMessage = `Error del servidor (${response.status})`;
+                    }
+                    showNotification(errorMessage, 'error');
                 }
             } catch (error) {
                 console.error('Error finishing session:', error);
@@ -5764,8 +5778,15 @@
                     showNotification('Sesión cancelada', 'warning');
                     await loadCoworkingSessions();
                 } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Error al cancelar sesión', 'error');
+                    let errorMessage = 'Error al cancelar sesión';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || errorMessage;
+                    } catch (parseError) {
+                        console.error('Error parsing JSON response:', parseError);
+                        errorMessage = `Error del servidor (${response.status})`;
+                    }
+                    showNotification(errorMessage, 'error');
                 }
             } catch (error) {
                 console.error('Error canceling session:', error);
@@ -5795,8 +5816,15 @@
                     await loadCoworkingSessions();
                     return true;
                 } else {
-                    const error = await response.json();
-                    showNotification(error.error || 'Error al crear sesión', 'error');
+                    let errorMessage = 'Error al crear sesión';
+                    try {
+                        const error = await response.json();
+                        errorMessage = error.error || errorMessage;
+                    } catch (parseError) {
+                        console.error('Error parsing JSON response:', parseError);
+                        errorMessage = `Error del servidor (${response.status})`;
+                    }
+                    showNotification(errorMessage, 'error');
                     return false;
                 }
             } catch (error) {
