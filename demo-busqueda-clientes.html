@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo - Búsqueda de Clientes - POS Conejo Negro</title>
+    
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="public/css/mobile-optimized.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <style>
+        /* Variables de colores consistentes con el tema */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d00ff;
+            --accent-pink: #ff00d9;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .demo-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .demo-header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 10px 40px rgba(0, 217, 255, 0.2);
+            text-align: center;
+        }
+
+        .demo-title {
+            color: var(--accent-cyan);
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .demo-subtitle {
+            color: var(--text-secondary);
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .back-button {
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-pink));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(157, 0, 255, 0.4);
+        }
+
+        .demo-section {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .demo-section h3 {
+            color: var(--text-primary);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .demo-section p {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .search-container {
+            margin-bottom: 20px;
+        }
+
+        .search-label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .info-card {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 20px;
+            border-left: 4px solid var(--accent-cyan);
+        }
+
+        .info-card h4 {
+            color: var(--accent-cyan);
+            margin-bottom: 10px;
+            font-size: 1.1rem;
+        }
+
+        .info-card ul {
+            color: var(--text-secondary);
+            padding-left: 20px;
+        }
+
+        .info-card li {
+            margin-bottom: 8px;
+        }
+
+        .selected-info {
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            display: none;
+        }
+
+        .selected-info.show {
+            display: block;
+        }
+
+        .selected-title {
+            color: var(--success);
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .selected-details {
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .clear-button {
+            background: linear-gradient(45deg, var(--danger), #ff3838);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+
+        .clear-button:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.4);
+        }
+
+        .demo-code {
+            background: var(--bg-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 15px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            overflow-x: auto;
+        }
+
+        .demo-code pre {
+            color: var(--text-primary);
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.4;
+        }
+
+        .demo-code code {
+            color: var(--accent-cyan);
+        }
+
+        .feature-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .feature-item {
+            background: rgba(157, 0, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            border: 1px solid rgba(157, 0, 255, 0.2);
+        }
+
+        .feature-icon {
+            color: var(--accent-purple);
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            color: var(--text-primary);
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+
+        .feature-desc {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="demo-container">
+        <!-- Header -->
+        <div class="demo-header">
+            <h1 class="demo-title">
+                <i class="fas fa-search"></i>
+                BÚSQUEDA DE CLIENTES
+            </h1>
+            <p class="demo-subtitle">Sistema de autocompletado inteligente para selección rápida de clientes</p>
+            <a href="/clientes" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver a Gestión de Clientes
+            </a>
+        </div>
+
+        <!-- Demostración principal -->
+        <div class="demo-section">
+            <h3>
+                <i class="fas fa-play-circle"></i>
+                Demostración Interactiva
+            </h3>
+            <p>
+                Escribe en el campo de búsqueda para ver el autocompletado en acción. 
+                El sistema busca por nombre, teléfono o email y muestra resultados en tiempo real.
+            </p>
+
+            <div class="search-container">
+                <label class="search-label">
+                    <i class="fas fa-search"></i>
+                    Buscar Cliente
+                </label>
+                <input type="text" id="customer-search" placeholder="Escribe para buscar...">
+            </div>
+
+            <div class="selected-info" id="selected-info">
+                <div class="selected-title">
+                    <i class="fas fa-check-circle"></i>
+                    Cliente Seleccionado
+                </div>
+                <div class="selected-details" id="selected-details">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+                <button class="clear-button" onclick="clearSelection()">
+                    <i class="fas fa-times"></i>
+                    Limpiar Selección
+                </button>
+            </div>
+
+            <div class="info-card">
+                <h4>Instrucciones de Uso:</h4>
+                <ul>
+                    <li><strong>Escribir:</strong> Comienza a escribir cualquier parte del nombre, teléfono o email</li>
+                    <li><strong>Navegar:</strong> Usa las flechas ↑ ↓ para navegar por los resultados</li>
+                    <li><strong>Seleccionar:</strong> Presiona Enter o haz clic en un resultado</li>
+                    <li><strong>Crear:</strong> Si no existe el cliente, aparecerá la opción de crearlo</li>
+                    <li><strong>Cancelar:</strong> Presiona Escape para cerrar el dropdown</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Características -->
+        <div class="demo-section">
+            <h3>
+                <i class="fas fa-star"></i>
+                Características Principales
+            </h3>
+
+            <div class="feature-list">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-bolt"></i>
+                    </div>
+                    <div class="feature-title">Búsqueda Rápida</div>
+                    <div class="feature-desc">Resultados en tiempo real con debounce optimizado</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="feature-title">Vista Detallada</div>
+                    <div class="feature-desc">Muestra información relevante: contacto, visitas, gastos</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-crown"></i>
+                    </div>
+                    <div class="feature-title">Estado VIP</div>
+                    <div class="feature-desc">Identifica visualmente clientes con membresía activa</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-keyboard"></i>
+                    </div>
+                    <div class="feature-title">Navegación por Teclado</div>
+                    <div class="feature-desc">Control completo con flechas, Enter y Escape</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-plus"></i>
+                    </div>
+                    <div class="feature-title">Creación Rápida</div>
+                    <div class="feature-desc">Opción de crear nuevo cliente desde la búsqueda</div>
+                </div>
+
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <i class="fas fa-mobile-alt"></i>
+                    </div>
+                    <div class="feature-title">Responsive</div>
+                    <div class="feature-desc">Optimizado para dispositivos móviles y táctiles</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Implementación -->
+        <div class="demo-section">
+            <h3>
+                <i class="fas fa-code"></i>
+                Implementación
+            </h3>
+            <p>
+                Para usar este componente en cualquier página, simplemente incluye el script y 
+                inicializa el componente en cualquier input:
+            </p>
+
+            <div class="demo-code">
+                <pre><code>// HTML
+&lt;input type="text" id="customer-input" /&gt;
+
+// JavaScript
+const searchInput = document.getElementById('customer-input');
+const customerSearch = new CustomerSearch(searchInput, {
+    onSelect: (customer) => {
+        console.log('Cliente seleccionado:', customer);
+    },
+    onCreate: (name) => {
+        console.log('Crear cliente:', name);
+    }
+});
+
+// Obtener cliente seleccionado
+const selectedCustomer = customerSearch.getSelectedCustomer();</code></pre>
+            </div>
+        </div>
+
+        <!-- API -->
+        <div class="demo-section">
+            <h3>
+                <i class="fas fa-plug"></i>
+                API Endpoint
+            </h3>
+            <p>
+                El componente utiliza el endpoint <code>/api/customers/search/{query}</code> 
+                que devuelve resultados en formato JSON:
+            </p>
+
+            <div class="demo-code">
+                <pre><code>GET /api/customers/search/maria
+Response:
+[
+  {
+    "id": "customer_123",
+    "name": "María González",
+    "email": "maria@email.com",
+    "phone": "123456789",
+    "totalVisits": 5,
+    "totalSpent": 750,
+    "isVIP": true,
+    "display": "María González (123456789) - maria@email.com"
+  }
+]</code></pre>
+            </div>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script src="public/js/customer-search.js"></script>
+    <script>
+        let customerSearch;
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inicializar búsqueda de clientes
+            const searchInput = document.getElementById('customer-search');
+            
+            customerSearch = new CustomerSearch(searchInput, {
+                onSelect: (customer) => {
+                    console.log('Cliente seleccionado:', customer);
+                    showSelectedCustomer(customer);
+                },
+                onCreate: (name) => {
+                    console.log('Crear cliente con nombre:', name);
+                    alert(`Se crearía un nuevo cliente con nombre: "${name}"`);
+                }
+            });
+
+            // Eventos personalizados
+            searchInput.addEventListener('customerSelected', (e) => {
+                console.log('Evento customerSelected:', e.detail);
+            });
+
+            searchInput.addEventListener('createCustomer', (e) => {
+                console.log('Evento createCustomer:', e.detail);
+            });
+        });
+
+        function showSelectedCustomer(customer) {
+            const selectedInfo = document.getElementById('selected-info');
+            const selectedDetails = document.getElementById('selected-details');
+            
+            const membershipStatus = customer.isVIP ? 
+                '<span style="color: var(--accent-pink); font-weight: 600;"><i class="fas fa-crown"></i> VIP</span>' : 
+                '<span style="color: var(--text-secondary);">Regular</span>';
+                
+            selectedDetails.innerHTML = `
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px;">
+                    <div>
+                        <strong>Nombre:</strong> ${customer.name}
+                    </div>
+                    <div>
+                        <strong>Estado:</strong> ${membershipStatus}
+                    </div>
+                    ${customer.email ? `<div><strong>Email:</strong> ${customer.email}</div>` : ''}
+                    ${customer.phone ? `<div><strong>Teléfono:</strong> ${customer.phone}</div>` : ''}
+                    <div>
+                        <strong>Visitas:</strong> ${customer.totalVisits}
+                    </div>
+                    <div>
+                        <strong>Total Gastado:</strong> $${customer.totalSpent.toLocaleString()}
+                    </div>
+                </div>
+            `;
+            
+            selectedInfo.classList.add('show');
+        }
+
+        function clearSelection() {
+            if (customerSearch) {
+                customerSearch.clearSelection();
+            }
+            
+            const selectedInfo = document.getElementById('selected-info');
+            selectedInfo.classList.remove('show');
+        }
+    </script>
+</body>
+</html>

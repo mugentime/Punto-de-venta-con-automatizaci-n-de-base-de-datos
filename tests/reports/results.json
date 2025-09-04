@@ -14,7 +14,7 @@
       "Test Suite": "POS Conejo Negro E2E Tests",
       "Environment": "development",
       "Base URL": "http://localhost:3000",
-      "Timestamp": "2025-09-03T15:25:55.214Z",
+      "Timestamp": "2025-09-03T15:44:29.323Z",
       "actualWorkers": 1
     },
     "preserveOutput": "always",
@@ -54,7 +54,7 @@
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-03T15:25:55.214Z",
+          "Timestamp": "2025-09-03T15:44:29.323Z",
           "actualWorkers": 1
         },
         "id": "setup",
@@ -74,7 +74,7 @@
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-03T15:25:55.214Z",
+          "Timestamp": "2025-09-03T15:44:29.323Z",
           "actualWorkers": 1
         },
         "id": "chromium",
@@ -126,25 +126,25 @@
                   "workerIndex": 0,
                   "parallelIndex": 0,
                   "status": "failed",
-                  "duration": 34214,
+                  "duration": 36578,
                   "error": {
                     "message": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n",
-                    "stack": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:60:14",
+                    "stack": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:93:14",
                     "location": {
                       "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
                       "column": 14,
-                      "line": 60
+                      "line": 93
                     },
-                    "snippet": "\u001b[0m \u001b[90m 58 |\u001b[39m   \n \u001b[90m 59 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 60 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 61 |\u001b[39m   \n \u001b[90m 62 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 63 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
+                    "snippet": "\u001b[0m \u001b[90m 91 |\u001b[39m   \n \u001b[90m 92 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m   \n \u001b[90m 95 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 96 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
                   },
                   "errors": [
                     {
                       "location": {
                         "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
                         "column": 14,
-                        "line": 60
+                        "line": 93
                       },
-                      "message": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n\n\u001b[0m \u001b[90m 58 |\u001b[39m   \n \u001b[90m 59 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 60 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 61 |\u001b[39m   \n \u001b[90m 62 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 63 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:60:14\u001b[22m"
+                      "message": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n\n\u001b[0m \u001b[90m 91 |\u001b[39m   \n \u001b[90m 92 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m   \n \u001b[90m 95 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 96 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:93:14\u001b[22m"
                     }
                   ],
                   "stdout": [
@@ -171,11 +171,26 @@
                     },
                     {
                       "text": "Login form elements found, proceeding with authentication...\n"
+                    },
+                    {
+                      "text": "Filled credentials, submitting form...\n"
+                    },
+                    {
+                      "text": "After login attempt:\n"
+                    },
+                    {
+                      "text": "- Login screen visible: \u001b[33mtrue\u001b[39m\n"
+                    },
+                    {
+                      "text": "- Main app visible: \u001b[33mfalse\u001b[39m\n"
+                    },
+                    {
+                      "text": "Still on login screen, checking for JavaScript errors...\n"
                     }
                   ],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-09-03T15:25:58.555Z",
+                  "startTime": "2025-09-03T15:44:32.294Z",
                   "annotations": [],
                   "attachments": [
                     {
@@ -197,7 +212,7 @@
                   "errorLocation": {
                     "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
                     "column": 14,
-                    "line": 60
+                    "line": 93
                   }
                 }
               ],
@@ -214,8 +229,8 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-03T15:25:55.224Z",
-    "duration": 38270.06,
+    "startTime": "2025-09-03T15:44:29.329Z",
+    "duration": 40227.989,
     "expected": 0,
     "skipped": 0,
     "unexpected": 1,

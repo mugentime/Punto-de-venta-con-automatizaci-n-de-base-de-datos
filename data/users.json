@@ -52,5 +52,23 @@
       "canExportData": true,
       "canDeleteRecords": true
     }
+  },
+  {
+    "_id": "e0cbd27429eaa20acf48cc23",
+    "name": "Administrator",
+    "email": "admin@conejonegro.com",
+    "password": "$2a$12$VjjN2Vk3GsWrcqkBgvriJuqCuj0B8ZbWWssOJ7KEpuqbOlobieWva",
+    "role": "admin",
+    "isActive": true,
+    "createdAt": "2025-09-03T16:42:34.687Z",
+    "lastLogin": "2025-09-03T17:20:46.292Z",
+    "permissions": {
+      "canManageInventory": true,
+      "canRegisterClients": true,
+      "canViewReports": true,
+      "canManageUsers": true,
+      "canExportData": true,
+      "canDeleteRecords": true
+    }
   }
 ]

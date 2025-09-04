@@ -275,9 +275,27 @@ class DatabaseManager {
                 await this.updateProductStock(item.productId, item.quantity, 'subtract');
             }
             
+            // Update customer database with this record
+            try {
+                await this.updateCustomerWithRecord(recordData.client, record);
+            } catch (error) {
+                console.error('Error updating customer with record:', error);
+                // Continue execution - don't fail the record creation
+            }
+            
             return createdRecord;
         }
-        return await fileDatabase.createRecord(recordData);
+        const record = await fileDatabase.createRecord(recordData);
+        
+        // Update customer database with this record
+        try {
+            await this.updateCustomerWithRecord(recordData.client, record);
+        } catch (error) {
+            console.error('Error updating customer with record:', error);
+            // Continue execution - don't fail the record creation
+        }
+        
+        return record;
     }
 
     async deleteRecord(id, deletedBy) {
@@ -480,6 +498,14 @@ class DatabaseManager {
 
         const record = await this.createRecord(recordData);
 
+        // Update customer database with this record
+        try {
+            await this.updateCustomerWithRecord(sessionObj.client, recordData);
+        } catch (error) {
+            console.error('Error updating customer with record:', error);
+            // Continue execution - don't fail the session close
+        }
+
         return {
             session: updatedSession,
             record: record
@@ -522,6 +548,256 @@ class DatabaseManager {
         await this.updateProductStock(product._id, productData.quantity, 'subtract');
 
         return updatedSession;
+    }
+
+    // CUSTOMERS
+    async getCustomers() {
+        if (this.usePostgreSQL) {
+            return await database.getCustomers();
+        }
+        return await fileDatabase.getCustomers();
+    }
+
+    async getCustomerById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getCustomerById(id);
+        }
+        return await fileDatabase.getCustomerById(id);
+    }
+
+    async getCustomerByName(name) {
+        if (this.usePostgreSQL) {
+            return await database.getCustomerByName(name);
+        }
+        return await fileDatabase.getCustomerByName(name);
+    }
+
+    async createCustomer(customerData) {
+        if (this.usePostgreSQL) {
+            return await database.createCustomer(customerData);
+        }
+        return await fileDatabase.createCustomer(customerData);
+    }
+
+    async updateCustomer(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateCustomer(id, updateData);
+        }
+        return await fileDatabase.updateCustomer(id, updateData);
+    }
+
+    async deleteCustomer(id) {
+        if (this.usePostgreSQL) {
+            return await database.deleteCustomer(id);
+        }
+        return await fileDatabase.deleteCustomer(id);
+    }
+
+    async searchCustomers(query) {
+        if (this.usePostgreSQL) {
+            return await database.searchCustomers(query);
+        }
+        return await fileDatabase.searchCustomers(query);
+    }
+
+    async getCustomerStats() {
+        if (this.usePostgreSQL) {
+            return await database.getCustomerStats();
+        }
+        return await fileDatabase.getCustomerStats();
+    }
+
+    async findOrCreateCustomer(customerName, additionalData = {}) {
+        // Try to find existing customer by name
+        let customer = await this.getCustomerByName(customerName);
+        
+        if (!customer) {
+            // Create new customer
+            const Customer = require('../models/Customer');
+            const customerObj = new Customer({
+                name: customerName.trim(),
+                ...additionalData
+            });
+            
+            const validation = customerObj.validate();
+            if (!validation.isValid) {
+                throw new Error('Invalid customer data: ' + validation.errors.join(', '));
+            }
+            
+            customer = await this.createCustomer(customerObj.toJSON());
+        }
+        
+        return customer;
+    }
+
+    async updateCustomerWithRecord(customerName, recordData) {
+        const Customer = require('../models/Customer');
+        
+        // Find or create customer
+        let customerData = await this.findOrCreateCustomer(customerName);
+        
+        // Update customer with new record data
+        const customer = new Customer(customerData);
+        customer.addVisit(recordData);
+        
+        // Save updated customer
+        const updatedCustomer = await this.updateCustomer(customer._id, customer.toJSON());
+        
+        return updatedCustomer;
+    }
+
+    // EXPENSES (GASTOS)
+    async getExpenses() {
+        if (this.usePostgreSQL) {
+            return await database.getExpenses();
+        }
+        return await fileDatabase.getExpenses();
+    }
+
+    async getExpenseById(id) {
+        if (this.usePostgreSQL) {
+            return await database.getExpenseById(id);
+        }
+        return await fileDatabase.getExpenseById(id);
+    }
+
+    async createExpense(expenseData) {
+        if (this.usePostgreSQL) {
+            return await database.createExpense(expenseData);
+        }
+        return await fileDatabase.createExpense(expenseData);
+    }
+
+    async updateExpense(id, updateData) {
+        if (this.usePostgreSQL) {
+            return await database.updateExpense(id, updateData);
+        }
+        return await fileDatabase.updateExpense(id, updateData);
+    }
+
+    async deleteExpense(id) {
+        if (this.usePostgreSQL) {
+            return await database.deleteExpense(id);
+        }
+        return await fileDatabase.deleteExpense(id);
+    }
+
+    async getExpensesByCategory(category) {
+        if (this.usePostgreSQL) {
+            return await database.getExpensesByCategory(category);
+        }
+        return await fileDatabase.getExpensesByCategory(category);
+    }
+
+    async getExpensesByDateRange(startDate, endDate) {
+        if (this.usePostgreSQL) {
+            return await database.getExpensesByDateRange(startDate, endDate);
+        }
+        return await fileDatabase.getExpensesByDateRange(startDate, endDate);
+    }
+
+    async getRecurringExpenses() {
+        if (this.usePostgreSQL) {
+            return await database.getRecurringExpenses();
+        }
+        return await fileDatabase.getRecurringExpenses();
+    }
+
+    async getOverdueExpenses() {
+        if (this.usePostgreSQL) {
+            return await database.getOverdueExpenses();
+        }
+        return await fileDatabase.getOverdueExpenses();
+    }
+
+    async getExpenseStats() {
+        if (this.usePostgreSQL) {
+            return await database.getExpenseStats();
+        }
+        return await fileDatabase.getExpenseStats();
+    }
+
+    // Generate financial report (ingresos vs egresos)
+    async getFinancialReport(startDate, endDate) {
+        try {
+            // Get expenses for the period
+            const expenses = await this.getExpensesByDateRange(startDate, endDate);
+            const totalExpenses = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+            
+            // Get income from records for the period
+            const records = await this.getRecords();
+            const periodRecords = records.filter(record => {
+                const recordDate = new Date(record.date);
+                return recordDate >= startDate && recordDate <= endDate && !record.isDeleted;
+            });
+            const totalIncome = periodRecords.reduce((sum, record) => sum + record.total, 0);
+            
+            // Get coworking income
+            const sessions = await this.getCoworkingSessions();
+            const periodSessions = sessions.filter(session => {
+                const sessionDate = new Date(session.createdAt);
+                return sessionDate >= startDate && sessionDate <= endDate && session.status === 'closed';
+            });
+            const coworkingIncome = periodSessions.reduce((sum, session) => sum + (session.total || 0), 0);
+            
+            const totalRevenue = totalIncome + coworkingIncome;
+            const netProfit = totalRevenue - totalExpenses;
+            
+            return {
+                period: {
+                    startDate: startDate.toISOString().split('T')[0],
+                    endDate: endDate.toISOString().split('T')[0]
+                },
+                income: {
+                    pos_sales: totalIncome,
+                    coworking: coworkingIncome,
+                    total: totalRevenue
+                },
+                expenses: {
+                    total: totalExpenses,
+                    by_category: this.groupExpensesByCategory(expenses)
+                },
+                profit: {
+                    net: netProfit,
+                    margin: totalRevenue > 0 ? (netProfit / totalRevenue * 100) : 0
+                },
+                records_count: periodRecords.length,
+                sessions_count: periodSessions.length,
+                expenses_count: expenses.length
+            };
+        } catch (error) {
+            console.error('Error generating financial report:', error);
+            throw error;
+        }
+    }
+
+    // Helper method to group expenses by category
+    groupExpensesByCategory(expenses) {
+        const Expense = require('../models/Expense');
+        const categories = Expense.getCategories();
+        const grouped = {};
+        
+        // Initialize all categories with 0
+        Object.keys(categories).forEach(categoryId => {
+            grouped[categoryId] = {
+                name: categories[categoryId].name,
+                total: 0,
+                count: 0,
+                color: categories[categoryId].color,
+                icon: categories[categoryId].icon
+            };
+        });
+        
+        // Sum expenses by category
+        expenses.forEach(expense => {
+            const category = expense.category || 'otros';
+            if (grouped[category]) {
+                grouped[category].total += expense.amount;
+                grouped[category].count += 1;
+            }
+        });
+        
+        return grouped;
     }
 
     async close() {

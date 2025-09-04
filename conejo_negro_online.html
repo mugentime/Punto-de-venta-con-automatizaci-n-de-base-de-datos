@@ -1103,6 +1103,208 @@
             color: var(--bg-primary);
         }
 
+        /* Coworking Session Styles */
+        .session-card {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            position: relative;
+            transition: all 0.3s ease;
+        }
+
+        .session-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 4px 15px rgba(0, 217, 255, 0.2);
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .session-client {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+        }
+
+        .session-status {
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            background: rgba(46, 213, 115, 0.2);
+            color: #2ed573;
+            border: 1px solid rgba(46, 213, 115, 0.4);
+        }
+
+        .session-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .session-info-item {
+            text-align: center;
+        }
+
+        .session-info-label {
+            color: var(--text-secondary);
+            font-size: 12px;
+            margin-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .session-info-value {
+            color: var(--text-primary);
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .session-time-display {
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            margin-bottom: 15px;
+            border: 1px solid rgba(0, 217, 255, 0.3);
+        }
+
+        .session-elapsed-time {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent-cyan);
+            margin-bottom: 5px;
+        }
+
+        .session-current-cost {
+            color: var(--text-primary);
+            font-size: 1rem;
+            font-weight: 600;
+        }
+
+        .session-products {
+            margin-bottom: 15px;
+        }
+
+        .session-products-header {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 5px;
+        }
+
+        .session-product-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .session-product-info {
+            flex: 1;
+        }
+
+        .session-product-name {
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        .session-product-details {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .session-product-total {
+            color: var(--accent-cyan);
+            font-weight: 600;
+        }
+
+        .add-product-section {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+
+        .add-product-form {
+            display: flex;
+            gap: 10px;
+            align-items: end;
+        }
+
+        .add-product-form select {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .add-product-form input[type="number"] {
+            width: 80px;
+            min-width: 80px;
+        }
+
+        .session-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .session-btn {
+            flex: 1;
+            min-width: 120px;
+            padding: 10px 16px;
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .session-btn-success {
+            background: linear-gradient(45deg, #2ed573, #20bf6b);
+            color: white;
+        }
+
+        .session-btn-warning {
+            background: linear-gradient(45deg, #ffa726, #ff9800);
+            color: var(--bg-primary);
+        }
+
+        .session-btn-danger {
+            background: linear-gradient(45deg, #ff4757, #ff3838);
+            color: white;
+        }
+
+        .session-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(0, 217, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent-cyan);
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
         /* Responsive Design */
         @media (max-width: 768px) {
             .reports-header {
@@ -1135,6 +1337,28 @@
 
             .action-btn {
                 justify-content: center;
+            }
+
+            .session-info {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .session-actions {
+                flex-direction: column;
+            }
+
+            .session-btn {
+                min-width: auto;
+                width: 100%;
+            }
+
+            .add-product-form {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-product-form input[type="number"] {
+                width: 100%;
             }
         }
     </style>
@@ -1438,52 +1662,85 @@
 
             <!-- Coworking Section -->
             <section id="coworking" class="section">
+                <!-- Stats Header -->
                 <div class="card">
                     <h2 class="card-title">
-                        <i class="fas fa-laptop"></i>
+                        <i class="fas fa-users"></i>
                         Gestión de Coworking
+                        <button id="refresh-coworking" class="btn btn-sm" style="margin-left: auto; font-size: 12px;">
+                            <i class="fas fa-sync-alt"></i> Actualizar
+                        </button>
                     </h2>
                     
                     <div class="stats-card">
                         <div class="stat-item">
                             <div class="stat-value" id="coworking-active">0</div>
-                            <div class="stat-label">Espacios Activos</div>
+                            <div class="stat-label">Sesiones Activas</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value" id="coworking-today">0</div>
-                            <div class="stat-label">Clientes Hoy</div>
+                            <div class="stat-label">Clientes Activos</div>
                         </div>
                         <div class="stat-item">
                             <div class="stat-value" id="coworking-revenue">$0.00</div>
-                            <div class="stat-label">Ingresos Coworking</div>
+                            <div class="stat-label">Ingresos Actuales</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value" id="coworking-average">0h</div>
+                            <div class="stat-label">Tiempo Promedio</div>
                         </div>
                     </div>
+                </div>
+
+                <!-- New Session Form -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-plus-circle"></i>
+                        Nueva Sesión de Coworking
+                    </h2>
                     
-                    <div class="table-container">
-                        <table id="coworking-table">
-                            <thead>
-                                <tr>
-                                    <th>Cliente</th>
-                                    <th>Hora Inicio</th>
-                                    <th>Duración</th>
-                                    <th>Estado</th>
-                                    <th>Total</th>
-                                    <th>Bebidas Incluidas</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Los registros de coworking se agregarán aquí dinámicamente -->
-                            </tbody>
-                        </table>
+                    <form id="new-coworking-session-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="coworking-client-name">Nombre del Cliente</label>
+                                <input type="text" id="coworking-client-name" class="form-control" required placeholder="Ingresa el nombre del cliente">
+                            </div>
+                            <div class="form-group">
+                                <label for="coworking-hourly-rate">Tarifa por Hora</label>
+                                <input type="number" id="coworking-hourly-rate" class="form-control" value="58" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="coworking-notes">Notas (Opcional)</label>
+                                <input type="text" id="coworking-notes" class="form-control" placeholder="Notas adicionales">
+                            </div>
+                            <div class="form-group" style="align-self: flex-end;">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-play"></i>
+                                    Iniciar Sesión
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- Active Sessions -->
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-clock"></i>
+                        Sesiones Activas
+                    </h2>
+                    
+                    <div id="coworking-sessions-container">
+                        <!-- Active sessions will be loaded here -->
                     </div>
                     
-                    <div style="margin-top: 20px;">
-                        <p style="color: var(--text-secondary); font-size: 14px;">
-                            <i class="fas fa-info-circle"></i>
-                            Los servicios de coworking se registran desde la sección "Registro" seleccionando "Coworking" como tipo de servicio.
-                            Esta sección muestra un resumen de la actividad de coworking del día.
-                        </p>
+                    <div id="coworking-empty-state" class="empty-state" style="display: none; text-align: center; padding: 40px; color: var(--text-secondary);">
+                        <i class="fas fa-user-clock" style="font-size: 3rem; margin-bottom: 15px; opacity: 0.5;"></i>
+                        <h3 style="margin-bottom: 10px; color: var(--text-primary);">No hay sesiones activas</h3>
+                        <p>Inicia una nueva sesión de coworking para comenzar el seguimiento de tiempo</p>
                     </div>
                 </div>
             </section>
@@ -2089,7 +2346,7 @@
                     const passwordField = document.getElementById('login-password');
                     
                     if (emailField && passwordField) {
-                        emailField.value = 'admin@conejo.com';
+                        emailField.value = 'admin@conejonegro.com';
                         passwordField.value = 'admin123';
                         console.log('Auto-fill completed: Email and Password set');
                         
@@ -2105,101 +2362,99 @@
             }
         }
 
-        // Login
-        document.getElementById('login-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const email = document.getElementById('login-email').value;
-            const password = document.getElementById('login-password').value;
-            
-            try {
-                updateConnectionStatus('syncing');
-                const response = await fetch(`${API_BASE_URL}/auth/login`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-                
-                const data = await response.json();
-                
-                console.log('🔍 LOGIN DEBUG - Response status:', response.status);
-                console.log('🔍 LOGIN DEBUG - Response ok:', response.ok);
-                console.log('🔍 LOGIN DEBUG - Response data:', data);
-                
-                if (response.ok) {
-                    console.log('✅ LOGIN SUCCESS - Token received:', !!data.token);
-                    authToken = data.token;
-                    currentUser = data.user;
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    console.log('✅ LOGIN SUCCESS - Token saved to localStorage');
+        // Setup login and register forms (will be called from main DOMContentLoaded)
+        function setupAuthForms() {
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
                     
-                    showNotification('Login exitoso', 'success');
-                    showMainApp();
-                } else {
-                    console.log('❌ LOGIN FAILED - Status:', response.status, 'Error:', data.error);
-                    showNotification(data.error || 'Error en login', 'error');
-                    updateConnectionStatus('offline');
-                }
-            } catch (error) {
-                console.error('Error en login:', error);
-                showNotification('Error de conexión', 'error');
-                updateConnectionStatus('offline');
-            }
-        });
-
-        // Registro
-        document.getElementById('register-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const name = document.getElementById('register-name').value;
-            const email = document.getElementById('register-email').value;
-            const password = document.getElementById('register-password').value;
-            const role = document.getElementById('register-role').value;
-            
-            try {
-                updateConnectionStatus('syncing');
-                const response = await fetch(`${API_BASE_URL}/auth/register`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ name, email, password, role })
+                    const email = document.getElementById('login-email').value;
+                    const password = document.getElementById('login-password').value;
+                    
+                    try {
+                        updateConnectionStatus('syncing');
+                        const response = await fetch(`${API_BASE_URL}/auth/login`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ email, password })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        console.log('🔍 LOGIN DEBUG - Response status:', response.status);
+                        console.log('🔍 LOGIN DEBUG - Response ok:', response.ok);
+                        console.log('🔍 LOGIN DEBUG - Response data:', data);
+                        
+                        if (response.ok) {
+                            console.log('✅ LOGIN SUCCESS - Token received:', !!data.token);
+                            authToken = data.token;
+                            currentUser = data.user;
+                            localStorage.setItem('authToken', authToken);
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            console.log('✅ LOGIN SUCCESS - Token saved to localStorage');
+                            
+                            showNotification('Login exitoso', 'success');
+                            showMainApp();
+                        } else {
+                            console.log('❌ LOGIN FAILED - Status:', response.status, 'Error:', data.error);
+                            showNotification(data.error || 'Error en login', 'error');
+                            updateConnectionStatus('offline');
+                        }
+                    } catch (error) {
+                        console.error('Error en login:', error);
+                        showNotification('Error de conexión', 'error');
+                        updateConnectionStatus('offline');
+                    }
                 });
-                
-                const data = await response.json();
-                
-                if (response.ok) {
-                    authToken = data.token;
-                    currentUser = data.user;
-                    localStorage.setItem('authToken', authToken);
-                    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-                    showNotification('Registro exitoso', 'success');
-                    showMainApp();
-                } else {
-                    showNotification(data.error || 'Error en registro', 'error');
-                    updateConnectionStatus('offline');
-                }
-            } catch (error) {
-                console.error('Error en registro:', error);
-                showNotification('Error de conexión', 'error');
-                updateConnectionStatus('offline');
             }
-        });
+            
+            // Registro
+            const registerForm = document.getElementById('register-form');
+            if (registerForm) {
+                registerForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const name = document.getElementById('register-name').value;
+                    const email = document.getElementById('register-email').value;
+                    const password = document.getElementById('register-password').value;
+                    const role = document.getElementById('register-role').value;
+                    
+                    try {
+                        updateConnectionStatus('syncing');
+                        const response = await fetch(`${API_BASE_URL}/auth/register`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ name, email, password, role })
+                        });
+                        
+                        const data = await response.json();
+                        
+                        if (response.ok) {
+                            authToken = data.token;
+                            currentUser = data.user;
+                            localStorage.setItem('authToken', authToken);
+                            localStorage.setItem('currentUser', JSON.stringify(currentUser));
+                            showNotification('Registro exitoso', 'success');
+                            showMainApp();
+                        } else {
+                            showNotification(data.error || 'Error en registro', 'error');
+                            updateConnectionStatus('offline');
+                        }
+                    } catch (error) {
+                        console.error('Error en registro:', error);
+                        showNotification('Error de conexión', 'error');
+                        updateConnectionStatus('offline');
+                    }
+                });
+            }
+        }
 
-        // Logout
-        document.getElementById('logout-btn').addEventListener('click', function() {
-            if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
-                localStorage.removeItem('authToken');
-                localStorage.removeItem('currentUser');
-                authToken = null;
-                currentUser = null;
-                showLoginScreen();
-                showNotification('Sesión cerrada', 'warning');
-            }
-        });
+        // Logout button will be handled in main DOMContentLoaded
 
         // ===========================================
         // GESTIÓN DE ESTADO DE CONEXIÓN
@@ -2329,8 +2584,12 @@
                 updateDailyRecordsDisplay();
                 initializeReports();
                 
-                // Data loading complete
+                // Load coworking sessions if we're on the coworking section
+                if (document.querySelector('#coworking.section.active')) {
+                    await loadCoworkingSessions();
+                }
                 
+                // Data loading complete
                 showNotification('Datos cargados exitosamente', 'success');
             } catch (error) {
                 console.error('Error cargando datos:', error);
@@ -2357,8 +2616,8 @@
             }
         }
 
-        // Sincronizar datos manualmente
-        document.addEventListener('DOMContentLoaded', function() {
+        // Setup sync button (will be called from main DOMContentLoaded)
+        function setupSyncButton() {
             const syncButton = document.getElementById('sync-data');
             if (syncButton) {
                 syncButton.addEventListener('click', async function() {
@@ -2381,7 +2640,7 @@
                     }
                 });
             }
-        });
+        }
 
         // ===========================================
         // FUNCIONES DE LA APLICACIÓN
@@ -2810,7 +3069,11 @@
                             setupChartControls();
                         }
                         // Actualizar reportes con datos actuales - AWAIT para esperar datos reales
-                        await updateReportData('today');
+                        try {
+                            await updateReportData('today');
+                        } catch (error) {
+                            console.error('Error updating report data:', error);
+                        }
                     }, 100);
                 }
                 
@@ -2818,6 +3081,11 @@
                 if (sectionId === 'corte-caja') {
                     loadCashCuts();
                     loadServiceStatus();
+                }
+                
+                // Cargar sesiones de coworking cuando se accede a esa sección
+                if (sectionId === 'coworking') {
+                    loadCoworkingSessions();
                 }
                 
             });
@@ -4583,7 +4851,11 @@
                         document.getElementById('custom-date-range').style.display = 'flex';
                     } else {
                         document.getElementById('custom-date-range').style.display = 'none';
-                        await updateReportData(period);
+                        try {
+                            await updateReportData(period);
+                        } catch (error) {
+                            console.error('Error updating report data:', error);
+                        }
                     }
                 });
             }
@@ -4595,7 +4867,11 @@
                     const startDate = document.getElementById('start-date').value;
                     const endDate = document.getElementById('end-date').value;
                     if (startDate && endDate) {
-                        await updateReportData('custom', startDate, endDate);
+                        try {
+                            await updateReportData('custom', startDate, endDate);
+                        } catch (error) {
+                            console.error('Error updating custom report data:', error);
+                        }
                     }
                 });
             }
@@ -4875,11 +5151,7 @@
             updateReportData('today');
         }
 
-        // Inicializar aplicación
-
-        document.addEventListener('DOMContentLoaded', function() {
-            checkAuth();
-        });
+        // checkAuth will be called from main DOMContentLoaded
 
         // Verificar conexión periódicamente
         setInterval(async function() {
@@ -4901,71 +5173,68 @@
 
         // ===== CASH CUT FUNCTIONALITY =====
         
-        // Load cash cuts when section is accessed
-        document.addEventListener('DOMContentLoaded', function() {
-            // Listen for section changes to load cash cuts
-            const navLinks = document.querySelectorAll('.nav-link');
-            navLinks.forEach(link => {
-                link.addEventListener('click', function() {
-                    const sectionId = this.getAttribute('data-section');
-                    if (sectionId === 'corte-caja') {
-                        loadCashCuts();
-                        loadServiceStatus();
-                    }
-                });
-            });
-            
+        // Setup cash cuts interface (will be called from main DOMContentLoaded)
+        function setupCashCutsInterface() {
             // Manual cash cut button
-            document.getElementById('manual-cash-cut-btn').addEventListener('click', function() {
-                document.getElementById('manual-cut-notes').style.display = 'block';
-                this.style.display = 'none';
-            });
+            const manualCutBtn = document.getElementById('manual-cash-cut-btn');
+            if (manualCutBtn) {
+                manualCutBtn.addEventListener('click', function() {
+                    document.getElementById('manual-cut-notes').style.display = 'block';
+                    this.style.display = 'none';
+                });
+            }
             
             // Cancel manual cut
-            document.getElementById('cancel-manual-cut').addEventListener('click', function() {
-                document.getElementById('manual-cut-notes').style.display = 'none';
-                document.getElementById('manual-cash-cut-btn').style.display = 'block';
-                document.getElementById('cut-notes').value = '';
-            });
+            const cancelBtn = document.getElementById('cancel-manual-cut');
+            if (cancelBtn) {
+                cancelBtn.addEventListener('click', function() {
+                    document.getElementById('manual-cut-notes').style.display = 'none';
+                    document.getElementById('manual-cash-cut-btn').style.display = 'block';
+                    document.getElementById('cut-notes').value = '';
+                });
+            }
             
             // Confirm manual cut
-            document.getElementById('confirm-manual-cut').addEventListener('click', async function() {
-                const notes = document.getElementById('cut-notes').value.trim();
-                
-                if (!confirm('¿Estás seguro de que deseas realizar un corte de caja manual? Esta acción no se puede deshacer.')) {
-                    return;
-                }
-                
-                try {
-                    showNotification('Realizando corte de caja...', 'info');
+            const confirmBtn = document.getElementById('confirm-manual-cut');
+            if (confirmBtn) {
+                confirmBtn.addEventListener('click', async function() {
+                    const notes = document.getElementById('cut-notes').value.trim();
                     
-                    const response = await apiRequest('/cashcuts/manual', {
-                        method: 'POST',
-                        body: JSON.stringify({ notes })
-                    });
-                    
-                    if (response.success) {
-                        showNotification('Corte de caja realizado exitosamente', 'success');
-                        
-                        // Reset form
-                        document.getElementById('manual-cut-notes').style.display = 'none';
-                        document.getElementById('manual-cash-cut-btn').style.display = 'block';
-                        document.getElementById('cut-notes').value = '';
-                        
-                        // Reload cash cuts
-                        loadCashCuts();
-                        
-                        // Show cut details
-                        showCashCutDetails(response.cashCut);
-                    } else {
-                        showNotification('Error al realizar el corte de caja: ' + response.error, 'error');
+                    if (!confirm('¿Estás seguro de que deseas realizar un corte de caja manual? Esta acción no se puede deshacer.')) {
+                        return;
                     }
-                } catch (error) {
-                    console.error('Error performing manual cash cut:', error);
-                    showNotification('Error de conexión al realizar el corte', 'error');
-                }
-            });
-        });
+                    
+                    try {
+                        showNotification('Realizando corte de caja...', 'info');
+                        
+                        const response = await apiRequest('/cashcuts/manual', {
+                            method: 'POST',
+                            body: JSON.stringify({ notes })
+                        });
+                        
+                        if (response.success) {
+                            showNotification('Corte de caja realizado exitosamente', 'success');
+                            
+                            // Reset form
+                            document.getElementById('manual-cut-notes').style.display = 'none';
+                            document.getElementById('manual-cash-cut-btn').style.display = 'block';
+                            document.getElementById('cut-notes').value = '';
+                            
+                            // Reload cash cuts
+                            loadCashCuts();
+                            
+                            // Show cut details
+                            showCashCutDetails(response.cashCut);
+                        } else {
+                            showNotification('Error al realizar el corte de caja: ' + response.error, 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error performing manual cash cut:', error);
+                        showNotification('Error de conexión al realizar el corte', 'error');
+                    }
+                });
+            }
+        }
         
         // Load cash cuts list
         async function loadCashCuts() {
@@ -5108,80 +5377,6 @@
             console.log('Cash cuts functionality disabled');
             return;
         }
-            
-            // Show loading
-            loadingEl.style.display = 'block';
-            statsEl.style.display = 'none';
-            noCutsEl.style.display = 'none';
-            listEl.style.display = 'none';
-            
-            try {
-                // Get date range from current report period
-                let startDate = null;
-                let endDate = null;
-                
-                if (reportData.period === 'custom' && reportData.startDate && reportData.endDate) {
-                    startDate = reportData.startDate;
-                    endDate = reportData.endDate;
-                } else {
-                    // Calculate date range based on period
-                    const now = new Date();
-                    endDate = now.toISOString().split('T')[0];
-                    
-                    switch (reportData.period) {
-                        case 'today':
-                            startDate = endDate;
-                            break;
-                        case 'week':
-                            const weekAgo = new Date(now);
-                            weekAgo.setDate(weekAgo.getDate() - 7);
-                            startDate = weekAgo.toISOString().split('T')[0];
-                            break;
-                        case 'month':
-                            const monthAgo = new Date(now);
-                            monthAgo.setMonth(monthAgo.getMonth() - 1);
-                            startDate = monthAgo.toISOString().split('T')[0];
-                            break;
-                        default:
-                            startDate = endDate;
-                    }
-                }
-                
-                // Get cash cuts for the period
-                const response = await apiRequest(`/cashcuts?startDate=${startDate}&endDate=${endDate}&limit=100`);
-                
-                if (response.success && response.cashCuts.length > 0) {
-                    // Filter cash cuts within the exact period
-                    const periodCuts = response.cashCuts.filter(cut => {
-                        const cutDate = new Date(cut.cutDate);
-                        const start = new Date(startDate);
-                        const end = new Date(endDate);
-                        end.setHours(23, 59, 59, 999); // Include full end day
-                        
-                        return cutDate >= start && cutDate <= end;
-                    });
-                    
-                    if (periodCuts.length > 0) {
-                        updateReportCashCutsDisplay(periodCuts);
-                        statsEl.style.display = 'block';
-                        listEl.style.display = 'block';
-                    } else {
-                        noCutsEl.style.display = 'block';
-                    }
-                } else {
-                    noCutsEl.style.display = 'block';
-                }
-            } catch (error) {
-                console.error('Error loading report cash cuts:', error);
-                noCutsEl.innerHTML = `
-                    <i class="fas fa-exclamation-triangle"></i>
-                    Error al cargar cortes de caja del período
-                `;
-                noCutsEl.style.display = 'block';
-            }
-            
-            loadingEl.style.display = 'none';
-        }
         
         // Update cash cuts display in reports
         function updateReportCashCutsDisplay(cashCuts) {
@@ -5234,34 +5429,476 @@
             `;
         }
         // ===========================================
+        // GESTIÓN DE COWORKING
+        // ===========================================
+        
+        let coworkingSessions = [];
+        let coworkingUpdateInterval = null;
+        
+        // Load coworking sessions
+        async function loadCoworkingSessions() {
+            if (!authToken) return;
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/sessions/active`, {
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    coworkingSessions = data.sessions || [];
+                    updateCoworkingDisplay();
+                    updateCoworkingStats();
+                } else {
+                    console.error('Error loading coworking sessions');
+                }
+            } catch (error) {
+                console.error('Error loading coworking sessions:', error);
+            }
+        }
+        
+        // Update coworking display
+        function updateCoworkingDisplay() {
+            const container = document.getElementById('coworking-sessions-container');
+            const emptyState = document.getElementById('coworking-empty-state');
+            
+            if (!container) return;
+            
+            if (coworkingSessions.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            emptyState.style.display = 'none';
+            container.innerHTML = coworkingSessions.map(session => createCoworkingSessionCard(session)).join('');
+            
+            // Setup event listeners for session actions
+            setupCoworkingSessionEvents();
+        }
+        
+        // Create coworking session card HTML
+        function createCoworkingSessionCard(session) {
+            const startTime = new Date(session.startTime);
+            const elapsed = calculateElapsedTime(startTime);
+            const currentCost = calculateCurrentCost(session, elapsed.totalMinutes);
+            
+            return `
+                <div class="session-card" data-session-id="${session._id}">
+                    <div class="session-header">
+                        <div class="session-client">${session.client}</div>
+                        <div class="session-status">Activa</div>
+                    </div>
+                    
+                    <div class="session-info">
+                        <div class="session-info-item">
+                            <div class="session-info-label">Inicio</div>
+                            <div class="session-info-value">${formatTime(startTime)}</div>
+                        </div>
+                        <div class="session-info-item">
+                            <div class="session-info-label">Tarifa/Hora</div>
+                            <div class="session-info-value">$${session.hourlyRate.toFixed(2)}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="session-time-display">
+                        <div class="session-elapsed-time" data-start="${session.startTime}">${elapsed.display}</div>
+                        <div class="session-current-cost">Costo Actual: $${currentCost.toFixed(2)}</div>
+                    </div>
+                    
+                    ${session.notes ? `<div style="color: var(--text-secondary); font-style: italic; margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 6px;">"${session.notes}"</div>` : ''}
+                    
+                    <div class="session-products">
+                        <div class="session-products-header">Productos (${(session.products || []).length})</div>
+                        <div class="session-products-list">
+                            ${renderCoworkingSessionProducts(session.products || [])}
+                        </div>
+                    </div>
+                    
+                    <div class="add-product-section">
+                        <div class="add-product-form">
+                            <select class="form-control product-select" data-session="${session._id}">
+                                <option value="">Seleccionar producto...</option>
+                                ${data.products.filter(p => p.isActive && p.quantity > 0).map(p => 
+                                    `<option value="${p._id}" data-price="${p.price}" data-cost="${p.cost}" data-category="${p.category}">
+                                        ${p.name} - $${p.price.toFixed(2)} (${p.quantity})
+                                    </option>`
+                                ).join('')}
+                            </select>
+                            <input type="number" class="form-control quantity-input" data-session="${session._id}" value="1" min="1" placeholder="Cant.">
+                            <button type="button" class="btn btn-primary add-product-btn" data-session="${session._id}">
+                                <i class="fas fa-plus"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="session-actions">
+                        <button class="session-btn session-btn-success checkout-btn" data-session="${session._id}">
+                            <i class="fas fa-cash-register"></i> Finalizar y Cobrar
+                        </button>
+                        <button class="session-btn session-btn-danger cancel-btn" data-session="${session._id}">
+                            <i class="fas fa-times"></i> Cancelar
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Render session products
+        function renderCoworkingSessionProducts(products) {
+            if (!products || products.length === 0) {
+                return '<div style="text-align: center; color: var(--text-secondary); padding: 10px;">No hay productos agregados</div>';
+            }
+            
+            return products.map(product => `
+                <div class="session-product-item">
+                    <div class="session-product-info">
+                        <div class="session-product-name">${product.name}</div>
+                        <div class="session-product-details">Cantidad: ${product.quantity} | ${product.category}</div>
+                    </div>
+                    <div class="session-product-total">$${(product.price * product.quantity).toFixed(2)}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Calculate elapsed time
+        function calculateElapsedTime(startTime) {
+            const now = new Date();
+            const elapsed = now - startTime;
+            const totalMinutes = Math.floor(elapsed / 60000);
+            const hours = Math.floor(totalMinutes / 60);
+            const minutes = totalMinutes % 60;
+            
+            return {
+                totalMinutes,
+                hours,
+                minutes,
+                display: `${hours}h ${minutes.toString().padStart(2, '0')}m`
+            };
+        }
+        
+        // Calculate current cost
+        function calculateCurrentCost(session, totalMinutes) {
+            const hours = totalMinutes / 60;
+            return hours * session.hourlyRate;
+        }
+        
+        // Update coworking stats
+        function updateCoworkingStats() {
+            document.getElementById('coworking-active').textContent = coworkingSessions.length;
+            document.getElementById('coworking-today').textContent = coworkingSessions.length;
+            
+            let totalRevenue = 0;
+            let totalMinutes = 0;
+            
+            coworkingSessions.forEach(session => {
+                const elapsed = calculateElapsedTime(new Date(session.startTime));
+                totalMinutes += elapsed.totalMinutes;
+                totalRevenue += calculateCurrentCost(session, elapsed.totalMinutes);
+            });
+            
+            document.getElementById('coworking-revenue').textContent = `$${totalRevenue.toFixed(2)}`;
+            
+            const averageMinutes = coworkingSessions.length > 0 ? totalMinutes / coworkingSessions.length : 0;
+            const averageHours = Math.floor(averageMinutes / 60);
+            const remainingMinutes = Math.floor(averageMinutes % 60);
+            document.getElementById('coworking-average').textContent = `${averageHours}h ${remainingMinutes}m`;
+        }
+        
+        // Update time displays
+        function updateCoworkingTimeDisplays() {
+            document.querySelectorAll('.session-elapsed-time').forEach(element => {
+                const startTime = new Date(element.dataset.start);
+                const elapsed = calculateElapsedTime(startTime);
+                element.textContent = elapsed.display;
+            });
+            
+            // Update current costs
+            coworkingSessions.forEach(session => {
+                const elapsed = calculateElapsedTime(new Date(session.startTime));
+                const currentCost = calculateCurrentCost(session, elapsed.totalMinutes);
+                const costElement = document.querySelector(`[data-session-id="${session._id}"] .session-current-cost`);
+                if (costElement) {
+                    costElement.textContent = `Costo Actual: $${currentCost.toFixed(2)}`;
+                }
+            });
+            
+            updateCoworkingStats();
+        }
+        
+        // Setup coworking session event listeners
+        function setupCoworkingSessionEvents() {
+            // Add product buttons
+            document.querySelectorAll('.add-product-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sessionId = this.dataset.session;
+                    addProductToCoworkingSession(sessionId);
+                });
+            });
+            
+            // Checkout buttons
+            document.querySelectorAll('.checkout-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sessionId = this.dataset.session;
+                    showCoworkingCheckoutModal(sessionId);
+                });
+            });
+            
+            // Cancel buttons
+            document.querySelectorAll('.cancel-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    const sessionId = this.dataset.session;
+                    cancelCoworkingSession(sessionId);
+                });
+            });
+        }
+        
+        // Add product to coworking session
+        async function addProductToCoworkingSession(sessionId) {
+            const productSelect = document.querySelector(`.product-select[data-session="${sessionId}"]`);
+            const quantityInput = document.querySelector(`.quantity-input[data-session="${sessionId}"]`);
+            
+            const productId = productSelect.value;
+            const quantity = parseInt(quantityInput.value);
+            
+            if (!productId || quantity < 1) {
+                showNotification('Selecciona un producto y cantidad válida', 'warning');
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/products`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ productId, quantity })
+                });
+                
+                if (response.ok) {
+                    showNotification('Producto agregado exitosamente', 'success');
+                    productSelect.value = '';
+                    quantityInput.value = '1';
+                    await Promise.all([loadCoworkingSessions(), loadData()]);
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Error al agregar producto', 'error');
+                }
+            } catch (error) {
+                console.error('Error adding product:', error);
+                showNotification('Error al agregar producto', 'error');
+            }
+        }
+        
+        // Show checkout modal
+        function showCoworkingCheckoutModal(sessionId) {
+            const session = coworkingSessions.find(s => s._id === sessionId);
+            if (!session) return;
+            
+            const elapsed = calculateElapsedTime(new Date(session.startTime));
+            const currentCost = calculateCurrentCost(session, elapsed.totalMinutes);
+            
+            const paymentMethod = prompt(
+                `Finalizar sesión de ${session.client}\n\n` +
+                `Tiempo: ${elapsed.display}\n` +
+                `Costo actual: $${currentCost.toFixed(2)}\n\n` +
+                `Método de pago:\n` +
+                `1 = Efectivo\n` +
+                `2 = Tarjeta\n` +
+                `3 = Transferencia\n\n` +
+                `Ingresa el número:`, '1'
+            );
+            
+            if (paymentMethod) {
+                const methods = { '1': 'efectivo', '2': 'tarjeta', '3': 'transferencia' };
+                const method = methods[paymentMethod];
+                
+                if (method) {
+                    finishCoworkingSession(sessionId, method);
+                } else {
+                    showNotification('Método de pago inválido', 'error');
+                }
+            }
+        }
+        
+        // Finish coworking session
+        async function finishCoworkingSession(sessionId, paymentMethod) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}/checkout`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({ payment: paymentMethod })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification(`Sesión finalizada. Total: $${result.total.toFixed(2)}`, 'success');
+                    await Promise.all([loadCoworkingSessions(), loadData()]);
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Error al finalizar sesión', 'error');
+                }
+            } catch (error) {
+                console.error('Error finishing session:', error);
+                showNotification('Error al finalizar sesión', 'error');
+            }
+        }
+        
+        // Cancel coworking session
+        async function cancelCoworkingSession(sessionId) {
+            if (!confirm('¿Estás seguro de que quieres cancelar esta sesión?')) {
+                return;
+            }
+            
+            try {
+                const response = await fetch(`${API_BASE_URL}/sessions/${sessionId}`, {
+                    method: 'DELETE',
+                    headers: { 'Authorization': `Bearer ${authToken}` }
+                });
+                
+                if (response.ok) {
+                    showNotification('Sesión cancelada', 'warning');
+                    await loadCoworkingSessions();
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Error al cancelar sesión', 'error');
+                }
+            } catch (error) {
+                console.error('Error canceling session:', error);
+                showNotification('Error al cancelar sesión', 'error');
+            }
+        }
+        
+        // Create new coworking session
+        async function createCoworkingSession(clientName, hourlyRate, notes) {
+            try {
+                const response = await fetch(`${API_BASE_URL}/sessions`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        client: clientName.trim(),
+                        hourlyRate: parseFloat(hourlyRate),
+                        notes: notes.trim()
+                    })
+                });
+                
+                if (response.ok) {
+                    const result = await response.json();
+                    showNotification('Sesión iniciada exitosamente', 'success');
+                    await loadCoworkingSessions();
+                    return true;
+                } else {
+                    const error = await response.json();
+                    showNotification(error.error || 'Error al crear sesión', 'error');
+                    return false;
+                }
+            } catch (error) {
+                console.error('Error creating session:', error);
+                showNotification('Error al crear sesión', 'error');
+                return false;
+            }
+        }
+        
+        // Format time
+        function formatTime(date) {
+            return date.toLocaleTimeString('es-MX', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+        }
+        
+        // Setup coworking interface
+        function setupCoworkingInterface() {
+            // New session form
+            const newSessionForm = document.getElementById('new-coworking-session-form');
+            if (newSessionForm) {
+                newSessionForm.addEventListener('submit', async function(e) {
+                    e.preventDefault();
+                    
+                    const clientName = document.getElementById('coworking-client-name').value;
+                    const hourlyRate = document.getElementById('coworking-hourly-rate').value;
+                    const notes = document.getElementById('coworking-notes').value;
+                    
+                    if (!clientName.trim()) {
+                        showNotification('El nombre del cliente es requerido', 'error');
+                        return;
+                    }
+                    
+                    const success = await createCoworkingSession(clientName, hourlyRate, notes);
+                    if (success) {
+                        newSessionForm.reset();
+                        document.getElementById('coworking-hourly-rate').value = '58';
+                    }
+                });
+            }
+            
+            // Refresh button
+            const refreshBtn = document.getElementById('refresh-coworking');
+            if (refreshBtn) {
+                refreshBtn.addEventListener('click', function() {
+                    loadCoworkingSessions();
+                });
+            }
+            
+            // Start auto-update interval
+            if (coworkingUpdateInterval) {
+                clearInterval(coworkingUpdateInterval);
+            }
+            
+            coworkingUpdateInterval = setInterval(() => {
+                if (document.querySelector('#coworking.section.active')) {
+                    updateCoworkingTimeDisplays();
+                    
+                    // Full refresh every 2 minutes
+                    if (Date.now() % 120000 < 30000) {
+                        loadCoworkingSessions();
+                    }
+                }
+            }, 30000);
+        }
+        
+        // ===========================================
         // INICIALIZACIÓN DE LA APLICACIÓN
         // ===========================================
         
-        // Initialize the application when page loads
-        document.addEventListener('DOMContentLoaded', async function() {
-            console.log('🚀 Iniciando aplicación POS...');
-            
-            // Setup auto-fill functionality BEFORE auth check
-            setupAutoFill();
-            
-            // Initialize authentication check first
-            try {
-                const isAuthenticated = await checkAuth();
-                console.log('🔐 Estado de autenticación:', isAuthenticated);
-            } catch (error) {
-                console.error('❌ Error durante verificación de auth:', error);
-                showLoginScreen();
+        // Función para inicializar la navegación móvil
+        function initializeMobileNavigation() {
+            // Mobile navigation buttons
+            const mobileNavButtons = document.querySelectorAll('.mobile-nav-btn');
+            if (mobileNavButtons.length > 0) {
+                mobileNavButtons.forEach(btn => {
+                    btn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        
+                        const section = this.getAttribute('data-section');
+                        
+                        // Remove active class from all mobile buttons
+                        document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        
+                        // Find and click the corresponding nav-link
+                        const targetLink = document.querySelector(`.nav-link[data-section="${section}"]`);
+                        if (targetLink) {
+                            targetLink.click();
+                        }
+                    });
+                });
             }
-            
-            // Initialize charts and other components
-            try {
-                initializeCharts();
-                console.log('📊 Charts inicializados');
-            } catch (error) {
-                console.error('❌ Error inicializando charts:', error);
-            }
+        }
         
-        // Mobile Navigation Fix - Agregar función showSection y event handlers móviles
+        // Función para inicializar la navegación general
+        function initializeNavigation() {
+            // Ya está configurado arriba en el código
+        }
+        
+        // Mobile Navigation Fix - Agregar función showSection global
         window.showSection = function(sectionName) {
             // Mapear nombres cortos a IDs de sección actuales
             const sectionMap = {
@@ -5281,35 +5918,63 @@
                 targetLink.click();
             }
         };
-            // Mobile navigation buttons con data-section
-            const mobileNavButtons = document.querySelectorAll('.mobile-nav-btn');
-            if (mobileNavButtons.length > 0) {
-                mobileNavButtons.forEach(btn => {
-                    btn.addEventListener('click', function(e) {
-                        e.preventDefault();
-                        
-                        const section = this.getAttribute('data-section');
-                        
-                        // Remove active class from all mobile buttons
-                        document.querySelectorAll('.mobile-nav-btn').forEach(b => b.classList.remove('active'));
-                        this.classList.add('active');
-                        
-                        // Find and click the corresponding nav-link
-                        const targetLink = document.querySelector(`.nav-link[data-section="${section}"]`);
-                        if (targetLink) {
-                            targetLink.click();
-                        } else {
-                            // If no nav-link, handle section change directly
-                            document.querySelectorAll('.content-section').forEach(s => s.style.display = 'none');
-                            const targetSection = document.getElementById(section);
-                            if (targetSection) {
-                                targetSection.style.display = 'block';
-                            }
+
+        // ===========================================
+        // INICIALIZACIÓN PRINCIPAL DE LA APLICACIÓN
+        // ===========================================
+        
+        // Initialize the application when DOM is ready
+        document.addEventListener('DOMContentLoaded', async function() {
+            console.log('🚀 Initializing POS application...');
+            
+            try {
+                // Setup all interface components first
+                setupAutoFill();
+                console.log('✅ Auto-fill setup complete');
+                
+                setupAuthForms();
+                console.log('✅ Auth forms setup complete');
+                
+                setupSyncButton();
+                console.log('✅ Sync button setup complete');
+                
+                setupCashCutsInterface();
+                console.log('✅ Cash cuts interface setup complete');
+                
+                // Setup coworking interface
+                setupCoworkingInterface();
+                console.log('✅ Coworking interface setup complete');
+                
+                // Initialize mobile navigation
+                initializeMobileNavigation();
+                console.log('✅ Mobile navigation initialized');
+                
+                // Setup logout button
+                const logoutBtn = document.getElementById('logout-btn');
+                if (logoutBtn) {
+                    logoutBtn.addEventListener('click', function() {
+                        if (confirm('¿Estás seguro de que deseas cerrar sesión?')) {
+                            localStorage.removeItem('authToken');
+                            localStorage.removeItem('currentUser');
+                            authToken = null;
+                            currentUser = null;
+                            showLoginScreen();
+                            showNotification('Sesión cerrada', 'warning');
                         }
                     });
-                });
+                }
+                
+                // Check authentication status
+                await checkAuth();
+                console.log('✅ Authentication check complete');
+                
+                console.log('✅ POS application fully initialized');
+            } catch (error) {
+                console.error('❌ Error during initialization:', error);
+                showLoginScreen();
             }
         });
+        
     </script>
 </body>
 </html>

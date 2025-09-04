@@ -229,5 +229,159 @@
     "isDeleted": false,
     "createdAt": "2025-08-26T23:27:19.769Z",
     "drink": "Café Test"
+  },
+  {
+    "_id": "10ee395e33318a5d01f695d8",
+    "client": "pablo",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "quantity": 1,
+        "price": 18,
+        "cost": 8,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 18,
+    "serviceCharge": 0,
+    "total": 18,
+    "payment": "efectivo",
+    "cost": 8,
+    "profit": 10,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-09-03T17:22:10.770Z",
+    "time": "11:22:10",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "isDeleted": true,
+    "createdAt": "2025-09-03T17:22:10.775Z",
+    "drink": "Fig Bar",
+    "drinkProduct": "da56c66d52b8e46b70f40b6f",
+    "deletedAt": "2025-09-03T17:27:06.897Z",
+    "deletedBy": "e0cbd27429eaa20acf48cc23"
+  },
+  {
+    "_id": "c0fd3ac13009b88f64aa481c",
+    "client": "pablo",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "quantity": 1,
+        "price": 18,
+        "cost": 8,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 0,
+    "serviceCharge": 58,
+    "total": 58,
+    "payment": "tarjeta",
+    "cost": 8,
+    "profit": 50,
+    "drinksCost": 8,
+    "tip": 0,
+    "date": "2025-09-03T17:27:01.200Z",
+    "time": "11:27:01",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "isDeleted": false,
+    "createdAt": "2025-09-03T17:27:01.201Z",
+    "drink": "Fig Bar",
+    "drinkProduct": "da56c66d52b8e46b70f40b6f"
+  },
+  {
+    "_id": "e1921b953f41b0f97d482657",
+    "client": "Juan Pérez - Test Cliente",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "test-product-123",
+        "name": "Americano",
+        "quantity": 2,
+        "price": 40,
+        "cost": 12,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 3,
+    "subtotal": 0,
+    "serviceCharge": 174,
+    "total": 174,
+    "payment": "tarjeta",
+    "cost": 24,
+    "profit": 150,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-09-03T18:13:28.772Z",
+    "time": "12:13:28",
+    "isDeleted": false,
+    "createdAt": "2025-09-03T18:13:28.790Z",
+    "drink": "Americano",
+    "drinkProduct": "test-product-123"
+  },
+  {
+    "_id": "766344c7237552075862a640",
+    "client": "María González - Test Cliente TM",
+    "service": "coworking",
+    "products": [
+      {
+        "productId": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "quantity": 1,
+        "price": 18,
+        "cost": 8,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 2,
+    "subtotal": 0,
+    "serviceCharge": 116,
+    "total": 116,
+    "payment": "tarjeta",
+    "cost": 8,
+    "profit": 108,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-09-03T18:13:59.155Z",
+    "time": "12:13:59",
+    "isDeleted": false,
+    "createdAt": "2025-09-03T18:13:59.173Z",
+    "drink": "Fig Bar",
+    "drinkProduct": "da56c66d52b8e46b70f40b6f"
+  },
+  {
+    "_id": "dc25381be34d69aec05123e0",
+    "client": "María González - Test Cliente TM",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "quantity": 2,
+        "price": 18,
+        "cost": 8,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 36,
+    "serviceCharge": 0,
+    "total": 36,
+    "payment": "efectivo",
+    "cost": 16,
+    "profit": 20,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-09-03T18:13:59.206Z",
+    "time": "12:13:59",
+    "isDeleted": false,
+    "createdAt": "2025-09-03T18:13:59.207Z",
+    "drink": "Fig Bar",
+    "drinkProduct": "da56c66d52b8e46b70f40b6f"
   }
 ]

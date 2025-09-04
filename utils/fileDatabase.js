@@ -19,10 +19,11 @@ class FileDatabase {
     this.usersFile = path.join(this.dataPath, 'users.json');
     this.productsFile = path.join(this.dataPath, 'products.json');
     this.recordsFile = path.join(this.dataPath, 'records.json');
-    this.backupsFile = path.join(this.dataPath, 'backups.json');
-    this.cashCutsFile = path.join(this.dataPath, 'cashcuts.json');
+    this.cashCutsFile = path.join(this.dataPath, 'cash_cuts.json');
     this.membershipsFile = path.join(this.dataPath, 'memberships.json');
     this.coworkingSessionsFile = path.join(this.dataPath, 'coworking_sessions.json');
+    this.customersFile = path.join(this.dataPath, 'customers.json');
+    this.expensesFile = path.join(this.dataPath, 'expenses.json');
     
     this.initialized = false;
   }
@@ -43,6 +44,8 @@ class FileDatabase {
       await this.initializeFile(this.cashCutsFile, []);
       await this.initializeFile(this.membershipsFile, []);
       await this.initializeFile(this.coworkingSessionsFile, []);
+      await this.initializeFile(this.customersFile, []);
+      await this.initializeFile(this.expensesFile, []);
       
       // Create default admin user if no users exist
       const users = await this.getUsers();
@@ -960,6 +963,458 @@ class FileDatabase {
     } catch (error) {
       console.error('Error deleting coworking session:', error);
       throw error;
+    }
+  }
+
+  // CUSTOMERS
+  async getCustomers() {
+    try {
+      await this.initializeFile(this.customersFile, []);
+      const data = await fs.readFile(this.customersFile, 'utf8');
+      return JSON.parse(data).filter(c => c.isActive !== false);
+    } catch (error) {
+      console.error('Error reading customers:', error);
+      return [];
+    }
+  }
+
+  async getCustomerById(id) {
+    try {
+      const customers = await this.getCustomers();
+      return customers.find(c => c._id === id);
+    } catch (error) {
+      console.error('Error getting customer by ID:', error);
+      return null;
+    }
+  }
+
+  async getCustomerByName(name) {
+    try {
+      const customers = await this.getCustomers();
+      return customers.find(c => c.name.toLowerCase() === name.toLowerCase());
+    } catch (error) {
+      console.error('Error getting customer by name:', error);
+      return null;
+    }
+  }
+
+  async createCustomer(customerData) {
+    try {
+      const customers = await this.getCustomers();
+      
+      const newCustomer = {
+        _id: customerData._id || this.generateId(),
+        name: customerData.name,
+        email: customerData.email || null,
+        phone: customerData.phone || null,
+        birthDate: customerData.birthDate || null,
+        notes: customerData.notes || '',
+        status: customerData.status || 'active',
+        tags: customerData.tags || [],
+        preferredServices: customerData.preferredServices || [],
+        totalVisits: customerData.totalVisits || 0,
+        firstVisit: customerData.firstVisit || new Date().toISOString(),
+        lastVisit: customerData.lastVisit || new Date().toISOString(),
+        totalSpent: customerData.totalSpent || 0,
+        averageSpent: customerData.averageSpent || 0,
+        totalSessions: customerData.totalSessions || 0,
+        totalHours: customerData.totalHours || 0,
+        favoriteProducts: customerData.favoriteProducts || [],
+        productStatistics: customerData.productStatistics || {},
+        preferredPaymentMethod: customerData.preferredPaymentMethod || null,
+        paymentStatistics: customerData.paymentStatistics || {
+          efectivo: 0,
+          tarjeta: 0,
+          transferencia: 0
+        },
+        averageSessionDuration: customerData.averageSessionDuration || 0,
+        preferredTimeSlots: customerData.preferredTimeSlots || [],
+        weekdayPreferences: customerData.weekdayPreferences || {},
+        loyaltyPoints: customerData.loyaltyPoints || 0,
+        loyaltyTier: customerData.loyaltyTier || 'bronze',
+        isActive: customerData.isActive !== undefined ? customerData.isActive : true,
+        createdBy: customerData.createdBy,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString()
+      };
+
+      customers.push(newCustomer);
+      await fs.writeFile(this.customersFile, JSON.stringify(customers, null, 2));
+      
+      return newCustomer;
+    } catch (error) {
+      console.error('Error creating customer:', error);
+      throw error;
+    }
+  }
+
+  async updateCustomer(id, updateData) {
+    try {
+      const customers = await this.getCustomers();
+      const customerIndex = customers.findIndex(c => c._id === id);
+
+      if (customerIndex === -1) {
+        throw new Error('Customer not found');
+      }
+
+      customers[customerIndex] = {
+        ...customers[customerIndex],
+        ...updateData,
+        updatedAt: new Date().toISOString()
+      };
+
+      await fs.writeFile(this.customersFile, JSON.stringify(customers, null, 2));
+      return customers[customerIndex];
+    } catch (error) {
+      console.error('Error updating customer:', error);
+      throw error;
+    }
+  }
+
+  async deleteCustomer(id) {
+    try {
+      const customers = await this.getCustomers();
+      const customerIndex = customers.findIndex(c => c._id === id);
+
+      if (customerIndex === -1) {
+        throw new Error('Customer not found');
+      }
+
+      // Soft delete
+      customers[customerIndex].isActive = false;
+      customers[customerIndex].updatedAt = new Date().toISOString();
+
+      await fs.writeFile(this.customersFile, JSON.stringify(customers, null, 2));
+      return true;
+    } catch (error) {
+      console.error('Error deleting customer:', error);
+      throw error;
+    }
+  }
+
+  async searchCustomers(query) {
+    try {
+      const customers = await this.getCustomers();
+      const searchTerm = query.toLowerCase();
+      
+      return customers.filter(customer => 
+        customer.name.toLowerCase().includes(searchTerm) ||
+        (customer.email && customer.email.toLowerCase().includes(searchTerm)) ||
+        (customer.phone && customer.phone.includes(searchTerm))
+      );
+    } catch (error) {
+      console.error('Error searching customers:', error);
+      return [];
+    }
+  }
+
+  async getCustomerStats() {
+    try {
+      const customers = await this.getCustomers();
+      
+      const stats = {
+        total: customers.length,
+        active: customers.filter(c => c.status === 'active').length,
+        vip: customers.filter(c => c.status === 'vip').length,
+        totalLifetimeValue: customers.reduce((sum, c) => sum + c.totalSpent, 0),
+        averageLifetimeValue: 0,
+        topSpenders: customers
+          .sort((a, b) => b.totalSpent - a.totalSpent)
+          .slice(0, 10)
+          .map(c => ({
+            id: c._id,
+            name: c.name,
+            totalSpent: c.totalSpent,
+            totalVisits: c.totalVisits,
+            loyaltyTier: c.loyaltyTier
+          })),
+        segmentation: {
+          new: customers.filter(c => c.totalVisits < 3).length,
+          occasional: customers.filter(c => c.totalVisits >= 3 && c.totalVisits < 10).length,
+          regular: customers.filter(c => c.totalVisits >= 10 && c.totalVisits < 20).length,
+          loyal: customers.filter(c => c.totalVisits >= 20 && c.totalVisits < 50).length,
+          vip: customers.filter(c => c.totalVisits >= 50 && c.totalSpent >= 5000).length
+        },
+        loyaltyTiers: {
+          bronze: customers.filter(c => c.loyaltyTier === 'bronze').length,
+          silver: customers.filter(c => c.loyaltyTier === 'silver').length,
+          gold: customers.filter(c => c.loyaltyTier === 'gold').length,
+          platinum: customers.filter(c => c.loyaltyTier === 'platinum').length
+        },
+        atRisk: customers.filter(c => {
+          const daysSinceLastVisit = Math.ceil((new Date() - new Date(c.lastVisit)) / (1000 * 60 * 60 * 24));
+          return daysSinceLastVisit > 30;
+        }).length
+      };
+      
+      if (stats.total > 0) {
+        stats.averageLifetimeValue = stats.totalLifetimeValue / stats.total;
+      }
+      
+      return stats;
+    } catch (error) {
+      console.error('Error getting customer stats:', error);
+      return {
+        total: 0,
+        active: 0,
+        vip: 0,
+        totalLifetimeValue: 0,
+        averageLifetimeValue: 0,
+        topSpenders: [],
+        segmentation: { new: 0, occasional: 0, regular: 0, loyal: 0, vip: 0 },
+        loyaltyTiers: { bronze: 0, silver: 0, gold: 0, platinum: 0 },
+        atRisk: 0
+      };
+    }
+  }
+
+  // ============ EXPENSES MANAGEMENT ============
+
+  async getExpenses() {
+    try {
+      const data = await fs.readFile(this.expensesFile, 'utf8');
+      return JSON.parse(data).filter(expense => expense.isActive !== false);
+    } catch (error) {
+      console.error('Error reading expenses:', error);
+      return [];
+    }
+  }
+
+  async getExpenseById(id) {
+    try {
+      const expenses = await this.getExpenses();
+      return expenses.find(e => e._id === id);
+    } catch (error) {
+      console.error('Error getting expense by id:', error);
+      return null;
+    }
+  }
+
+  async createExpense(expenseData) {
+    try {
+      const expenses = await this.getExpenses();
+      
+      const expense = {
+        _id: this.generateId(),
+        ...expenseData,
+        createdAt: new Date().toISOString(),
+        updatedAt: new Date().toISOString(),
+        isActive: true
+      };
+      
+      expenses.push(expense);
+      await fs.writeFile(this.expensesFile, JSON.stringify(expenses, null, 2));
+      
+      console.log('💰 Created expense:', {
+        id: expense._id,
+        amount: expense.amount,
+        category: expense.category,
+        description: expense.description
+      });
+      
+      return expense;
+    } catch (error) {
+      console.error('Error creating expense:', error);
+      throw error;
+    }
+  }
+
+  async updateExpense(id, updateData) {
+    try {
+      const expenses = await this.getExpenses();
+      const expenseIndex = expenses.findIndex(e => e._id === id);
+      
+      if (expenseIndex === -1) {
+        throw new Error('Expense not found');
+      }
+      
+      expenses[expenseIndex] = {
+        ...expenses[expenseIndex],
+        ...updateData,
+        updatedAt: new Date().toISOString()
+      };
+      
+      await fs.writeFile(this.expensesFile, JSON.stringify(expenses, null, 2));
+      
+      console.log('🔄 Updated expense:', {
+        id: id,
+        amount: expenses[expenseIndex].amount,
+        category: expenses[expenseIndex].category
+      });
+      
+      return expenses[expenseIndex];
+    } catch (error) {
+      console.error('Error updating expense:', error);
+      throw error;
+    }
+  }
+
+  async deleteExpense(id) {
+    try {
+      const expenses = await this.getExpenses();
+      const expenseIndex = expenses.findIndex(e => e._id === id);
+      
+      if (expenseIndex === -1) {
+        throw new Error('Expense not found');
+      }
+      
+      // Soft delete
+      expenses[expenseIndex].isActive = false;
+      expenses[expenseIndex].updatedAt = new Date().toISOString();
+      
+      await fs.writeFile(this.expensesFile, JSON.stringify(expenses, null, 2));
+      
+      console.log('🗑️ Deleted expense:', id);
+      
+      return true;
+    } catch (error) {
+      console.error('Error deleting expense:', error);
+      throw error;
+    }
+  }
+
+  async getExpensesByCategory(category) {
+    try {
+      const expenses = await this.getExpenses();
+      return expenses.filter(expense => expense.category === category);
+    } catch (error) {
+      console.error('Error getting expenses by category:', error);
+      return [];
+    }
+  }
+
+  async getExpensesByDateRange(startDate, endDate) {
+    try {
+      const expenses = await this.getExpenses();
+      return expenses.filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate >= startDate && expenseDate <= endDate;
+      });
+    } catch (error) {
+      console.error('Error getting expenses by date range:', error);
+      return [];
+    }
+  }
+
+  async getRecurringExpenses() {
+    try {
+      const expenses = await this.getExpenses();
+      return expenses.filter(expense => expense.type === 'recurrente');
+    } catch (error) {
+      console.error('Error getting recurring expenses:', error);
+      return [];
+    }
+  }
+
+  async getOverdueExpenses() {
+    try {
+      const expenses = await this.getExpenses();
+      const today = new Date();
+      
+      return expenses.filter(expense => {
+        if (expense.type !== 'recurrente' || expense.status === 'pagado') {
+          return false;
+        }
+        
+        if (!expense.nextDueDate) {
+          return false;
+        }
+        
+        return new Date(expense.nextDueDate) < today;
+      });
+    } catch (error) {
+      console.error('Error getting overdue expenses:', error);
+      return [];
+    }
+  }
+
+  async getExpenseStats() {
+    try {
+      const expenses = await this.getExpenses();
+      const Expense = require('../models/Expense');
+      const categories = Expense.getCategories();
+      
+      // Current month calculations
+      const now = new Date();
+      const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+      const endOfMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+      
+      const currentMonthExpenses = expenses.filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate >= startOfMonth && expenseDate <= endOfMonth;
+      });
+      
+      // Previous month for comparison
+      const startOfPrevMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+      const endOfPrevMonth = new Date(now.getFullYear(), now.getMonth(), 0);
+      
+      const prevMonthExpenses = expenses.filter(expense => {
+        const expenseDate = new Date(expense.date);
+        return expenseDate >= startOfPrevMonth && expenseDate <= endOfPrevMonth;
+      });
+      
+      // Calculate totals
+      const totalThisMonth = currentMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
+      const totalLastMonth = prevMonthExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      // Group by category
+      const byCategory = {};
+      Object.keys(categories).forEach(categoryId => {
+        const categoryExpenses = currentMonthExpenses.filter(e => e.category === categoryId);
+        byCategory[categoryId] = {
+          name: categories[categoryId].name,
+          total: categoryExpenses.reduce((sum, e) => sum + e.amount, 0),
+          count: categoryExpenses.length,
+          color: categories[categoryId].color,
+          icon: categories[categoryId].icon
+        };
+      });
+      
+      // Calculate percentage change
+      const percentageChange = totalLastMonth > 0 ? 
+        ((totalThisMonth - totalLastMonth) / totalLastMonth) * 100 : 
+        (totalThisMonth > 0 ? 100 : 0);
+      
+      // Get overdue expenses
+      const overdueExpenses = await this.getOverdueExpenses();
+      const overdueAmount = overdueExpenses.reduce((sum, e) => sum + e.amount, 0);
+      
+      return {
+        currentMonth: {
+          total: totalThisMonth,
+          count: currentMonthExpenses.length,
+          byCategory: byCategory
+        },
+        previousMonth: {
+          total: totalLastMonth,
+          count: prevMonthExpenses.length
+        },
+        comparison: {
+          percentageChange: Math.round(percentageChange * 100) / 100,
+          absoluteChange: totalThisMonth - totalLastMonth,
+          trend: totalThisMonth > totalLastMonth ? 'up' : 
+                totalThisMonth < totalLastMonth ? 'down' : 'stable'
+        },
+        overdue: {
+          count: overdueExpenses.length,
+          amount: overdueAmount
+        },
+        topCategories: Object.entries(byCategory)
+          .sort(([,a], [,b]) => b.total - a.total)
+          .slice(0, 5)
+          .map(([id, data]) => ({ id, ...data })),
+        recurringExpenses: (await this.getRecurringExpenses()).length
+      };
+    } catch (error) {
+      console.error('Error getting expense stats:', error);
+      return {
+        currentMonth: { total: 0, count: 0, byCategory: {} },
+        previousMonth: { total: 0, count: 0 },
+        comparison: { percentageChange: 0, absoluteChange: 0, trend: 'stable' },
+        overdue: { count: 0, amount: 0 },
+        topCategories: [],
+        recurringExpenses: 0
+      };
     }
   }
 

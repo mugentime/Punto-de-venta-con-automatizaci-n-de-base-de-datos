@@ -1,1 +1,46 @@
-[]
+[
+  {
+    "_id": "da56c66d52b8e46b70f40b6f",
+    "name": "Fig Bar",
+    "category": "cafeteria",
+    "quantity": 18,
+    "cost": 8,
+    "price": 18,
+    "lowStockAlert": 5,
+    "description": "",
+    "barcode": "",
+    "isActive": true,
+    "createdAt": "2025-09-03T17:21:49.111Z",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "updatedAt": "2025-09-03T18:13:59.208Z"
+  },
+  {
+    "_id": "98073dd887c7bd3441dafdb3",
+    "name": "coca",
+    "category": "refrigerador",
+    "quantity": 1,
+    "cost": 0.04,
+    "price": 0.06,
+    "lowStockAlert": 5,
+    "description": "",
+    "barcode": "",
+    "isActive": false,
+    "createdAt": "2025-09-03T17:27:22.746Z",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "deletedAt": "2025-09-03T17:27:27.802Z"
+  },
+  {
+    "_id": "ccb6b65bdbefb3fdc543e5f0",
+    "name": "americano",
+    "category": "cafeteria",
+    "quantity": 1,
+    "cost": 0.03,
+    "price": 0.03,
+    "lowStockAlert": 5,
+    "description": "",
+    "barcode": "",
+    "isActive": true,
+    "createdAt": "2025-09-03T17:27:36.959Z",
+    "createdBy": "e0cbd27429eaa20acf48cc23"
+  }
+]

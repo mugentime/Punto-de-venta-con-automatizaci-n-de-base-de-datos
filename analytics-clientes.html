@@ -1,0 +1,1001 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Analytics de Clientes - POS Conejo Negro</title>
+    
+    <!-- CSS Dependencies -->
+    <link rel="stylesheet" href="public/css/styles.css">
+    <link rel="stylesheet" href="public/css/mobile-optimized.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/date-fns@2.29.3/index.min.js"></script>
+    
+    <style>
+        /* Variables de colores consistentes con el tema */
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d00ff;
+            --accent-pink: #ff00d9;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        /* Contenedor principal */
+        .analytics-container {
+            max-width: 1800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Header del dashboard */
+        .analytics-header {
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-secondary));
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+            border: 2px solid var(--accent-cyan);
+            box-shadow: 0 10px 40px rgba(0, 217, 255, 0.2);
+            position: relative;
+        }
+
+        .analytics-title {
+            color: var(--accent-cyan);
+            font-size: 2.8rem;
+            margin-bottom: 15px;
+            text-align: center;
+            font-weight: 700;
+            text-shadow: 0 0 20px rgba(0, 217, 255, 0.5);
+        }
+
+        .back-button {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            background: linear-gradient(45deg, var(--accent-purple), var(--accent-pink));
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(157, 0, 255, 0.4);
+        }
+
+        /* Filtros de fecha */
+        .date-filters {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .date-filter-btn {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: var(--text-primary);
+            padding: 8px 16px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .date-filter-btn.active {
+            background: var(--accent-cyan);
+            color: var(--bg-primary);
+            box-shadow: 0 0 15px rgba(0, 217, 255, 0.5);
+        }
+
+        .date-filter-btn:hover {
+            border-color: var(--accent-cyan);
+        }
+
+        /* Grid principal de analytics */
+        .analytics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        /* Tarjetas de métricas */
+        .metric-card {
+            background: linear-gradient(135deg, var(--bg-card), #1e1e38);
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid rgba(0, 217, 255, 0.2);
+            transition: all 0.3s ease;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .metric-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+        }
+
+        .metric-card:hover {
+            border-color: var(--accent-cyan);
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+            transform: translateY(-5px);
+        }
+
+        .metric-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .metric-title {
+            font-size: 1.4rem;
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .metric-icon {
+            font-size: 2rem;
+            color: var(--accent-cyan);
+            opacity: 0.8;
+        }
+
+        .metric-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+
+        .metric-change {
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .metric-change.positive {
+            color: var(--success);
+        }
+
+        .metric-change.negative {
+            color: var(--danger);
+        }
+
+        .metric-change.neutral {
+            color: var(--text-secondary);
+        }
+
+        /* Gráficos */
+        .chart-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            margin-bottom: 30px;
+            grid-column: 1 / -1;
+        }
+
+        .chart-title {
+            font-size: 1.5rem;
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 400px;
+            margin: 20px 0;
+        }
+
+        /* Top clientes */
+        .top-clientes-card {
+            background: var(--bg-card);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .top-cliente-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            margin-bottom: 10px;
+            background: rgba(0, 217, 255, 0.05);
+            border-radius: 10px;
+            border-left: 4px solid var(--accent-cyan);
+            transition: all 0.3s ease;
+        }
+
+        .top-cliente-item:hover {
+            background: rgba(0, 217, 255, 0.1);
+            transform: translateX(5px);
+        }
+
+        .cliente-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .cliente-rank {
+            background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+            color: var(--bg-primary);
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .cliente-nombre {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .cliente-metric {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            text-align: right;
+        }
+
+        /* Tablas de estadísticas */
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        .stats-table th,
+        .stats-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid rgba(0, 217, 255, 0.1);
+        }
+
+        .stats-table th {
+            background: rgba(0, 217, 255, 0.1);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 14px;
+            letter-spacing: 0.5px;
+        }
+
+        .stats-table td {
+            color: var(--text-primary);
+        }
+
+        .stats-table tr:hover {
+            background: rgba(0, 217, 255, 0.05);
+        }
+
+        /* Indicadores de progreso */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(0, 217, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 8px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+
+        /* Grid de dos columnas para secciones grandes */
+        .two-column-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        /* Loading y estados */
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 60px;
+            color: var(--accent-cyan);
+        }
+
+        .spinner {
+            border: 3px solid rgba(0, 217, 255, 0.3);
+            border-top: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .two-column-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .analytics-container {
+                padding: 10px;
+            }
+            
+            .analytics-title {
+                font-size: 2rem;
+            }
+            
+            .analytics-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .back-button {
+                position: static;
+                margin-bottom: 20px;
+                align-self: flex-start;
+            }
+            
+            .analytics-header {
+                padding: 20px;
+            }
+            
+            .date-filters {
+                justify-content: flex-start;
+            }
+        }
+
+        /* Animaciones */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metric-card,
+        .chart-card,
+        .top-clientes-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="analytics-container">
+        <!-- Header -->
+        <div class="analytics-header">
+            <a href="/clientes" class="back-button">
+                <i class="fas fa-arrow-left"></i>
+                Volver a Clientes
+            </a>
+            
+            <h1 class="analytics-title">
+                <i class="fas fa-chart-line"></i>
+                ANALYTICS DE CLIENTES
+            </h1>
+            
+            <!-- Filtros de fecha -->
+            <div class="date-filters">
+                <button class="date-filter-btn active" data-period="7">Últimos 7 días</button>
+                <button class="date-filter-btn" data-period="30">Último mes</button>
+                <button class="date-filter-btn" data-period="90">Últimos 3 meses</button>
+                <button class="date-filter-btn" data-period="365">Último año</button>
+                <button class="date-filter-btn" data-period="all">Todo el tiempo</button>
+            </div>
+        </div>
+
+        <!-- Loading indicator -->
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Cargando analytics de clientes...</p>
+        </div>
+
+        <!-- Grid principal de métricas -->
+        <div class="analytics-grid" id="analytics-content">
+            <!-- Métricas principales -->
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clientes Totales</div>
+                    <i class="fas fa-users metric-icon"></i>
+                </div>
+                <div class="metric-value" id="total-clientes-metric">0</div>
+                <div class="metric-change neutral" id="clientes-change">
+                    <i class="fas fa-minus"></i>
+                    <span>Sin cambios</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Ingresos por Cliente</div>
+                    <i class="fas fa-dollar-sign metric-icon"></i>
+                </div>
+                <div class="metric-value" id="ingreso-promedio">$0</div>
+                <div class="metric-change neutral" id="ingreso-change">
+                    <i class="fas fa-minus"></i>
+                    <span>Sin datos previos</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clientes Activos</div>
+                    <i class="fas fa-user-check metric-icon"></i>
+                </div>
+                <div class="metric-value" id="clientes-activos">0</div>
+                <div class="metric-change neutral" id="activos-change">
+                    <i class="fas fa-minus"></i>
+                    <span>En los últimos 30 días</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Frecuencia de Visitas</div>
+                    <i class="fas fa-calendar-alt metric-icon"></i>
+                </div>
+                <div class="metric-value" id="frecuencia-visitas">0</div>
+                <div class="metric-change neutral" id="frecuencia-change">
+                    <i class="fas fa-minus"></i>
+                    <span>Visitas por cliente</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Clientes VIP</div>
+                    <i class="fas fa-crown metric-icon"></i>
+                </div>
+                <div class="metric-value" id="clientes-vip-metric">0</div>
+                <div class="metric-change neutral" id="vip-change">
+                    <i class="fas fa-minus"></i>
+                    <span>Con membresía activa</span>
+                </div>
+            </div>
+
+            <div class="metric-card">
+                <div class="metric-header">
+                    <div class="metric-title">Retención</div>
+                    <i class="fas fa-heart metric-icon"></i>
+                </div>
+                <div class="metric-value" id="retencion-rate">0%</div>
+                <div class="metric-change neutral" id="retencion-change">
+                    <i class="fas fa-minus"></i>
+                    <span>Clientes que regresan</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Grid de dos columnas -->
+        <div class="two-column-grid">
+            <!-- Top Clientes por Gasto -->
+            <div class="top-clientes-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-trophy"></i>
+                    Top Clientes por Gasto
+                </h3>
+                <div id="top-clientes-gasto">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+
+            <!-- Top Clientes por Visitas -->
+            <div class="top-clientes-card">
+                <h3 class="chart-title">
+                    <i class="fas fa-medal"></i>
+                    Top Clientes por Visitas
+                </h3>
+                <div id="top-clientes-visitas">
+                    <!-- Se llenará dinámicamente -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de ingresos por tiempo -->
+        <div class="chart-card">
+            <h3 class="chart-title">
+                <i class="fas fa-chart-area"></i>
+                Evolución de Ingresos por Clientes
+            </h3>
+            <div class="chart-container">
+                <canvas id="ingresos-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Gráfico de segmentación de clientes -->
+        <div class="chart-card">
+            <h3 class="chart-title">
+                <i class="fas fa-pie-chart"></i>
+                Segmentación de Clientes
+            </h3>
+            <div class="chart-container">
+                <canvas id="segmentacion-chart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabla de estadísticas detalladas -->
+        <div class="chart-card">
+            <h3 class="chart-title">
+                <i class="fas fa-table"></i>
+                Estadísticas Detalladas por Cliente
+            </h3>
+            <table class="stats-table" id="stats-table">
+                <thead>
+                    <tr>
+                        <th>Cliente</th>
+                        <th>Visitas</th>
+                        <th>Total Gastado</th>
+                        <th>Promedio por Visita</th>
+                        <th>Última Visita</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Se llenará dinámicamente -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- JavaScript -->
+    <script>
+        // Variables globales
+        let clientesData = [];
+        let currentPeriod = 7;
+        let charts = {};
+
+        // Inicializar la página
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeDateFilters();
+            cargarAnalytics();
+        });
+
+        // Inicializar filtros de fecha
+        function initializeDateFilters() {
+            const filterButtons = document.querySelectorAll('.date-filter-btn');
+            
+            filterButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    // Remover clase active de todos los botones
+                    filterButtons.forEach(btn => btn.classList.remove('active'));
+                    
+                    // Agregar clase active al botón clickeado
+                    this.classList.add('active');
+                    
+                    // Actualizar período y recargar datos
+                    currentPeriod = this.dataset.period;
+                    cargarAnalytics();
+                });
+            });
+        }
+
+        // Cargar analytics desde la API
+        async function cargarAnalytics() {
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('analytics-content').style.opacity = '0.5';
+            
+            try {
+                // Cargar datos de clientes
+                const response = await fetch('/api/customers/public');
+                if (response.ok) {
+                    clientesData = await response.json();
+                    console.log('Datos de analytics cargados:', clientesData.length, 'clientes');
+                    
+                    // Procesar y mostrar analytics
+                    procesarAnalytics();
+                    actualizarMetricas();
+                    crearGraficos();
+                    crearTopClientes();
+                    crearTablaEstadisticas();
+                    
+                } else {
+                    console.error('Error al cargar analytics:', response.statusText);
+                    mostrarError('Error al cargar analytics de clientes');
+                }
+            } catch (error) {
+                console.error('Error de conexión:', error);
+                mostrarError('Error de conexión con el servidor');
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('analytics-content').style.opacity = '1';
+            }
+        }
+
+        // Procesar datos de analytics
+        function procesarAnalytics() {
+            // Filtrar datos por período si es necesario
+            let filteredData = clientesData;
+            
+            if (currentPeriod !== 'all') {
+                const cutoffDate = new Date();
+                cutoffDate.setDate(cutoffDate.getDate() - parseInt(currentPeriod));
+                
+                filteredData = clientesData.filter(cliente => {
+                    if (cliente.lastVisitDate) {
+                        return new Date(cliente.lastVisitDate) >= cutoffDate;
+                    }
+                    return false;
+                });
+            }
+            
+            return filteredData;
+        }
+
+        // Actualizar métricas principales
+        function actualizarMetricas() {
+            const data = procesarAnalytics();
+            
+            // Total clientes
+            document.getElementById('total-clientes-metric').textContent = clientesData.length;
+            
+            // Ingreso promedio por cliente
+            const ingresoPromedio = clientesData.length > 0 ? 
+                clientesData.reduce((sum, c) => sum + c.totalSpent, 0) / clientesData.length : 0;
+            document.getElementById('ingreso-promedio').textContent = `$${Math.round(ingresoPromedio).toLocaleString()}`;
+            
+            // Clientes activos (con visitas recientes)
+            const fechaCorte = new Date();
+            fechaCorte.setDate(fechaCorte.getDate() - 30);
+            const clientesActivos = clientesData.filter(c => 
+                c.lastVisitDate && new Date(c.lastVisitDate) >= fechaCorte
+            ).length;
+            document.getElementById('clientes-activos').textContent = clientesActivos;
+            
+            // Frecuencia promedio de visitas
+            const frecuenciaPromedio = clientesData.length > 0 ?
+                clientesData.reduce((sum, c) => sum + c.totalVisits, 0) / clientesData.length : 0;
+            document.getElementById('frecuencia-visitas').textContent = Math.round(frecuenciaPromedio * 10) / 10;
+            
+            // Clientes VIP
+            const clientesVIP = clientesData.filter(c => 
+                c.membershipEndDate && new Date(c.membershipEndDate) > new Date()
+            ).length;
+            document.getElementById('clientes-vip-metric').textContent = clientesVIP;
+            
+            // Tasa de retención (clientes con más de 1 visita)
+            const clientesConRetorno = clientesData.filter(c => c.totalVisits > 1).length;
+            const tasaRetencion = clientesData.length > 0 ? 
+                (clientesConRetorno / clientesData.length) * 100 : 0;
+            document.getElementById('retencion-rate').textContent = `${Math.round(tasaRetencion)}%`;
+        }
+
+        // Crear gráficos
+        function crearGraficos() {
+            crearGraficoIngresos();
+            crearGraficoSegmentacion();
+        }
+
+        // Gráfico de evolución de ingresos
+        function crearGraficoIngresos() {
+            const ctx = document.getElementById('ingresos-chart').getContext('2d');
+            
+            // Destruir gráfico existente si existe
+            if (charts.ingresos) {
+                charts.ingresos.destroy();
+            }
+            
+            // Simular datos de evolución temporal (en un sistema real vendría de la base de datos)
+            const labels = [];
+            const data = [];
+            
+            // Generar últimos 30 días
+            for (let i = 29; i >= 0; i--) {
+                const fecha = new Date();
+                fecha.setDate(fecha.getDate() - i);
+                labels.push(fecha.toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }));
+                
+                // Simular ingresos diarios basados en los datos de clientes
+                const ingresosDia = Math.random() * (clientesData.reduce((sum, c) => sum + c.totalSpent, 0) / 30);
+                data.push(Math.round(ingresosDia));
+            }
+            
+            charts.ingresos = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Ingresos por Clientes',
+                        data: data,
+                        borderColor: '#00d9ff',
+                        backgroundColor: 'rgba(0, 217, 255, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff'
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            ticks: {
+                                color: '#a0a0c0'
+                            },
+                            grid: {
+                                color: 'rgba(0, 217, 255, 0.1)'
+                            }
+                        },
+                        y: {
+                            ticks: {
+                                color: '#a0a0c0',
+                                callback: function(value) {
+                                    return '$' + value.toLocaleString();
+                                }
+                            },
+                            grid: {
+                                color: 'rgba(0, 217, 255, 0.1)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Gráfico de segmentación de clientes
+        function crearGraficoSegmentacion() {
+            const ctx = document.getElementById('segmentacion-chart').getContext('2d');
+            
+            // Destruir gráfico existente si existe
+            if (charts.segmentacion) {
+                charts.segmentacion.destroy();
+            }
+            
+            // Calcular segmentación
+            const vip = clientesData.filter(c => 
+                c.membershipEndDate && new Date(c.membershipEndDate) > new Date()
+            ).length;
+            
+            const regulares = clientesData.filter(c => 
+                c.totalVisits > 1 && (!c.membershipEndDate || new Date(c.membershipEndDate) <= new Date())
+            ).length;
+            
+            const nuevos = clientesData.filter(c => 
+                c.totalVisits <= 1
+            ).length;
+            
+            charts.segmentacion = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Clientes VIP', 'Clientes Regulares', 'Clientes Nuevos'],
+                    datasets: [{
+                        data: [vip, regulares, nuevos],
+                        backgroundColor: [
+                            '#ff00d9',
+                            '#00d9ff', 
+                            '#00ff88'
+                        ],
+                        borderColor: '#1a1a2e',
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: {
+                                color: '#e0e0ff',
+                                usePointStyle: true,
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Crear listas de top clientes
+        function crearTopClientes() {
+            crearTopClientesPorGasto();
+            crearTopClientesPorVisitas();
+        }
+
+        // Top clientes por gasto
+        function crearTopClientesPorGasto() {
+            const container = document.getElementById('top-clientes-gasto');
+            const topClientes = [...clientesData]
+                .sort((a, b) => b.totalSpent - a.totalSpent)
+                .slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            if (topClientes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No hay datos disponibles</p>';
+                return;
+            }
+            
+            topClientes.forEach((cliente, index) => {
+                const item = document.createElement('div');
+                item.className = 'top-cliente-item';
+                item.innerHTML = `
+                    <div class="cliente-info">
+                        <div class="cliente-rank">${index + 1}</div>
+                        <div class="cliente-nombre">${cliente.name}</div>
+                    </div>
+                    <div class="cliente-metric">
+                        $${cliente.totalSpent.toLocaleString()}
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                            ${cliente.totalVisits} visitas
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Top clientes por visitas
+        function crearTopClientesPorVisitas() {
+            const container = document.getElementById('top-clientes-visitas');
+            const topClientes = [...clientesData]
+                .sort((a, b) => b.totalVisits - a.totalVisits)
+                .slice(0, 5);
+            
+            container.innerHTML = '';
+            
+            if (topClientes.length === 0) {
+                container.innerHTML = '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No hay datos disponibles</p>';
+                return;
+            }
+            
+            topClientes.forEach((cliente, index) => {
+                const item = document.createElement('div');
+                item.className = 'top-cliente-item';
+                item.innerHTML = `
+                    <div class="cliente-info">
+                        <div class="cliente-rank">${index + 1}</div>
+                        <div class="cliente-nombre">${cliente.name}</div>
+                    </div>
+                    <div class="cliente-metric">
+                        ${cliente.totalVisits} visitas
+                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 2px;">
+                            $${cliente.totalSpent.toLocaleString()} total
+                        </div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Crear tabla de estadísticas detalladas
+        function crearTablaEstadisticas() {
+            const tbody = document.querySelector('#stats-table tbody');
+            tbody.innerHTML = '';
+            
+            if (clientesData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-secondary); padding: 20px;">No hay datos disponibles</td></tr>';
+                return;
+            }
+            
+            // Ordenar por total gastado descendente
+            const clientesOrdenados = [...clientesData].sort((a, b) => b.totalSpent - a.totalSpent);
+            
+            clientesOrdenados.forEach(cliente => {
+                const row = document.createElement('tr');
+                
+                // Determinar estado
+                let estado = 'Nuevo';
+                let estadoColor = 'var(--success)';
+                
+                if (cliente.membershipEndDate && new Date(cliente.membershipEndDate) > new Date()) {
+                    estado = 'VIP';
+                    estadoColor = 'var(--accent-pink)';
+                } else if (cliente.totalVisits > 1) {
+                    estado = 'Regular';
+                    estadoColor = 'var(--accent-cyan)';
+                }
+                
+                // Formatear última visita
+                const ultimaVisita = cliente.lastVisitDate ? 
+                    new Date(cliente.lastVisitDate).toLocaleDateString('es-ES') : 'Nunca';
+                
+                // Calcular promedio por visita
+                const promedioPorVisita = cliente.totalVisits > 0 ? 
+                    cliente.totalSpent / cliente.totalVisits : 0;
+                
+                row.innerHTML = `
+                    <td>${cliente.name}</td>
+                    <td>${cliente.totalVisits}</td>
+                    <td>$${cliente.totalSpent.toLocaleString()}</td>
+                    <td>$${Math.round(promedioPorVisita).toLocaleString()}</td>
+                    <td>${ultimaVisita}</td>
+                    <td>
+                        <span style="color: ${estadoColor}; font-weight: 600;">
+                            ${estado}
+                        </span>
+                    </td>
+                `;
+                
+                tbody.appendChild(row);
+            });
+        }
+
+        // Mostrar errores
+        function mostrarError(mensaje) {
+            document.getElementById('analytics-content').innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; padding: 60px; color: var(--danger);">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 4rem; margin-bottom: 20px;"></i>
+                    <h3>Error</h3>
+                    <p>${mensaje}</p>
+                    <button onclick="cargarAnalytics()" style="
+                        margin-top: 20px;
+                        background: linear-gradient(45deg, var(--accent-cyan), var(--accent-purple));
+                        color: var(--bg-primary);
+                        border: none;
+                        padding: 12px 24px;
+                        border-radius: 25px;
+                        font-weight: 600;
+                        cursor: pointer;
+                    ">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        }
+
+        // Actualizar automáticamente cada 5 minutos
+        setInterval(() => {
+            console.log('Actualizando analytics automáticamente...');
+            cargarAnalytics();
+        }, 5 * 60 * 1000);
+    </script>
+</body>
+</html>

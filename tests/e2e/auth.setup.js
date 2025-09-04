@@ -53,8 +53,41 @@ setup('authenticate', async ({ page }) => {
   await page.fill('#login-email', 'admin@conejonegro.com');
   await page.fill('#login-password', 'admin123');
   
+  console.log('Filled credentials, submitting form...');
+  
   // Submit login form
   await page.click('button[type="submit"]');
+  
+  // Wait a moment for the form to be processed
+  await page.waitForTimeout(2000);
+  
+  // Check for any error messages first
+  const errorMessages = await page.locator('.error, .alert-danger, [class*="error"]').count();
+  if (errorMessages > 0) {
+    const errorText = await page.locator('.error, .alert-danger, [class*="error"]').first().textContent();
+    console.log('❌ Login error detected:', errorText);
+  }
+  
+  // Check current page state after login attempt
+  const loginScreenVisible = await page.locator('#login-screen').isVisible();
+  const mainAppVisibleAfterLogin = await page.locator('#main-app').isVisible();
+  
+  console.log('After login attempt:');
+  console.log('- Login screen visible:', loginScreenVisible);
+  console.log('- Main app visible:', mainAppVisibleAfterLogin);
+  
+  // If still on login screen, there might be an authentication issue
+  if (loginScreenVisible) {
+    console.log('Still on login screen, checking for JavaScript errors...');
+    // Check console logs for errors
+    const consoleMessages = [];
+    page.on('console', msg => consoleMessages.push(msg.text()));
+    await page.waitForTimeout(1000);
+    
+    if (consoleMessages.length > 0) {
+      console.log('Browser console messages:', consoleMessages);
+    }
+  }
   
   // Wait for successful login - main app should become visible
   await page.waitForSelector('#main-app', { state: 'visible', timeout: 30000 });

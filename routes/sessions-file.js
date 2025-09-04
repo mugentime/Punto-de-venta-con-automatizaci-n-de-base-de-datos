@@ -109,7 +109,7 @@ router.get('/:id', auth, async (req, res) => {
 // Create new coworking session
 router.post('/', auth, canManageCoworking, async (req, res) => {
   try {
-    const { client, hourlyRate = 58, notes = '' } = req.body;
+    const { client, hourlyRate = 58, notes = '', startTime } = req.body;
 
     // Validation
     if (!client || client.trim().length === 0) {
@@ -125,12 +125,19 @@ router.post('/', auth, canManageCoworking, async (req, res) => {
     }
 
     // Create session using model
-    const session = new CoworkingSession({
+    const sessionData = {
       client: client.trim(),
       hourlyRate: parseFloat(hourlyRate),
       notes: notes.trim(),
       createdBy: req.user.userId
-    });
+    };
+
+    // If custom startTime is provided, use it
+    if (startTime) {
+      sessionData.startTime = new Date(startTime).toISOString();
+    }
+
+    const session = new CoworkingSession(sessionData);
 
     // Validate session
     const validation = session.validate();

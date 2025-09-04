@@ -19,27 +19,30 @@ if (process.env.RAILWAY_ENVIRONMENT) {
 
 // FORCE REDEPLOY: 2025-09-03T15:20:01.476Z - Ensure DATABASE_URL is loaded
 
-// 🚨 EMERGENCY: Force PostgreSQL for Railway deployment
+// 🚨 COMMENTED OUT: Force PostgreSQL for Railway deployment
+// This was causing issues with local development using file-based system
 console.log('🔍 Checking DATABASE_URL...', !!process.env.DATABASE_URL);
-if (!process.env.DATABASE_URL && (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production')) {
-    console.log('🚨 FORCING DATABASE_URL for Railway...');
-    process.env.DATABASE_URL = 'postgresql://postgres:aezVREfCHRpQHBfwweXHEaANsbeIMeno@postgres.railway.internal:5432/railway';
-    console.log('✅ DATABASE_URL set for Railway deployment');
-}
+// if (!process.env.DATABASE_URL && (process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV === 'production')) {
+//     console.log('🚨 FORCING DATABASE_URL for Railway...');
+//     process.env.DATABASE_URL = 'postgresql://postgres:aezVREfCHRpQHBfwweXHEaANsbeIMeno@postgres.railway.internal:5432/railway';
+//     console.log('✅ DATABASE_URL set for Railway deployment');
+// }
 
 
-// Import routes - using PostgreSQL system for production
-const authRoutes = require('./routes/auth');
-const productRoutes = require('./routes/products');
-const recordRoutes = require('./routes/records-new'); // FORCED UPDATE - Contains /historical endpoint
+// FIXED: Import consistent file-based routes for working authentication
+const authRoutes = require('./routes/auth-file');
+const productRoutes = require('./routes/products-file');
+const recordRoutes = require('./routes/records-file'); // FIXED: Use file-based records routes
 const backupRoutes = require('./routes/backup');
 // File-based routes for features not yet migrated to PostgreSQL
 const cashCutRoutes = require('./routes/cashcuts-file');
 const membershipRoutes = require('./routes/memberships-file');
 const sessionRoutes = require('./routes/sessions-file');
+const customerRoutes = require('./routes/customers-file');
+const expenseRoutes = require('./routes/expenses-file');
 
-// Import auth middleware
-const { auth } = require('./middleware/auth');
+// FIXED: Import consistent file-based auth middleware
+const { auth } = require('./middleware/auth-file');
 
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
@@ -221,6 +224,8 @@ app.use('/api/records', requireDatabase, recordRoutes); // Includes /historical 
 app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
 app.use('/api/memberships', requireDatabase, membershipRoutes);
 app.use('/api/sessions', requireDatabase, sessionRoutes);
+app.use('/api/customers', requireDatabase, customerRoutes);
+app.use('/api/expenses', requireDatabase, expenseRoutes);
 app.use('/api/backup', backupRoutes); // Backup can work without DB for file operations
 
 // Export/download endpoint
@@ -415,6 +420,33 @@ app.get('/coworking', (req, res) => {
   } catch (error) {
     console.error('Error serving coworking.html:', error);
     res.status(500).send('Error loading coworking page');
+  }
+});
+
+app.get('/clientes', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'clientes.html'));
+  } catch (error) {
+    console.error('Error serving clientes.html:', error);
+    res.status(500).send('Error loading clientes page');
+  }
+});
+
+app.get('/analytics-clientes', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'analytics-clientes.html'));
+  } catch (error) {
+    console.error('Error serving analytics-clientes.html:', error);
+    res.status(500).send('Error loading analytics clientes page');
+  }
+});
+
+app.get('/demo-busqueda-clientes', (req, res) => {
+  try {
+    res.sendFile(path.join(__dirname, 'demo-busqueda-clientes.html'));
+  } catch (error) {
+    console.error('Error serving demo-busqueda-clientes.html:', error);
+    res.status(500).send('Error loading demo search clientes page');
   }
 });
 

@@ -41,5 +41,60 @@
     "id": "1756250887607xx8nbjbju",
     "createdAt": "2025-08-26T23:28:07.607Z",
     "updatedAt": "2025-08-26T23:28:07.607Z"
+  },
+  {
+    "cutDate": "2025-09-03T17:28:01.942Z",
+    "cutTime": "11:28",
+    "startDate": "2025-08-26T23:28:07.606Z",
+    "endDate": "2025-09-03T17:28:01.942Z",
+    "cutType": "manual",
+    "totalRecords": 1,
+    "totalIncome": 58,
+    "totalCost": 8,
+    "totalProfit": 50,
+    "averageTicket": 58,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 1,
+        "amount": 58
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 1,
+        "amount": 58
+      }
+    },
+    "topProducts": [
+      {
+        "productName": "Fig Bar",
+        "quantity": 1,
+        "revenue": 58
+      }
+    ],
+    "hourlyBreakdown": [
+      {
+        "hour": "11:00",
+        "count": 1,
+        "revenue": 58
+      }
+    ],
+    "notes": "sdfgsdfg",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "id": "1756920481945qjpq0v0e3",
+    "createdAt": "2025-09-03T17:28:01.946Z",
+    "updatedAt": "2025-09-03T17:28:01.946Z"
   }
 ]

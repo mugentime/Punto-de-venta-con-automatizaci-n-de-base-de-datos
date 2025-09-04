@@ -68,7 +68,8 @@
     "jsonwebtoken": "^9.0.2",
     "node-cron": "^3.0.2",
     "node-fetch": "^2.7.0",
-    "pg": "^8.11.3"
+    "pg": "^8.11.3",
+    "task-master-ai": "^0.25.1"
   },
   "devDependencies": {
     "nodemon": "^3.0.1",

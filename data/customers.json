@@ -1,0 +1,52 @@
+[
+  {
+    "_id": "customer_udaljtw9m2gmf4aqfik",
+    "name": "María González - Test Cliente TM",
+    "email": null,
+    "phone": null,
+    "birthDate": null,
+    "notes": "",
+    "status": "active",
+    "tags": [],
+    "preferredServices": [
+      "coworking",
+      "cafeteria"
+    ],
+    "totalVisits": 2,
+    "firstVisit": "2025-09-03T18:13:59.180Z",
+    "lastVisit": "2025-09-03T18:13:59.206Z",
+    "totalSpent": 152,
+    "averageSpent": 76,
+    "totalSessions": 1,
+    "totalHours": 2,
+    "favoriteProducts": [],
+    "productStatistics": {
+      "da56c66d52b8e46b70f40b6f": {
+        "name": "Fig Bar",
+        "quantity": 3,
+        "totalSpent": 54,
+        "category": "cafeteria"
+      }
+    },
+    "preferredPaymentMethod": null,
+    "paymentStatistics": {
+      "efectivo": 1,
+      "tarjeta": 1,
+      "transferencia": 0
+    },
+    "averageSessionDuration": 120,
+    "preferredTimeSlots": [
+      "afternoon"
+    ],
+    "weekdayPreferences": {
+      "Wednesday": 2
+    },
+    "loyaltyPoints": 152,
+    "loyaltyTier": "bronze",
+    "isActive": true,
+    "createdBy": null,
+    "createdAt": "2025-09-03T18:13:59.181Z",
+    "updatedAt": "2025-09-03T18:13:59.211Z",
+    "id": "customer_udaljtw9m2gmf4aqfik"
+  }
+]

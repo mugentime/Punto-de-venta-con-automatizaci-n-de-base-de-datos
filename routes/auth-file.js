@@ -87,11 +87,25 @@ router.post('/login', async (req, res) => {
     }
     
     console.log('✅ LOGIN SUCCESS: Generating token for', email);
+    console.log('🔍 USER OBJECT BEFORE TOKEN:', {
+      id: user._id || user.id,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      allKeys: Object.keys(user)
+    });
     
     // Generate token
     const token = databaseManager.generateToken(user);
     
     console.log('🎟️ TOKEN GENERATED successfully for', email);
+    console.log('🔍 USER OBJECT BEING RETURNED:', {
+      id: user._id || user.id,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      allKeys: Object.keys(user)
+    });
     
     res.json({
       message: 'Login successful',
@@ -291,6 +305,72 @@ router.post('/quick-login', async (req, res) => {
     res.json({
       success: false,
       error: error.message
+    });
+  }
+});
+
+// Debug login flow endpoint
+router.post('/debug-login', async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    
+    console.log('🔍 DEBUG LOGIN - Step 1: Input validation');
+    if (!email || !password) {
+      return res.json({ error: 'Missing email or password' });
+    }
+    
+    console.log('🔍 DEBUG LOGIN - Step 2: Validate user password');
+    const user = await databaseManager.validateUserPassword(email, password);
+    
+    console.log('🔍 DEBUG LOGIN - Step 3: User validation result:', {
+      userFound: !!user,
+      userId: user?._id,
+      userEmail: user?.email,
+      userRole: user?.role,
+      userKeys: user ? Object.keys(user) : null
+    });
+    
+    if (!user) {
+      return res.json({ error: 'User validation failed' });
+    }
+    
+    console.log('🔍 DEBUG LOGIN - Step 4: Generate token');
+    const token = databaseManager.generateToken(user);
+    
+    console.log('🔍 DEBUG LOGIN - Step 5: Token generated:', {
+      tokenGenerated: !!token,
+      tokenPreview: token ? token.substring(0, 30) + '...' : null
+    });
+    
+    // Decode token to see what's inside
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.decode(token);
+    
+    console.log('🔍 DEBUG LOGIN - Step 6: Token contents:', {
+      userId: decoded.userId,
+      email: decoded.email,
+      role: decoded.role
+    });
+    
+    res.json({
+      success: true,
+      debug: {
+        userFound: !!user,
+        tokenGenerated: !!token,
+        tokenUserId: decoded.userId,
+        tokenEmail: decoded.email,
+        originalUserId: user._id,
+        originalEmail: user.email
+      },
+      token,
+      user
+    });
+    
+  } catch (error) {
+    console.error('💥 DEBUG LOGIN ERROR:', error);
+    res.json({
+      error: true,
+      message: error.message
     });
   }
 });
