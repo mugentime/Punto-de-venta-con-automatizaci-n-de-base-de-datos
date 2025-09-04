@@ -17,17 +17,9 @@ window.addEventListener('orientationchange', () => {
   setTimeout(setVHProperty, 100); // Delay for orientation change completion
 });
 
-// Prevent iOS bounce scrolling
-document.addEventListener('touchmove', function(e) {
-  if (e.touches.length > 1) return; // Allow pinch zoom
-  
-  const target = e.target;
-  const scrollableParent = target.closest('.scrollable, [data-scrollable]');
-  
-  if (!scrollableParent) {
-    e.preventDefault(); // Prevent bounce on non-scrollable elements
-  }
-}, { passive: false });
+// Allow natural mobile scrolling - removed bounce prevention that blocked scrolling
+// The body and html are naturally scrollable, no need to prevent touchmove
+// This allows proper vertical scrolling on mobile devices
 
 // Optimize touch events for better performance
 let touchStartY = 0;

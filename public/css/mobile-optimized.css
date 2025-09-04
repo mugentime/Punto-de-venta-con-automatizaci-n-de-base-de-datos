@@ -483,7 +483,7 @@ body {
   
   /* Improve mobile scrolling */
   -webkit-overflow-scrolling: touch !important;
-  overscroll-behavior-y: contain !important;
+  overscroll-behavior-y: auto !important;
   
   /* Prevent text size adjustment */
   -webkit-text-size-adjust: 100% !important;
@@ -584,7 +584,7 @@ main {
 
 .modal-backdrop,
 .overlay {
-  touch-action: none !important;
+  touch-action: pan-y pinch-zoom !important;
 }
 
 /* CRITICAL FIX 8: Improve link touch targets */
