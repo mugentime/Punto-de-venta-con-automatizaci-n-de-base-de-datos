@@ -6,6 +6,10 @@
     <title>Conejo Negro - POS System</title>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Mobile Optimizations - CRITICAL for touch devices -->
+    <link rel="stylesheet" href="css/mobile-optimized.css">
+    <!-- Mobile Enhancement JavaScript - Load early for critical fixes -->
+    <script src="js/mobile-enhancements.js"></script>
     <style>
         :root {
             --bg-primary: #0a0a0f;
@@ -27,6 +31,13 @@
             box-sizing: border-box;
         }
 
+        html {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: smooth;
+            touch-action: manipulation;
+            height: 100%;
+        }
+
         body {
             font-family: 'Roboto', sans-serif;
             background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
@@ -35,6 +46,9 @@
             display: flex;
             align-items: center;
             justify-content: center;
+            -webkit-overflow-scrolling: touch;
+            touch-action: manipulation;
+            overflow-y: auto;
         }
 
         .container {
@@ -45,6 +59,8 @@
             border-radius: 20px;
             box-shadow: 0 20px 60px rgba(0, 217, 255, 0.3);
             border: 1px solid rgba(0, 217, 255, 0.2);
+            touch-action: manipulation;
+            -webkit-overflow-scrolling: touch;
         }
 
         .logo {
@@ -160,9 +176,17 @@
         }
 
         @media (max-width: 768px) {
+            html, body {
+                -webkit-overflow-scrolling: touch !important;
+                touch-action: manipulation !important;
+                overflow-y: auto !important;
+            }
+            
             .container {
                 padding: 20px;
                 margin: 20px;
+                touch-action: manipulation !important;
+                -webkit-overflow-scrolling: touch !important;
             }
             
             .title {
@@ -171,6 +195,17 @@
             
             .subtitle {
                 font-size: 18px;
+            }
+            
+            .option-card {
+                touch-action: manipulation !important;
+                -webkit-tap-highlight-color: transparent;
+                cursor: pointer;
+            }
+            
+            .option-card:active {
+                transform: translateY(-2px);
+                transition: all 0.1s ease;
             }
         }
     </style>
