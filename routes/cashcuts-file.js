@@ -1,7 +1,7 @@
 const express = require('express');
 const { auth } = require('../middleware/auth-file');
 const databaseManager = require('../utils/databaseManager');
-const cashCutService = require('../utils/cashCutService');
+const cashCutService = require('../utils/improvedCashCutService');
 
 const router = express.Router();
 
