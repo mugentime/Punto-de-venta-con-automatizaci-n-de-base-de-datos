@@ -2024,6 +2024,70 @@
                 </div>
             </section>
 
+            <!-- Inventario Cafetería -->
+            <section id="inventario-cafeteria" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-coffee"></i>
+                        Inventario de Cafetería
+                    </h2>
+                    
+                    <form id="cafeteria-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cafeteria-name">Nombre del Producto</label>
+                                <input type="text" id="cafeteria-name" class="form-control" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cafeteria-quantity">Cantidad</label>
+                                <input type="number" id="cafeteria-quantity" class="form-control" min="1" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="cafeteria-cost">Costo de Compra</label>
+                                <input type="number" id="cafeteria-cost" class="form-control" step="0.01" min="0" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="cafeteria-price">Precio de Venta</label>
+                                <input type="number" id="cafeteria-price" class="form-control" step="0.01" min="0" required>
+                            </div>
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-plus"></i>
+                            Agregar Producto
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-mug-hot"></i>
+                        Productos de Cafetería
+                    </h2>
+                    
+                    <div class="table-container">
+                        <table id="cafeteria-table">
+                            <thead>
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Costo Compra</th>
+                                    <th>Precio Venta</th>
+                                    <th>Ganancia</th>
+                                    <th>Acciones</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Los productos se agregarán aquí dinámicamente -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
             <!-- Inventario Alimentos -->
             <section id="inventario-alimentos" class="section">
                 <div class="card">
@@ -3039,6 +3103,7 @@
         // Actualizar tablas de productos
         function updateProductTables() {
             updateRefrigeradorTable();
+            updateCafeteriaTable();
             updateAlimentosTable();
             updateProductSelects();
             initializeDateInput();
@@ -3120,6 +3185,55 @@
             });
         }
 
+        // Actualizar tabla de cafetería
+        function updateCafeteriaTable() {
+            const tbody = document.querySelector('#cafeteria-table tbody');
+            if (!tbody) return; // Si no existe la tabla, no hacer nada
+            
+            tbody.innerHTML = '';
+            
+            const cafeteriaProducts = data.products.filter(p => p.category === 'cafeteria' && p.isActive);
+            
+            cafeteriaProducts.forEach(product => {
+                const profit = product.price - product.cost;
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${product.name}</td>
+                    <td>${product.quantity}</td>
+                    <td>$${product.cost.toFixed(2)}</td>
+                    <td>$${product.price.toFixed(2)}</td>
+                    <td>$${profit.toFixed(2)}</td>
+                    <td>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary btn-sm action-btn edit-product-btn" data-product-id="${product._id}" title="Editar cantidad">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}" title="Eliminar producto">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+            
+            // Agregar event listeners para botones de productos cafetería (CSP compliant)
+            document.querySelectorAll('#cafeteria-table .delete-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    deleteProduct(productId);
+                });
+            });
+            
+            document.querySelectorAll('#cafeteria-table .edit-product-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const productId = this.getAttribute('data-product-id');
+                    editProductStock(productId);
+                });
+            });
+        }
 
         function updateAlimentosTable() {
             const tbody = document.querySelector('#alimentos-table tbody');
@@ -3511,6 +3625,64 @@
                 showNotification('Alimento agregado al inventario', 'success');
             } catch (error) {
                 showNotification('Error agregando alimento: ' + error.message, 'error');
+            }
+        });
+
+        // Agregar producto de cafetería
+        document.getElementById('cafeteria-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('cafeteria-name').value,
+                quantity: parseInt(document.getElementById('cafeteria-quantity').value),
+                cost: parseFloat(document.getElementById('cafeteria-cost').value),
+                price: parseFloat(document.getElementById('cafeteria-price').value),
+                category: 'cafeteria'
+            };
+            
+            try {
+                const response = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
+                data.products.push(newProduct);
+                updateProductTables(); // Update all tables and selects
+                this.reset();
+                showNotification('Producto agregado a la cafetería', 'success');
+            } catch (error) {
+                showNotification('Error agregando producto: ' + error.message, 'error');
+            }
+        });
+
+        // Agregar producto de cafetería
+        document.getElementById('cafeteria-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const productData = {
+                name: document.getElementById('cafeteria-name').value,
+                quantity: parseInt(document.getElementById('cafeteria-quantity').value),
+                cost: parseFloat(document.getElementById('cafeteria-cost').value),
+                price: parseFloat(document.getElementById('cafeteria-price').value),
+                category: 'cafeteria'
+            };
+            
+            try {
+                const response = await apiRequest('/products', {
+                    method: 'POST',
+                    body: JSON.stringify(productData)
+                });
+                
+                // Extract product from response (server returns { message, product })
+                const newProduct = response.product || response;
+                data.products.push(newProduct);
+                updateProductTables(); // Update all tables and selects
+                this.reset();
+                showNotification('Producto agregado a la cafetería', 'success');
+            } catch (error) {
+                showNotification('Error agregando producto: ' + error.message, 'error');
             }
         });
 
