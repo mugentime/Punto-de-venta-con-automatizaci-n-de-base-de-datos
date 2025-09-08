@@ -345,33 +345,8 @@ app.get('/api/sync', requireDatabase, auth, async (req, res) => {
   }
 });
 
-// Initialize sample data endpoint
-app.post('/api/init-data', requireDatabase, auth, async (req, res) => {
-  try {
-    // Check if products already exist
-    const products = await databaseManager.getProducts();
-    if (products.length > 0) {
-      return res.json({
-        message: 'Sample data already exists',
-        products: products.filter(p => p.isActive)
-      });
-    }
-    
-    // Initialize with default products (they should already be created by databaseManager.initialize)
-    await databaseManager.initialize();
-    const newProducts = await databaseManager.getProducts();
-    
-    res.json({
-      message: 'Sample data initialized successfully',
-      products: newProducts.filter(p => p.isActive)
-    });
-  } catch (error) {
-    console.error('Init data error:', error);
-    res.status(500).json({
-      error: 'Failed to initialize sample data'
-    });
-  }
-});
+// Sample data initialization endpoint disabled to prevent data loss
+// Use proper database management tools instead
 
 // Database setup endpoint
 app.post('/api/setup', requireDatabase, async (req, res) => {

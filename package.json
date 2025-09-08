@@ -12,7 +12,6 @@
     "dev": "nodemon server.js",
     "setup": "node setup.js",
     "build": "echo 'Build completed successfully'",
-    "postinstall": "node initDatabase.js",
     "test": "npm run test:unit && npm run test:integration && npm run test:e2e",
     "test:unit": "jest --config=tests/config/jest.config.js tests/unit",
     "test:integration": "jest --config=tests/config/jest.config.js tests/integration --runInBand",
