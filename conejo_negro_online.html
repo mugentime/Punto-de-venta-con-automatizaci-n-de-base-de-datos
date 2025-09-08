@@ -208,6 +208,212 @@
             gap: 15px;
             color: var(--text-secondary);
         }
+        
+        .user-details {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 2px;
+        }
+        
+        .user-greeting {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .user-role {
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 10px;
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid rgba(0, 217, 255, 0.3);
+            color: var(--accent-cyan);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .user-role.admin {
+            background: rgba(255, 0, 85, 0.1);
+            border-color: rgba(255, 0, 85, 0.3);
+            color: var(--danger);
+        }
+        
+        .user-role.manager {
+            background: rgba(255, 193, 7, 0.1);
+            border-color: rgba(255, 193, 7, 0.3);
+            color: var(--warning);
+        }
+        
+        /* Mensaje de permisos insuficientes */
+        .no-permission-message {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 193, 7, 0.05);
+            border: 2px dashed rgba(255, 193, 7, 0.3);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .no-permission-content {
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        
+        .no-permission-icon {
+            font-size: 48px;
+            color: var(--warning);
+            margin-bottom: 20px;
+        }
+        
+        .no-permission-message h3 {
+            color: var(--warning);
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .no-permission-message p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .permission-requirements {
+            list-style: none;
+            padding: 0;
+            margin: 20px 0;
+        }
+        
+        .permission-requirements li {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 8px 0;
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+        
+        .permission-requirements i {
+            color: var(--success);
+            font-size: 14px;
+        }
+        
+        .permission-contact {
+            font-style: italic;
+            color: var(--text-muted) !important;
+            font-size: 14px !important;
+        }
+        
+        /* Estados mejorados para el módulo de gastos */
+        .expenses-loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            background: rgba(0, 217, 255, 0.05);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .expenses-loading .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0, 217, 255, 0.2);
+            border-top: 3px solid var(--accent-cyan);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .expenses-loading p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .expenses-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 2px dashed rgba(0, 217, 255, 0.2);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .expenses-empty-state i {
+            font-size: 48px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+        
+        .expenses-empty-state h3 {
+            color: var(--text-secondary);
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .expenses-empty-state p {
+            color: var(--text-muted);
+            font-size: 14px;
+            margin: 0;
+        }
+        
+        .expenses-error-state {
+            text-align: center;
+            padding: 60px 20px;
+            background: rgba(255, 0, 85, 0.05);
+            border: 2px solid rgba(255, 0, 85, 0.2);
+            border-radius: 15px;
+            margin: 20px 0;
+        }
+        
+        .expenses-error-state i {
+            font-size: 48px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+        
+        .expenses-error-state h3 {
+            color: var(--danger);
+            font-size: 20px;
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+        
+        .expenses-error-state p {
+            color: var(--text-secondary);
+            font-size: 16px;
+            line-height: 1.5;
+            margin-bottom: 20px;
+        }
+        
+        .expenses-retry-btn {
+            background: var(--danger);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .expenses-retry-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(255, 0, 85, 0.3);
+        }
 
         .logout-btn {
             background: var(--danger);
@@ -1497,7 +1703,10 @@
                     </nav>
                     
                     <div class="user-info">
-                        <span>Bienvenido, <span id="user-name">Usuario</span></span>
+                        <div class="user-details">
+                            <span class="user-greeting">Bienvenido, <span id="user-name">Usuario</span></span>
+                            <span class="user-role" id="user-role">Cargando...</span>
+                        </div>
                         <button id="logout-btn" class="logout-btn">
                             <i class="fas fa-sign-out-alt"></i>
                             Salir
@@ -2240,6 +2449,22 @@
                         Gestión de Gastos
                     </h2>
                     
+                    <!-- Mensaje de permisos insuficientes -->
+                    <div id="expenses-no-permission" class="no-permission-message" style="display: none;">
+                        <div class="no-permission-content">
+                            <div class="no-permission-icon">
+                                <i class="fas fa-lock"></i>
+                            </div>
+                            <h3>Acceso Restringido</h3>
+                            <p>No tienes permisos para gestionar gastos. Esta funcionalidad está disponible solo para:</p>
+                            <ul class="permission-requirements">
+                                <li><i class="fas fa-check"></i> Administradores del sistema</li>
+                                <li><i class="fas fa-check"></i> Usuarios con permisos de reportes</li>
+                            </ul>
+                            <p class="permission-contact">Contacta al administrador si necesitas acceso a esta sección.</p>
+                        </div>
+                    </div>
+                    
                     <div id="expenses-root">
                         <!-- Estadísticas rápidas -->
                         <div class="expenses-header">
@@ -2325,6 +2550,19 @@
                             <div class="loading-spinner"></div>
                             <p>Cargando gastos...</p>
                         </div>
+                        
+                        <!-- Error state -->
+                        <div class="expenses-error-state" id="expenses-error" style="display: none;">
+                            <div class="expenses-error-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <h3>Error al Cargar Gastos</h3>
+                            <p id="expenses-error-message">No se pudieron cargar los gastos. Verifique su conexión e inténtelo nuevamente.</p>
+                            <button class="expenses-retry-btn" onclick="if(window.Expenses && window.Expenses.retry) window.Expenses.retry()">
+                                <i class="fas fa-refresh"></i>
+                                Reintentar
+                            </button>
+                        </div>
                     </div>
                 </div>
             </section>
@@ -2349,6 +2587,92 @@
             records: [],
             reports: []
         };
+        
+        // ===========================================
+        // GESTIÓN DE PERMISOS
+        // ===========================================
+        
+        // Verificar si el usuario puede gestionar gastos
+        function canManageExpenses() {
+            if (!currentUser) {
+                return false;
+            }
+            
+            // Administradores siempre pueden gestionar gastos
+            if (currentUser.role === 'admin') {
+                return true;
+            }
+            
+            // Usuarios con permiso canViewReports también pueden gestionar gastos
+            if (currentUser.permissions && currentUser.permissions.includes('canViewReports')) {
+                return true;
+            }
+            
+            return false;
+        }
+        
+        // Obtener texto amigable del rol
+        function getRoleFriendlyName(role) {
+            const roleNames = {
+                'admin': 'Administrador',
+                'employee': 'Empleado',
+                'manager': 'Gerente'
+            };
+            return roleNames[role] || role;
+        }
+        
+        // Actualizar información del usuario en la UI
+        function updateUserInfo() {
+            if (!currentUser) return;
+            
+            // Actualizar nombre
+            const userNameElement = document.getElementById('user-name');
+            if (userNameElement) {
+                userNameElement.textContent = currentUser.name || currentUser.email || 'Usuario';
+            }
+            
+            // Actualizar rol
+            const userRoleElement = document.getElementById('user-role');
+            if (userRoleElement) {
+                const roleFriendly = getRoleFriendlyName(currentUser.role);
+                userRoleElement.textContent = roleFriendly;
+                
+                // Añadir clases CSS según el rol
+                userRoleElement.className = 'user-role';
+                if (currentUser.role) {
+                    userRoleElement.classList.add(currentUser.role);
+                }
+            }
+        }
+        
+        // Actualizar visibilidad de navegación según permisos
+        function updateNavigationVisibility() {
+            const hasExpensePermission = canManageExpenses();
+            
+            // Controlar pestaña principal de gastos
+            const expenseMainTab = document.querySelector('nav a[data-section="gastos"]');
+            if (expenseMainTab) {
+                if (hasExpensePermission) {
+                    expenseMainTab.style.display = 'flex';
+                    expenseMainTab.parentElement.style.display = 'block';
+                } else {
+                    expenseMainTab.style.display = 'none';
+                    expenseMainTab.parentElement.style.display = 'none';
+                }
+            }
+            
+            // Controlar pestaña móvil de gastos
+            const expenseMobileTab = document.querySelector('.mobile-nav-btn[data-section="gastos"]');
+            if (expenseMobileTab) {
+                if (hasExpensePermission) {
+                    expenseMobileTab.style.display = 'flex';
+                } else {
+                    expenseMobileTab.style.display = 'none';
+                }
+            }
+            
+            console.log('Navigation updated - User can manage expenses:', hasExpensePermission);
+        }
 
         // ===========================================
         // GESTIÓN DE AUTENTICACIÓN
@@ -2410,12 +2734,20 @@
         function showMainApp() {
             document.getElementById('login-screen').classList.add('hidden');
             document.getElementById('main-app').style.display = 'block';
-            document.getElementById('user-name').textContent = currentUser?.email || 'Usuario';
+            
+            // Actualizar información del usuario
+            updateUserInfo();
+            
+            // Controlar visibilidad de pestañas según permisos
+            updateNavigationVisibility();
+            
             updateConnectionStatus('online');
+            
             // Only load data if we have a valid token
             if (authToken) {
                 loadInitialData();
             }
+            
             // Initialize date input since registro is the default active section
             setTimeout(initializeDateInput, 100);
         }
@@ -3195,11 +3527,28 @@
                 // Cargar módulo de gastos cuando se accede a esa sección
                 if (sectionId === 'gastos') {
                     console.log('Navegando a sección de gastos');
-                    // Aquí se inicializará el módulo de gastos
-                    if (window.Expenses && window.Expenses.onEnter) {
-                        window.Expenses.onEnter();
+                    
+                    // Verificar permisos antes de cargar el módulo
+                    const hasPermission = canManageExpenses();
+                    const expensesRoot = document.getElementById('expenses-root');
+                    const noPermissionMsg = document.getElementById('expenses-no-permission');
+                    
+                    if (hasPermission) {
+                        // Usuario tiene permisos - mostrar interfaz normal
+                        if (expensesRoot) expensesRoot.style.display = 'block';
+                        if (noPermissionMsg) noPermissionMsg.style.display = 'none';
+                        
+                        // Inicializar módulo de gastos
+                        if (window.Expenses && window.Expenses.onEnter) {
+                            window.Expenses.onEnter();
+                        } else {
+                            console.log('Módulo de gastos aún no cargado');
+                        }
                     } else {
-                        console.log('Módulo de gastos aún no cargado');
+                        // Usuario no tiene permisos - mostrar mensaje
+                        if (expensesRoot) expensesRoot.style.display = 'none';
+                        if (noPermissionMsg) noPermissionMsg.style.display = 'block';
+                        console.log('Acceso denegado a gastos - permisos insuficientes');
                     }
                 }
                 
