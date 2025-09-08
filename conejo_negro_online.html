@@ -1395,6 +1395,10 @@
             <i class="fas fa-cut"></i>
             <span>Corte</span>
         </a>
+        <a href="#" class="nav-item mobile-nav-btn" data-section="gastos">
+            <i class="fas fa-receipt"></i>
+            <span>Gastos</span>
+        </a>
     </div>
     
     <div class="cyber-grid"></div>
@@ -1486,6 +1490,7 @@
                             <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
                             <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
                             <li><a href="#" class="nav-link" data-section="corte-caja">Corte de Caja</a></li>
+                            <li><a href="#" class="nav-link" data-section="gastos"><i class="fas fa-receipt"></i> Gastos</a></li>
                         </ul>
                     </nav>
                     
@@ -2219,6 +2224,29 @@
                             <div style="display: flex; justify-content: space-between; margin-bottom: 10px;">
                                 <span>Último corte automático:</span>
                                 <span id="last-cut-time" class="text-muted">N/A</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Gestión de Gastos -->
+            <section id="gastos" class="section">
+                <div class="card">
+                    <h2 class="card-title">
+                        <i class="fas fa-receipt"></i>
+                        Gestión de Gastos
+                    </h2>
+                    
+                    <div id="expenses-root">
+                        <!-- El contenido del módulo de gastos se cargará aquí -->
+                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
+                            <i class="fas fa-receipt" style="font-size: 48px; margin-bottom: 20px; color: var(--accent-cyan);"></i>
+                            <h3>Módulo de Gastos</h3>
+                            <p>Gestiona los gastos operativos del negocio</p>
+                            <div style="margin-top: 20px;">
+                                <i class="fas fa-spinner fa-spin"></i>
+                                Cargando módulo de gastos...
                             </div>
                         </div>
                     </div>
@@ -3086,6 +3114,17 @@
                 // Cargar sesiones de coworking cuando se accede a esa sección
                 if (sectionId === 'coworking') {
                     loadCoworkingSessions();
+                }
+                
+                // Cargar módulo de gastos cuando se accede a esa sección
+                if (sectionId === 'gastos') {
+                    console.log('Navegando a sección de gastos');
+                    // Aquí se inicializará el módulo de gastos
+                    if (window.Expenses && window.Expenses.onEnter) {
+                        window.Expenses.onEnter();
+                    } else {
+                        console.log('Módulo de gastos aún no cargado');
+                    }
                 }
                 
             });
