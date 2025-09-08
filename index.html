@@ -190,6 +190,68 @@
             color: var(--accent-cyan);
         }
 
+        /* Sección de Acceso Rápido */
+        .quick-access {
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 1px solid rgba(0, 217, 255, 0.2);
+        }
+
+        .quick-access-title {
+            text-align: center;
+            color: var(--accent-cyan);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 25px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .option-card {
+            display: block;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            text-decoration: none;
+            color: var(--text-primary);
+            border: 1px solid rgba(0, 217, 255, 0.2);
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .option-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 217, 255, 0.3);
+            border-color: var(--accent-cyan);
+            background: rgba(255, 255, 255, 0.08);
+        }
+
+        .option-icon {
+            width: 60px;
+            height: 60px;
+            background: linear-gradient(135deg, var(--accent-cyan), var(--accent-purple));
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--bg-primary);
+            margin: 0 auto 15px;
+        }
+
+        .option-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--accent-cyan);
+        }
+
+        .option-desc {
+            font-size: 14px;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+
         .status-indicator {
             display: inline-flex;
             align-items: center;
@@ -294,6 +356,19 @@
                 <p>📧 Email: admin@conejonegro.com</p>
                 <p>🔑 Password: admin123</p>
             </div>
+        </div>
+        
+        <!-- Sección de Acceso Rápido -->
+        <div class="quick-access">
+            <h3 class="quick-access-title">Acceso Rápido</h3>
+            
+            <a href="/inventario" class="option-card">
+                <div class="option-icon">
+                    <i class="fas fa-boxes"></i>
+                </div>
+                <div class="option-title">Inventario Cafetería</div>
+                <div class="option-desc">Control de stock de café, insumos y productos de cafetería</div>
+            </a>
         </div>
         
         <div style="margin-top: 40px; padding: 20px; background: rgba(0, 0, 0, 0.2); border-radius: 10px;">
