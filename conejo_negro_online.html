@@ -1591,10 +1591,6 @@
             <i class="fas fa-snowflake"></i>
             <span>Refriger.</span>
         </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-cafeteria">
-            <i class="fas fa-coffee"></i>
-            <span>Cafetería</span>
-        </a>
         <a href="#" class="nav-item mobile-nav-btn" data-section="reportes">
             <i class="fas fa-chart-bar"></i>
             <span>Reportes</span>
@@ -1694,7 +1690,6 @@
                             <li><a href="#" class="nav-link active" data-section="registro">Registro</a></li>
                             <li><a href="#" class="nav-link" data-section="coworking">Coworking</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-refrigerador">Inventario Refrigerador</a></li>
-                            <li><a href="#" class="nav-link" data-section="inventario-cafeteria">Inventario Cafetería</a></li>
                             <li><a href="#" class="nav-link" data-section="inventario-alimentos">Inventario Alimentos</a></li>
                             <li><a href="#" class="nav-link" data-section="reportes">Reportes</a></li>
                             <li><a href="#" class="nav-link" data-section="corte-caja">Corte de Caja</a></li>
@@ -2012,70 +2007,6 @@
                                     <th>Producto</th>
                                     <th>Cantidad</th>
                                     <th>Costo Compra</th>
-                                    <th>Precio Venta</th>
-                                    <th>Ganancia</th>
-                                    <th>Acciones</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <!-- Los productos se agregarán aquí dinámicamente -->
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Inventario Cafetería -->
-            <section id="inventario-cafeteria" class="section">
-                <div class="card">
-                    <h2 class="card-title">
-                        <i class="fas fa-mug-hot"></i>
-                        Inventario de Cafetería
-                    </h2>
-                    
-                    <form id="cafeteria-form">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="cafeteria-name">Nombre del Producto</label>
-                                <input type="text" id="cafeteria-name" class="form-control" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cafeteria-quantity">Cantidad</label>
-                                <input type="number" id="cafeteria-quantity" class="form-control" min="1" required>
-                            </div>
-                        </div>
-                        
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label for="cafeteria-cost">Costo de Producción</label>
-                                <input type="number" id="cafeteria-cost" class="form-control" step="0.01" min="0" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="cafeteria-price">Precio de Venta</label>
-                                <input type="number" id="cafeteria-price" class="form-control" step="0.01" min="0" required>
-                            </div>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">
-                            <i class="fas fa-plus"></i>
-                            Agregar Producto
-                        </button>
-                    </form>
-                </div>
-                
-                <div class="card">
-                    <h2 class="card-title">
-                        <i class="fas fa-coffee"></i>
-                        Productos de Cafetería
-                    </h2>
-                    
-                    <div class="table-container">
-                        <table id="cafeteria-table">
-                            <thead>
-                                <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Costo Producción</th>
                                     <th>Precio Venta</th>
                                     <th>Ganancia</th>
                                     <th>Acciones</th>
@@ -3104,7 +3035,6 @@
         // Actualizar tablas de productos
         function updateProductTables() {
             updateRefrigeradorTable();
-            updateCafeteriaTable();
             updateAlimentosTable();
             updateProductSelects();
             initializeDateInput();
@@ -3186,40 +3116,6 @@
             });
         }
 
-        // Actualizar tabla de cafetería
-        function updateCafeteriaTable() {
-            const tbody = document.querySelector('#cafeteria-table tbody');
-            tbody.innerHTML = '';
-            
-            const cafeteriaProducts = data.products.filter(p => p.category === 'cafeteria' && p.isActive);
-            
-            cafeteriaProducts.forEach(product => {
-                const profit = product.price - product.cost;
-                const row = document.createElement('tr');
-                row.innerHTML = `
-                    <td>${product.name}</td>
-                    <td>${product.quantity}</td>
-                    <td>$${product.cost.toFixed(2)}</td>
-                    <td>$${product.price.toFixed(2)}</td>
-                    <td>$${profit.toFixed(2)}</td>
-                    <td>
-                        <button class="btn btn-danger btn-sm action-btn delete-product-btn" data-product-id="${product._id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(row);
-            });
-            
-            // Agregar event listeners para botones de eliminar productos cafetería (CSP compliant)
-            document.querySelectorAll('#cafeteria-table .delete-product-btn').forEach(button => {
-                button.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    const productId = this.getAttribute('data-product-id');
-                    deleteProduct(productId);
-                });
-            });
-        }
 
         function updateAlimentosTable() {
             const tbody = document.querySelector('#alimentos-table tbody');
@@ -3584,34 +3480,6 @@
             }
         });
 
-        // Agregar producto cafetería
-        document.getElementById('cafeteria-form').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            
-            const productData = {
-                name: document.getElementById('cafeteria-name').value,
-                quantity: parseInt(document.getElementById('cafeteria-quantity').value),
-                cost: parseFloat(document.getElementById('cafeteria-cost').value),
-                price: parseFloat(document.getElementById('cafeteria-price').value),
-                category: 'cafeteria'
-            };
-            
-            try {
-                const response = await apiRequest('/products', {
-                    method: 'POST',
-                    body: JSON.stringify(productData)
-                });
-                
-                // Extract product from response (server returns { message, product })
-                const newProduct = response.product || response;
-                data.products.push(newProduct);
-                updateProductTables(); // Update all tables and selects
-                this.reset();
-                showNotification('Producto agregado a la cafetería', 'success');
-            } catch (error) {
-                showNotification('Error agregando producto: ' + error.message, 'error');
-            }
-        });
 
         // Agregar alimento preparado
         document.getElementById('alimentos-form').addEventListener('submit', async function(e) {
