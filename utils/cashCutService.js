@@ -1,11 +1,17 @@
 const databaseManager = require('./databaseManager');
 const cron = require('node-cron');
+const DuplicatePreventionService = require('../backend/services/DuplicatePreventionService');
+const EnhancedCashClosingController = require('../backend/controllers/EnhancedCashClosingController');
+const { v4: uuidv4 } = require('uuid');
 
 class CashCutService {
   constructor() {
     this.initialized = false;
     this.jobs = new Map();
     this.lastCutTime = null;
+    this.duplicateService = new DuplicatePreventionService();
+    this.enhancedController = new EnhancedCashClosingController();
+    console.log('🔧 TaskMaster: CashCutService initialized with duplicate prevention');
   }
 
   async initialize() {
@@ -69,8 +75,16 @@ class CashCutService {
     return await this.performCashCut('automatic');
   }
 
-  async performManualCashCut(userId, notes = '') {
-    return await this.performCashCut('manual', userId, notes);
+  async performManualCashCut(userId, notes = '', idempotencyKey = null) {
+    console.log('🔧 TaskMaster: Manual cash cut requested with duplicate prevention');
+    
+    // Generate idempotency key if not provided
+    if (!idempotencyKey) {
+      idempotencyKey = this.generateIdempotencyKey(userId, notes);
+    }
+    
+    // Use Enhanced Controller for duplicate prevention
+    return await this.performEnhancedManualCashCut(userId, notes, idempotencyKey);
   }
 
   async performCashCut(cutType = 'automatic', userId = null, notes = '') {
@@ -96,8 +110,11 @@ class CashCutService {
       // Get records for the period
       const records = await this.getRecordsForPeriod(startDate, endDate);
       
-      // Calculate statistics
-      const stats = this.calculatePeriodStats(records);
+      // 💰 NEW: Get expenses for the period
+      const expenses = await this.getExpensesForPeriod(startDate, endDate);
+      
+      // Calculate statistics including expenses
+      const stats = this.calculatePeriodStats(records, expenses);
       
       // Create cash cut data
       const cashCutData = {
@@ -113,10 +130,16 @@ class CashCutService {
         totalRecords: stats.totalRecords,
         totalIncome: Math.round(stats.totalIncome * 100) / 100,
         totalCost: Math.round(stats.totalCost * 100) / 100,
-        totalProfit: Math.round((stats.totalIncome - stats.totalCost) * 100) / 100,
+        // 💰 NEW: Include expenses in cash cut
+        totalExpenses: Math.round(stats.totalExpenses * 100) / 100,
+        totalExpenseRecords: stats.totalExpenseRecords,
+        netProfit: Math.round((stats.totalIncome - stats.totalCost - stats.totalExpenses) * 100) / 100,
+        totalProfit: Math.round((stats.totalIncome - stats.totalCost) * 100) / 100, // Keep original for compatibility
         averageTicket: stats.totalRecords > 0 ? Math.round((stats.totalIncome / stats.totalRecords) * 100) / 100 : 0,
         paymentBreakdown: stats.paymentBreakdown,
         serviceBreakdown: stats.serviceBreakdown,
+        // 💰 NEW: Add expenses breakdown
+        expenseBreakdown: stats.expenseBreakdown,
         topProducts: stats.topProducts,
         hourlyBreakdown: stats.hourlyBreakdown,
         notes,
@@ -130,7 +153,7 @@ class CashCutService {
       // Update last cut time
       this.lastCutTime = cutDate;
       
-      console.log(`💰 Cash cut completed: ${stats.totalRecords} records, $${stats.totalIncome} income, $${stats.totalIncome - stats.totalCost} profit`);
+      console.log(`💰 Cash cut completed: ${stats.totalRecords} records, $${stats.totalIncome} income, $${stats.totalExpenses} expenses, $${stats.totalIncome - stats.totalCost - stats.totalExpenses} net profit`);
       
       return cashCutData;
     } catch (error) {
@@ -152,11 +175,27 @@ class CashCutService {
     }
   }
 
-  calculatePeriodStats(records) {
+  // 💰 NEW: Get expenses for the period to include in cash cut
+  async getExpensesForPeriod(startDate, endDate) {
+    try {
+      const allExpenses = await databaseManager.getExpensesByDateRange(startDate, endDate);
+      return allExpenses.filter(expense => {
+        return expense.isActive !== false && expense.status === 'pagado';
+      });
+    } catch (error) {
+      console.error('Error getting expenses for period:', error);
+      return [];
+    }
+  }
+
+  calculatePeriodStats(records, expenses = []) {
     const stats = {
       totalRecords: records.length,
       totalIncome: 0,
       totalCost: 0,
+      // 💰 NEW: Add expenses tracking
+      totalExpenses: 0,
+      totalExpenseRecords: expenses.length,
       paymentBreakdown: {
         efectivo: { count: 0, amount: 0 },
         tarjeta: { count: 0, amount: 0 },
@@ -165,6 +204,15 @@ class CashCutService {
       serviceBreakdown: {
         cafeteria: { count: 0, amount: 0 },
         coworking: { count: 0, amount: 0 }
+      },
+      // 💰 NEW: Add expenses breakdown by category
+      expenseBreakdown: {
+        'gastos-fijos': { count: 0, amount: 0 },
+        'insumos': { count: 0, amount: 0 },
+        'sueldos': { count: 0, amount: 0 },
+        'marketing': { count: 0, amount: 0 },
+        'mantenimiento': { count: 0, amount: 0 },
+        'otros': { count: 0, amount: 0 }
       },
       topProducts: [],
       hourlyBreakdown: []
@@ -210,6 +258,23 @@ class CashCutService {
       }
       hourlyStats[hour].count++;
       hourlyStats[hour].revenue += record.total;
+    });
+
+    // 💰 NEW: Process expenses for the period
+    expenses.forEach(expense => {
+      // Add to total expenses
+      stats.totalExpenses += expense.amount;
+      
+      // Expense breakdown by category
+      const category = expense.category || 'otros';
+      if (stats.expenseBreakdown[category]) {
+        stats.expenseBreakdown[category].count++;
+        stats.expenseBreakdown[category].amount += expense.amount;
+      } else {
+        // If category not found, add to 'otros'
+        stats.expenseBreakdown['otros'].count++;
+        stats.expenseBreakdown['otros'].amount += expense.amount;
+      }
     });
 
     // Convert product stats to top products (sorted by revenue)
@@ -312,15 +377,102 @@ class CashCutService {
     return Date.now().toString() + Math.random().toString(36).substr(2, 9);
   }
 
-  // Manual trigger for testing
+  /**
+   * 🔧 TaskMaster: Generate idempotency key for manual cash cuts
+   */
+  generateIdempotencyKey(userId, notes) {
+    const timestamp = Math.floor(Date.now() / (1000 * 60)); // Round to minute
+    const payload = `${userId}_manual_${timestamp}_${notes}`;
+    return require('crypto').createHash('sha256').update(payload).digest('hex').substring(0, 16);
+  }
+
+  /**
+   * 💰 NEW: Trigger manual cash cut (wrapper for external calls)
+   */
   async triggerManualCut(userId, notes = '') {
+    console.log(`🔄 Manual cash cut triggered by user: ${userId}`);
+    return await this.performManualCashCut(userId, notes);
+  }
+
+  /**
+   * 🔄 TaskMaster: Enhanced manual cash cut with duplicate prevention
+   */
+  async performEnhancedManualCashCut(userId, notes, idempotencyKey) {
+    console.log(`🔧 TaskMaster: Processing enhanced cash cut - Key: ${idempotencyKey}`);
+    
     try {
-      console.log('🔄 Manually triggering cash cut...');
-      const result = await this.performManualCashCut(userId, notes);
-      console.log('✅ Manual cash cut completed:', result);
+      // Check if cash cut already exists
+      const existingCashCut = await this.checkExistingCashCut(idempotencyKey);
+      if (existingCashCut) {
+        console.log(`✅ TaskMaster: Returning existing cash cut: ${existingCashCut.id}`);
+        return existingCashCut;
+      }
+
+      // Acquire lock to prevent concurrent duplicates
+      const lockResult = await this.duplicateService.acquireLock(userId, idempotencyKey, 'manual_cash_cut');
+      if (!lockResult.success) {
+        throw new Error(`Duplicate operation in progress: ${lockResult.message}`);
+      }
+
+      try {
+        // Perform the actual cash cut with original logic
+        const result = await this.performCashCut('manual', userId, notes);
+        
+        // Store mapping for future duplicate checks
+        await this.storeCashCutMapping(idempotencyKey, result);
+        
+        console.log(`✅ TaskMaster: New cash cut created: ${result.id}`);
+        return result;
+        
+      } finally {
+        // Always release the lock
+        await this.duplicateService.releaseLock(lockResult.lockKey, lockResult.lockValue);
+      }
+      
+    } catch (error) {
+      console.error(`❌ TaskMaster: Enhanced cash cut failed:`, error.message);
+      throw error;
+    }
+  }
+
+  /**
+   * 🔍 TaskMaster: Check if cash cut already exists by idempotency key
+   */
+  async checkExistingCashCut(idempotencyKey) {
+    try {
+      const cashCuts = await this.getCashCuts();
+      return cashCuts.find(cut => cut.idempotencyKey === idempotencyKey);
+    } catch (error) {
+      console.error('Error checking existing cash cut:', error.message);
+      return null;
+    }
+  }
+
+  /**
+   * 💾 TaskMaster: Store cash cut mapping for duplicate prevention
+   */
+  async storeCashCutMapping(idempotencyKey, cashCut) {
+    try {
+      // Add idempotency key to cash cut data
+      cashCut.idempotencyKey = idempotencyKey;
+      cashCut.taskMasterProtected = true;
+      cashCut.createdByTaskMaster = new Date().toISOString();
+      
+      console.log(`💾 TaskMaster: Stored mapping ${idempotencyKey} -> ${cashCut.id}`);
+    } catch (error) {
+      console.error('Error storing cash cut mapping:', error.message);
+    }
+  }
+
+  // Manual trigger for testing with TaskMaster protection
+  async triggerManualCut(userId, notes = '', idempotencyKey = null) {
+    try {
+      console.log('🔧 TaskMaster: Manually triggering protected cash cut...');
+      const result = await this.performManualCashCut(userId, notes, idempotencyKey);
+      console.log('✅ TaskMaster: Protected manual cash cut completed:', result.id);
       return result;
     } catch (error) {
-      console.error('❌ Manual cash cut failed:', error);
+      console.error('❌ TaskMaster: Protected manual cash cut failed:', error);
       throw error;
     }
   }
