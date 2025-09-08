@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Mobile Optimizations - CRITICAL for touch devices -->
     <link rel="stylesheet" href="css/mobile-optimized.css">
+    <!-- Estilos del módulo de gastos -->
+    <link rel="stylesheet" href="css/gastos.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
     <!-- Mobile Enhancement JavaScript - Load early for critical fixes -->
     <script src="js/mobile-enhancements.js"></script>
@@ -2239,15 +2241,89 @@
                     </h2>
                     
                     <div id="expenses-root">
-                        <!-- El contenido del módulo de gastos se cargará aquí -->
-                        <div style="text-align: center; padding: 40px; color: var(--text-secondary);">
-                            <i class="fas fa-receipt" style="font-size: 48px; margin-bottom: 20px; color: var(--accent-cyan);"></i>
-                            <h3>Módulo de Gastos</h3>
-                            <p>Gestiona los gastos operativos del negocio</p>
-                            <div style="margin-top: 20px;">
-                                <i class="fas fa-spinner fa-spin"></i>
-                                Cargando módulo de gastos...
+                        <!-- Estadísticas rápidas -->
+                        <div class="expenses-header">
+                            <div class="expenses-stats">
+                                <div class="expenses-stat-card">
+                                    <div class="expenses-stat-value" id="expenses-gastos-mes">$0</div>
+                                    <div class="expenses-stat-label">Gastos Este Mes</div>
+                                </div>
+                                
+                                <div class="expenses-stat-card">
+                                    <div class="expenses-stat-value" id="expenses-gastos-pendientes">0</div>
+                                    <div class="expenses-stat-label">Gastos Pendientes</div>
+                                </div>
+                                
+                                <div class="expenses-stat-card">
+                                    <div class="expenses-stat-value" id="expenses-categoria-mayor">-</div>
+                                    <div class="expenses-stat-label">Mayor Categoría</div>
+                                </div>
+                                
+                                <div class="expenses-stat-card">
+                                    <div class="expenses-stat-value" id="expenses-balance-neto">$0</div>
+                                    <div class="expenses-stat-label">Balance Neto</div>
+                                </div>
                             </div>
+                        </div>
+                        
+                        <!-- Sección de acciones -->
+                        <div class="expenses-actions">
+                            <div class="expenses-action-buttons">
+                                <button class="btn btn-add" id="expenses-add-btn">
+                                    <i class="fas fa-plus"></i>
+                                    Agregar Gasto
+                                </button>
+                                
+                                <button class="btn btn-report" id="expenses-report-btn">
+                                    <i class="fas fa-chart-line"></i>
+                                    Ver Reporte
+                                </button>
+                            </div>
+                            
+                            <!-- Filtros -->
+                            <div class="expenses-filters">
+                                <div class="expenses-filter-group">
+                                    <label>Categoría</label>
+                                    <select id="expenses-filtro-categoria">
+                                        <option value="">Todas las categorías</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="expenses-filter-group">
+                                    <label>Estado</label>
+                                    <select id="expenses-filtro-estado">
+                                        <option value="">Todos los estados</option>
+                                        <option value="pagado">Pagado</option>
+                                        <option value="pendiente">Pendiente</option>
+                                    </select>
+                                </div>
+                                
+                                <div class="expenses-filter-group">
+                                    <label>Fecha desde</label>
+                                    <input type="date" id="expenses-fecha-desde">
+                                </div>
+                                
+                                <div class="expenses-filter-group">
+                                    <label>Fecha hasta</label>
+                                    <input type="date" id="expenses-fecha-hasta">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Grid de gastos -->
+                        <div class="expenses-grid" id="expenses-grid">
+                            <!-- Los gastos se cargarán dinámicamente aquí -->
+                            <div class="expenses-empty-state">
+                                <i class="fas fa-receipt"></i>
+                                <h3>No hay gastos registrados</h3>
+                                <p>Comienza agregando tu primer gasto</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Loading indicator -->
+                        <div class="expenses-loading" id="expenses-loading" style="display: none;">
+                            <div class="loading-spinner"></div>
+                            <p>Cargando gastos...</p>
                         </div>
                     </div>
                 </div>
@@ -6043,5 +6119,8 @@
         });
         
     </script>
+    
+    <!-- Módulo de Gastos -->
+    <script src="js/expenses.js"></script>
 </body>
 </html>
