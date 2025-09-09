@@ -4,30 +4,26 @@ const DuplicatePreventionService = require('../backend/services/DuplicatePrevent
 const EnhancedCashClosingController = require('../backend/controllers/EnhancedCashClosingController');
 const { v4: uuidv4 } = require('uuid');
 
+/**
+ * @deprecated This service is being replaced by the unified module at src/modules/cashcut
+ * This file now exports the unified service for backwards compatibility
+ */
+
+// Redirect to unified module
+const unifiedModule = require('../src/modules/cashcut');
+const service = unifiedModule.service;
+
+// For backwards compatibility
 class CashCutService {
   constructor() {
-    this.initialized = false;
-    this.jobs = new Map();
-    this.lastCutTime = null;
-    this.duplicateService = new DuplicatePreventionService();
-    this.enhancedController = new EnhancedCashClosingController();
-    console.log('🔧 TaskMaster: CashCutService initialized with duplicate prevention');
+    console.log('🔧 TaskMaster: Using unified CashCutService from modules/cashcut');
+    // Delegate all methods to the unified service
+    return service;
   }
+}
 
-  async initialize() {
-    try {
-      // Load the last cut time to determine when to start
-      await this.loadLastCutTime();
-      
-      // Setup automatic 12-hour cuts
-      this.setup12HourCuts();
-      
-      this.initialized = true;
-      console.log('✅ Cash cut service initialized');
-    } catch (error) {
-      console.error('❌ Failed to initialize cash cut service:', error);
-    }
-  }
+// Export the unified service directly
+module.exports = service;
 
   async loadLastCutTime() {
     try {

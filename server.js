@@ -50,7 +50,8 @@ const databaseManager = require('./utils/databaseManager');
 
 // Import scheduled tasks
 require('./utils/scheduler');
-require('./utils/cashCutService');
+// Initialize unified cash cut service
+const cashCutModule = require('./src/modules/cashcut');
 require('./utils/membershipNotificationService');
 
 const app = express();
@@ -120,6 +121,20 @@ let isDatabaseReady = false;
     } else {
       console.log('✅ File-based database ready - Data may be lost on deployment');
       console.log('⚠️  Add PostgreSQL database in Railway for persistent storage');
+    }
+    
+    // Initialize cash cut service after database is ready
+    try {
+      await cashCutModule.init({
+        db: databaseManager,
+        settings: {
+          cron: process.env.CASHCUT_CRON || 'off', // Disabled by default
+          timezone: process.env.TZ || 'America/Mexico_City'
+        }
+      });
+      console.log('✅ Cash cut service initialized');
+    } catch (error) {
+      console.error('⚠️ Cash cut service initialization failed:', error.message);
     }
   } catch (error) {
     console.error('❌ Database initialization error:', error.message);

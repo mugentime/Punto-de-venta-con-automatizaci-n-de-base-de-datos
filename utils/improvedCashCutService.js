@@ -1,13 +1,11 @@
 /**
- * Servicio de Corte de Caja Mejorado - TaskMaster Integration
- * 🔧 Task Master: Duplicate Prevention for Cash Cuts
+ * @deprecated This service is being replaced by the unified module at src/modules/cashcut
+ * This file now exports the unified service for backwards compatibility
  */
 
-const databaseManager = require('./databaseManager');
-const fs = require('fs').promises;
-const path = require('path');
-
-class ImprovedCashCutService {
+// Redirect to unified module
+const unifiedModule = require('../src/modules/cashcut');
+module.exports = unifiedModule.service;
     constructor() {
         this.processingCuts = new Map(); // Track cuts being processed
         this.recentCuts = new Map(); // Cache recent cuts to prevent duplicates
