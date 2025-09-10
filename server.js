@@ -130,6 +130,31 @@ let isDatabaseReady = false;
       console.log('⚠️  Add PostgreSQL database in Render for persistent storage');
     }
     
+    // 🧠 HIVE MIND AUTO-REPAIR: Create admin user if missing
+    try {
+      const users = await databaseManager.getUsers();
+      const adminExists = users.find(user => user.email === 'admin@conejonegro.com');
+      
+      if (!adminExists) {
+        console.log('🔧 HIVE MIND: Creating missing admin user for production...');
+        
+        const adminUser = await databaseManager.createUser({
+          name: 'Administrator',
+          email: 'admin@conejonegro.com',
+          password: 'admin123',
+          role: 'admin'
+        });
+        
+        console.log('✅ HIVE MIND: Admin user created successfully!');
+        console.log('   Email: admin@conejonegro.com');
+        console.log('   Password: admin123');
+      } else {
+        console.log('✅ Admin user already exists - login should work');
+      }
+    } catch (error) {
+      console.error('⚠️ HIVE MIND: Admin user setup failed:', error.message);
+    }
+    
     // Initialize cash cut service after database is ready
     try {
       await cashCutModule.init({
