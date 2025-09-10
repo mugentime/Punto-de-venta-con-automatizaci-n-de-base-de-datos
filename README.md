@@ -1,5 +1,7 @@
 # Conejo Negro POS System
 
+> Deploy trigger: auth fix verification at 2025-09-10T16:26Z
+
 A complete Point of Sale system for Conejo Negro Café with authentication, inventory management, sales tracking, and automated Google Drive backups.
 
 ## 🚀 Features
