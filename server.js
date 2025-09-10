@@ -224,7 +224,8 @@ app.get('/api/emergency-test', (req, res) => {
     message: 'EMERGENCY TEST WORKING',
     timestamp: new Date().toISOString(),
     render_deployed: !!process.env.RENDER,
-    environment: process.env.NODE_ENV || 'development'
+    environment: process.env.NODE_ENV || 'development',
+    build_time: '2025-09-10T16:41:48Z'
   });
 });
 
