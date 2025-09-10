@@ -446,7 +446,7 @@ class CashCutController {
             
             await cashCutService.init({ 
                 settings: {
-                    cron: process.env.CASHCUT_CRON || '0 23 * * *',
+                    cron: process.env.CASHCUT_CRON || '0 0,12 * * *',
                     timezone: process.env.TZ || 'America/Mexico_City',
                     ...settings
                 }

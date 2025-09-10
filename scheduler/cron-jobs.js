@@ -6,8 +6,11 @@
 const cron = require('node-cron');
 const fetch = require('node-fetch');
 
-// Corte automático diario a las 23:59 con mejoras
-cron.schedule('59 23 * * *', async () => {
+// NOTA TaskMaster: Programación desactivada - manejada por CashCutService.init() en server.js
+// El servicio principal ahora maneja la programación automáticamente desde el arranque
+// Corte automático cada 12 horas (00:00 y 12:00) con mejoras - DESACTIVADO
+/*
+cron.schedule('0 0,12 * * *', async () => {
     console.log('🤖 TaskMaster: Ejecutando corte automático...');
     try {
         const result = await ejecutarCorteAutomatico();
@@ -28,6 +31,7 @@ cron.schedule('59 23 * * *', async () => {
     scheduled: true,
     timezone: "America/Mexico_City"
 });
+*/
 
 /**
  * 📊 Ejecutar corte automático mejorado

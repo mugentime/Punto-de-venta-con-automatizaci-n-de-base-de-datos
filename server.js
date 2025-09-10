@@ -135,11 +135,11 @@ let isDatabaseReady = false;
       await cashCutModule.init({
         db: databaseManager,
         settings: {
-          cron: process.env.CASHCUT_CRON || 'off', // Disabled by default
+          cron: process.env.CASHCUT_CRON || '0 0,12 * * *', // Every 12 hours by default
           timezone: process.env.TZ || 'America/Mexico_City'
         }
       });
-      console.log('✅ Cash cut service initialized');
+      console.log('✅ Cash cut service initialized with 12-hour automatic schedule');
     } catch (error) {
       console.error('⚠️ Cash cut service initialization failed:', error.message);
     }

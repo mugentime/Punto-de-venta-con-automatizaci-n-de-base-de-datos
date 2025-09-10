@@ -62,6 +62,11 @@ router.post('/manual', auth, cashCutController.triggerManualCut);
 router.post('/auto-run', auth, cashCutController.triggerAutomaticCut);
 
 /**
+ * 🤖 POST /api/cashcuts/automatic - Trigger automatic cash cut (alias)
+ */
+router.post('/automatic', auth, cashCutController.triggerAutomaticCut);
+
+/**
  * 🔍 GET /api/cashcuts/:id - Get specific cash cut by ID
  */
 router.get('/:id', auth, cashCutController.getCashCutById);

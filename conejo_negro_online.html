@@ -5881,43 +5881,74 @@
         // Load service status
         async function loadServiceStatus() {
             try {
-                // Check for open cash cuts
-                const openCutResponse = await apiRequest('/cashcuts/open');
-                const hasOpenCut = openCutResponse && openCutResponse._id;
-                
-                // Update UI based on open cut status
+                // Check service status for automatic cuts
+                const serviceResponse = await apiRequest('/cashcuts/service/status');
                 const statusEl = document.getElementById('auto-cuts-status');
                 const lastCutEl = document.getElementById('last-cut-time');
+                
+                if (serviceResponse && serviceResponse.success && serviceResponse.serviceStatus) {
+                    const svc = serviceResponse.serviceStatus;
+                    const auto = (svc.jobs && svc.jobs.automatic) || {};
+                    const activo = !!(svc.initialized && svc.taskMasterActive && auto.scheduled === true);
+                    
+                    if (activo) {
+                        if (statusEl) {
+                            statusEl.innerHTML = '<i class="fas fa-check-circle" style="color: var(--success);"></i> Activo';
+                        }
+                        if (lastCutEl && svc.lastCutTime) {
+                            const lastCutDate = new Date(svc.lastCutTime).toLocaleString('es-MX');
+                            lastCutEl.textContent = `\u00daltimo corte: ${lastCutDate}`;
+                        } else if (lastCutEl) {
+                            lastCutEl.textContent = `Programado: ${svc.schedule || '0 0,12 * * *'} (${svc.timezone || 'America/Mexico_City'})`;
+                        }
+                    } else {
+                        if (statusEl) {
+                            statusEl.innerHTML = '<i class="fas fa-times-circle" style="color: var(--danger);"></i> Inactivo';
+                        }
+                        if (lastCutEl) {
+                            lastCutEl.textContent = 'Servicio no inicializado';
+                        }
+                    }
+                } else {
+                    // Fallback: Check for open cash cuts to show something useful
+                    const openCutResponse = await apiRequest('/cashcuts/open');
+                    const hasOpenCut = openCutResponse && openCutResponse._id;
+                    
+                    if (statusEl) {
+                        if (hasOpenCut) {
+                            statusEl.innerHTML = '<i class="fas fa-unlock" style="color: var(--warning);"></i> Corte Abierto';
+                        } else {
+                            statusEl.innerHTML = '<i class="fas fa-question-circle" style="color: var(--warning);"></i> Estado desconocido';
+                        }
+                    }
+                    
+                    if (lastCutEl) {
+                        if (hasOpenCut) {
+                            const openDate = new Date(openCutResponse.openedAt).toLocaleString('es-MX');
+                            lastCutEl.textContent = `Abierto: ${openDate}`;
+                        } else {
+                            lastCutEl.textContent = 'No disponible';
+                        }
+                    }
+                }
+                
+                // Handle manual button state (separate from service status)
+                const openCutResponse = await apiRequest('/cashcuts/open');
+                const hasOpenCut = openCutResponse && openCutResponse._id;
                 const manualBtn = document.getElementById('manual-cash-cut-btn');
                 
-                if (hasOpenCut) {
-                    if (statusEl) {
-                        statusEl.innerHTML = '<i class="fas fa-unlock" style="color: var(--warning);"></i> Corte Abierto';
-                    }
-                    if (lastCutEl) {
-                        const openDate = new Date(openCutResponse.openedAt).toLocaleString('es-MX');
-                        lastCutEl.textContent = `Abierto: ${openDate}`;
-                    }
-                    // Disable manual cash cut button if there's already an open cut
-                    if (manualBtn) {
+                if (manualBtn) {
+                    if (hasOpenCut) {
                         manualBtn.disabled = true;
                         manualBtn.innerHTML = '<i class="fas fa-lock"></i> Ya hay un corte abierto';
                         manualBtn.style.opacity = '0.6';
-                    }
-                } else {
-                    if (statusEl) {
-                        statusEl.innerHTML = '<i class="fas fa-lock" style="color: var(--success);"></i> Sin cortes abiertos';
-                    }
-                    if (lastCutEl) {
-                        lastCutEl.textContent = 'Sin cortes abiertos';
-                    }
-                    // Enable manual cash cut button
-                    if (manualBtn) {
+                    } else {
                         manualBtn.disabled = false;
-                        manualBtn.innerHTML = '<i class="fas fa-cut"></i> Corte Manual';
+                        manualBtn.innerHTML = '<i class="fas fa-scissors"></i> Finalizar D\u00eda - Corte Manual';
                         manualBtn.style.opacity = '1';
                     }
                 }
+                
             } catch (error) {
                 console.error('Error loading service status:', error);
                 const statusEl = document.getElementById('auto-cuts-status');

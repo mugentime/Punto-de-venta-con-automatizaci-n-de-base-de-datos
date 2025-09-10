@@ -572,6 +572,8 @@ class CashCutService {
                     { running: job.running || false, scheduled: true }
                 ])
             ),
+            schedule: this.settings?.cron || null,
+            timezone: this.settings?.timezone || 'America/Mexico_City',
             taskMasterActive: true,
             version: '2.0.0'
         };
