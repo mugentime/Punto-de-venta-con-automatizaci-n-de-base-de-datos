@@ -59,7 +59,8 @@
     "mcp:playwright": "cross-env PLAYWRIGHT_MCP_BASE_URL=http://localhost:3000 npx mcp-server-playwright --port 3001 --host localhost",
     "mcp:playwright:start": "powershell -File scripts/manage-playwright-mcp.ps1 start",
     "mcp:playwright:stop": "powershell -File scripts/manage-playwright-mcp.ps1 stop",
-    "mcp:playwright:status": "powershell -File scripts/manage-playwright-mcp.ps1 status"
+    "mcp:playwright:status": "powershell -File scripts/manage-playwright-mcp.ps1 status",
+    "bootstrap:admin": "node scripts/bootstrap-admin.js"
   },
   "keywords": [
     "pos",
