@@ -34,15 +34,8 @@ router.get('/charts', auth, cashCutController.getChartsData);
 
 /**
  * 🔍 GET /api/cashcuts/open - Get current open cash cut
- * Note: This endpoint is a placeholder for future implementation
  */
-router.get('/open', auth, (req, res) => {
-    res.status(404).json({
-        success: false,
-        error: 'No open cash cut found',
-        message: 'Cash cuts are performed as complete transactions'
-    });
-});
+router.get('/open', auth, cashCutController.getOpenCashCut);
 
 /**
  * 📊 GET /api/cashcuts/service/status - Get service status
@@ -90,39 +83,31 @@ router.delete('/:id', auth, cashCutController.deleteCashCut);
  */
 
 /**
- * POST /api/cashcuts - Create new cash cut (for future cash drawer management)
- * This would be used when implementing a cash drawer opening/closing system
+ * POST /api/cashcuts - Create new cash cut
+ * Body:
+ * - openingAmount: number (required)
+ * - openedBy: string (required)
+ * - notes: string (optional)
  */
-router.post('/', auth, (req, res) => {
-    res.status(501).json({
-        success: false,
-        error: 'Cash cut creation endpoint not implemented',
-        message: 'Use /manual or /auto-run endpoints to perform cash cuts'
-    });
-});
+router.post('/', auth, cashCutController.createCashCut);
 
 /**
- * POST /api/cashcuts/:id/entries - Add entry to cash cut (for future implementation)
- * This would be used for tracking individual transactions within a cash cut period
+ * POST /api/cashcuts/:id/entries - Add entry to cash cut
+ * Body:
+ * - type: 'sale' | 'expense' | 'adjustment' (required)
+ * - amount: number (required)
+ * - referenceId: string (optional)
+ * - note: string (optional)
  */
-router.post('/:id/entries', auth, (req, res) => {
-    res.status(501).json({
-        success: false,
-        error: 'Cash cut entries endpoint not implemented',
-        message: 'Cash cuts are performed as complete transactions with all period data'
-    });
-});
+router.post('/:id/entries', auth, cashCutController.addEntry);
 
 /**
- * POST /api/cashcuts/:id/close - Close cash cut (for future implementation)
- * This would be used when implementing manual cash drawer closing
+ * POST /api/cashcuts/:id/close - Close cash cut
+ * Body:
+ * - closingAmount: number (required)
+ * - closedBy: string (required)
+ * - notes: string (optional)
  */
-router.post('/:id/close', auth, (req, res) => {
-    res.status(501).json({
-        success: false,
-        error: 'Cash cut closing endpoint not implemented',
-        message: 'Cash cuts are performed as complete transactions'
-    });
-});
+router.post('/:id/close', auth, cashCutController.closeCashCut);
 
 module.exports = router;

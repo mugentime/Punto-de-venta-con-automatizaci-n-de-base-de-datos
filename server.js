@@ -104,6 +104,13 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Correlation ID middleware for request tracking
+app.use((req, res, next) => {
+  req.id = req.headers['x-request-id'] || require('crypto').randomUUID();
+  res.setHeader('x-request-id', req.id);
+  next();
+});
+
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
@@ -448,15 +455,17 @@ app.use('*', (req, res) => {
   });
 });
 
-// Error handling middleware
+// Enhanced error handling middleware with correlation ID
 app.use((error, req, res, next) => {
-  console.error('Server Error:', error);
+  const correlationId = req.id || 'unknown';
+  console.error(`[${correlationId}] Server Error:`, error);
   
   res.status(error.status || 500).json({
     error: process.env.NODE_ENV === 'production' 
       ? 'Internal Server Error' 
       : error.message,
-    timestamp: new Date().toISOString()
+    timestamp: new Date().toISOString(),
+    correlationId
   });
 });
 

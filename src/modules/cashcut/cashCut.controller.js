@@ -4,37 +4,191 @@
  */
 
 const cashCutService = require('./cashCut.service');
+const databaseManager = require('../../../utils/databaseManager');
 
 class CashCutController {
     /**
-     * 📋 Get all cash cuts
+     * 📋 Get all cash cuts with new API format
      */
     async getCashCuts(req, res) {
         try {
-            const { limit = 50, startDate, endDate } = req.query;
-            let cashCuts;
-
-            if (startDate && endDate) {
-                // Get cash cuts for date range
-                const allCuts = await cashCutService.getCashCuts(parseInt(limit));
-                cashCuts = allCuts.filter(cut => {
-                    const cutDate = new Date(cut.cutDate);
-                    return cutDate >= new Date(startDate) && cutDate <= new Date(endDate);
-                });
-            } else {
-                cashCuts = await cashCutService.getCashCuts(parseInt(limit));
-            }
-
-            res.json({
-                success: true,
-                cashCuts,
-                total: cashCuts.length
+            const { limit = 50, offset = 0, from, to, status } = req.query;
+            
+            // Use new database manager method for consistency
+            const cashCuts = await databaseManager.listCashCuts({
+                limit: parseInt(limit),
+                offset: parseInt(offset),
+                from,
+                to,
+                status
             });
+
+            // Return in new API format (direct array)
+            res.json(cashCuts);
         } catch (error) {
             console.error('Error getting cash cuts:', error);
             res.status(500).json({
-                success: false,
                 error: 'Failed to retrieve cash cuts',
+                message: error.message
+            });
+        }
+    }
+    
+    /**
+     * 🔓 Get open cash cut
+     */
+    async getOpenCashCut(req, res) {
+        try {
+            const openCut = await databaseManager.getOpenCashCut();
+            
+            if (!openCut) {
+                return res.status(404).json({
+                    error: 'No open cash cut found'
+                });
+            }
+
+            res.json(openCut);
+        } catch (error) {
+            console.error('Error getting open cash cut:', error);
+            res.status(500).json({
+                error: 'Failed to retrieve open cash cut',
+                message: error.message
+            });
+        }
+    }
+    
+    /**
+     * 🆕 Create new cash cut
+     */
+    async createCashCut(req, res) {
+        try {
+            const { openingAmount, openedBy, notes } = req.body;
+            
+            // Validation
+            if (!openingAmount || openingAmount < 0) {
+                return res.status(400).json({
+                    error: 'Opening amount is required and must be non-negative'
+                });
+            }
+            
+            if (!openedBy) {
+                return res.status(400).json({
+                    error: 'openedBy is required'
+                });
+            }
+            
+            const cashCut = await databaseManager.createCashCut({
+                openingAmount: parseFloat(openingAmount),
+                openedBy,
+                notes: notes || ''
+            });
+
+            res.status(201).json(cashCut);
+        } catch (error) {
+            console.error('Error creating cash cut:', error);
+            if (error.message.includes('already an open cash cut')) {
+                return res.status(409).json({
+                    error: error.message
+                });
+            }
+            res.status(500).json({
+                error: 'Failed to create cash cut',
+                message: error.message
+            });
+        }
+    }
+    
+    /**
+     * 🔒 Close cash cut
+     */
+    async closeCashCut(req, res) {
+        try {
+            const { id } = req.params;
+            const { closingAmount, closedBy, notes } = req.body;
+            
+            // Validation
+            if (closingAmount === undefined || closingAmount === null) {
+                return res.status(400).json({
+                    error: 'Closing amount is required'
+                });
+            }
+            
+            if (!closedBy) {
+                return res.status(400).json({
+                    error: 'closedBy is required'
+                });
+            }
+            
+            const cashCut = await databaseManager.closeCashCut({
+                id,
+                closingAmount: parseFloat(closingAmount),
+                closedBy,
+                notes: notes || ''
+            });
+
+            res.json(cashCut);
+        } catch (error) {
+            console.error('Error closing cash cut:', error);
+            if (error.message.includes('not found')) {
+                return res.status(404).json({
+                    error: error.message
+                });
+            }
+            if (error.message.includes('not open')) {
+                return res.status(409).json({
+                    error: error.message
+                });
+            }
+            res.status(500).json({
+                error: 'Failed to close cash cut',
+                message: error.message
+            });
+        }
+    }
+    
+    /**
+     * 📝 Add entry to cash cut
+     */
+    async addEntry(req, res) {
+        try {
+            const { id } = req.params;
+            const { type, amount, referenceId, note } = req.body;
+            
+            // Validation
+            if (!type || !['sale', 'expense', 'adjustment'].includes(type)) {
+                return res.status(400).json({
+                    error: 'Invalid entry type. Must be sale, expense, or adjustment'
+                });
+            }
+            
+            if (!amount || isNaN(parseFloat(amount))) {
+                return res.status(400).json({
+                    error: 'Valid amount is required'
+                });
+            }
+            
+            const updatedCashCut = await databaseManager.appendEntry(id, {
+                type,
+                amount: parseFloat(amount),
+                referenceId,
+                note
+            });
+
+            res.json(updatedCashCut);
+        } catch (error) {
+            console.error('Error adding entry to cash cut:', error);
+            if (error.message.includes('not found')) {
+                return res.status(404).json({
+                    error: error.message
+                });
+            }
+            if (error.message.includes('not open')) {
+                return res.status(409).json({
+                    error: error.message
+                });
+            }
+            res.status(500).json({
+                error: 'Failed to add entry to cash cut',
                 message: error.message
             });
         }
@@ -45,23 +199,18 @@ class CashCutController {
      */
     async getCashCutById(req, res) {
         try {
-            const cashCut = await cashCutService.getCashCutById(req.params.id);
+            const cashCut = await databaseManager.getCashCutById(req.params.id);
             
             if (!cashCut) {
                 return res.status(404).json({
-                    success: false,
                     error: 'Cash cut not found'
                 });
             }
 
-            res.json({
-                success: true,
-                cashCut
-            });
+            res.json(cashCut);
         } catch (error) {
             console.error('Error getting cash cut:', error);
             res.status(500).json({
-                success: false,
                 error: 'Failed to retrieve cash cut',
                 message: error.message
             });

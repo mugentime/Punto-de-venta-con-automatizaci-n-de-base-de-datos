@@ -100,6 +100,15 @@ class Database {
                 performed_by VARCHAR(24),
                 start_date TIMESTAMP,
                 end_date TIMESTAMP,
+                status VARCHAR(20) DEFAULT 'closed',
+                opening_amount DECIMAL(10,2) DEFAULT 0,
+                closing_amount DECIMAL(10,2),
+                expected_amount DECIMAL(10,2) DEFAULT 0,
+                opened_by VARCHAR(24),
+                opened_at TIMESTAMP,
+                closed_by VARCHAR(24),
+                closed_at TIMESTAMP,
+                entries JSONB DEFAULT '[]',
                 sales_summary JSONB DEFAULT '{}',
                 product_summary JSONB DEFAULT '[]',
                 totals JSONB DEFAULT '{}',
@@ -111,8 +120,16 @@ class Database {
                 is_deleted BOOLEAN DEFAULT false,
                 deleted_by VARCHAR(24),
                 deleted_at TIMESTAMP,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             )
+        `);
+
+        // Add unique constraint to prevent multiple open cash cuts
+        await this.pool.query(`
+            CREATE UNIQUE INDEX IF NOT EXISTS idx_single_open_cashcut 
+            ON cashcuts (status) 
+            WHERE status = 'open' AND is_deleted = false
         `);
 
         await this.pool.query(`

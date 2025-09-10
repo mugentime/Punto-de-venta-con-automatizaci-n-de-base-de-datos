@@ -341,7 +341,7 @@ class DatabaseManager {
         return fileDatabase.generateId();
     }
 
-    // CASH CUTS
+    // CASH CUTS - Enhanced for new cashcut service
     async getCashCuts(limit = 50) {
         if (this.usePostgreSQL) {
             return await database.getCashCuts(limit);
@@ -373,6 +373,258 @@ class DatabaseManager {
             });
         }
         return await fileDatabase.deleteCashCut(id, deletedBy);
+    }
+
+    // ENHANCED CASHCUT METHODS for unified service
+    async ensureCashcutSchema() {
+        try {
+            if (this.usePostgreSQL) {
+                // PostgreSQL schema is already created in database.js
+                console.log('✅ CashCut PostgreSQL schema already ensured');
+                return true;
+            } else {
+                // For file-based, ensure directory and files exist
+                const fs = require('fs').promises;
+                const path = require('path');
+                const dataDir = path.join(__dirname, '..', 'data');
+                const cashCutsPath = path.join(dataDir, 'cashcuts.json');
+                
+                try {
+                    await fs.access(cashCutsPath);
+                } catch {
+                    await fs.mkdir(dataDir, { recursive: true });
+                    await fs.writeFile(cashCutsPath, JSON.stringify([], null, 2));
+                }
+                
+                console.log('✅ CashCut file schema ensured');
+                return true;
+            }
+        } catch (error) {
+            console.error('❌ Error ensuring cashcut schema:', error);
+            return false;
+        }
+    }
+
+    async beginTransaction() {
+        if (this.usePostgreSQL) {
+            // For PostgreSQL, return a client from pool for transaction
+            const client = await require('./database').pool.connect();
+            await client.query('BEGIN');
+            return client;
+        }
+        // For file-based, transactions are not needed (atomic file writes)
+        return null;
+    }
+
+    async commit(client) {
+        if (this.usePostgreSQL && client) {
+            await client.query('COMMIT');
+            client.release();
+        }
+    }
+
+    async rollback(client) {
+        if (this.usePostgreSQL && client) {
+            await client.query('ROLLBACK');
+            client.release();
+        }
+    }
+
+    // NEW CASHCUT SERVICE METHODS
+    async createCashCut({ openingAmount, openedBy, notes = '' }) {
+        // Check if there's already an open cash cut
+        const openCashCut = await this.getOpenCashCut();
+        if (openCashCut) {
+            throw new Error('There is already an open cash cut. Please close it first.');
+        }
+
+        const id = this.generateId();
+        const cashCut = {
+            _id: id,
+            id: id, // Compatibility
+            status: 'open',
+            openingAmount: parseFloat(openingAmount) || 0,
+            openedBy,
+            openedAt: new Date(),
+            notes,
+            entries: [],
+            closingAmount: null,
+            closedBy: null,
+            closedAt: null,
+            expectedAmount: parseFloat(openingAmount) || 0,
+            difference: null,
+            createdAt: new Date(),
+            updatedAt: new Date()
+        };
+
+        return await this.saveCashCut(cashCut);
+    }
+
+    async getOpenCashCut() {
+        try {
+            const cashCuts = await this.getCashCuts(100);
+            return cashCuts.find(cut => cut.status === 'open');
+        } catch (error) {
+            console.error('Error getting open cash cut:', error);
+            return null;
+        }
+    }
+
+    async appendEntry(cashCutId, { type, amount, referenceId, note }) {
+        try {
+            const cashCut = await this.getCashCutById(cashCutId);
+            if (!cashCut) {
+                throw new Error('Cash cut not found');
+            }
+
+            if (cashCut.status !== 'open') {
+                throw new Error('Cash cut is not open');
+            }
+
+            const entry = {
+                id: this.generateId(),
+                type, // 'sale', 'expense', 'adjustment'
+                amount: parseFloat(amount),
+                referenceId,
+                note: note || '',
+                createdAt: new Date()
+            };
+
+            // Add entry to cash cut
+            if (!cashCut.entries) cashCut.entries = [];
+            cashCut.entries.push(entry);
+
+            // Update expected amount
+            if (type === 'sale' || type === 'adjustment') {
+                cashCut.expectedAmount += parseFloat(amount);
+            } else if (type === 'expense') {
+                cashCut.expectedAmount -= parseFloat(amount);
+            }
+
+            cashCut.updatedAt = new Date();
+
+            // Save updated cash cut
+            if (this.usePostgreSQL) {
+                return await require('./database').updateCashCut(cashCutId, cashCut);
+            } else {
+                const fs = require('fs').promises;
+                const path = require('path');
+                const cashCutsPath = path.join(__dirname, '..', 'data', 'cashcuts.json');
+                
+                const cashCuts = await this.getCashCuts(1000);
+                const index = cashCuts.findIndex(c => c.id === cashCutId || c._id === cashCutId);
+                if (index !== -1) {
+                    cashCuts[index] = cashCut;
+                    await fs.writeFile(cashCutsPath, JSON.stringify(cashCuts, null, 2));
+                }
+            }
+
+            return cashCut;
+        } catch (error) {
+            console.error('Error appending entry to cash cut:', error);
+            throw error;
+        }
+    }
+
+    async computeExpectedAmount(cashCutId) {
+        try {
+            const cashCut = await this.getCashCutById(cashCutId);
+            if (!cashCut) {
+                throw new Error('Cash cut not found');
+            }
+
+            let expected = cashCut.openingAmount || 0;
+            
+            if (cashCut.entries && cashCut.entries.length > 0) {
+                cashCut.entries.forEach(entry => {
+                    if (entry.type === 'sale' || entry.type === 'adjustment') {
+                        expected += parseFloat(entry.amount) || 0;
+                    } else if (entry.type === 'expense') {
+                        expected -= parseFloat(entry.amount) || 0;
+                    }
+                });
+            }
+
+            return Math.round(expected * 100) / 100;
+        } catch (error) {
+            console.error('Error computing expected amount:', error);
+            return 0;
+        }
+    }
+
+    async closeCashCut({ id, closingAmount, closedBy, notes = '' }) {
+        try {
+            const cashCut = await this.getCashCutById(id);
+            if (!cashCut) {
+                throw new Error('Cash cut not found');
+            }
+
+            if (cashCut.status !== 'open') {
+                throw new Error('Cash cut is not open');
+            }
+
+            const expectedAmount = await this.computeExpectedAmount(id);
+            const finalClosingAmount = parseFloat(closingAmount);
+            const difference = finalClosingAmount - expectedAmount;
+
+            // Update cash cut
+            cashCut.status = 'closed';
+            cashCut.closingAmount = finalClosingAmount;
+            cashCut.closedBy = closedBy;
+            cashCut.closedAt = new Date();
+            cashCut.expectedAmount = expectedAmount;
+            cashCut.difference = Math.round(difference * 100) / 100;
+            cashCut.notes = (cashCut.notes || '') + (notes ? '\n' + notes : '');
+            cashCut.updatedAt = new Date();
+
+            // Save updated cash cut
+            if (this.usePostgreSQL) {
+                return await require('./database').updateCashCut(id, cashCut);
+            } else {
+                const fs = require('fs').promises;
+                const path = require('path');
+                const cashCutsPath = path.join(__dirname, '..', 'data', 'cashcuts.json');
+                
+                const cashCuts = await this.getCashCuts(1000);
+                const index = cashCuts.findIndex(c => c.id === id || c._id === id);
+                if (index !== -1) {
+                    cashCuts[index] = cashCut;
+                    await fs.writeFile(cashCutsPath, JSON.stringify(cashCuts, null, 2));
+                }
+            }
+
+            return cashCut;
+        } catch (error) {
+            console.error('Error closing cash cut:', error);
+            throw error;
+        }
+    }
+
+    async listCashCuts({ from, to, status, limit = 50, offset = 0 }) {
+        try {
+            let cashCuts = await this.getCashCuts(limit + offset);
+            
+            // Apply filters
+            if (from) {
+                const fromDate = new Date(from);
+                cashCuts = cashCuts.filter(cut => new Date(cut.createdAt || cut.openedAt) >= fromDate);
+            }
+            
+            if (to) {
+                const toDate = new Date(to);
+                cashCuts = cashCuts.filter(cut => new Date(cut.createdAt || cut.openedAt) <= toDate);
+            }
+            
+            if (status) {
+                cashCuts = cashCuts.filter(cut => cut.status === status);
+            }
+            
+            // Apply pagination
+            return cashCuts.slice(offset, offset + limit);
+        } catch (error) {
+            console.error('Error listing cash cuts:', error);
+            return [];
+        }
     }
 
     // MEMBERSHIPS
