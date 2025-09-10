@@ -6,12 +6,12 @@ const jwt = require('jsonwebtoken');
 
 class FileDatabase {
   constructor() {
-    // Use Railway storage or local
-    this.isRailway = process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID;
+    // Use Render storage or local
+    this.isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
     
-    if (this.isRailway) {
-      // For Railway, try persistent volume first, fallback to app storage
-      this.dataPath = process.env.RAILWAY_VOLUME_MOUNT_PATH || '/app/data';
+    if (this.isRender) {
+      // For Render, use app data directory
+      this.dataPath = '/app/data';
     } else {
       this.dataPath = path.join(__dirname, '..', 'data');
     }
@@ -24,6 +24,7 @@ class FileDatabase {
     this.coworkingSessionsFile = path.join(this.dataPath, 'coworking_sessions.json');
     this.customersFile = path.join(this.dataPath, 'customers.json');
     this.expensesFile = path.join(this.dataPath, 'expenses.json');
+    this.backupsFile = path.join(this.dataPath, 'backups.json');
     
     this.initialized = false;
   }

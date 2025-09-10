@@ -74,8 +74,8 @@ app.use(helmet({
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? [
-        'https://pos-conejonegro-production.up.railway.app',
-        process.env.RAILWAY_PUBLIC_DOMAIN ? `https://${process.env.RAILWAY_PUBLIC_DOMAIN}` : null
+        'https://pos-conejonegro-production.onrender.com',
+        process.env.RENDER_EXTERNAL_URL || null
       ].filter(Boolean)
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
@@ -127,7 +127,7 @@ let isDatabaseReady = false;
       console.log('✅ PostgreSQL database ready - Data will persist across deployments!');
     } else {
       console.log('✅ File-based database ready - Data may be lost on deployment');
-      console.log('⚠️  Add PostgreSQL database in Railway for persistent storage');
+      console.log('⚠️  Add PostgreSQL database in Render for persistent storage');
     }
     
     // Initialize cash cut service after database is ready
@@ -166,7 +166,8 @@ app.get('/api/emergency-test', (req, res) => {
   res.json({ 
     message: 'EMERGENCY TEST WORKING',
     timestamp: new Date().toISOString(),
-    railway_deployed: true 
+    render_deployed: !!process.env.RENDER,
+    environment: process.env.NODE_ENV || 'development'
   });
 });
 

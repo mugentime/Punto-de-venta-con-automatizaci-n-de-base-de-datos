@@ -33,14 +33,16 @@ router.get('/stats', auth, cashCutController.getStatistics);
 router.get('/charts', auth, cashCutController.getChartsData);
 
 /**
- * 🔍 GET /api/cashcuts/open - Get current open cash cut
+ * 🔍 GET /api/cashcuts/open - Get current open cash cut (PUBLIC)
+ * This endpoint is public to allow the UI to check for open cash cuts
  */
-router.get('/open', auth, cashCutController.getOpenCashCut);
+router.get('/open', cashCutController.getOpenCashCut);
 
 /**
- * 📊 GET /api/cashcuts/service/status - Get service status
+ * 📊 GET /api/cashcuts/service/status - Get service status (PUBLIC)
+ * This endpoint is public to allow the UI to check service status without authentication
  */
-router.get('/service/status', auth, cashCutController.getServiceStatus);
+router.get('/service/status', cashCutController.getServiceStatus);
 
 /**
  * 🔄 POST /api/cashcuts/init - Initialize service (admin only)
