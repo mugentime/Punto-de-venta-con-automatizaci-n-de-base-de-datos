@@ -7,6 +7,7 @@ A complete Point of Sale system for Conejo Negro Café with authentication, inve
 - **🔐 User Authentication**: Secure login system with role-based permissions
 - **📦 Inventory Management**: Track products for both cafetería and refrigerador
 - **💰 Sales Recording**: Register client transactions with service types
+- **💸 Cash Cuts (Cortes de Caja)**: Complete cash flow management system
 - **📊 Reporting**: Daily, weekly, and monthly reports with statistics
 - **☁️ Cloud Backup**: Automated Google Drive backups with scheduling
 - **🔄 Real-time Sync**: Multi-user support with data synchronization
@@ -177,6 +178,77 @@ conejo-negro-pos/
 └── package.json        # Dependencies & scripts
 ```
 
+## 💸 Cash Cuts (Cortes de Caja)
+
+Complete cash flow management system for tracking daily cash operations.
+
+### Features
+
+- **🆕 Cash Cut Creation**: Open cash drawer with initial amount
+- **📝 Movement Tracking**: Record sales, expenses, and adjustments
+- **🔒 Cash Cut Closing**: Final count with automatic difference calculation  
+- **🤖 Automated Cuts**: Scheduled cash cuts using cron jobs
+- **🔒 Constraints**: Prevents multiple open cash cuts simultaneously
+- **📊 Real-time Status**: Live tracking of cash flow and expected amounts
+
+### Quick Start
+
+#### 1. Environment Setup
+```bash
+# Optional: Set automated cash cuts (daily at 11 PM)
+CASHCUT_CRON="0 23 * * *"
+
+# Set timezone
+TZ="America/Mexico_City"
+```
+
+#### 2. API Usage
+```bash
+# Create cash cut
+curl -X POST http://localhost:3000/api/cashcuts \\
+  -H "Authorization: Bearer $TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"openingAmount": 1000, "openedBy": "user-id"}'
+
+# Add movement  
+curl -X POST http://localhost:3000/api/cashcuts/CASH_CUT_ID/entries \\
+  -H "Authorization: Bearer $TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"type": "sale", "amount": 250.50, "note": "Coffee sale"}'
+
+# Close cash cut
+curl -X POST http://localhost:3000/api/cashcuts/CASH_CUT_ID/close \\
+  -H "Authorization: Bearer $TOKEN" \\
+  -H "Content-Type: application/json" \\
+  -d '{"closingAmount": 1245.50, "closedBy": "user-id"}'
+```
+
+#### 3. Frontend Integration
+
+Access cash cut management through:
+- **Main POS Interface**: Integrated cash cut buttons and status indicators
+- **Detailed Modal**: Complete cash cut information with movement history
+- **Real-time Updates**: Live status of open/closed cash cuts
+
+### Configuration
+
+#### Cron Schedule Examples
+- **Disabled**: `CASHCUT_CRON=off`
+- **Daily 11 PM**: `CASHCUT_CRON="0 23 * * *"`
+- **Every 4 hours**: `CASHCUT_CRON="0 */4 * * *"`
+- **Development (every 2 min)**: `CASHCUT_CRON="*/2 * * * *"`
+
+#### Database Support
+- **PostgreSQL**: Full support with constraints and transactions
+- **File-based**: JSON storage with atomic operations
+
+### Documentation
+
+For detailed API documentation, troubleshooting, and PowerShell examples:
+➡️ **[Complete Cash Cuts Documentation](./docs/cashcut.md)**
+
+---
+
 ## 🔄 Backup System
 
 ### Automated Backups
@@ -191,9 +263,9 @@ The system automatically creates backups:
 Create manual backups via the API:
 
 ```bash
-curl -X POST http://localhost:3000/api/backup/create \
-  -H "Authorization: Bearer YOUR_JWT_TOKEN" \
-  -H "Content-Type: application/json" \
+curl -X POST http://localhost:3000/api/backup/create \\
+  -H "Authorization: Bearer YOUR_JWT_TOKEN" \\
+  -H "Content-Type: application/json" \\
   -d '{"type": "manual"}'
 ```
 
