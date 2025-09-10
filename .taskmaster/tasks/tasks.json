@@ -1,0 +1,8 @@
+﻿{
+  "version": "1.0.0",
+  "tasks": [
+    { "name": "pos:server", "command": "node", "args": ["server.js"], "cwd": ".", "restart": true, "env": { "PORT": "3000" } },
+    { "name": "mcp:server", "command": "node", "args": ["C:\Users\je2al\Desktop\POS-CONEJONEGRO\claude-task-master\\mcp-server\\server.js"], "cwd": ".", "restart": true },
+    { "name": "magic-ui", "command": "echo", "args": ["Magic UI integrated"], "cwd": ".", "restart": false }
+  ]
+}
