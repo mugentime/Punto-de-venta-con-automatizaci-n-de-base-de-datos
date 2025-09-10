@@ -33,6 +33,11 @@ class ExpensesAPI {
      * @returns {string} Base URL de la API
      */
     _getAPIBaseURL() {
+        // Si está ejecutándose desde file:// (local), usar servidor de producción
+        if (window.location.protocol === 'file:') {
+            return 'https://pos-conejo-negro.onrender.com/api';
+        }
+        
         const isLocalhost = window.location.hostname === 'localhost' || 
                            window.location.hostname === '127.0.0.1';
         
