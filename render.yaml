@@ -13,7 +13,7 @@ services:
       - key: PORT
         value: 3000
       - key: JWT_SECRET
-        generateValue: true
+        value: a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd
       - key: RATE_LIMIT_WINDOW_MS
         value: 900000
       - key: RATE_LIMIT_MAX_REQUESTS
