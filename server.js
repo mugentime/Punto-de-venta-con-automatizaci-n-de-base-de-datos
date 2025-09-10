@@ -228,6 +228,27 @@ app.get('/api/emergency-test', (req, res) => {
   });
 });
 
+// TEMPORARY DEBUG - Check environment variables
+app.get('/api/debug/env', (req, res) => {
+  res.json({
+    message: 'TEMPORARY ENV DEBUG',
+    timestamp: new Date().toISOString(),
+    env_check: {
+      NODE_ENV: process.env.NODE_ENV || 'not_set',
+      DATABASE_URL: process.env.DATABASE_URL ? `${process.env.DATABASE_URL.substring(0, 20)}...` : 'NOT_SET',
+      database_url_present: !!process.env.DATABASE_URL,
+      RENDER: !!process.env.RENDER,
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL || 'not_set',
+      JWT_SECRET: process.env.JWT_SECRET ? 'present' : 'NOT_SET',
+      ADMIN_EMAIL: process.env.ADMIN_EMAIL || 'not_set',
+      ADMIN_PASSWORD: process.env.ADMIN_PASSWORD ? 'present' : 'not_set'
+    },
+    production_detected: (process.env.NODE_ENV === 'production' || process.env.RENDER === 'true' || !!process.env.RENDER_EXTERNAL_URL),
+    should_use_postgres: !!process.env.DATABASE_URL,
+    uptime: process.uptime()
+  });
+});
+
 // DEBUG ENDPOINT - Show users in production (temporary)
 app.get('/api/debug/users', async (req, res) => {
   try {
