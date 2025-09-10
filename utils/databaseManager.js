@@ -40,14 +40,40 @@ class DatabaseManager {
 
     async getUserById(id) {
         if (this.usePostgreSQL) {
-            return await database.getUserById(id);
+            const user = await database.getUserById(id);
+            if (!user) return null;
+            // Map fields for routes/auth.js compatibility
+            return {
+                id: user._id,        // Map _id to id
+                email: user.username, // Map username to email  
+                name: user.name || user.username.split('@')[0], // Default name from email
+                password: user.password,
+                role: user.role,
+                isActive: user.isActive,
+                permissions: user.permissions,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            };
         }
         return await fileDatabase.getUserById(id);
     }
 
     async getUserByEmail(email) {
         if (this.usePostgreSQL) {
-            return await database.getUserByUsername(email); // Using username as email
+            const user = await database.getUserByUsername(email); // Using username as email
+            if (!user) return null;
+            // Map fields for routes/auth.js compatibility
+            return {
+                id: user._id,        // Map _id to id
+                email: user.username, // Map username to email
+                name: user.name || user.username.split('@')[0], // Default name from email
+                password: user.password,
+                role: user.role,
+                isActive: user.isActive,
+                permissions: user.permissions,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            };
         }
         return await fileDatabase.getUserByEmail(email);
     }
