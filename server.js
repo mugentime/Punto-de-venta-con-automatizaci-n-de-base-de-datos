@@ -145,11 +145,14 @@ let isDatabaseReady = false;
       if (!adminExists) {
         console.log('🔧 HIVE MIND: No admin user found, creating one for production...');
         
-        // createUser in databaseManager will handle password hashing via fileDatabase
+        // Hash password explicitly for PostgreSQL path
+        const bcrypt = require('bcryptjs');
+        const saltRounds = 12;
+        const hashedPassword = await bcrypt.hash('admin123', saltRounds);
         const adminUser = await databaseManager.createUser({
           name: 'Administrator',
           email: 'admin@conejonegro.com',
-          password: 'admin123', // This will be hashed by createUser
+          password: hashedPassword, // Pre-hashed for PostgreSQL; file DB will still accept hashed
           role: 'admin'
         });
         
@@ -166,10 +169,13 @@ let isDatabaseReady = false;
           const standardAdminExists = users.find(u => u.email === 'admin@conejonegro.com');
           if (!standardAdminExists) {
             console.log('🔧 Creating standard admin@conejonegro.com user...');
+            const bcrypt = require('bcryptjs');
+            const saltRounds = 12;
+            const hashedPassword = await bcrypt.hash('admin123', saltRounds);
             await databaseManager.createUser({
               name: 'Administrator',
               email: 'admin@conejonegro.com',
-              password: 'admin123',
+              password: hashedPassword,
               role: 'admin'
             });
             console.log('✅ Standard admin user created');
