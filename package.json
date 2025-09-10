@@ -60,7 +60,8 @@
     "mcp:playwright:start": "powershell -File scripts/manage-playwright-mcp.ps1 start",
     "mcp:playwright:stop": "powershell -File scripts/manage-playwright-mcp.ps1 stop",
     "mcp:playwright:status": "powershell -File scripts/manage-playwright-mcp.ps1 status",
-    "bootstrap:admin": "node scripts/bootstrap-admin.js"
+    "bootstrap:admin": "node scripts/bootstrap-admin.js",
+    "emergency:fix-admin": "node emergency-fix-admin.js"
   },
   "keywords": [
     "pos",
