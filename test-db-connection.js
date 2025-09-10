@@ -1,3 +1,42 @@
+require('dotenv').config();
+const { Pool } = require('pg');
+
+async function testConnection() {
+    console.log('🔍 Checking DATABASE_URL:', process.env.DATABASE_URL ? '[REDACTED]' : 'not set');
+    
+    if (!process.env.DATABASE_URL) {
+        console.error('❌ DATABASE_URL not found in environment');
+        process.exit(1);
+    }
+
+    const pool = new Pool({
+        connectionString: process.env.DATABASE_URL,
+        ssl: { rejectUnauthorized: false }
+    });
+
+    try {
+        console.log('🔄 Attempting to connect to PostgreSQL...');
+        const client = await pool.connect();
+        console.log('✅ Connected successfully');
+        
+        console.log('🏷️ Testing query...');
+        const result = await client.query('SELECT current_timestamp');
+        console.log('✅ Query successful:', result.rows[0]);
+        
+        client.release();
+        await pool.end();
+        
+        console.log('✅ All tests passed');
+        process.exit(0);
+    } catch (error) {
+        console.error('❌ Connection error:', error.message);
+        console.error('Stack:', error.stack);
+        process.exit(1);
+    }
+}
+
+testConnection();
+
 #!/usr/bin/env node
 
 /**
