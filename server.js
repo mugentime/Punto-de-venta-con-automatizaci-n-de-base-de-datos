@@ -257,6 +257,62 @@ app.get('/api/debug/users', async (req, res) => {
   }
 });
 
+// EMERGENCY ADMIN CREATION - Force create admin user
+app.post('/api/emergency/create-admin', async (req, res) => {
+  try {
+    if (!isDatabaseReady) {
+      return res.status(503).json({ error: 'Database not ready' });
+    }
+    
+    console.log('🚨 EMERGENCY: Force creating admin user...');
+    
+    // Check current users
+    const users = await databaseManager.getUsers();
+    console.log(`Current user count: ${users.length}`);
+    
+    // Find existing admin
+    const existingAdmin = users.find(u => u.email === 'admin@conejonegro.com');
+    if (existingAdmin) {
+      return res.json({
+        message: 'Admin user already exists',
+        email: existingAdmin.email,
+        created: false
+      });
+    }
+    
+    // Force create admin user
+    const adminUser = await databaseManager.createUser({
+      name: 'Administrator',
+      email: 'admin@conejonegro.com',
+      password: 'admin123',
+      role: 'admin'
+    });
+    
+    console.log('✅ EMERGENCY: Admin user created!', adminUser);
+    
+    res.json({
+      message: 'Admin user created successfully!',
+      email: 'admin@conejonegro.com',
+      password: 'admin123',
+      created: true,
+      user: {
+        id: adminUser._id || adminUser.id,
+        name: adminUser.name,
+        email: adminUser.email,
+        role: adminUser.role
+      }
+    });
+    
+  } catch (error) {
+    console.error('❌ EMERGENCY: Admin creation failed:', error);
+    res.status(500).json({
+      error: 'Failed to create admin user',
+      message: error.message,
+      stack: process.env.NODE_ENV !== 'production' ? error.stack : undefined
+    });
+  }
+});
+
 // EMERGENCY HISTORICAL ENDPOINT - DIRECT IN SERVER.JS
 app.post('/api/records/historical', requireDatabase, async (req, res) => {
   console.log('🔥 HISTORICAL ENDPOINT HIT DIRECTLY!', req.body);
