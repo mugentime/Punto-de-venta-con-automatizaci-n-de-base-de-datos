@@ -47,16 +47,12 @@ router.post('/login', async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        email: user.email,
-        role: user.role 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate token via databaseManager for compatibility with file/PostgreSQL modes
+    const token = databaseManager.generateToken({
+      _id: user.id, // map to _id for file-based token schema
+      email: user.email,
+      role: user.role
+    });
 
     console.log('🎫 Token generated:', token ? 'SUCCESS' : 'FAILED');
 
@@ -152,16 +148,12 @@ router.post('/register', async (req, res) => {
     // Create user using databaseManager
     const user = await databaseManager.createUser(userData);
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { 
-        userId: user.id,
-        email: user.email,
-        role: user.role 
-      },
-      process.env.JWT_SECRET,
-      { expiresIn: '7d' }
-    );
+    // Generate token via databaseManager for compatibility with file/PostgreSQL modes
+    const token = databaseManager.generateToken({
+      _id: user.id, // map to _id for file-based token schema
+      email: user.email,
+      role: user.role
+    });
 
     res.status(201).json({
       message: 'User registered successfully',

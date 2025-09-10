@@ -35,11 +35,16 @@ const auth = async (req, res, next) => {
       });
     }
 
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    // Verify token using databaseManager for compatibility with file/PostgreSQL modes
+    const decoded = databaseManager.verifyToken(token);
+    if (!decoded) {
+      return res.status(401).json({
+        error: 'Invalid token.'
+      });
+    }
     
     // CRITICAL FIX: Use databaseManager instead of MongoDB User model
-    // This prevents the infinite loop caused by MongoDB dependency
+    // This prevents the infinite loop caused by MongoDB dependency  
     const user = await databaseManager.getUserById(decoded.userId);
     if (!user || !user.isActive) {
       return res.status(401).json({
