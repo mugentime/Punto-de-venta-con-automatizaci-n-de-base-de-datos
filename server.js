@@ -114,6 +114,25 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Debug route to count users
+app.get('/api/debug/users', async (req, res) => {
+  try {
+    console.log('👤 Checking user count');
+    const users = await databaseManager.getUsers();
+    console.log(`📃 Found ${users.length} users`);
+    console.log('📂 Admin users:', users.filter(u => u.role === 'admin').map(u => u.email));
+    
+    res.json({
+      status: 'ok',
+      userCount: users.length,
+      adminEmails: users.filter(u => u.role === 'admin').map(u => u.email)
+    });
+  } catch (error) {
+    console.error('❌ User count error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Health check route with database info
 app.get('/api/health', async (req, res) => {
   try {
