@@ -222,6 +222,41 @@ app.get('/api/emergency-test', (req, res) => {
   });
 });
 
+// DEBUG ENDPOINT - Show users in production (temporary)
+app.get('/api/debug/users', async (req, res) => {
+  try {
+    if (!isDatabaseReady) {
+      return res.status(503).json({ error: 'Database not ready' });
+    }
+    
+    const users = await databaseManager.getUsers();
+    
+    // Return safe user info (no passwords)
+    const safeUsers = users.map(user => ({
+      id: user._id || user.id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      isActive: user.isActive,
+      createdAt: user.createdAt,
+      lastLogin: user.lastLogin
+    }));
+    
+    res.json({
+      message: 'Users in production database',
+      count: safeUsers.length,
+      users: safeUsers,
+      databaseType: process.env.DATABASE_URL ? 'PostgreSQL' : 'File-based',
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Failed to get users',
+      message: error.message
+    });
+  }
+});
+
 // EMERGENCY HISTORICAL ENDPOINT - DIRECT IN SERVER.JS
 app.post('/api/records/historical', requireDatabase, async (req, res) => {
   console.log('🔥 HISTORICAL ENDPOINT HIT DIRECTLY!', req.body);
