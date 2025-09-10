@@ -551,7 +551,7 @@ class FileDatabase {
     
     return jwt.sign(
       {
-        userId: user._id,
+        userId: user.userId || user._id, // Match auth middleware expectations
         email: user.email,
         role: user.role,
         iat: Math.floor(Date.now() / 1000)

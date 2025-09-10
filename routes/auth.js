@@ -49,7 +49,7 @@ router.post('/login', async (req, res) => {
 
     // Generate token via databaseManager for compatibility with file/PostgreSQL modes
     const token = databaseManager.generateToken({
-      _id: user._id || user.id, // Use _id from file DB or id from PostgreSQL
+      userId: user._id || user.id, // Use _id from file DB or id from PostgreSQL
       email: user.email,
       role: user.role
     });
@@ -150,7 +150,7 @@ router.post('/register', async (req, res) => {
 
     // Generate token via databaseManager for compatibility with file/PostgreSQL modes
     const token = databaseManager.generateToken({
-      _id: user._id || user.id, // Use _id from file DB or id from PostgreSQL
+      userId: user._id || user.id, // Use _id from file DB or id from PostgreSQL
       email: user.email,
       role: user.role
     });
