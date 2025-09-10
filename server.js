@@ -117,6 +117,14 @@ app.use(express.static(path.join(__dirname, 'public')));
 // Health check route with database info
 app.get('/api/health', async (req, res) => {
   try {
+    console.log('🏥 Health check request received');
+    console.log('📊 Environment variables:', {
+      NODE_ENV: process.env.NODE_ENV,
+      DATABASE_URL: process.env.DATABASE_URL ? '[REDACTED]' : 'not set',
+      RENDER_EXTERNAL_URL: process.env.RENDER_EXTERNAL_URL,
+      RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT
+    });
+    console.log('📁 Current directory:', __dirname);
     res.json({
       status: 'ok',
       databaseType: process.env.DATABASE_URL ? 'postgresql' : 'file-based',
