@@ -114,6 +114,43 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Manual database initialization endpoint
+app.post('/api/admin/init-database', async (req, res) => {
+  try {
+    console.log('🛠️ Manual database initialization requested');
+    
+    if (!isDatabaseReady) {
+      console.log('🔄 Initializing database manually...');
+      await databaseManager.initialize();
+      isDatabaseReady = true;
+      console.log('✅ Database manually initialized');
+    }
+    
+    // Get database status
+    const dbType = process.env.DATABASE_URL ? 'postgresql' : 'file-based';
+    const users = await databaseManager.getUsers();
+    const products = await databaseManager.getProducts();
+    
+    res.json({
+      status: 'success',
+      message: 'Database initialized successfully',
+      databaseType: dbType,
+      isDatabaseReady: true,
+      stats: {
+        users: users.length,
+        products: products.length
+      }
+    });
+  } catch (error) {
+    console.error('❌ Manual database initialization failed:', error);
+    res.status(500).json({
+      status: 'error',
+      message: 'Database initialization failed',
+      error: error.message
+    });
+  }
+});
+
 // Debug route to count users
 app.get('/api/debug/users', async (req, res) => {
   try {
