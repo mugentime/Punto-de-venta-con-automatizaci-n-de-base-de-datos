@@ -132,6 +132,97 @@ npm start
 
 The server will start on `http://localhost:3000`
 
+## 🎭 Playwright MCP Server
+
+The project includes a Playwright MCP (Model Context Protocol) server for browser automation and testing. This enables AI agents like Claude to interact with the POS system through web automation.
+
+### Prerequisites
+
+- **@playwright/mcp**: Installed as dev dependency
+- **Chromium Browser**: Automatically installed with Playwright
+- **Port 3001**: Must be available (used by MCP server)
+
+### Quick Start
+
+#### Start MCP Server
+```bash
+# Option 1: Direct npm script
+npm run mcp:playwright
+
+# Option 2: Using management script
+npm run mcp:playwright:start
+# or
+powershell -File scripts/manage-playwright-mcp.ps1 start
+```
+
+#### Check Status
+```bash
+npm run mcp:playwright:status
+```
+
+#### Stop Server
+```bash
+npm run mcp:playwright:stop
+```
+
+### Configuration
+
+The MCP server is configured in `.mcp.json` alongside other MCP servers:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "type": "sse",
+      "url": "http://localhost:3001/mcp",
+      "enabled": true,
+      "description": "Playwright MCP server for POS at http://localhost:3000"
+    }
+  }
+}
+```
+
+### Features
+
+- **🎯 Browser Automation**: Control Chrome/Chromium programmatically
+- **📷 Screenshots**: Capture visual state of the POS system
+- **🔍 Element Interaction**: Click, type, and navigate through the interface
+- **⚡ Real-time Testing**: Live browser automation for testing and debugging
+- **🤖 AI Integration**: Works with Claude and other MCP-compatible AI clients
+
+### Architecture Integration
+
+The Playwright MCP server integrates with the existing Task Master architecture:
+
+- **Task Master**: Main orchestrator and architect for project workflows
+- **Claude-Flow**: Handles development workflows and task management
+- **Ruv-Swarm**: Manages multi-agent coordination
+- **Playwright MCP**: Provides browser automation capabilities
+
+### Testing
+
+Run the smoke test to verify Playwright can interact with the POS:
+
+```bash
+node scripts/playwright.smoke.js
+```
+
+### Troubleshooting
+
+#### Port Issues
+- Ensure port 3001 is not in use by other applications
+- Check Windows Firewall settings if connecting from external machines
+
+#### Browser Issues
+- Run `npx playwright install chromium` to reinstall browser
+- Check if antivirus software is blocking browser execution
+
+#### Log Files
+Logs are stored in `./logs/` directory:
+- `playwright-mcp.out.log`: Server output
+- `playwright-mcp.err.log`: Error messages
+- `smoke-test-screenshot.png`: Test screenshots
+
 ## 🌐 Usage
 
 ### Access Points

@@ -1,22 +1,28 @@
 {
-  "mcpServers": {
-    "claude-flow": {
-      "command": "npx",
-      "args": [
-        "claude-flow@alpha",
-        "mcp",
-        "start"
-      ],
-      "type": "stdio"
-    },
-    "ruv-swarm": {
-      "command": "npx",
-      "args": [
-        "ruv-swarm@latest",
-        "mcp",
-        "start"
-      ],
-      "type": "stdio"
-    }
-  }
+    "mcpServers":  {
+                       "claude-flow":  {
+                                           "command":  "npx",
+                                           "args":  [
+                                                        "claude-flow@alpha",
+                                                        "mcp",
+                                                        "start"
+                                                    ],
+                                           "type":  "stdio"
+                                       },
+                       "ruv-swarm":  {
+                                         "command":  "npx",
+                                         "args":  [
+                                                      "ruv-swarm@latest",
+                                                      "mcp",
+                                                      "start"
+                                                  ],
+                                         "type":  "stdio"
+                                     },
+                       "playwright":  {
+                                          "type":  "sse",
+                                          "url":  "http://localhost:3001/mcp",
+                                          "enabled":  true,
+                                          "description":  "Playwright MCP server for POS at http://localhost:3000"
+                                      }
+                   }
 }
