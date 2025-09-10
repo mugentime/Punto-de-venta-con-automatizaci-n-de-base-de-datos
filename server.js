@@ -29,8 +29,8 @@ console.log('🔍 Checking DATABASE_URL...', !!process.env.DATABASE_URL);
 // }
 
 
-// FIXED: Import consistent file-based routes for working authentication
-const authRoutes = require('./routes/auth-file');
+// FIXED: Import PostgreSQL-compatible auth routes for authentication
+const authRoutes = require('./routes/auth');
 const productRoutes = require('./routes/products-file');
 const recordRoutes = require('./routes/records-file'); // FIXED: Use file-based records routes
 const backupRoutes = require('./routes/backup');
@@ -41,8 +41,8 @@ const sessionRoutes = require('./routes/sessions-file');
 const customerRoutes = require('./routes/customers-file');
 const expenseRoutes = require('./routes/expenses-file');
 
-// FIXED: Import consistent file-based auth middleware
-const { auth } = require('./middleware/auth-file');
+// FIXED: Import PostgreSQL-compatible auth middleware
+const { auth } = require('./middleware/auth');
 
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
@@ -133,26 +133,52 @@ let isDatabaseReady = false;
     // 🧠 HIVE MIND AUTO-REPAIR: Create admin user if missing
     try {
       const users = await databaseManager.getUsers();
-      const adminExists = users.find(user => user.email === 'admin@conejonegro.com');
+      console.log(`🔍 Found ${users.length} users in database`);
+      
+      // Check for admin user with any email format
+      const adminExists = users.find(user => 
+        user.email === 'admin@conejonegro.com' || 
+        user.role === 'admin' ||
+        (user.email && user.email.includes('admin'))
+      );
       
       if (!adminExists) {
-        console.log('🔧 HIVE MIND: Creating missing admin user for production...');
+        console.log('🔧 HIVE MIND: No admin user found, creating one for production...');
         
+        // createUser in databaseManager will handle password hashing via fileDatabase
         const adminUser = await databaseManager.createUser({
           name: 'Administrator',
           email: 'admin@conejonegro.com',
-          password: 'admin123',
+          password: 'admin123', // This will be hashed by createUser
           role: 'admin'
         });
         
         console.log('✅ HIVE MIND: Admin user created successfully!');
         console.log('   Email: admin@conejonegro.com');
         console.log('   Password: admin123');
+        console.log('   User ID:', adminUser._id || adminUser.id);
       } else {
-        console.log('✅ Admin user already exists - login should work');
+        console.log('✅ Admin user already exists:', adminExists.email, '(', adminExists.role, ')');
+        console.log('   Login should work with: admin@conejonegro.com / admin123');
+        
+        // If existing admin has different email, also create the expected one
+        if (adminExists.email !== 'admin@conejonegro.com') {
+          const standardAdminExists = users.find(u => u.email === 'admin@conejonegro.com');
+          if (!standardAdminExists) {
+            console.log('🔧 Creating standard admin@conejonegro.com user...');
+            await databaseManager.createUser({
+              name: 'Administrator',
+              email: 'admin@conejonegro.com',
+              password: 'admin123',
+              role: 'admin'
+            });
+            console.log('✅ Standard admin user created');
+          }
+        }
       }
     } catch (error) {
       console.error('⚠️ HIVE MIND: Admin user setup failed:', error.message);
+      console.error('   Stack:', error.stack);
     }
     
     // Initialize cash cut service after database is ready
