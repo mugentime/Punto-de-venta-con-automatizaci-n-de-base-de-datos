@@ -10,8 +10,8 @@ class FileDatabase {
     this.isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
     
     if (this.isRender) {
-      // For Render, use app data directory
-      this.dataPath = '/app/data';
+      // For Render, use project source directory
+      this.dataPath = '/opt/render/project/src/data';
     } else {
       this.dataPath = path.join(__dirname, '..', 'data');
     }
