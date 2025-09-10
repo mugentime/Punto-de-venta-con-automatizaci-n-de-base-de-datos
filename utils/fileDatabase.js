@@ -31,8 +31,13 @@ class FileDatabase {
 
   async initialize() {
     try {
+      console.log('📊 Starting file database initialization...');
+      console.log('📂 Using data path:', this.dataPath);
+      console.log('🌐 Running in Render?', this.isRender);
+      
       // Create data directory if it doesn't exist
       await fs.mkdir(this.dataPath, { recursive: true });
+      console.log('🗄 Created data directory');
       
       // Try to recover from local backup first
       const recoverySuccess = await this.recoverFromBackup();
@@ -71,8 +76,11 @@ class FileDatabase {
 
   async initializeFile(filePath, defaultData) {
     try {
+      console.log('💿 Checking file:', path.basename(filePath));
       await fs.access(filePath);
-    } catch {
+      console.log('✅ File exists:', path.basename(filePath));
+    } catch (error) {
+      console.log('⚠️ File not found:', path.basename(filePath), error.code);
       await fs.writeFile(filePath, JSON.stringify(defaultData, null, 2));
       console.log(`📄 Created: ${path.basename(filePath)}`);
     }
