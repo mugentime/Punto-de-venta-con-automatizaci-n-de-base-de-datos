@@ -439,6 +439,75 @@ app.get('/api/exports/:filename', async (req, res) => {
   }
 });
 
+// Fix admin user endpoint for deployment issues
+app.get('/fix-admin-user', async (req, res) => {
+  try {
+    console.log('🔧 MANUAL FIX: Checking admin user in production...');
+    const users = await databaseManager.getUsers();
+    console.log(`Found ${users.length} users`);
+    
+    const existingAdmin = users.find(u => u.email === 'admin@conejonegro.com');
+    if (existingAdmin) {
+      console.log('Found existing admin:', existingAdmin.email);
+      
+      // Check if password is properly hashed
+      const bcrypt = require('bcryptjs');
+      const isPlaintext = !existingAdmin.password.startsWith('$2');
+      
+      if (isPlaintext) {
+        console.log('Admin password needs rehashing...');
+        const saltRounds = 12;
+        const hashedPassword = await bcrypt.hash('admin123', saltRounds);
+        
+        // Update the password
+        await databaseManager.updateUser(existingAdmin._id, {
+          password: hashedPassword
+        });
+        
+        console.log('✅ Admin password rehashed');
+        res.json({
+          status: 'fixed',
+          message: 'Admin password has been rehashed',
+          email: 'admin@conejonegro.com',
+          userId: existingAdmin._id
+        });
+      } else {
+        res.json({
+          status: 'ok',
+          message: 'Admin user exists with proper hash',
+          email: 'admin@conejonegro.com',
+          userId: existingAdmin._id
+        });
+      }
+    } else {
+      console.log('Creating new admin user...');
+      const bcrypt = require('bcryptjs');
+      const saltRounds = 12;
+      const hashedPassword = await bcrypt.hash('admin123', saltRounds);
+      
+      const newAdmin = await databaseManager.createUser({
+        name: 'Administrator',
+        email: 'admin@conejonegro.com',
+        password: hashedPassword,
+        role: 'admin'
+      });
+      
+      res.json({
+        status: 'created',
+        message: 'New admin user created',
+        email: 'admin@conejonegro.com',
+        userId: newAdmin._id || newAdmin.id
+      });
+    }
+  } catch (error) {
+    console.error('Fix admin error:', error);
+    res.status(500).json({
+      status: 'error',
+      message: error.message
+    });
+  }
+});
+
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
