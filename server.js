@@ -114,6 +114,23 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
+// Health check route with database info
+app.get('/api/health', async (req, res) => {
+  try {
+    res.json({
+      status: 'ok',
+      databaseType: process.env.DATABASE_URL ? 'postgresql' : 'file-based',
+      isDatabaseReady,
+      dataPath: path.resolve(__dirname, 'data'),
+      environment: process.env.NODE_ENV || 'development',
+      railwayEnv: process.env.RAILWAY_ENVIRONMENT || 'none',
+      renderEnv: process.env.RENDER_EXTERNAL_URL ? 'active' : 'none'
+    });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Initialize file-based database
 let isDatabaseReady = false;
 
