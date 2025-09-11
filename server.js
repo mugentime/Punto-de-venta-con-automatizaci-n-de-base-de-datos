@@ -1061,46 +1061,8 @@ app.get('/fix-admin-user', async (req, res) => {
   }
 });
 
-// Health check endpoint
-app.get('/api/health', async (req, res) => {
-  try {
-    // Get storage information
-    const storageStats = await cloudStorageService.getStorageStats ? 
-      await cloudStorageService.getStorageStats() : 
-      { type: 'unknown', available: 0 };
-
-    res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      environment: {
-        railway: !!(process.env.RAILWAY_ENVIRONMENT || process.env.RAILWAY_PROJECT_ID),
-        node_env: process.env.NODE_ENV || 'development'
-      },
-      storage: {
-        type: storageStats.type || 'Unknown',
-        available: storageStats.available || 0,
-        used: storageStats.used || 0,
-        isPersistent: storageStats.isPersistent || false,
-        backupsCount: storageStats.backupsCount || 0
-      },
-      database: {
-        type: 'file-based',
-        ready: isDatabaseReady,
-        status: isDatabaseReady ? 'ready' : 'initializing',
-        path: process.env.DATABASE_URL ? 'postgresql' : 'file-based'
-      }
-    });
-  } catch (error) {
-    console.error('Health check error:', error);
-    res.json({
-      status: 'OK',
-      timestamp: new Date().toISOString(),
-      uptime: process.uptime(),
-      error: 'Could not fetch detailed stats'
-    });
-  }
-});
+// Deprecated health check endpoint - removed duplicate
+// Main health check is implemented above with proper file-based configuration
 
 // Stats endpoint for dashboard  
 app.get('/api/stats', requireDatabase, auth, async (req, res) => {
