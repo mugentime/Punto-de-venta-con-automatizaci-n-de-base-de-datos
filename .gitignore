@@ -56,11 +56,60 @@ Thumbs.db
 # Build output
 dist/
 build/
+out/
 
 # Database files
 *.db
 *.sqlite
 *.sqlite3
+
+# Test results
+test-results/
+playwright-report/
+test-screenshots/
+coverage/
+.nyc_output
+
+# Performance and profiling
+*.cpuprofile
+*.heapprofile
+.clinic/
+
+# Production files
+production.log
+access.log
+
+# Backup files
+*.bak
+*.backup
+*.orig
+
+# Docker
+.dockerignore
+
+# Environment-specific
+.env.staging
+.env.production
+
+# Security
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
+
+# Cache directories
+.cache/
+.parcel-cache/
+.next/
+.nuxt/
+
+# Editor directories and files
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
 
 # AI agent directories
 .claude-flow/
@@ -68,3 +117,32 @@ build/
 .swarm/
 
 logs/*.log
+
+# Claude Flow generated files
+.claude/settings.local.json
+.mcp.json
+claude-flow.config.json
+.swarm/
+.hive-mind/
+memory/claude-flow-data.json
+memory/sessions/*
+!memory/sessions/README.md
+memory/agents/*
+!memory/agents/README.md
+coordination/memory_bank/*
+coordination/subtasks/*
+coordination/orchestration/*
+*.db
+*.db-journal
+*.db-wal
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+claude-flow
+claude-flow.bat
+claude-flow.ps1
+hive-mind-prompt-*.txt
+
+nul
+/nul
+
