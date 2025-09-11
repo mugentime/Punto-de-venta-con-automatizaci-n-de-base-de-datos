@@ -115,6 +115,7 @@ const { auth } = require('./middleware/auth');
 // Import services
 const cloudStorageService = require('./utils/cloudStorage');
 const databaseManager = require('./utils/databaseManager');
+const syncManager = require('./utils/syncManager');
 
 // Import scheduled tasks
 require('./utils/scheduler');
@@ -305,7 +306,7 @@ app.get('/api/health', async (req, res) => {
     
     res.json({
       status: 'ok',
-      databaseType: process.env.DATABASE_URL ? 'postgresql' : 'file-based',
+      databaseType: 'file-based-with-git-sync',
       isDatabaseReady,
       dataPath: path.resolve(__dirname, 'data'),
       environment: process.env.NODE_ENV || 'development',
@@ -313,7 +314,13 @@ app.get('/api/health', async (req, res) => {
       renderEnv: process.env.RENDER_EXTERNAL_URL ? 'active' : 'none',
       uptime: process.uptime(),
       databaseResponseTime: dbResponseTime,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      storageInfo: {
+        type: 'File-based with Git synchronization',
+        persistent: true,
+        cost: 'Free',
+        backup: 'Automatic via Git repository'
+      }
     });
   } catch (error) {
     res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: error.message });
@@ -392,6 +399,145 @@ app.get('/api/build-info', async (req, res) => {
 });
 
 /**
+ * Data Synchronization Endpoints
+ * Provides Git-based data persistence without requiring paid database services
+ */
+
+/**
+ * Sync Status Endpoint
+ * Shows current sync status and data statistics
+ * @route GET /api/sync/status
+ * @returns {Object} Sync status and data file information
+ */
+app.get('/api/sync/status', async (req, res) => {
+  try {
+    const status = await syncManager.getSyncStatus();
+    res.json({
+      ...status,
+      system: 'File-based with Git synchronization',
+      cost: 'Free',
+      persistent: true
+    });
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      error: 'Sync status unavailable',
+      message: error.message
+    });
+  }
+});
+
+/**
+ * Create Data Backup Endpoint
+ * Creates backup of current data and commits to Git
+ * @route POST /api/sync/backup
+ * @returns {Object} Backup operation result
+ */
+app.post('/api/sync/backup', async (req, res) => {
+  try {
+    console.log('💾 Manual backup requested');
+    const result = await syncManager.syncToGit();
+    
+    if (result.success) {
+      res.json({
+        status: 'success',
+        message: 'Data backup completed successfully',
+        ...result
+      });
+    } else {
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        status: 'error',
+        message: 'Backup failed',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      status: 'error',
+      message: 'Backup operation failed',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Restore Data from Backup Endpoint
+ * Restores data from latest backup or specified backup file
+ * @route POST /api/sync/restore
+ * @returns {Object} Restore operation result
+ */
+app.post('/api/sync/restore', async (req, res) => {
+  try {
+    console.log('🔄 Manual restore requested');
+    const { backupFile } = req.body;
+    
+    const result = await syncManager.restoreFromBackup(backupFile);
+    
+    if (result.success) {
+      // Reinitialize database manager after restore
+      isDatabaseReady = false;
+      await databaseManager.initialize();
+      isDatabaseReady = true;
+      
+      res.json({
+        status: 'success',
+        message: `Data restored successfully (${result.restored} files)`,
+        ...result
+      });
+    } else {
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        status: 'error',
+        message: 'Restore failed',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      status: 'error',
+      message: 'Restore operation failed',
+      error: error.message
+    });
+  }
+});
+
+/**
+ * Sync from Git Repository Endpoint
+ * Pulls latest data from Git repository (for deployment recovery)
+ * @route POST /api/sync/pull
+ * @returns {Object} Pull operation result
+ */
+app.post('/api/sync/pull', async (req, res) => {
+  try {
+    console.log('📥 Git pull requested');
+    const result = await syncManager.syncFromGit();
+    
+    if (result.success) {
+      // Reinitialize database manager after pull
+      isDatabaseReady = false;
+      await databaseManager.initialize();
+      isDatabaseReady = true;
+      
+      res.json({
+        status: 'success',
+        message: 'Data synchronized from Git repository',
+        ...result
+      });
+    } else {
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+        status: 'error',
+        message: 'Git sync failed',
+        error: result.error
+      });
+    }
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
+      status: 'error',
+      message: 'Git sync operation failed',
+      error: error.message
+    });
+  }
+});
+
+/**
  * Database Initialization State
  * Tracks whether the database (PostgreSQL or file-based) is ready for operations
  * @type {boolean}
@@ -415,6 +561,21 @@ let isDatabaseReady = false;
       console.log('⚠️  Add PostgreSQL database in Render for persistent storage');
     }
     
+    // 💾 Data Synchronization Setup
+    console.log('💾 Initializing data synchronization...');
+    try {
+      const syncResult = await syncManager.syncFromGit();
+      if (syncResult.success) {
+        console.log('   ✅ Data synchronized from Git repository');
+      } else {
+        console.log('   ⚠️  Could not sync from Git:', syncResult.error);
+        console.log('   📁 Using existing local data');
+      }
+    } catch (error) {
+      console.log('   ⚠️  Sync initialization failed:', error.message);
+      console.log('   📁 Continuing with local data only');
+    }
+    
     // 🧠 TaskMaster Architecture Verification
     console.log('🧠 TaskMaster Status:');
     console.log('   ✅ Architecture: Primary (as configured)');
@@ -422,6 +583,7 @@ let isDatabaseReady = false;
     console.log('   🔗 GitHub Integration: Active');
     console.log('   🚀 Render Auto-Deploy: Enabled');
     console.log('   📊 Health Monitoring: /api/health, /api/version, /api/build-info');
+    console.log('   💾 Data Sync: /api/sync/status, /api/sync/backup, /api/sync/restore');
     
     // 🧠 HIVE MIND AUTO-REPAIR: Create admin user if missing
     try {

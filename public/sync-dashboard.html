@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard de Sincronización - POS Conejo Negro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .dashboard {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            max-width: 800px;
+            width: 100%;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            color: #2d3748;
+            margin-bottom: 10px;
+            font-size: 2rem;
+        }
+
+        .header p {
+            color: #718096;
+            font-size: 1.1rem;
+        }
+
+        .status-card {
+            background: #f7fafc;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid #4299e1;
+        }
+
+        .status-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .status-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .status-label {
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .status-value {
+            color: #4a5568;
+            font-family: 'Courier New', monospace;
+            background: #edf2f7;
+            padding: 4px 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 25px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn.success {
+            background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+        }
+
+        .btn.warning {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+
+        .btn.danger {
+            background: linear-gradient(135deg, #f56565 0%, #e53e3e 100%);
+        }
+
+        .data-files {
+            margin-top: 30px;
+        }
+
+        .data-files h3 {
+            color: #2d3748;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+
+        .file-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .file-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 8px;
+        }
+
+        .file-stats {
+            font-size: 0.85rem;
+            color: #718096;
+        }
+
+        .loading {
+            text-align: center;
+            color: #718096;
+            font-style: italic;
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 500;
+        }
+
+        .message.success {
+            background: #c6f6d5;
+            color: #276749;
+            border: 1px solid #9ae6b4;
+        }
+
+        .message.error {
+            background: #fed7d7;
+            color: #c53030;
+            border: 1px solid #feb2b2;
+        }
+
+        .message.info {
+            background: #bee3f8;
+            color: #2b6cb0;
+            border: 1px solid #90cdf4;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .action-buttons {
+                grid-template-columns: 1fr;
+            }
+            
+            .file-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-btn">← Volver al POS</a>
+    
+    <div class="dashboard">
+        <div class="header">
+            <h1>🔄 Dashboard de Sincronización</h1>
+            <p>Gestiona la persistencia de datos sin costo adicional</p>
+        </div>
+
+        <div class="status-card">
+            <h3 style="color: #2d3748; margin-bottom: 15px;">📊 Estado del Sistema</h3>
+            <div id="status-content" class="loading">
+                Cargando estado del sistema...
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <button id="backup-btn" class="btn success" onclick="createBackup()">
+                💾 Crear Backup
+            </button>
+            <button id="restore-btn" class="btn warning" onclick="restoreData()">
+                🔄 Restaurar Datos
+            </button>
+            <button id="pull-btn" class="btn" onclick="pullFromGit()">
+                📥 Sincronizar desde Git
+            </button>
+            <button id="refresh-btn" class="btn" onclick="loadStatus()">
+                🔄 Actualizar Estado
+            </button>
+        </div>
+
+        <div id="message-container"></div>
+
+        <div class="data-files">
+            <h3>📁 Archivos de Datos</h3>
+            <div id="files-content" class="loading">
+                Cargando información de archivos...
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentStatus = {};
+
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/sync/status');
+                currentStatus = await response.json();
+                displayStatus(currentStatus);
+                displayFiles(currentStatus.dataFiles);
+                clearMessage();
+            } catch (error) {
+                showMessage('Error al cargar el estado del sistema', 'error');
+                console.error('Error loading status:', error);
+            }
+        }
+
+        function displayStatus(status) {
+            const statusContent = document.getElementById('status-content');
+            
+            statusContent.innerHTML = `
+                <div class="status-row">
+                    <span class="status-label">Sistema de almacenamiento:</span>
+                    <span class="status-value">${status.system || 'File-based con Git'}</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Costo:</span>
+                    <span class="status-value" style="color: #38a169;">✅ ${status.cost || 'Gratuito'}</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Sincronización en progreso:</span>
+                    <span class="status-value ${status.syncInProgress ? 'danger' : 'success'}">
+                        ${status.syncInProgress ? '🔄 Sí' : '✅ No'}
+                    </span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Número de backups:</span>
+                    <span class="status-value">${status.backups ? status.backups.length : 0}</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Rama Git:</span>
+                    <span class="status-value">${status.gitStatus?.branch || 'N/A'}</span>
+                </div>
+                <div class="status-row">
+                    <span class="status-label">Cambios sin confirmar:</span>
+                    <span class="status-value ${status.gitStatus?.hasChanges ? 'warning' : 'success'}">
+                        ${status.gitStatus?.hasChanges ? '⚠️ Sí' : '✅ No'}
+                    </span>
+                </div>
+            `;
+        }
+
+        function displayFiles(dataFiles) {
+            const filesContent = document.getElementById('files-content');
+            
+            if (!dataFiles || Object.keys(dataFiles).length === 0) {
+                filesContent.innerHTML = '<p class="loading">No hay información de archivos disponible</p>';
+                return;
+            }
+
+            const fileCards = Object.entries(dataFiles).map(([fileName, fileInfo]) => {
+                if (!fileInfo.exists) {
+                    return `
+                        <div class="file-card" style="opacity: 0.6;">
+                            <div class="file-name">📄 ${fileName}</div>
+                            <div class="file-stats">❌ Archivo no encontrado</div>
+                        </div>
+                    `;
+                }
+
+                const modifiedDate = new Date(fileInfo.modified).toLocaleString('es');
+                const sizeKB = (fileInfo.size / 1024).toFixed(1);
+
+                return `
+                    <div class="file-card">
+                        <div class="file-name">📄 ${fileName}</div>
+                        <div class="file-stats">
+                            📊 ${fileInfo.records} registros<br>
+                            💾 ${sizeKB} KB<br>
+                            🕐 ${modifiedDate}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            filesContent.innerHTML = `<div class="file-grid">${fileCards}</div>`;
+        }
+
+        async function createBackup() {
+            const btn = document.getElementById('backup-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Creando backup...';
+
+            try {
+                const response = await fetch('/api/sync/backup', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage('✅ Backup creado exitosamente y sincronizado con Git', 'success');
+                    setTimeout(loadStatus, 1000);
+                } else {
+                    showMessage(`❌ Error al crear backup: ${result.error || result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Error de conexión al crear backup', 'error');
+                console.error('Backup error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '💾 Crear Backup';
+            }
+        }
+
+        async function restoreData() {
+            if (!confirm('¿Estás seguro de que quieres restaurar desde el último backup? Esto sobrescribirá los datos actuales.')) {
+                return;
+            }
+
+            const btn = document.getElementById('restore-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Restaurando...';
+
+            try {
+                const response = await fetch('/api/sync/restore', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage('✅ Datos restaurados exitosamente desde backup', 'success');
+                    setTimeout(loadStatus, 1000);
+                } else {
+                    showMessage(`❌ Error al restaurar: ${result.error || result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Error de conexión al restaurar datos', 'error');
+                console.error('Restore error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '🔄 Restaurar Datos';
+            }
+        }
+
+        async function pullFromGit() {
+            const btn = document.getElementById('pull-btn');
+            btn.disabled = true;
+            btn.textContent = '⏳ Sincronizando...';
+
+            try {
+                const response = await fetch('/api/sync/pull', { method: 'POST' });
+                const result = await response.json();
+
+                if (result.status === 'success') {
+                    showMessage('✅ Datos sincronizados desde repositorio Git', 'success');
+                    setTimeout(loadStatus, 1000);
+                } else {
+                    showMessage(`❌ Error al sincronizar: ${result.error || result.message}`, 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Error de conexión al sincronizar con Git', 'error');
+                console.error('Pull error:', error);
+            } finally {
+                btn.disabled = false;
+                btn.textContent = '📥 Sincronizar desde Git';
+            }
+        }
+
+        function showMessage(text, type) {
+            const container = document.getElementById('message-container');
+            container.innerHTML = `<div class="message ${type}">${text}</div>`;
+            
+            // Auto-hide success messages after 5 seconds
+            if (type === 'success') {
+                setTimeout(clearMessage, 5000);
+            }
+        }
+
+        function clearMessage() {
+            const container = document.getElementById('message-container');
+            container.innerHTML = '';
+        }
+
+        // Load status on page load
+        document.addEventListener('DOMContentLoaded', loadStatus);
+
+        // Auto-refresh every 30 seconds
+        setInterval(loadStatus, 30000);
+    </script>
+</body>
+</html>

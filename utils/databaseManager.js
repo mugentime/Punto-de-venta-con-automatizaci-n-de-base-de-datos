@@ -3,12 +3,14 @@ const fileDatabase = require('./fileDatabase');
 
 class DatabaseManager {
     constructor() {
-        this.usePostgreSQL = !!process.env.DATABASE_URL;
+        // FORCED: Always use file-based database (no PostgreSQL subscription required)
+        this.usePostgreSQL = false;
         this.initialized = false;
-        console.log('🔧 DatabaseManager constructor - DATABASE_URL present:', !!process.env.DATABASE_URL);
+        console.log('🔧 DatabaseManager constructor - Forced to use file-based database');
+        console.log('📁 Using file-based storage with Git synchronization');
         if (process.env.DATABASE_URL) {
-            const maskedUrl = process.env.DATABASE_URL.replace(/(postgresql:\/\/[^:]+:)[^@]+(@.+)/, '$1***$2');
-            console.log('🔗 Using PostgreSQL connection:', maskedUrl);
+            console.log('⚠️  DATABASE_URL found but ignored - using file-based database instead');
+            console.log('💾 This provides free, persistent storage via Git repository');
         }
     }
 

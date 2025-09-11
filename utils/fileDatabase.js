@@ -546,8 +546,11 @@ class FileDatabase {
   }
 
   generateToken(user) {
-    // Fixed secret key for consistent JWT across all environments
-    const secret = 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+    // SECURITY: Require JWT_SECRET environment variable
+    const secret = process.env.JWT_SECRET;
+    if (!secret) {
+      throw new Error('JWT_SECRET environment variable is required for security');
+    }
     
     return jwt.sign(
       {
@@ -563,8 +566,12 @@ class FileDatabase {
 
   verifyToken(token) {
     try {
-      // Fixed secret key - must match generateToken exactly
-      const secret = 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+      // SECURITY: Require JWT_SECRET environment variable
+      const secret = process.env.JWT_SECRET;
+      if (!secret) {
+        console.error('SECURITY ERROR: JWT_SECRET environment variable not set');
+        return null;
+      }
       return jwt.verify(token, secret);
     } catch (error) {
       return null;
