@@ -11,7 +11,7 @@
                     "test:online":  "node ./tests/diagnostics/online-diagnostics.js --url https://pos-conejo-negro.onrender.com/online",
                     "test:online:headful":  "node ./tests/diagnostics/online-diagnostics.js --url https://pos-conejo-negro.onrender.com/online --headless=false",
                     "test:online:mobile-only":  "node ./tests/diagnostics/online-diagnostics.js --url https://pos-conejo-negro.onrender.com/online --desktop=false",
-                    "start":  "node server.js",
+    "start": "node server-minimal.js",
                     "dev":  "nodemon server.js --ignore tests/ --ignore docs/",
                     "dev:watch":  "nodemon server.js --watch *.js --watch routes/ --watch utils/ --watch middleware/",
                     "dev:debug":  "nodemon --inspect server.js",
