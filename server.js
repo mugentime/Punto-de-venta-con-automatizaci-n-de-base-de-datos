@@ -85,7 +85,7 @@ if (process.env.RAILWAY_ENVIRONMENT) {
     console.log('🏠 Local development environment');
 }
 
-// FORCE REDEPLOY: 2025-09-03T15:20:01.476Z - Ensure DATABASE_URL is loaded
+// FORCE REDEPLOY: 2025-09-11T17:40:00Z - Deploy file-based system with Git sync
 
 // 🚨 COMMENTED OUT: Force PostgreSQL for Railway deployment
 // This was causing issues with local development using file-based system
