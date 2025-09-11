@@ -7,10 +7,37 @@ class Database {
     constructor() {
         // Configurar conexión a PostgreSQL o fallback a archivos
         if (process.env.DATABASE_URL) {
+            // Enhanced SSL configuration for Render PostgreSQL
+            const isProduction = process.env.NODE_ENV === 'production' || process.env.RENDER_EXTERNAL_URL;
+            const sslConfig = isProduction ? { 
+                rejectUnauthorized: false,
+                require: true,
+                // Additional SSL options for better Render compatibility
+                servername: undefined, // Let PostgreSQL handle server name
+                checkServerIdentity: () => undefined // Bypass server identity check
+            } : false;
+            
             this.pool = new Pool({
                 connectionString: process.env.DATABASE_URL,
-                ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false
+                ssl: sslConfig,
+                // Connection pool optimization for cloud deployments
+                max: parseInt(process.env.DB_POOL_MAX) || 20,
+                min: parseInt(process.env.DB_POOL_MIN) || 1,
+                acquireTimeoutMillis: parseInt(process.env.DB_ACQUIRE_TIMEOUT) || 60000,
+                idleTimeoutMillis: parseInt(process.env.DB_IDLE_TIMEOUT) || 600000,
+                connectionTimeoutMillis: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 30000,
+                // Retry logic for cloud deployment resilience
+                retryDelayMultiplier: 2,
+                retryDelayMax: 5000
             });
+            
+            console.log('🔗 PostgreSQL Pool Configuration:', {
+                ssl: isProduction ? 'enabled (rejectUnauthorized: false)' : 'disabled',
+                maxConnections: parseInt(process.env.DB_POOL_MAX) || 20,
+                connectionTimeout: parseInt(process.env.DB_CONNECTION_TIMEOUT) || 30000,
+                databaseUrl: process.env.DATABASE_URL.replace(/(postgresql:\/\/[^:]+:)[^@]+(@.+)/, '$1***$2')
+            });
+            
             this.useDatabase = true;
         } else {
             this.useDatabase = false;
@@ -34,6 +61,36 @@ class Database {
     }
 
     async initDatabase() {
+        console.log('🔄 Initializing PostgreSQL database with retry logic...');
+        
+        // Retry logic for database connection
+        const maxRetries = 5;
+        const retryDelay = 2000; // 2 seconds
+        
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`🔗 Database connection attempt ${attempt}/${maxRetries}`);
+                
+                // Test connection first
+                await this.pool.query('SELECT NOW()');
+                console.log('✅ Database connection established successfully');
+                break;
+                
+            } catch (error) {
+                console.error(`❌ Connection attempt ${attempt} failed:`, error.message);
+                
+                if (attempt === maxRetries) {
+                    console.error('🚨 All database connection attempts failed');
+                    throw new Error(`Database connection failed after ${maxRetries} attempts: ${error.message}`);
+                }
+                
+                console.log(`⏳ Retrying in ${retryDelay}ms...`);
+                await new Promise(resolve => setTimeout(resolve, retryDelay * attempt));
+            }
+        }
+        
+        console.log('📋 Creating database tables if they don\'t exist...');
+        
         // Crear tablas si no existen
         await this.pool.query(`
             CREATE TABLE IF NOT EXISTS users (
@@ -929,8 +986,11 @@ class Database {
 
     // JWT Token Methods
     generateToken(user) {
-        // Use environment JWT_SECRET or fallback to hardcoded one for consistency
-        const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+        // SECURITY: Require JWT_SECRET environment variable
+        const secret = process.env.JWT_SECRET;
+        if (!secret) {
+            throw new Error('JWT_SECRET environment variable is required for security');
+        }
         
         return jwt.sign(
             {
@@ -946,8 +1006,12 @@ class Database {
 
     verifyToken(token) {
         try {
-            // Use environment JWT_SECRET or fallback to hardcoded one for consistency
-            const secret = process.env.JWT_SECRET || 'a3aa6a461b5ec2db6ace95b5a9612583d213a8d69df9bf1c1679bcbe8559a8fd';
+            // SECURITY: Require JWT_SECRET environment variable
+            const secret = process.env.JWT_SECRET;
+            if (!secret) {
+                console.error('SECURITY ERROR: JWT_SECRET environment variable not set');
+                return null;
+            }
             return jwt.verify(token, secret);
         } catch (error) {
             return null;

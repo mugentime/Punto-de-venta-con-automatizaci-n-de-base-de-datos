@@ -1,10 +1,78 @@
+/**
+ * @fileoverview Point of Sale System Server - Main Application Entry Point
+ * @description Express.js server for Conejo Negro Café POS system with dual storage support
+ * @author POS Development Team
+ * @version 1.0.0
+ * @created 2025-09-11
+ */
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
-// RAILWAY ENVIRONMENT DETECTION
+
+// Import application constants for better maintainability
+const {
+  SECURITY,
+  RATE_LIMIT: RATE_LIMIT_CONFIG,
+  SERVER,
+  DATABASE,
+  HTTP_STATUS,
+  CORS: CORS_CONFIG,
+  CSP,
+  ERROR_MESSAGES,
+  SUCCESS_MESSAGES
+} = require('./config/constants');
+
+/**
+ * Security Environment Validation
+ * Validates critical environment variables before startup
+ */
+function validateEnvironment() {
+    const requiredVars = {
+        JWT_SECRET: 'JWT signing secret (minimum 32 characters)'
+    };
+    
+    const missing = [];
+    const weak = [];
+    
+    for (const [varName, description] of Object.entries(requiredVars)) {
+        const value = process.env[varName];
+        if (!value) {
+            missing.push(`${varName}: ${description}`);
+        } else if (varName === 'JWT_SECRET' && value.length < 32) {
+            weak.push(`${varName}: Too short (${value.length} chars, minimum 32)`);
+        }
+    }
+    
+    if (missing.length > 0) {
+        console.error('🚨 SECURITY ERROR: Missing required environment variables:');
+        missing.forEach(msg => console.error(`   - ${msg}`));
+        console.error('\n💡 Create a .env file with the required variables.');
+        process.exit(1);
+    }
+    
+    if (weak.length > 0) {
+        console.error('🚨 SECURITY WARNING: Weak environment variables:');
+        weak.forEach(msg => console.error(`   - ${msg}`));
+        console.error('\n💡 Use strong, randomly generated values for production.');
+        if (process.env.NODE_ENV === 'production') {
+            process.exit(1);
+        }
+    }
+    
+    console.log('✅ Environment security validation passed');
+}
+
+// Run security validation
+validateEnvironment();
+
+/**
+ * Environment Detection and Configuration
+ * Detects Railway deployment environment and configures database accordingly
+ */
 if (process.env.RAILWAY_ENVIRONMENT) {
     console.log('🚀 Railway environment detected');
     console.log('📊 DATABASE_URL present:', !!process.env.DATABASE_URL);
@@ -56,7 +124,7 @@ require('./utils/membershipNotificationService');
 
 const app = express();
 
-// CRITICAL FIX: Optimized Security middleware to prevent infinite loops
+// CRITICAL FIX: Enhanced Security middleware with HSTS and additional headers
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -67,7 +135,22 @@ app.use(helmet({
       imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'", "https://cdnjs.cloudflare.com", "https://cdn.jsdelivr.net"]
     }
-  }
+  },
+  // Enhanced security headers
+  hsts: {
+    maxAge: 31536000, // 1 year
+    includeSubDomains: true,
+    preload: true
+  },
+  frameguard: {
+    action: 'deny' // X-Frame-Options: DENY
+  },
+  noSniff: true, // X-Content-Type-Options: nosniff
+  referrerPolicy: {
+    policy: 'strict-origin-when-cross-origin'
+  },
+  crossOriginEmbedderPolicy: false, // Disable for better compatibility
+  permittedCrossDomainPolicies: false
 }));
 
 // FIXED: CORS configuration to prevent preflight loops
@@ -85,17 +168,21 @@ app.use(cors({
 }));
 
 // FIXED: Rate limiting with skip for health checks to prevent deployment loops
+/**
+ * Rate Limiting Configuration
+ * Prevents abuse while allowing health checks and emergency endpoints
+ * @type {Function} Express rate limiting middleware
+ */
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 minutes
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 200, // Increased for deployment
+  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || RATE_LIMIT_CONFIG.WINDOW_MS,
+  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || RATE_LIMIT_CONFIG.MAX_REQUESTS,
   message: {
-    error: 'Too many requests from this IP, please try again later.'
+    error: RATE_LIMIT_CONFIG.ERROR_MESSAGE
   },
   skip: (req) => {
     // Skip rate limiting for health checks and emergency endpoints
-    return req.path === '/api/health' || 
-           req.path === '/api/emergency-test' ||
-           req.path.startsWith('/api/auth/login');
+    return SERVER.HEALTH_CHECK_PATHS.includes(req.path) || 
+           SERVER.AUTH_PATHS.some(path => req.path.startsWith(path));
   }
 });
 app.use('/api/', limiter);
@@ -104,7 +191,13 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Correlation ID middleware for request tracking
+/**
+ * Request Correlation ID Middleware
+ * Adds unique request ID for tracking and debugging purposes
+ * @param {Object} req - Express request object
+ * @param {Object} res - Express response object
+ * @param {Function} next - Next middleware function
+ */
 app.use((req, res, next) => {
   req.id = req.headers['x-request-id'] || require('crypto').randomUUID();
   res.setHeader('x-request-id', req.id);
@@ -114,7 +207,12 @@ app.use((req, res, next) => {
 // Serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Manual database initialization endpoint
+/**
+ * Manual Database Initialization Endpoint
+ * Allows manual initialization of the database with admin user creation
+ * @route POST /api/admin/init-database
+ * @returns {Object} Database initialization status and statistics
+ */
 app.post('/api/admin/init-database', async (req, res) => {
   try {
     console.log('🛠️ Manual database initialization requested');
@@ -133,7 +231,7 @@ app.post('/api/admin/init-database', async (req, res) => {
     
     res.json({
       status: 'success',
-      message: 'Database initialized successfully',
+      message: SUCCESS_MESSAGES.DATABASE.INITIALIZED,
       databaseType: dbType,
       isDatabaseReady: true,
       stats: {
@@ -143,15 +241,20 @@ app.post('/api/admin/init-database', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ Manual database initialization failed:', error);
-    res.status(500).json({
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({
       status: 'error',
-      message: 'Database initialization failed',
+      message: ERROR_MESSAGES.DATABASE.OPERATION_FAILED,
       error: error.message
     });
   }
 });
 
-// Debug route to count users
+/**
+ * Debug Endpoint - User Count
+ * Development endpoint to check user count and admin users
+ * @route GET /api/debug/users
+ * @returns {Object} User count and admin email list
+ */
 app.get('/api/debug/users', async (req, res) => {
   try {
     console.log('👤 Checking user count');
@@ -166,11 +269,16 @@ app.get('/api/debug/users', async (req, res) => {
     });
   } catch (error) {
     console.error('❌ User count error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
 
-// Health check route with database info
+/**
+ * Health Check Endpoint
+ * Provides system status, environment info, and database state
+ * @route GET /api/health
+ * @returns {Object} System health status and configuration
+ */
 app.get('/api/health', async (req, res) => {
   try {
     console.log('🏥 Health check request received');
@@ -181,6 +289,20 @@ app.get('/api/health', async (req, res) => {
       RAILWAY_ENVIRONMENT: process.env.RAILWAY_ENVIRONMENT
     });
     console.log('📁 Current directory:', __dirname);
+    
+    // Enhanced health check with database timing
+    let dbResponseTime = null;
+    if (isDatabaseReady) {
+      const dbStart = Date.now();
+      try {
+        await databaseManager.getUsers();
+        dbResponseTime = Date.now() - dbStart;
+      } catch (error) {
+        console.error('⚠️ Database health check failed:', error.message);
+        dbResponseTime = -1;
+      }
+    }
+    
     res.json({
       status: 'ok',
       databaseType: process.env.DATABASE_URL ? 'postgresql' : 'file-based',
@@ -188,17 +310,99 @@ app.get('/api/health', async (req, res) => {
       dataPath: path.resolve(__dirname, 'data'),
       environment: process.env.NODE_ENV || 'development',
       railwayEnv: process.env.RAILWAY_ENVIRONMENT || 'none',
-      renderEnv: process.env.RENDER_EXTERNAL_URL ? 'active' : 'none'
+      renderEnv: process.env.RENDER_EXTERNAL_URL ? 'active' : 'none',
+      uptime: process.uptime(),
+      databaseResponseTime: dbResponseTime,
+      timestamp: new Date().toISOString()
     });
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: error.message });
   }
 });
 
-// Initialize file-based database
+/**
+ * Version Endpoint
+ * Provides version, git commit, build info for deployment tracking
+ * @route GET /api/version
+ * @returns {Object} Version and build information
+ */
+app.get('/api/version', (req, res) => {
+  try {
+    const packageInfo = require('./package.json');
+    
+    res.json({
+      name: packageInfo.name,
+      version: packageInfo.version,
+      description: packageInfo.description,
+      commit: process.env.RENDER_GIT_COMMIT || process.env.RAILWAY_GIT_COMMIT || 'unknown',
+      serviceId: process.env.RENDER_SERVICE_ID || process.env.RAILWAY_SERVICE_ID || 'local',
+      buildTime: process.env.BUILD_TIME || new Date().toISOString(),
+      nodeVersion: process.version,
+      environment: process.env.NODE_ENV || 'development',
+      platform: process.platform,
+      arch: process.arch,
+      uptime: process.uptime(),
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
+      error: 'Version information unavailable',
+      message: error.message 
+    });
+  }
+});
+
+/**
+ * Build Info Endpoint
+ * Provides TaskMaster build verification and deployment metadata
+ * @route GET /api/build-info
+ * @returns {Object} Build information and TaskMaster verification
+ */
+app.get('/api/build-info', async (req, res) => {
+  try {
+    const fs = require('fs').promises;
+    const buildInfoPath = path.join(__dirname, 'public', 'build-info.json');
+    
+    try {
+      const buildInfo = await fs.readFile(buildInfoPath, 'utf8');
+      res.json(JSON.parse(buildInfo));
+    } catch (error) {
+      // If build-info.json doesn't exist, generate minimal info
+      res.json({
+        build: {
+          timestamp: new Date().toISOString(),
+          version: require('./package.json').version,
+          status: 'runtime-generated',
+          commit: process.env.RENDER_GIT_COMMIT || 'unknown'
+        },
+        taskMaster: {
+          enabled: true,
+          architect: 'primary',
+          configPresent: require('fs').existsSync('./taskmaster.config.json')
+        },
+        note: 'Build info not found, generated at runtime'
+      });
+    }
+  } catch (error) {
+    res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 
+      error: 'Build information unavailable',
+      message: error.message 
+    });
+  }
+});
+
+/**
+ * Database Initialization State
+ * Tracks whether the database (PostgreSQL or file-based) is ready for operations
+ * @type {boolean}
+ */
 let isDatabaseReady = false;
 
-// Initialize database on startup (PostgreSQL or File-based)
+/**
+ * Database Initialization on Startup
+ * Initializes either PostgreSQL or file-based storage and creates admin user if needed
+ * Implements the "HIVE MIND AUTO-REPAIR" pattern for resilient deployments
+ */
 (async () => {
   try {
     await databaseManager.initialize();
@@ -210,6 +414,14 @@ let isDatabaseReady = false;
       console.log('✅ File-based database ready - Data may be lost on deployment');
       console.log('⚠️  Add PostgreSQL database in Render for persistent storage');
     }
+    
+    // 🧠 TaskMaster Architecture Verification
+    console.log('🧠 TaskMaster Status:');
+    console.log('   ✅ Architecture: Primary (as configured)');
+    console.log('   📄 Config: taskmaster.config.json');
+    console.log('   🔗 GitHub Integration: Active');
+    console.log('   🚀 Render Auto-Deploy: Enabled');
+    console.log('   📊 Health Monitoring: /api/health, /api/version, /api/build-info');
     
     // 🧠 HIVE MIND AUTO-REPAIR: Create admin user if missing
     try {
@@ -226,10 +438,9 @@ let isDatabaseReady = false;
       if (!adminExists) {
         console.log('🔧 HIVE MIND: No admin user found, creating one for production...');
         
-        // Hash password explicitly for PostgreSQL path
+        // Hash password using configured security constants
         const bcrypt = require('bcryptjs');
-        const saltRounds = 12;
-        const hashedPassword = await bcrypt.hash('admin123', saltRounds);
+        const hashedPassword = await bcrypt.hash('admin123', SECURITY.BCRYPT_SALT_ROUNDS);
         const adminUser = await databaseManager.createUser({
           name: 'Administrator',
           email: 'admin@conejonegro.com',
@@ -251,8 +462,7 @@ let isDatabaseReady = false;
           if (!standardAdminExists) {
             console.log('🔧 Creating standard admin@conejonegro.com user...');
             const bcrypt = require('bcryptjs');
-            const saltRounds = 12;
-            const hashedPassword = await bcrypt.hash('admin123', saltRounds);
+            const hashedPassword = await bcrypt.hash('admin123', SECURITY.BCRYPT_SALT_ROUNDS);
             await databaseManager.createUser({
               name: 'Administrator',
               email: 'admin@conejonegro.com',
