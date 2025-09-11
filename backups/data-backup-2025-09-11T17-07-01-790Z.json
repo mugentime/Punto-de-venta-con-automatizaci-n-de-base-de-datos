@@ -1,0 +1,1126 @@
+{
+  "timestamp": "2025-09-11T17-07-01-790Z",
+  "data": {
+    "users.json": [
+      {
+        "_id": "f933df463d8c3a5a45ddfcd6",
+        "name": "Administrador",
+        "email": "gerencia@conejonegro.mx",
+        "password": "$2a$12$V9lxdqsBkX4cFLnqQurFw.Crr6VTeoNN9LjLz4DPTRqvu2OFou8dG",
+        "role": "admin",
+        "isActive": true,
+        "createdAt": "2025-08-20T12:38:57.086Z",
+        "lastLogin": null,
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": true,
+          "canExportData": true,
+          "canDeleteRecords": true
+        }
+      },
+      {
+        "_id": "0ac89352c28b505a577d620c",
+        "name": "Test User",
+        "email": "test@example.com",
+        "password": "$2a$12$yMSE45qDU1BdUamS.Sqc2eVH2CQJakH34W0ZSAVBCCclCL06pAfuy",
+        "role": "employee",
+        "isActive": true,
+        "createdAt": "2025-08-26T22:59:49.463Z",
+        "lastLogin": null,
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": false,
+          "canExportData": false,
+          "canDeleteRecords": false
+        }
+      },
+      {
+        "_id": "2e420e3ace8d6f19da4ccb8a",
+        "name": "Test Admin",
+        "email": "testadmin@test.com",
+        "password": "$2a$12$i3OgLD2AZWpgKicOjUucuuvPY6hfFB2bbyI2Ypx7OOoXFKUIEWX3a",
+        "role": "admin",
+        "isActive": true,
+        "createdAt": "2025-08-30T15:10:31.867Z",
+        "lastLogin": "2025-08-30T15:14:07.831Z",
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": true,
+          "canExportData": true,
+          "canDeleteRecords": true
+        }
+      },
+      {
+        "_id": "e0cbd27429eaa20acf48cc23",
+        "name": "Administrator",
+        "email": "admin@conejonegro.com",
+        "password": "$2a$12$VjjN2Vk3GsWrcqkBgvriJuqCuj0B8ZbWWssOJ7KEpuqbOlobieWva",
+        "role": "admin",
+        "isActive": true,
+        "createdAt": "2025-09-03T16:42:34.687Z",
+        "lastLogin": "2025-09-10T05:25:03.805Z",
+        "permissions": {
+          "canManageInventory": true,
+          "canRegisterClients": true,
+          "canViewReports": true,
+          "canManageUsers": true,
+          "canExportData": true,
+          "canDeleteRecords": true
+        }
+      }
+    ],
+    "products.json": [
+      {
+        "_id": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "category": "cafeteria",
+        "quantity": 18,
+        "cost": 8,
+        "price": 18,
+        "lowStockAlert": 5,
+        "description": "",
+        "barcode": "",
+        "isActive": true,
+        "createdAt": "2025-09-03T17:21:49.111Z",
+        "createdBy": "e0cbd27429eaa20acf48cc23",
+        "updatedAt": "2025-09-03T18:13:59.208Z"
+      },
+      {
+        "_id": "98073dd887c7bd3441dafdb3",
+        "name": "coca",
+        "category": "refrigerador",
+        "quantity": 1,
+        "cost": 0.04,
+        "price": 0.06,
+        "lowStockAlert": 5,
+        "description": "",
+        "barcode": "",
+        "isActive": false,
+        "createdAt": "2025-09-03T17:27:22.746Z",
+        "createdBy": "e0cbd27429eaa20acf48cc23",
+        "deletedAt": "2025-09-03T17:27:27.802Z"
+      },
+      {
+        "_id": "ccb6b65bdbefb3fdc543e5f0",
+        "name": "americano",
+        "category": "cafeteria",
+        "quantity": 1,
+        "cost": 0.03,
+        "price": 0.03,
+        "lowStockAlert": 5,
+        "description": "",
+        "barcode": "",
+        "isActive": true,
+        "createdAt": "2025-09-03T17:27:36.959Z",
+        "createdBy": "e0cbd27429eaa20acf48cc23"
+      }
+    ],
+    "records.json": [
+      {
+        "_id": "sample001",
+        "client": "María González",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "dfed68c7e52e1541bc05c2e1",
+            "name": "Americano",
+            "quantity": 1,
+            "price": 40,
+            "cost": 12,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 40,
+        "serviceCharge": 0,
+        "total": 45,
+        "payment": "efectivo",
+        "cost": 12,
+        "profit": 33,
+        "tip": 5,
+        "drinksCost": 0,
+        "date": "2025-08-22T10:30:00.000Z",
+        "time": "10:30:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T10:30:00.000Z",
+        "drink": "Americano",
+        "drinkProduct": "dfed68c7e52e1541bc05c2e1"
+      },
+      {
+        "_id": "sample002",
+        "client": "Juan Pérez",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "a91a51aece2a6002c1004c63",
+            "name": "Espresso",
+            "quantity": 2,
+            "price": 35,
+            "cost": 10,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 3,
+        "subtotal": 0,
+        "serviceCharge": 174,
+        "total": 184,
+        "payment": "tarjeta",
+        "cost": 20,
+        "profit": 164,
+        "tip": 10,
+        "drinksCost": 20,
+        "date": "2025-08-22T09:15:00.000Z",
+        "time": "09:15:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T09:15:00.000Z",
+        "drink": "Espresso",
+        "drinkProduct": "a91a51aece2a6002c1004c63"
+      },
+      {
+        "_id": "sample003",
+        "client": "Ana Ruiz",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "da3fbc9738bee30c027d82ab",
+            "name": "Capuccino",
+            "quantity": 1,
+            "price": 45,
+            "cost": 15,
+            "category": "cafeteria"
+          },
+          {
+            "productId": "d06e8814c3427a93b899ae34",
+            "name": "Coca-Cola",
+            "quantity": 1,
+            "price": 25,
+            "cost": 15,
+            "category": "refrigerador"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 70,
+        "serviceCharge": 0,
+        "total": 70,
+        "payment": "transferencia",
+        "cost": 30,
+        "profit": 40,
+        "tip": 0,
+        "drinksCost": 0,
+        "date": "2025-08-22T11:45:00.000Z",
+        "time": "11:45:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T11:45:00.000Z",
+        "drink": "Capuccino, Coca-Cola",
+        "drinkProduct": "da3fbc9738bee30c027d82ab"
+      },
+      {
+        "_id": "sample004",
+        "client": "Carlos López",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "3b2d5196c49a1c461bedab18",
+            "name": "Latte",
+            "quantity": 1,
+            "price": 40,
+            "cost": 12,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 2,
+        "subtotal": 0,
+        "serviceCharge": 116,
+        "total": 126,
+        "payment": "efectivo",
+        "cost": 12,
+        "profit": 114,
+        "tip": 10,
+        "drinksCost": 12,
+        "date": "2025-08-22T14:20:00.000Z",
+        "time": "14:20:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T14:20:00.000Z",
+        "drink": "Latte",
+        "drinkProduct": "3b2d5196c49a1c461bedab18"
+      },
+      {
+        "_id": "sample005",
+        "client": "Sofia Martínez",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "94254701297d33d3fc12f922",
+            "name": "Jugo de Naranja",
+            "quantity": 1,
+            "price": 35,
+            "cost": 20,
+            "category": "refrigerador"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 35,
+        "serviceCharge": 0,
+        "total": 40,
+        "payment": "tarjeta",
+        "cost": 20,
+        "profit": 20,
+        "tip": 5,
+        "drinksCost": 0,
+        "date": "2025-08-22T16:10:00.000Z",
+        "time": "16:10:00",
+        "createdBy": "f933df463d8c3a5a45ddfcd6",
+        "isDeleted": false,
+        "createdAt": "2025-08-22T16:10:00.000Z",
+        "drink": "Jugo de Naranja",
+        "drinkProduct": "94254701297d33d3fc12f922"
+      },
+      {
+        "_id": "a58d7c0054a07ec5b29131f0",
+        "client": "Cliente Prueba",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "cafe001mokha2025",
+            "name": "Mokha",
+            "quantity": 2,
+            "price": 50,
+            "cost": 18,
+            "category": "cafeteria"
+          },
+          {
+            "productId": "refri001tepepsi25",
+            "name": "Pepsi",
+            "quantity": 1,
+            "price": 25,
+            "cost": 14,
+            "category": "refrigerador"
+          }
+        ],
+        "hours": 3,
+        "subtotal": 25,
+        "serviceCharge": 174,
+        "total": 214,
+        "payment": "tarjeta",
+        "cost": 50,
+        "profit": 164,
+        "drinksCost": 0,
+        "tip": 15,
+        "date": "2025-08-26T23:10:29.563Z",
+        "time": "17:10:29",
+        "createdBy": "0ac89352c28b505a577d620c",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:10:29.564Z",
+        "drink": "Mokha",
+        "drinkProduct": "cafe001mokha2025"
+      },
+      {
+        "_id": "7c4352fb1a2bbcd24cb0bd2c",
+        "client": "Test Cliente",
+        "service": "cafeteria",
+        "products": [
+          {
+            "name": "Café Test",
+            "quantity": 1,
+            "cost": 10,
+            "price": 25,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 25,
+        "serviceCharge": 0,
+        "total": 25,
+        "payment": "efectivo",
+        "cost": 10,
+        "profit": 15,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-08-26T23:27:19.769Z",
+        "time": "17:27:19",
+        "createdBy": "test-user-id",
+        "isDeleted": false,
+        "createdAt": "2025-08-26T23:27:19.769Z",
+        "drink": "Café Test"
+      },
+      {
+        "_id": "10ee395e33318a5d01f695d8",
+        "client": "pablo",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "da56c66d52b8e46b70f40b6f",
+            "name": "Fig Bar",
+            "quantity": 1,
+            "price": 18,
+            "cost": 8,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 18,
+        "serviceCharge": 0,
+        "total": 18,
+        "payment": "efectivo",
+        "cost": 8,
+        "profit": 10,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-09-03T17:22:10.770Z",
+        "time": "11:22:10",
+        "createdBy": "e0cbd27429eaa20acf48cc23",
+        "isDeleted": true,
+        "createdAt": "2025-09-03T17:22:10.775Z",
+        "drink": "Fig Bar",
+        "drinkProduct": "da56c66d52b8e46b70f40b6f",
+        "deletedAt": "2025-09-03T17:27:06.897Z",
+        "deletedBy": "e0cbd27429eaa20acf48cc23"
+      },
+      {
+        "_id": "c0fd3ac13009b88f64aa481c",
+        "client": "pablo",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "da56c66d52b8e46b70f40b6f",
+            "name": "Fig Bar",
+            "quantity": 1,
+            "price": 18,
+            "cost": 8,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 0,
+        "serviceCharge": 58,
+        "total": 58,
+        "payment": "tarjeta",
+        "cost": 8,
+        "profit": 50,
+        "drinksCost": 8,
+        "tip": 0,
+        "date": "2025-09-03T17:27:01.200Z",
+        "time": "11:27:01",
+        "createdBy": "e0cbd27429eaa20acf48cc23",
+        "isDeleted": false,
+        "createdAt": "2025-09-03T17:27:01.201Z",
+        "drink": "Fig Bar",
+        "drinkProduct": "da56c66d52b8e46b70f40b6f"
+      },
+      {
+        "_id": "e1921b953f41b0f97d482657",
+        "client": "Juan Pérez - Test Cliente",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "test-product-123",
+            "name": "Americano",
+            "quantity": 2,
+            "price": 40,
+            "cost": 12,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 3,
+        "subtotal": 0,
+        "serviceCharge": 174,
+        "total": 174,
+        "payment": "tarjeta",
+        "cost": 24,
+        "profit": 150,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-09-03T18:13:28.772Z",
+        "time": "12:13:28",
+        "isDeleted": false,
+        "createdAt": "2025-09-03T18:13:28.790Z",
+        "drink": "Americano",
+        "drinkProduct": "test-product-123"
+      },
+      {
+        "_id": "766344c7237552075862a640",
+        "client": "María González - Test Cliente TM",
+        "service": "coworking",
+        "products": [
+          {
+            "productId": "da56c66d52b8e46b70f40b6f",
+            "name": "Fig Bar",
+            "quantity": 1,
+            "price": 18,
+            "cost": 8,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 2,
+        "subtotal": 0,
+        "serviceCharge": 116,
+        "total": 116,
+        "payment": "tarjeta",
+        "cost": 8,
+        "profit": 108,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-09-03T18:13:59.155Z",
+        "time": "12:13:59",
+        "isDeleted": false,
+        "createdAt": "2025-09-03T18:13:59.173Z",
+        "drink": "Fig Bar",
+        "drinkProduct": "da56c66d52b8e46b70f40b6f"
+      },
+      {
+        "_id": "dc25381be34d69aec05123e0",
+        "client": "María González - Test Cliente TM",
+        "service": "cafeteria",
+        "products": [
+          {
+            "productId": "da56c66d52b8e46b70f40b6f",
+            "name": "Fig Bar",
+            "quantity": 2,
+            "price": 18,
+            "cost": 8,
+            "category": "cafeteria"
+          }
+        ],
+        "hours": 1,
+        "subtotal": 36,
+        "serviceCharge": 0,
+        "total": 36,
+        "payment": "efectivo",
+        "cost": 16,
+        "profit": 20,
+        "drinksCost": 0,
+        "tip": 0,
+        "date": "2025-09-03T18:13:59.206Z",
+        "time": "12:13:59",
+        "isDeleted": false,
+        "createdAt": "2025-09-03T18:13:59.207Z",
+        "drink": "Fig Bar",
+        "drinkProduct": "da56c66d52b8e46b70f40b6f"
+      }
+    ],
+    "cash_cuts.json": [
+      {
+        "cutDate": "2025-09-10T01:26:00.135Z",
+        "cutTime": "19:26",
+        "startDate": "2025-09-10T01:24:00.201Z",
+        "endDate": "2025-09-10T01:26:00.135Z",
+        "cutType": "automatic",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalExpenses": 0,
+        "totalExpenseRecords": 0,
+        "netProfit": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "expenseBreakdown": {
+          "gastos-fijos": {
+            "count": 0,
+            "amount": 0
+          },
+          "insumos": {
+            "count": 0,
+            "amount": 0
+          },
+          "sueldos": {
+            "count": 0,
+            "amount": 0
+          },
+          "marketing": {
+            "count": 0,
+            "amount": 0
+          },
+          "mantenimiento": {
+            "count": 0,
+            "amount": 0
+          },
+          "otros": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "",
+        "createdBy": null,
+        "id": "17574675601376bcffldo1",
+        "idempotencyKey": null,
+        "taskMasterProtected": true,
+        "createdByTaskMaster": "2025-09-10T01:26:00.137Z",
+        "createdAt": "2025-09-10T01:26:00.138Z",
+        "updatedAt": "2025-09-10T01:26:00.138Z"
+      },
+      {
+        "cutDate": "2025-09-10T01:24:00.201Z",
+        "cutTime": "19:24",
+        "startDate": "2025-09-10T01:22:32.973Z",
+        "endDate": "2025-09-10T01:24:00.201Z",
+        "cutType": "automatic",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalExpenses": 0,
+        "totalExpenseRecords": 0,
+        "netProfit": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "expenseBreakdown": {
+          "gastos-fijos": {
+            "count": 0,
+            "amount": 0
+          },
+          "insumos": {
+            "count": 0,
+            "amount": 0
+          },
+          "sueldos": {
+            "count": 0,
+            "amount": 0
+          },
+          "marketing": {
+            "count": 0,
+            "amount": 0
+          },
+          "mantenimiento": {
+            "count": 0,
+            "amount": 0
+          },
+          "otros": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "",
+        "createdBy": null,
+        "id": "1757467440203jzgfop3m4",
+        "idempotencyKey": null,
+        "taskMasterProtected": true,
+        "createdByTaskMaster": "2025-09-10T01:24:00.203Z",
+        "createdAt": "2025-09-10T01:24:00.204Z",
+        "updatedAt": "2025-09-10T01:24:00.204Z"
+      },
+      {
+        "cutDate": "2025-09-10T01:22:32.973Z",
+        "cutTime": "19:22",
+        "startDate": "2025-09-05T18:44:39.714Z",
+        "endDate": "2025-09-10T01:22:32.973Z",
+        "cutType": "automatic",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalExpenses": 0,
+        "totalExpenseRecords": 0,
+        "netProfit": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "expenseBreakdown": {
+          "gastos-fijos": {
+            "count": 0,
+            "amount": 0
+          },
+          "insumos": {
+            "count": 0,
+            "amount": 0
+          },
+          "sueldos": {
+            "count": 0,
+            "amount": 0
+          },
+          "marketing": {
+            "count": 0,
+            "amount": 0
+          },
+          "mantenimiento": {
+            "count": 0,
+            "amount": 0
+          },
+          "otros": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "",
+        "createdBy": null,
+        "id": "17574673529847mqbefjcn",
+        "idempotencyKey": null,
+        "taskMasterProtected": true,
+        "createdByTaskMaster": "2025-09-10T01:22:32.984Z",
+        "createdAt": "2025-09-10T01:22:32.985Z",
+        "updatedAt": "2025-09-10T01:22:32.985Z"
+      },
+      {
+        "cutDate": "2025-09-05T18:44:39.714Z",
+        "cutTime": "12:44",
+        "startDate": "2025-09-05T18:44:39.702Z",
+        "endDate": "2025-09-05T18:44:39.714Z",
+        "cutType": "manual",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "Prueba concurrente - 2025-09-05T18:44:39.714Z - 0",
+        "createdBy": "test-concurrent-1757097877691",
+        "id": "1757097879716gvpg7y3x4",
+        "createdAt": "2025-09-05T18:44:39.723Z",
+        "updatedAt": "2025-09-05T18:44:39.723Z"
+      },
+      {
+        "cutDate": "2025-09-05T18:44:39.702Z",
+        "cutTime": "12:44",
+        "startDate": "2025-09-05T18:44:39.696Z",
+        "endDate": "2025-09-05T18:44:39.702Z",
+        "cutType": "manual",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "Prueba duplicados directa - 2025-09-05T18:44:39.695Z",
+        "createdBy": "test-user-1757097877691",
+        "id": "1757097879703c8va4omfd",
+        "createdAt": "2025-09-05T18:44:39.711Z",
+        "updatedAt": "2025-09-05T18:44:39.711Z"
+      },
+      {
+        "cutDate": "2025-09-05T18:44:39.696Z",
+        "cutTime": "12:44",
+        "startDate": "2025-09-05T18:44:37.692Z",
+        "endDate": "2025-09-05T18:44:39.696Z",
+        "cutType": "manual",
+        "totalRecords": 0,
+        "totalIncome": 0,
+        "totalCost": 0,
+        "totalProfit": 0,
+        "averageTicket": 0,
+        "paymentBreakdown": {
+          "efectivo": {
+            "count": 0,
+            "amount": 0
+          },
+          "tarjeta": {
+            "count": 0,
+            "amount": 0
+          },
+          "transferencia": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "serviceBreakdown": {
+          "cafeteria": {
+            "count": 0,
+            "amount": 0
+          },
+          "coworking": {
+            "count": 0,
+            "amount": 0
+          }
+        },
+        "topProducts": [],
+        "hourlyBreakdown": [],
+        "notes": "Prueba duplicados directa - 2025-09-05T18:44:39.695Z",
+        "createdBy": "test-user-1757097877691",
+        "id": "1757097879698pwvz2nif9",
+        "createdAt": "2025-09-05T18:44:39.699Z",
+        "updatedAt": "2025-09-05T18:44:39.699Z"
+      },
+      {
+        "_id": "ea7b162d696ff615f1506362",
+        "id": "ea7b162d696ff615f1506362",
+        "status": "closed",
+        "openingAmount": 1000,
+        "openedBy": "test-user",
+        "openedAt": "2025-09-10T01:14:02.498Z",
+        "notes": "Test validation\nClosed manually for testing",
+        "entries": [],
+        "closingAmount": 1000,
+        "closedBy": "test-cleanup",
+        "closedAt": "2025-09-10T02:15:00.000Z",
+        "expectedAmount": 1000,
+        "difference": 0,
+        "createdAt": "2025-09-10T01:14:02.498Z",
+        "updatedAt": "2025-09-10T02:15:00.000Z"
+      },
+      {
+        "_id": "9987d2197b1cfe2961be2e0a",
+        "id": "9987d2197b1cfe2961be2e0a",
+        "status": "closed",
+        "openingAmount": 1000,
+        "openedBy": "test-runner",
+        "openedAt": "2025-09-10T01:32:59.190Z",
+        "notes": "Automated validation test\nAuto-closed for testing",
+        "entries": [],
+        "closingAmount": 1000,
+        "closedBy": "test-runner",
+        "closedAt": "2025-09-10T01:33:39.587Z",
+        "expectedAmount": 1000,
+        "difference": 0,
+        "createdAt": "2025-09-10T01:32:59.190Z",
+        "updatedAt": "2025-09-10T01:33:39.587Z"
+      },
+      {
+        "_id": "45997fbaf9614a90d47d433e",
+        "id": "45997fbaf9614a90d47d433e",
+        "status": "closed",
+        "openingAmount": 1000,
+        "openedBy": "test-runner",
+        "openedAt": "2025-09-10T01:33:39.599Z",
+        "notes": "Automated validation test\nTest closure",
+        "entries": [
+          {
+            "id": "04886f3ea4a0eddf7674d337",
+            "type": "sale",
+            "amount": 250.5,
+            "referenceId": "TEST-001",
+            "note": "Test sale entry",
+            "createdAt": "2025-09-10T01:33:39.614Z"
+          },
+          {
+            "id": "f068249c4cea6b2c767f2a59",
+            "type": "expense",
+            "amount": 50,
+            "note": "Test expense",
+            "createdAt": "2025-09-10T01:33:39.627Z"
+          }
+        ],
+        "closingAmount": 1195.25,
+        "closedBy": "test-runner",
+        "closedAt": "2025-09-10T01:33:39.640Z",
+        "expectedAmount": 1200.5,
+        "difference": -5.25,
+        "createdAt": "2025-09-10T01:33:39.600Z",
+        "updatedAt": "2025-09-10T01:33:39.640Z"
+      }
+    ],
+    "expenses.json": [
+      {
+        "_id": "82166f18be9d62aadb928eb8",
+        "id": "expense_6uk6h5t1pj7mf4ct8md",
+        "amount": 15000,
+        "description": "Renta del Local - Test",
+        "category": "gastos-fijos",
+        "subcategory": "renta",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:12:09.447Z",
+        "updatedAt": "2025-09-03T19:12:09.447Z",
+        "type": "recurrente",
+        "recurrenceFrequency": "mensual",
+        "nextDueDate": "2025-10-03T00:00:00.000Z",
+        "supplier": "Inmobiliaria Test",
+        "paymentMethod": "transferencia",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Gasto de prueba para test visual",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "3888423cd33529ccb0be33a9",
+        "id": "expense_3k21v2momw4mf4ctdts",
+        "amount": 2500,
+        "description": "Cafe Premium Colombiano",
+        "category": "insumos",
+        "subcategory": "cafe",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:12:16.192Z",
+        "updatedAt": "2025-09-03T19:12:16.192Z",
+        "type": "unico",
+        "recurrenceFrequency": null,
+        "nextDueDate": null,
+        "supplier": "Cafe del Valle",
+        "paymentMethod": "efectivo",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Cafe organico para promocion especial",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "c25dd1ff2ad0ee6f7f7e81d7",
+        "id": "expense_1gd1yu9o118mf4cti1a",
+        "amount": 18000,
+        "description": "Sueldo Empleado - Diciembre",
+        "category": "sueldos",
+        "subcategory": "sueldo-empleados",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:12:21.647Z",
+        "updatedAt": "2025-09-03T19:12:21.647Z",
+        "type": "recurrente",
+        "recurrenceFrequency": "mensual",
+        "nextDueDate": "2025-10-03T00:00:00.000Z",
+        "supplier": "Nomina Interna",
+        "paymentMethod": "transferencia",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Pago de nomina diciembre",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "7bf9b50dcc6db1d405843ad9",
+        "id": "expense_heymj2kbs6mf4ctm55",
+        "amount": 800,
+        "description": "Publicidad Facebook Ads",
+        "category": "marketing",
+        "subcategory": "redes-sociales",
+        "date": "2025-09-02T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:12:26.970Z",
+        "updatedAt": "2025-09-03T19:17:34.836Z",
+        "type": "unico",
+        "recurrenceFrequency": null,
+        "nextDueDate": null,
+        "supplier": "Meta Business",
+        "paymentMethod": "transferencia",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Gasto pagado durante la prueba del sistema - 2025-09-03 13:17",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "3c8210db7db0155d244ef6d7",
+        "id": "expense_f9tfpg1r2aqmf4czb06",
+        "amount": 3200,
+        "description": "Compra de Vasos Biodegradables",
+        "category": "insumos",
+        "subcategory": "vasos-desechables",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:16:52.471Z",
+        "updatedAt": "2025-09-03T19:16:52.471Z",
+        "type": "unico",
+        "recurrenceFrequency": null,
+        "nextDueDate": null,
+        "supplier": "EcoSuministros SA",
+        "paymentMethod": "transferencia",
+        "invoiceNumber": "ECO-2025-1234",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Vasos ecol�gicos para mejorar la imagen del negocio",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "342fb17293414b8853e3ff22",
+        "id": "expense_b4yek2dnj2rmf4czhdo",
+        "amount": 899,
+        "description": "Internet Fibra �ptica 500MB",
+        "category": "gastos-fijos",
+        "subcategory": "internet",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:17:00.733Z",
+        "updatedAt": "2025-09-03T19:17:00.733Z",
+        "type": "recurrente",
+        "recurrenceFrequency": "mensual",
+        "nextDueDate": "2025-10-03T00:00:00.000Z",
+        "supplier": "TeleCorp Fibra",
+        "paymentMethod": "transferencia",
+        "invoiceNumber": "TC-2025-09-003",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Plan empresarial con IP fija",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "f231c3bdbd384bf38ae089eb",
+        "id": "expense_4jw2rmdgx9emf4cznm4",
+        "amount": 2800,
+        "description": "Mantenimiento Equipo de Refrigeraci�n",
+        "category": "mantenimiento",
+        "subcategory": "electrodomesticos",
+        "date": "2025-09-05T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:17:08.813Z",
+        "updatedAt": "2025-09-03T19:17:08.813Z",
+        "type": "unico",
+        "recurrenceFrequency": null,
+        "nextDueDate": null,
+        "supplier": "RefriService Pro",
+        "paymentMethod": "efectivo",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pendiente",
+        "tags": [],
+        "notes": "Mantenimiento programado para el viernes",
+        "createdBy": "test-user",
+        "isActive": true
+      },
+      {
+        "_id": "5f31d850c560ea267f801cd6",
+        "id": "expense_kr7bt0xgzumf4d0ku9",
+        "amount": 150,
+        "description": "Gasto temporal para prueba de eliminaci�n",
+        "category": "otros",
+        "subcategory": "imprevistos",
+        "date": "2025-09-03T00:00:00.000Z",
+        "createdAt": "2025-09-03T19:17:51.874Z",
+        "updatedAt": "2025-09-03T19:18:29.963Z",
+        "type": "unico",
+        "recurrenceFrequency": null,
+        "nextDueDate": null,
+        "supplier": "Temporal",
+        "paymentMethod": "efectivo",
+        "invoiceNumber": "",
+        "taxDeductible": false,
+        "status": "pagado",
+        "tags": [],
+        "notes": "Este gasto ser� eliminado como parte de la prueba",
+        "createdBy": "test-user",
+        "isActive": false
+      }
+    ]
+  },
+  "metadata": {
+    "version": "1.0.0",
+    "environment": "development",
+    "dataDir": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\data"
+  }
+}

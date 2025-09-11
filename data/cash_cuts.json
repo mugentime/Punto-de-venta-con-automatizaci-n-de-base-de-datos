@@ -1,0 +1,423 @@
+[
+  {
+    "cutDate": "2025-09-10T01:26:00.135Z",
+    "cutTime": "19:26",
+    "startDate": "2025-09-10T01:24:00.201Z",
+    "endDate": "2025-09-10T01:26:00.135Z",
+    "cutType": "automatic",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalExpenses": 0,
+    "totalExpenseRecords": 0,
+    "netProfit": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "expenseBreakdown": {
+      "gastos-fijos": {
+        "count": 0,
+        "amount": 0
+      },
+      "insumos": {
+        "count": 0,
+        "amount": 0
+      },
+      "sueldos": {
+        "count": 0,
+        "amount": 0
+      },
+      "marketing": {
+        "count": 0,
+        "amount": 0
+      },
+      "mantenimiento": {
+        "count": 0,
+        "amount": 0
+      },
+      "otros": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "",
+    "createdBy": null,
+    "id": "17574675601376bcffldo1",
+    "idempotencyKey": null,
+    "taskMasterProtected": true,
+    "createdByTaskMaster": "2025-09-10T01:26:00.137Z",
+    "createdAt": "2025-09-10T01:26:00.138Z",
+    "updatedAt": "2025-09-10T01:26:00.138Z"
+  },
+  {
+    "cutDate": "2025-09-10T01:24:00.201Z",
+    "cutTime": "19:24",
+    "startDate": "2025-09-10T01:22:32.973Z",
+    "endDate": "2025-09-10T01:24:00.201Z",
+    "cutType": "automatic",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalExpenses": 0,
+    "totalExpenseRecords": 0,
+    "netProfit": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "expenseBreakdown": {
+      "gastos-fijos": {
+        "count": 0,
+        "amount": 0
+      },
+      "insumos": {
+        "count": 0,
+        "amount": 0
+      },
+      "sueldos": {
+        "count": 0,
+        "amount": 0
+      },
+      "marketing": {
+        "count": 0,
+        "amount": 0
+      },
+      "mantenimiento": {
+        "count": 0,
+        "amount": 0
+      },
+      "otros": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "",
+    "createdBy": null,
+    "id": "1757467440203jzgfop3m4",
+    "idempotencyKey": null,
+    "taskMasterProtected": true,
+    "createdByTaskMaster": "2025-09-10T01:24:00.203Z",
+    "createdAt": "2025-09-10T01:24:00.204Z",
+    "updatedAt": "2025-09-10T01:24:00.204Z"
+  },
+  {
+    "cutDate": "2025-09-10T01:22:32.973Z",
+    "cutTime": "19:22",
+    "startDate": "2025-09-05T18:44:39.714Z",
+    "endDate": "2025-09-10T01:22:32.973Z",
+    "cutType": "automatic",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalExpenses": 0,
+    "totalExpenseRecords": 0,
+    "netProfit": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "expenseBreakdown": {
+      "gastos-fijos": {
+        "count": 0,
+        "amount": 0
+      },
+      "insumos": {
+        "count": 0,
+        "amount": 0
+      },
+      "sueldos": {
+        "count": 0,
+        "amount": 0
+      },
+      "marketing": {
+        "count": 0,
+        "amount": 0
+      },
+      "mantenimiento": {
+        "count": 0,
+        "amount": 0
+      },
+      "otros": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "",
+    "createdBy": null,
+    "id": "17574673529847mqbefjcn",
+    "idempotencyKey": null,
+    "taskMasterProtected": true,
+    "createdByTaskMaster": "2025-09-10T01:22:32.984Z",
+    "createdAt": "2025-09-10T01:22:32.985Z",
+    "updatedAt": "2025-09-10T01:22:32.985Z"
+  },
+  {
+    "cutDate": "2025-09-05T18:44:39.714Z",
+    "cutTime": "12:44",
+    "startDate": "2025-09-05T18:44:39.702Z",
+    "endDate": "2025-09-05T18:44:39.714Z",
+    "cutType": "manual",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "Prueba concurrente - 2025-09-05T18:44:39.714Z - 0",
+    "createdBy": "test-concurrent-1757097877691",
+    "id": "1757097879716gvpg7y3x4",
+    "createdAt": "2025-09-05T18:44:39.723Z",
+    "updatedAt": "2025-09-05T18:44:39.723Z"
+  },
+  {
+    "cutDate": "2025-09-05T18:44:39.702Z",
+    "cutTime": "12:44",
+    "startDate": "2025-09-05T18:44:39.696Z",
+    "endDate": "2025-09-05T18:44:39.702Z",
+    "cutType": "manual",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "Prueba duplicados directa - 2025-09-05T18:44:39.695Z",
+    "createdBy": "test-user-1757097877691",
+    "id": "1757097879703c8va4omfd",
+    "createdAt": "2025-09-05T18:44:39.711Z",
+    "updatedAt": "2025-09-05T18:44:39.711Z"
+  },
+  {
+    "cutDate": "2025-09-05T18:44:39.696Z",
+    "cutTime": "12:44",
+    "startDate": "2025-09-05T18:44:37.692Z",
+    "endDate": "2025-09-05T18:44:39.696Z",
+    "cutType": "manual",
+    "totalRecords": 0,
+    "totalIncome": 0,
+    "totalCost": 0,
+    "totalProfit": 0,
+    "averageTicket": 0,
+    "paymentBreakdown": {
+      "efectivo": {
+        "count": 0,
+        "amount": 0
+      },
+      "tarjeta": {
+        "count": 0,
+        "amount": 0
+      },
+      "transferencia": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "serviceBreakdown": {
+      "cafeteria": {
+        "count": 0,
+        "amount": 0
+      },
+      "coworking": {
+        "count": 0,
+        "amount": 0
+      }
+    },
+    "topProducts": [],
+    "hourlyBreakdown": [],
+    "notes": "Prueba duplicados directa - 2025-09-05T18:44:39.695Z",
+    "createdBy": "test-user-1757097877691",
+    "id": "1757097879698pwvz2nif9",
+    "createdAt": "2025-09-05T18:44:39.699Z",
+    "updatedAt": "2025-09-05T18:44:39.699Z"
+  },
+  {
+    "_id": "ea7b162d696ff615f1506362",
+    "id": "ea7b162d696ff615f1506362",
+    "status": "closed",
+    "openingAmount": 1000,
+    "openedBy": "test-user",
+    "openedAt": "2025-09-10T01:14:02.498Z",
+    "notes": "Test validation\nClosed manually for testing",
+    "entries": [],
+    "closingAmount": 1000,
+    "closedBy": "test-cleanup",
+    "closedAt": "2025-09-10T02:15:00.000Z",
+    "expectedAmount": 1000,
+    "difference": 0,
+    "createdAt": "2025-09-10T01:14:02.498Z",
+    "updatedAt": "2025-09-10T02:15:00.000Z"
+  },
+  {
+    "_id": "9987d2197b1cfe2961be2e0a",
+    "id": "9987d2197b1cfe2961be2e0a",
+    "status": "closed",
+    "openingAmount": 1000,
+    "openedBy": "test-runner",
+    "openedAt": "2025-09-10T01:32:59.190Z",
+    "notes": "Automated validation test\nAuto-closed for testing",
+    "entries": [],
+    "closingAmount": 1000,
+    "closedBy": "test-runner",
+    "closedAt": "2025-09-10T01:33:39.587Z",
+    "expectedAmount": 1000,
+    "difference": 0,
+    "createdAt": "2025-09-10T01:32:59.190Z",
+    "updatedAt": "2025-09-10T01:33:39.587Z"
+  },
+  {
+    "_id": "45997fbaf9614a90d47d433e",
+    "id": "45997fbaf9614a90d47d433e",
+    "status": "closed",
+    "openingAmount": 1000,
+    "openedBy": "test-runner",
+    "openedAt": "2025-09-10T01:33:39.599Z",
+    "notes": "Automated validation test\nTest closure",
+    "entries": [
+      {
+        "id": "04886f3ea4a0eddf7674d337",
+        "type": "sale",
+        "amount": 250.5,
+        "referenceId": "TEST-001",
+        "note": "Test sale entry",
+        "createdAt": "2025-09-10T01:33:39.614Z"
+      },
+      {
+        "id": "f068249c4cea6b2c767f2a59",
+        "type": "expense",
+        "amount": 50,
+        "note": "Test expense",
+        "createdAt": "2025-09-10T01:33:39.627Z"
+      }
+    ],
+    "closingAmount": 1195.25,
+    "closedBy": "test-runner",
+    "closedAt": "2025-09-10T01:33:39.640Z",
+    "expectedAmount": 1200.5,
+    "difference": -5.25,
+    "createdAt": "2025-09-10T01:33:39.600Z",
+    "updatedAt": "2025-09-10T01:33:39.640Z"
+  }
+]
