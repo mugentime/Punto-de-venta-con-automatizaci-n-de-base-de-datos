@@ -67,7 +67,7 @@ function validateEnvironment() {
 }
 
 // Run security validation
-// validateEnvironment(); // TEMPORARILY DISABLED FOR RENDER DEPLOYMENT
+validateEnvironment();
 
 /**
  * Environment Detection and Configuration

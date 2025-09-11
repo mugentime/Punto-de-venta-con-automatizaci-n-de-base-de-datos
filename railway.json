@@ -1,28 +1,4 @@
 {
-  "$schema": "https://railway.app/railway.schema.json",
-  "build": {
-    "builder": "NIXPACKS",
-    "buildCommand": "npm install"
-  },
-  "deploy": {
-    "startCommand": "npm start",
-    "restartPolicyType": "ON_FAILURE",
-    "restartPolicyMaxRetries": 10,
-    "healthcheckPath": "/api/health",
-    "healthcheckTimeout": 60
-  },
-  "environments": {
-    "production": {
-      "variables": {
-        "NODE_ENV": "production",
-        "JWT_SECRET": "conejo-negro-pos-secure-key-2025",
-        "RAILWAY_VOLUME_MOUNT_PATH": "/app/data",
-        "DATA_RECOVERY_ENABLED": "true",
-        "PLAYWRIGHT_BASE_URL": "https://pos-conejonegro-production.up.railway.app",
-        "MCP_ENDPOINT": "http://localhost:3001/mcp",
-        "MCP_HEADLESS": "true",
-        "MCP_PORT": "3001"
-      }
-    }
-  }
+    "environment":  "production",
+    "project":  "d395ae99-1dc9-4aae-96b6-0c805960665f"
 }
