@@ -1149,9 +1149,9 @@ app.post('/api/setup', requireDatabase, async (req, res) => {
 // Serve HTML files
 app.get('/', (req, res) => {
   try {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'conejo_negro_online.html'));
   } catch (error) {
-    console.error('Error serving index.html:', error);
+    console.error('Error serving conejo_negro_online.html:', error);
     res.status(500).send('Error loading homepage');
   }
 });
