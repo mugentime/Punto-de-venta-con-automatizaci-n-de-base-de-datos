@@ -1,0 +1,196 @@
+{
+  "timestamp": "2025-09-12T13:53:49.211Z",
+  "url": "https://pos-conejonegro-production.up.railway.app",
+  "totalTests": 6,
+  "passed": 1,
+  "failed": 5,
+  "errors": [
+    {
+      "test": "Login Functionality Test",
+      "error": "Login form inputs not found",
+      "stack": "Error: Login form inputs not found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:302:19\n    at async testWithRetry (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:60:13)\n    at async testLoginFunctionality (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:281:5)\n    at async runAudit (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:801:9)"
+    },
+    {
+      "test": "Navigation to Inventory",
+      "error": "Navigation element for Inventory not found",
+      "stack": "Error: Navigation element for Inventory not found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:356:23\n    at async testWithRetry (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:60:13)\n    at async testNavigation (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:348:9)\n    at async runAudit (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:802:9)"
+    },
+    {
+      "test": "Navigation to Sales",
+      "error": "Navigation element for Sales not found",
+      "stack": "Error: Navigation element for Sales not found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:356:23\n    at async testWithRetry (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:60:13)\n    at async testNavigation (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:348:9)\n    at async runAudit (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:802:9)"
+    },
+    {
+      "test": "Navigation to Reports",
+      "error": "Navigation element for Reports not found",
+      "stack": "Error: Navigation element for Reports not found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:356:23\n    at async testWithRetry (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:60:13)\n    at async testNavigation (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:348:9)\n    at async runAudit (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:802:9)"
+    },
+    {
+      "test": "Navigation to Cash Cut",
+      "error": "Navigation element for Cash Cut not found",
+      "stack": "Error: Navigation element for Cash Cut not found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:356:23\n    at async testWithRetry (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:60:13)\n    at async testNavigation (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:348:9)\n    at async runAudit (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\diagnostics\\railway-ui-audit.js:802:9)"
+    }
+  ],
+  "warnings": [],
+  "consoleErrors": [
+    {
+      "text": "Failed to load resource: the server responded with a status of 404 ()",
+      "location": {
+        "url": "https://pos-conejonegro-production.up.railway.app/favicon.ico",
+        "lineNumber": 0,
+        "columnNumber": 0
+      },
+      "timestamp": "2025-09-12T13:53:58.518Z"
+    }
+  ],
+  "networkFailures": [],
+  "performanceMetrics": {
+    "pageLoadTime": 7785,
+    "domContentLoaded": 7785,
+    "firstPaint": 7808,
+    "firstContentfulPaint": 7808,
+    "resources": 2,
+    "transferSize": 3113,
+    "domNodes": 13
+  },
+  "accessibilityIssues": [],
+  "visualIssues": [
+    {
+      "element": "HTML",
+      "position": "left: 0, right: 375.20001220703125",
+      "issue": "Element extends outside viewport"
+    },
+    {
+      "element": "BODY",
+      "position": "left: 0, right: 375.20001220703125",
+      "issue": "Element extends outside viewport"
+    }
+  ],
+  "functionalityTests": [
+    {
+      "name": "Login Functionality Test",
+      "status": "failed",
+      "error": "Login form inputs not found",
+      "attempts": 3
+    },
+    {
+      "name": "Navigation to Inventory",
+      "status": "failed",
+      "error": "Navigation element for Inventory not found",
+      "attempts": 3
+    },
+    {
+      "name": "Navigation to Sales",
+      "status": "failed",
+      "error": "Navigation element for Sales not found",
+      "attempts": 3
+    },
+    {
+      "name": "Navigation to Reports",
+      "status": "failed",
+      "error": "Navigation element for Reports not found",
+      "attempts": 3
+    },
+    {
+      "name": "Navigation to Cash Cut",
+      "status": "failed",
+      "error": "Navigation element for Cash Cut not found",
+      "attempts": 3
+    },
+    {
+      "name": "Core POS Functionality",
+      "status": "passed",
+      "attempt": 1
+    }
+  ],
+  "responsiveTests": [
+    {
+      "viewport": "Desktop",
+      "dimensions": "1920x1080",
+      "issues": 0,
+      "details": []
+    },
+    {
+      "viewport": "Tablet",
+      "dimensions": "768x1024",
+      "issues": 0,
+      "details": []
+    },
+    {
+      "viewport": "Mobile",
+      "dimensions": "375x667",
+      "issues": 2,
+      "details": [
+        {
+          "element": "HTML",
+          "position": "left: 0, right: 375.20001220703125",
+          "issue": "Element extends outside viewport"
+        },
+        {
+          "element": "BODY",
+          "position": "left: 0, right: 375.20001220703125",
+          "issue": "Element extends outside viewport"
+        }
+      ]
+    }
+  ],
+  "screenshots": [
+    {
+      "name": "initial-load",
+      "viewport": "desktop",
+      "path": "tests\\diagnostics\\screenshots\\desktop-initial-load-1757685238882.png"
+    },
+    {
+      "name": "pos-functionality",
+      "viewport": "desktop",
+      "path": "tests\\diagnostics\\screenshots\\desktop-pos-functionality-1757685262363.png"
+    },
+    {
+      "name": "homepage",
+      "viewport": "desktop",
+      "path": "tests\\diagnostics\\screenshots\\desktop-homepage-1757685263692.png"
+    },
+    {
+      "name": "homepage",
+      "viewport": "tablet",
+      "path": "tests\\diagnostics\\screenshots\\tablet-homepage-1757685264899.png"
+    },
+    {
+      "name": "homepage",
+      "viewport": "mobile",
+      "path": "tests\\diagnostics\\screenshots\\mobile-homepage-1757685266065.png"
+    }
+  ],
+  "summary": {
+    "totalTests": 6,
+    "passed": 1,
+    "failed": 5,
+    "passRate": "16.67%",
+    "criticalIssues": 5,
+    "warnings": 0,
+    "consoleErrors": 1,
+    "networkFailures": 0,
+    "accessibilityIssues": 0,
+    "visualIssues": 2
+  },
+  "recommendations": [
+    {
+      "priority": "HIGH",
+      "category": "JavaScript Errors",
+      "description": "Fix console errors to improve application stability",
+      "count": 1
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Visual Layout",
+      "description": "Fix visual layout issues and overlapping elements",
+      "count": 2
+    },
+    {
+      "priority": "MEDIUM",
+      "category": "Performance",
+      "description": "Page load time is 7.79s - optimize for better performance",
+      "metric": 7785
+    }
+  ]
+}

@@ -1,0 +1,31 @@
+[
+  {
+    "timestamp": "2025-09-04T17:27:30.721Z",
+    "localGit": {
+      "latestCommit": "a9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling",
+      "recentCommits": [
+        "a9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors\ne022a35 🔧 Fix: Install mongoose dependency and update package-lock.json\nd238e54 📚 Add Task Master deployment workflow backup and slash command documentation\naad6f85 Fix: Add missing mongoose dependency for Render deployment"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-04T17:26:44Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  }
+]

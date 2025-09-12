@@ -1,0 +1,1475 @@
+{
+  "runId": "2025-09-10T17-20-07-403Z",
+  "targetUrl": "https://pos-conejo-negro.onrender.com/online",
+  "startedAt": "2025-09-10T17:20:07.405Z",
+  "environment": {
+    "node": "v22.16.0",
+    "platform": "Windows_NT 10.0.26100 (win32)"
+  },
+  "headless": true,
+  "scenarios": [
+    {
+      "scenario": "desktop",
+      "startedAt": "2025-09-10T17:20:07.491Z",
+      "url": "https://pos-conejo-negro.onrender.com/online",
+      "events": [],
+      "console": [
+        {
+          "ts": "2025-09-10T17:20:08.493Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.494Z",
+          "type": "error",
+          "text": "Refused to apply style from 'https://pos-conejo-negro.onrender.com/css/gastos.css' because its MIME type ('application/json') is not a supported stylesheet MIME type, and strict MIME checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.515Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.526Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.723Z",
+          "type": "log",
+          "text": "✅ Mobile enhancements loaded successfully",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-enhancements.js",
+            "lineNumber": 219,
+            "columnNumber": 8
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.723Z",
+          "type": "log",
+          "text": "Simple mobile menu initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "lineNumber": 105,
+            "columnNumber": 8
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.723Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/login-enhancements.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.766Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/api/expensesApi.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.766Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/expenses.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.768Z",
+          "type": "log",
+          "text": "✅ Hamburger click listener added",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "lineNumber": 99,
+            "columnNumber": 12
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.769Z",
+          "type": "log",
+          "text": "🚀 Initializing POS application...",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6767,
+            "columnNumber": 20
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.769Z",
+          "type": "log",
+          "text": "✅ Auto-fill setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6772,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.769Z",
+          "type": "log",
+          "text": "✅ Auth forms setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6775,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ Sync button setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6778,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ Cash cuts interface setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6781,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ Coworking interface setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6785,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ Mobile navigation initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6789,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ Authentication check complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6808,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.770Z",
+          "type": "log",
+          "text": "✅ POS application fully initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6810,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:09.760Z",
+          "type": "log",
+          "text": "Auto-fill button clicked",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2779,
+            "columnNumber": 28
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:09.760Z",
+          "type": "log",
+          "text": "Auto-fill completed: Email and Password set",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2786,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.102Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/api/auth/login",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.104Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response status: 503",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2822,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.105Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response ok: false",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2823,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.105Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response data: {error: Database service initializing, message: The database is still initializing. Please try again in a moment., help: The file-based database is being set up.}",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2824,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.105Z",
+          "type": "log",
+          "text": "❌ LOGIN FAILED - Status: 503 Error: Database service initializing",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2837,
+            "columnNumber": 36
+          }
+        }
+      ],
+      "pageErrors": [],
+      "httpErrors": [
+        {
+          "ts": "2025-09-10T17:20:08.492Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "99a4a355-3bc6-42d4-ac22-072ccc6fe1af",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "78b05c9f-57ef-41c7",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:07 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d0981d6bdcf09d-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.515Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "e7289d46-ef60-4bcf-a712-ce3d3510cdf0",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "44031897-bbab-4b62",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:07 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d0981d6be2f09d-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:08.525Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "036c12a5-4953-4bcc-b6b4-c05cf4ac4bb7",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "4728aa88-77fd-460f",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:07 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d0981d6bd8f09d-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:11.101Z",
+          "url": "https://pos-conejo-negro.onrender.com/api/auth/login",
+          "status": 503,
+          "ok": false,
+          "headers": {
+            "x-request-id": "d0ccca2d-2c5a-4297-aeda-69d9337c4dae",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"a9-oneMw/vw9Junl1IiuPPLzhUVuTs\"",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "ee26d2e7-1bff-4f51",
+            "x-render-origin-server": "Render",
+            "server-timing": "cfExtPri",
+            "content-type": "application/json; charset=utf-8",
+            "priority": "u=1,i",
+            "x-ratelimit-reset": "1757525669",
+            "referrer-policy": "no-referrer",
+            "content-length": "113",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare",
+            "x-permitted-cross-domain-policies": "none",
+            "date": "Wed, 10 Sep 2025 17:20:10 GMT",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "x-download-options": "noopen",
+            "x-ratelimit-remaining": "97",
+            "cf-ray": "97d0982d5bd46781-DFW",
+            "access-control-allow-origin": "https://pos-conejo-negro.onrender.com",
+            "x-ratelimit-limit": "100"
+          }
+        }
+      ],
+      "networkFailures": [
+        {
+          "ts": "2025-09-10T17:20:08.494Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        },
+        {
+          "ts": "2025-09-10T17:20:08.495Z",
+          "url": "https://pos-conejo-negro.onrender.com/css/gastos.css",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "stylesheet"
+        },
+        {
+          "ts": "2025-09-10T17:20:08.516Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        },
+        {
+          "ts": "2025-09-10T17:20:08.526Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        }
+      ],
+      "screenshots": [
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808493.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808494.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808515.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808526.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808723.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808766.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524808766.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-http-503-1757524811101.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-console-error-1757524811102.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\desktop-loaded-1757524815803.png"
+      ],
+      "interactions": [
+        {
+          "ts": "2025-09-10T17:20:15.890Z",
+          "action": "exists",
+          "target": "body",
+          "ok": true
+        },
+        {
+          "ts": "2025-09-10T17:20:15.896Z",
+          "action": "visible",
+          "target": "Agregar Gasto",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:15.899Z",
+          "action": "visible",
+          "target": "Ver Reporte",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:15.906Z",
+          "action": "text-present",
+          "target": "Text:Gasto",
+          "ok": true
+        },
+        {
+          "ts": "2025-09-10T17:20:15.911Z",
+          "action": "text-present",
+          "target": "Text:Monto",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:15.915Z",
+          "action": "text-present",
+          "target": "Text:Categoria",
+          "ok": true
+        }
+      ],
+      "performance": {
+        "navigation": {
+          "name": "https://pos-conejo-negro.onrender.com/online",
+          "entryType": "navigation",
+          "startTime": 0,
+          "duration": 1573.7000000029802,
+          "initiatorType": "navigation",
+          "deliveryType": "",
+          "nextHopProtocol": "h2",
+          "renderBlockingStatus": "non-blocking",
+          "workerStart": 0,
+          "workerRouterEvaluationStart": 0,
+          "workerCacheLookupStart": 0,
+          "workerMatchedSourceType": "",
+          "workerFinalSourceType": "",
+          "redirectStart": 0,
+          "redirectEnd": 0,
+          "fetchStart": 0.20000000298023224,
+          "domainLookupStart": 3.899999998509884,
+          "domainLookupEnd": 58,
+          "connectStart": 58,
+          "secureConnectionStart": 397.3999999985099,
+          "connectEnd": 441.5,
+          "requestStart": 442,
+          "responseStart": 585.6000000014901,
+          "firstInterimResponseStart": 0,
+          "finalResponseHeadersStart": 585.6000000014901,
+          "responseEnd": 621.7000000029802,
+          "transferSize": 46257,
+          "encodedBodySize": 45957,
+          "decodedBodySize": 293742,
+          "responseStatus": 200,
+          "serverTiming": [],
+          "unloadEventStart": 0,
+          "unloadEventEnd": 0,
+          "domInteractive": 1173,
+          "domContentLoadedEventStart": 1173,
+          "domContentLoadedEventEnd": 1177.5,
+          "domComplete": 1573.3999999985099,
+          "loadEventStart": 1573.7000000029802,
+          "loadEventEnd": 1573.7000000029802,
+          "type": "navigate",
+          "redirectCount": 0,
+          "activationStart": 0,
+          "criticalCHRestart": 0,
+          "notRestoredReasons": null
+        },
+        "timing": {
+          "connectStart": 1757524807900,
+          "secureConnectionStart": 1757524807989,
+          "unloadEventEnd": 0,
+          "domainLookupStart": 1757524807595,
+          "domainLookupEnd": 1757524807649,
+          "responseStart": 1757524808177,
+          "connectEnd": 1757524808033,
+          "responseEnd": 1757524808213,
+          "requestStart": 1757524808033,
+          "domLoading": 1757524808227,
+          "redirectStart": 0,
+          "loadEventEnd": 1757524809165,
+          "domComplete": 1757524809165,
+          "navigationStart": 1757524807591,
+          "loadEventStart": 1757524809165,
+          "domContentLoadedEventEnd": 1757524808769,
+          "unloadEventStart": 0,
+          "redirectEnd": 0,
+          "domInteractive": 1757524808764,
+          "fetchStart": 1757524807591,
+          "domContentLoadedEventStart": 1757524808764
+        },
+        "resourcesCount": 11,
+        "resourcesSample": [
+          {
+            "name": "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap",
+            "initiatorType": "link",
+            "duration": 127.39999999850988,
+            "startTime": 639.2000000029802,
+            "transferSize": 2061,
+            "encodedBodySize": 1761,
+            "decodedBodySize": 17976
+          },
+          {
+            "name": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+            "initiatorType": "link",
+            "duration": 482.6000000014901,
+            "startTime": 639.3999999985099,
+            "transferSize": 19052,
+            "encodedBodySize": 18752,
+            "decodedBodySize": 102025
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/css/gastos.css",
+            "initiatorType": "link",
+            "duration": 260.3999999985099,
+            "startTime": 639.5,
+            "transferSize": 0,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/css/mobile-optimized.css",
+            "initiatorType": "link",
+            "duration": 280.30000000447035,
+            "startTime": 639.5,
+            "transferSize": 5401,
+            "encodedBodySize": 5101,
+            "decodedBodySize": 21712
+          },
+          {
+            "name": "https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js",
+            "initiatorType": "script",
+            "duration": 297.19999999552965,
+            "startTime": 639.7000000029802,
+            "transferSize": 69071,
+            "encodedBodySize": 68771,
+            "decodedBodySize": 199560
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/mobile-enhancements.js",
+            "initiatorType": "script",
+            "duration": 258.09999999403954,
+            "startTime": 639.8000000044703,
+            "transferSize": 2640,
+            "encodedBodySize": 2340,
+            "decodedBodySize": 6569
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "initiatorType": "script",
+            "duration": 280.79999999701977,
+            "startTime": 639.8000000044703,
+            "transferSize": 1208,
+            "encodedBodySize": 908,
+            "decodedBodySize": 3200
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+            "initiatorType": "script",
+            "duration": 292.90000000596046,
+            "startTime": 639.8999999985099,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+            "initiatorType": "script",
+            "duration": 259.80000000447035,
+            "startTime": 640,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+            "initiatorType": "script",
+            "duration": 282.6000000014901,
+            "startTime": 640,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/api/auth/login",
+            "initiatorType": "fetch",
+            "duration": 310.20000000298023,
+            "startTime": 3197.5,
+            "transferSize": 413,
+            "encodedBodySize": 113,
+            "decodedBodySize": 169
+          }
+        ]
+      },
+      "crashed": false,
+      "gotoError": "Login verification failed - main app not visible",
+      "finishedAt": "2025-09-10T17:20:15.915Z",
+      "durationMs": 8424
+    },
+    {
+      "scenario": "mobile",
+      "startedAt": "2025-09-10T17:20:15.922Z",
+      "url": "https://pos-conejo-negro.onrender.com/online",
+      "events": [],
+      "console": [
+        {
+          "ts": "2025-09-10T17:20:16.705Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.710Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.714Z",
+          "type": "error",
+          "text": "Refused to apply style from 'https://pos-conejo-negro.onrender.com/css/gastos.css' because its MIME type ('application/json') is not a supported stylesheet MIME type, and strict MIME checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.762Z",
+          "type": "log",
+          "text": "✅ Mobile enhancements loaded successfully",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-enhancements.js",
+            "lineNumber": 219,
+            "columnNumber": 8
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.872Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 404 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.873Z",
+          "type": "log",
+          "text": "Simple mobile menu initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "lineNumber": 105,
+            "columnNumber": 8
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.873Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/login-enhancements.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.879Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/api/expensesApi.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.880Z",
+          "type": "error",
+          "text": "Refused to execute script from 'https://pos-conejo-negro.onrender.com/js/expenses.js' because its MIME type ('application/json') is not executable, and strict MIME type checking is enabled.",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.920Z",
+          "type": "log",
+          "text": "✅ Hamburger click listener added",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "lineNumber": 99,
+            "columnNumber": 12
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.920Z",
+          "type": "log",
+          "text": "🚀 Initializing POS application...",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6767,
+            "columnNumber": 20
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.920Z",
+          "type": "log",
+          "text": "✅ Auto-fill setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6772,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.921Z",
+          "type": "log",
+          "text": "✅ Auth forms setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6775,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.921Z",
+          "type": "log",
+          "text": "✅ Sync button setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6778,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.921Z",
+          "type": "log",
+          "text": "✅ Cash cuts interface setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6781,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.921Z",
+          "type": "log",
+          "text": "✅ Coworking interface setup complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6785,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.921Z",
+          "type": "log",
+          "text": "✅ Mobile navigation initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6789,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.922Z",
+          "type": "log",
+          "text": "✅ Authentication check complete",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6808,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.922Z",
+          "type": "log",
+          "text": "✅ POS application fully initialized",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 6810,
+            "columnNumber": 24
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:17.705Z",
+          "type": "log",
+          "text": "Auto-fill button clicked",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2779,
+            "columnNumber": 28
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:17.705Z",
+          "type": "log",
+          "text": "Auto-fill completed: Email and Password set",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2786,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.941Z",
+          "type": "error",
+          "text": "Failed to load resource: the server responded with a status of 503 ()",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/api/auth/login",
+            "lineNumber": 0,
+            "columnNumber": 0
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.944Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response status: 503",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2822,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.944Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response ok: false",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2823,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.944Z",
+          "type": "log",
+          "text": "🔍 LOGIN DEBUG - Response data: {error: Database service initializing, message: The database is still initializing. Please try again in a moment., help: The file-based database is being set up.}",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2824,
+            "columnNumber": 32
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.944Z",
+          "type": "log",
+          "text": "❌ LOGIN FAILED - Status: 503 Error: Database service initializing",
+          "location": {
+            "url": "https://pos-conejo-negro.onrender.com/online",
+            "lineNumber": 2837,
+            "columnNumber": 36
+          }
+        }
+      ],
+      "pageErrors": [],
+      "httpErrors": [
+        {
+          "ts": "2025-09-10T17:20:16.704Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "051bad17-d517-462a-9dda-aa2b89763af2",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "17091a23-3724-4321",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:15 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d098516e806b50-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.710Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "fb3a40ec-73b1-466f-a46e-8da8b187b268",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "8c024260-4d11-4088",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:15 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d098516e7c6b50-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:16.872Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+          "status": 404,
+          "ok": false,
+          "headers": {
+            "x-request-id": "38cf15ef-85f9-4396-8ebc-8511b7c11087",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"1e-SvoDJ0TWSUtmmS54YVs86NoyJAg\"",
+            "x-permitted-cross-domain-policies": "none",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "f4f66fe9-0242-46df",
+            "x-render-origin-server": "Render",
+            "date": "Wed, 10 Sep 2025 17:20:15 GMT",
+            "content-type": "application/json; charset=utf-8",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "referrer-policy": "no-referrer",
+            "x-download-options": "noopen",
+            "cf-ray": "97d098516e826b50-DFW",
+            "content-length": "34",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare"
+          }
+        },
+        {
+          "ts": "2025-09-10T17:20:18.941Z",
+          "url": "https://pos-conejo-negro.onrender.com/api/auth/login",
+          "status": 503,
+          "ok": false,
+          "headers": {
+            "x-request-id": "c5655477-bbd4-4aff-8b1c-81f338ef36bd",
+            "content-encoding": "br",
+            "cf-cache-status": "DYNAMIC",
+            "etag": "W/\"a9-oneMw/vw9Junl1IiuPPLzhUVuTs\"",
+            "x-content-type-options": "nosniff",
+            "alt-svc": "h3=\":443\"; ma=86400",
+            "rndr-id": "45743c28-f231-48cd",
+            "x-render-origin-server": "Render",
+            "server-timing": "cfExtPri",
+            "content-type": "application/json; charset=utf-8",
+            "priority": "u=1,i",
+            "x-ratelimit-reset": "1757525669",
+            "referrer-policy": "no-referrer",
+            "content-length": "113",
+            "x-xss-protection": "0",
+            "origin-agent-cluster": "?1",
+            "server": "cloudflare",
+            "x-permitted-cross-domain-policies": "none",
+            "date": "Wed, 10 Sep 2025 17:20:17 GMT",
+            "vary": "Origin, Accept-Encoding",
+            "x-frame-options": "SAMEORIGIN",
+            "strict-transport-security": "max-age=15552000; includeSubDomains",
+            "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+            "x-dns-prefetch-control": "off",
+            "cross-origin-opener-policy": "same-origin",
+            "cross-origin-resource-policy": "same-origin",
+            "access-control-allow-credentials": "true",
+            "x-download-options": "noopen",
+            "x-ratelimit-remaining": "96",
+            "cf-ray": "97d0985f3e9df05a-DFW",
+            "access-control-allow-origin": "https://pos-conejo-negro.onrender.com",
+            "x-ratelimit-limit": "100"
+          }
+        }
+      ],
+      "networkFailures": [
+        {
+          "ts": "2025-09-10T17:20:16.705Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        },
+        {
+          "ts": "2025-09-10T17:20:16.711Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        },
+        {
+          "ts": "2025-09-10T17:20:16.715Z",
+          "url": "https://pos-conejo-negro.onrender.com/css/gastos.css",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "stylesheet"
+        },
+        {
+          "ts": "2025-09-10T17:20:16.873Z",
+          "url": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+          "method": "GET",
+          "failure": {
+            "errorText": "net::ERR_ABORTED"
+          },
+          "resourceType": "script"
+        }
+      ],
+      "screenshots": [
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816705.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816710.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816714.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816872.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816873.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816879.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524816880.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-http-503-1757524818941.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-console-error-1757524818941.png",
+        "reports\\online\\2025-09-10T17-20-07-403Z\\screenshots\\mobile-loaded-1757524823796.png"
+      ],
+      "interactions": [
+        {
+          "ts": "2025-09-10T17:20:23.941Z",
+          "action": "exists",
+          "target": "body",
+          "ok": true
+        },
+        {
+          "ts": "2025-09-10T17:20:23.947Z",
+          "action": "visible",
+          "target": "Agregar Gasto",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:23.950Z",
+          "action": "visible",
+          "target": "Ver Reporte",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:23.955Z",
+          "action": "text-present",
+          "target": "Text:Gasto",
+          "ok": true
+        },
+        {
+          "ts": "2025-09-10T17:20:23.959Z",
+          "action": "text-present",
+          "target": "Text:Monto",
+          "ok": false,
+          "error": "Not found"
+        },
+        {
+          "ts": "2025-09-10T17:20:23.963Z",
+          "action": "text-present",
+          "target": "Text:Categoria",
+          "ok": true
+        }
+      ],
+      "performance": {
+        "navigation": {
+          "name": "https://pos-conejo-negro.onrender.com/online",
+          "entryType": "navigation",
+          "startTime": 0,
+          "duration": 1111.3999999985099,
+          "initiatorType": "navigation",
+          "deliveryType": "",
+          "nextHopProtocol": "h2",
+          "renderBlockingStatus": "non-blocking",
+          "workerStart": 0,
+          "workerRouterEvaluationStart": 0,
+          "workerCacheLookupStart": 0,
+          "workerMatchedSourceType": "",
+          "workerFinalSourceType": "",
+          "redirectStart": 0,
+          "redirectEnd": 0,
+          "fetchStart": 0,
+          "domainLookupStart": 1.6999999955296516,
+          "domainLookupEnd": 37.29999999701977,
+          "connectStart": 37.29999999701977,
+          "secureConnectionStart": 111.39999999850988,
+          "connectEnd": 153.19999999552965,
+          "requestStart": 153.39999999850988,
+          "responseStart": 421.29999999701977,
+          "firstInterimResponseStart": 0,
+          "finalResponseHeadersStart": 421.29999999701977,
+          "responseEnd": 578.1999999955297,
+          "transferSize": 46257,
+          "encodedBodySize": 45957,
+          "decodedBodySize": 293742,
+          "responseStatus": 200,
+          "serverTiming": [],
+          "unloadEventStart": 0,
+          "unloadEventEnd": 0,
+          "domInteractive": 946.5,
+          "domContentLoadedEventStart": 946.5,
+          "domContentLoadedEventEnd": 950.2999999970198,
+          "domComplete": 1111.2999999970198,
+          "loadEventStart": 1111.3999999985099,
+          "loadEventEnd": 1111.3999999985099,
+          "type": "navigate",
+          "redirectCount": 0,
+          "activationStart": 0,
+          "criticalCHRestart": 0,
+          "notRestoredReasons": null
+        },
+        "timing": {
+          "connectStart": 1757524816007,
+          "secureConnectionStart": 1757524816081,
+          "unloadEventEnd": 0,
+          "domainLookupStart": 1757524815971,
+          "domainLookupEnd": 1757524816007,
+          "responseStart": 1757524816391,
+          "connectEnd": 1757524816123,
+          "responseEnd": 1757524816548,
+          "requestStart": 1757524816123,
+          "domLoading": 1757524816429,
+          "redirectStart": 0,
+          "loadEventEnd": 1757524817081,
+          "domComplete": 1757524817081,
+          "navigationStart": 1757524815970,
+          "loadEventStart": 1757524817081,
+          "domContentLoadedEventEnd": 1757524816920,
+          "unloadEventStart": 0,
+          "redirectEnd": 0,
+          "domInteractive": 1757524816916,
+          "fetchStart": 1757524815970,
+          "domContentLoadedEventStart": 1757524816916
+        },
+        "resourcesCount": 11,
+        "resourcesSample": [
+          {
+            "name": "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap",
+            "initiatorType": "link",
+            "duration": 130.60000000149012,
+            "startTime": 578.6999999955297,
+            "transferSize": 2084,
+            "encodedBodySize": 1784,
+            "decodedBodySize": 18150
+          },
+          {
+            "name": "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css",
+            "initiatorType": "link",
+            "duration": 130.60000000149012,
+            "startTime": 578.8999999985099,
+            "transferSize": 19052,
+            "encodedBodySize": 18752,
+            "decodedBodySize": 102025
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/css/mobile-optimized.css",
+            "initiatorType": "link",
+            "duration": 151.89999999850988,
+            "startTime": 579,
+            "transferSize": 5401,
+            "encodedBodySize": 5101,
+            "decodedBodySize": 21712
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/css/gastos.css",
+            "initiatorType": "link",
+            "duration": 164.79999999701977,
+            "startTime": 579,
+            "transferSize": 0,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/mobile-enhancements.js",
+            "initiatorType": "script",
+            "duration": 150.60000000149012,
+            "startTime": 579.1999999955297,
+            "transferSize": 2640,
+            "encodedBodySize": 2340,
+            "decodedBodySize": 6569
+          },
+          {
+            "name": "https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js",
+            "initiatorType": "script",
+            "duration": 200.40000000596046,
+            "startTime": 579.1999999955297,
+            "transferSize": 69071,
+            "encodedBodySize": 68771,
+            "decodedBodySize": 199560
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/mobile-menu-simple.js",
+            "initiatorType": "script",
+            "duration": 320.70000000298023,
+            "startTime": 579.2999999970198,
+            "transferSize": 1208,
+            "encodedBodySize": 908,
+            "decodedBodySize": 3200
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/login-enhancements.js",
+            "initiatorType": "script",
+            "duration": 154.89999999850988,
+            "startTime": 579.3999999985099,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/api/expensesApi.js",
+            "initiatorType": "script",
+            "duration": 150.5,
+            "startTime": 582.3999999985099,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/js/expenses.js",
+            "initiatorType": "script",
+            "duration": 318.59999999403954,
+            "startTime": 582.6000000014901,
+            "transferSize": 300,
+            "encodedBodySize": 0,
+            "decodedBodySize": 0
+          },
+          {
+            "name": "https://pos-conejo-negro.onrender.com/api/auth/login",
+            "initiatorType": "fetch",
+            "duration": 165,
+            "startTime": 2798.2999999970198,
+            "transferSize": 413,
+            "encodedBodySize": 113,
+            "decodedBodySize": 169
+          }
+        ]
+      },
+      "crashed": false,
+      "gotoError": "Login verification failed - main app not visible",
+      "finishedAt": "2025-09-10T17:20:23.963Z",
+      "durationMs": 8041
+    }
+  ],
+  "summary": {
+    "totalScenarios": 2,
+    "consoleErrors": 16,
+    "pageErrors": 0,
+    "httpErrors": 8,
+    "networkFailures": 8,
+    "crashedPages": 0,
+    "gotoErrors": 2,
+    "functionalFindings": [
+      {
+        "scenario": "desktop",
+        "interactions": [
+          {
+            "ts": "2025-09-10T17:20:15.890Z",
+            "action": "exists",
+            "target": "body",
+            "ok": true
+          },
+          {
+            "ts": "2025-09-10T17:20:15.896Z",
+            "action": "visible",
+            "target": "Agregar Gasto",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:15.899Z",
+            "action": "visible",
+            "target": "Ver Reporte",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:15.906Z",
+            "action": "text-present",
+            "target": "Text:Gasto",
+            "ok": true
+          },
+          {
+            "ts": "2025-09-10T17:20:15.911Z",
+            "action": "text-present",
+            "target": "Text:Monto",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:15.915Z",
+            "action": "text-present",
+            "target": "Text:Categoria",
+            "ok": true
+          }
+        ]
+      },
+      {
+        "scenario": "mobile",
+        "interactions": [
+          {
+            "ts": "2025-09-10T17:20:23.941Z",
+            "action": "exists",
+            "target": "body",
+            "ok": true
+          },
+          {
+            "ts": "2025-09-10T17:20:23.947Z",
+            "action": "visible",
+            "target": "Agregar Gasto",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:23.950Z",
+            "action": "visible",
+            "target": "Ver Reporte",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:23.955Z",
+            "action": "text-present",
+            "target": "Text:Gasto",
+            "ok": true
+          },
+          {
+            "ts": "2025-09-10T17:20:23.959Z",
+            "action": "text-present",
+            "target": "Text:Monto",
+            "ok": false,
+            "error": "Not found"
+          },
+          {
+            "ts": "2025-09-10T17:20:23.963Z",
+            "action": "text-present",
+            "target": "Text:Categoria",
+            "ok": true
+          }
+        ]
+      }
+    ]
+  },
+  "finishedAt": "2025-09-10T17:20:24.016Z",
+  "nodeLevelErrors": []
+}

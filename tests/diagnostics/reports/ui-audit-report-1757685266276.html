@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UI/UX Audit Report - 12/9/2025</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; background: #f5f5f5; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+        h1 { font-size: 2.5em; margin-bottom: 10px; }
+        .subtitle { opacity: 0.9; }
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
+        .summary-card { background: white; padding: 20px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .summary-card h3 { color: #667eea; margin-bottom: 10px; }
+        .summary-card .value { font-size: 2em; font-weight: bold; }
+        .summary-card.success .value { color: #10b981; }
+        .summary-card.warning .value { color: #f59e0b; }
+        .summary-card.error .value { color: #ef4444; }
+        .section { background: white; padding: 30px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .section h2 { color: #667eea; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #e5e7eb; }
+        .test-result { padding: 15px; margin: 10px 0; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; }
+        .test-result.passed { background: #d1fae5; border-left: 4px solid #10b981; }
+        .test-result.failed { background: #fee2e2; border-left: 4px solid #ef4444; }
+        .issue-list { list-style: none; }
+        .issue-item { padding: 10px; margin: 5px 0; background: #f9fafb; border-radius: 5px; border-left: 3px solid #f59e0b; }
+        .recommendation { padding: 20px; margin: 10px 0; border-radius: 8px; }
+        .recommendation.HIGH { background: #fee2e2; border-left: 4px solid #ef4444; }
+        .recommendation.MEDIUM { background: #fef3c7; border-left: 4px solid #f59e0b; }
+        .recommendation.LOW { background: #dbeafe; border-left: 4px solid #3b82f6; }
+        .screenshot-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 20px; }
+        .screenshot-item { text-align: center; }
+        .screenshot-item img { width: 100%; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+        .metrics-table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        .metrics-table th, .metrics-table td { padding: 12px; text-align: left; border-bottom: 1px solid #e5e7eb; }
+        .metrics-table th { background: #f9fafb; font-weight: 600; }
+        .footer { text-align: center; padding: 20px; color: #6b7280; }
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 0.875em; font-weight: 600; }
+        .badge.success { background: #d1fae5; color: #065f46; }
+        .badge.error { background: #fee2e2; color: #991b1b; }
+        .badge.warning { background: #fef3c7; color: #92400e; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>UI/UX Audit Report</h1>
+            <div class="subtitle">
+                <p>URL: https://pos-conejonegro-production.up.railway.app</p>
+                <p>Date: 12/9/2025, 7:53:49 a.m.</p>
+            </div>
+        </header>
+
+        <div class="summary-grid">
+            <div class="summary-card error">
+                <h3>Pass Rate</h3>
+                <div class="value">16.67%</div>
+                <div>1/6 tests</div>
+            </div>
+            <div class="summary-card error">
+                <h3>Critical Issues</h3>
+                <div class="value">5</div>
+            </div>
+            <div class="summary-card warning">
+                <h3>Console Errors</h3>
+                <div class="value">1</div>
+            </div>
+            <div class="summary-card success">
+                <h3>Network Failures</h3>
+                <div class="value">0</div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>Test Results</h2>
+            
+                <div class="test-result failed">
+                    <div>
+                        <strong>Login Functionality Test</strong>
+                        <div style="color: #ef4444; margin-top: 5px;">Login form inputs not found</div>
+                    </div>
+                    <span class="badge error">FAILED</span>
+                </div>
+            
+                <div class="test-result failed">
+                    <div>
+                        <strong>Navigation to Inventory</strong>
+                        <div style="color: #ef4444; margin-top: 5px;">Navigation element for Inventory not found</div>
+                    </div>
+                    <span class="badge error">FAILED</span>
+                </div>
+            
+                <div class="test-result failed">
+                    <div>
+                        <strong>Navigation to Sales</strong>
+                        <div style="color: #ef4444; margin-top: 5px;">Navigation element for Sales not found</div>
+                    </div>
+                    <span class="badge error">FAILED</span>
+                </div>
+            
+                <div class="test-result failed">
+                    <div>
+                        <strong>Navigation to Reports</strong>
+                        <div style="color: #ef4444; margin-top: 5px;">Navigation element for Reports not found</div>
+                    </div>
+                    <span class="badge error">FAILED</span>
+                </div>
+            
+                <div class="test-result failed">
+                    <div>
+                        <strong>Navigation to Cash Cut</strong>
+                        <div style="color: #ef4444; margin-top: 5px;">Navigation element for Cash Cut not found</div>
+                    </div>
+                    <span class="badge error">FAILED</span>
+                </div>
+            
+                <div class="test-result passed">
+                    <div>
+                        <strong>Core POS Functionality</strong>
+                        
+                    </div>
+                    <span class="badge success">PASSED</span>
+                </div>
+            
+        </div>
+
+        
+        <div class="section">
+            <h2>Recommendations</h2>
+            
+                <div class="recommendation HIGH">
+                    <strong>JavaScript Errors</strong> - Priority: HIGH
+                    <p>Fix console errors to improve application stability</p>
+                    <small>1 issues found</small>
+                </div>
+            
+                <div class="recommendation MEDIUM">
+                    <strong>Visual Layout</strong> - Priority: MEDIUM
+                    <p>Fix visual layout issues and overlapping elements</p>
+                    <small>2 issues found</small>
+                </div>
+            
+                <div class="recommendation MEDIUM">
+                    <strong>Performance</strong> - Priority: MEDIUM
+                    <p>Page load time is 7.79s - optimize for better performance</p>
+                    
+                </div>
+            
+        </div>
+        
+
+        <div class="section">
+            <h2>Performance Metrics</h2>
+            <table class="metrics-table">
+                <thead>
+                    <tr>
+                        <th>Metric</th>
+                        <th>Value</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Page Load Time</td>
+                        <td>7.79s</td>
+                        <td><span class="badge warning">
+                            Needs Improvement
+                        </span></td>
+                    </tr>
+                    <tr>
+                        <td>DOM Content Loaded</td>
+                        <td>7.79s</td>
+                        <td><span class="badge warning">
+                            Slow
+                        </span></td>
+                    </tr>
+                    <tr>
+                        <td>Total Resources</td>
+                        <td>2</td>
+                        <td><span class="badge success">
+                            Optimal
+                        </span></td>
+                    </tr>
+                    <tr>
+                        <td>DOM Nodes</td>
+                        <td>13</td>
+                        <td><span class="badge success">
+                            Optimal
+                        </span></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        
+        <div class="section">
+            <h2>Responsive Design Tests</h2>
+            
+                <div style="margin: 20px 0;">
+                    <h3>Desktop (1920x1080)</h3>
+                    <p>Issues found: 0</p>
+                    <p style="color: #10b981;">✓ No layout issues detected</p>
+                </div>
+            
+                <div style="margin: 20px 0;">
+                    <h3>Tablet (768x1024)</h3>
+                    <p>Issues found: 0</p>
+                    <p style="color: #10b981;">✓ No layout issues detected</p>
+                </div>
+            
+                <div style="margin: 20px 0;">
+                    <h3>Mobile (375x667)</h3>
+                    <p>Issues found: 2</p>
+                    
+                        <ul class="issue-list">
+                            
+                                <li class="issue-item">Element extends outside viewport: HTML</li>
+                            
+                                <li class="issue-item">Element extends outside viewport: BODY</li>
+                            
+                        </ul>
+                    
+                </div>
+            
+        </div>
+        
+
+        
+        <div class="section">
+            <h2>Console Errors</h2>
+            <ul class="issue-list">
+                
+                    <li class="issue-item">
+                        <strong>Failed to load resource: the server responded with a status of 404 ()</strong>
+                        <br><small>Location: {"url":"https://pos-conejonegro-production.up.railway.app/favicon.ico","lineNumber":0,"columnNumber":0}</small>
+                    </li>
+                
+            </ul>
+        </div>
+        
+
+        
+
+        <div class="footer">
+            <p>Generated by Railway UI Audit Tool</p>
+            <p>12/9/2025, 7:54:26 a.m.</p>
+        </div>
+    </div>
+</body>
+</html>

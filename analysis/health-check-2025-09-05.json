@@ -1,0 +1,1800 @@
+[
+  {
+    "timestamp": "2025-09-05T17:31:02.939Z",
+    "cycle": 1,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:31:02 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7753e2f86f7c5-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:31:03.190Z\",\"uptime\":61.46475691,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:31:03 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"130-pPUIALrYa2TRsdVtf6SNosRiAgk\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "17bfe6fb-4198-45c5",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757094364",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a775403dd3cb9a-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:36:04.961Z",
+    "cycle": 2,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:36:04 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a77c9d5a9f0fe7-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:36:05.075Z\",\"uptime\":363.350306477,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:36:05 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-7HbgCZJJcbCgvsuD4oNqVr+E4gk\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "caa68604-61b0-4e46",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "98",
+          "x-ratelimit-reset": "1757094364",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a77c9f0e9c24e5-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:41:05.651Z",
+    "cycle": 3,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:41:05 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a783f4eb3bd7ac-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:41:05.813Z\",\"uptime\":664.088166065,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:41:05 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-T0jJV4OuMZwNK0bH7k65lr4Rc3c\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "c461ecdf-b9ed-4231",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "97",
+          "x-ratelimit-reset": "1757094364",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a783f6cedd7650-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:46:05.663Z",
+    "cycle": 4,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:46:05 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a78b47df0b2a9d-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:46:05.835Z\",\"uptime\":964.110259376,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:46:05 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-aGi/ih+UeiF5Fm51C9bl8qJstCU\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "8e577db9-6910-4f1e",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757095266",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a78b4a296adbb2-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:51:05.665Z",
+    "cycle": 5,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:51:05 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7929b1b80dbc6-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:51:05.892Z\",\"uptime\":1264.167226625,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:51:05 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-GIXB6K9mfAQddgwvcdaBNyqQiDg\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "f20e53ab-310d-431c",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "65",
+          "x-ratelimit-reset": "1757095266",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7929d78b28535-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:56:05.667Z",
+    "cycle": 6,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:56:05 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a799edbf87f7e3-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T17:56:05.754Z\",\"uptime\":1564.029307152,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 17:56:05 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-QuPZfqmFhDL0XbDij6JI8ae0PjA\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "9d1a40a3-a424-4cd3",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "63",
+          "x-ratelimit-reset": "1757095266",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a799ef5b30cbae-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:01:06.248Z",
+    "cycle": 7,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:01:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7a1444e6df0e2-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:01:06.417Z\",\"uptime\":1864.691811686,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:01:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-Ksf/uUHbxy+qVvx20ArAPPBMvVs\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "c7a3dfe4-355a-4c73",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757096167",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7a146580a7cb6-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:06:06.262Z",
+    "cycle": 8,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:06:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7a8974c0fcb9c-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:06:06.280Z\",\"uptime\":2164.555133836,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:06:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-8DGjxFdnVri9dCYYErgCD/XVpFA\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "aa18db57-94ca-4993",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "93",
+          "x-ratelimit-reset": "1757096167",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7a898d8377d58-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:11:06.510Z",
+    "cycle": 9,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:11:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7afecf9572aed-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:11:07.276Z\",\"uptime\":2465.550515647,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:11:07 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-cUT3exgFyotyU3yR/pU8RZs/QJ8\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "0ce2cd8d-2c80-4dfe",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "92",
+          "x-ratelimit-reset": "1757096167",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7aff1c8a9091c-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:16:06.518Z",
+    "cycle": 10,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:16:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7b73e6bf214de-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:16:06.531Z\",\"uptime\":23.474195118,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:16:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"131-BIvlcSfPx7SfgxsYFadHohzzeI0\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "8d1f1a14-00bb-41c9",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757097067",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7b74069369d92-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:21:06.527Z",
+    "cycle": 11,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:21:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7be91ab8dcbac-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:21:06.620Z\",\"uptime\":323.562866713,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:21:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-k9hl0SaggpSaHB6JtofSFyxL3FE\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "02b9b961-3c2f-4d09",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "98",
+          "x-ratelimit-reset": "1757097067",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7be93f9362ad0-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:26:06.533Z",
+    "cycle": 12,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:26:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7c5e4ad8ef7c5-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:26:06.694Z\",\"uptime\":245.443555081,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:26:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-pI5NTwo+V9P858TlhmxEvK+mVGM\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "8a776836-2ea2-4467",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757097667",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7c5e72f962b5d-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:31:06.548Z",
+    "cycle": 13,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:31:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7cd37aea6f8cf-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:31:06.671Z\",\"uptime\":115.243425431,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:31:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-BOweNCf9ibafCvGajX8dyI7Gim0\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "783ae661-90d0-4bcc",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "88",
+          "x-ratelimit-reset": "1757097867",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7cd39e84e2f40-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:36:06.550Z",
+    "cycle": 14,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:36:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7d48aab8f2aeb-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:36:06.532Z\",\"uptime\":415.105110427,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:36:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-rwlQ2AdFlCKvRfvzkZTfGLa0IkA\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "a22a2d39-71d8-4bb1",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "83",
+          "x-ratelimit-reset": "1757097867",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7d48c7984ef75-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:41:06.554Z",
+    "cycle": 15,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:41:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7dbdd9919d9df-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:41:06.516Z\",\"uptime\":715.088817998,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:41:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-7W2/skhIz6k2IcvcB7jcgdmzoKI\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "c73496dc-ed5d-4e9a",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "82",
+          "x-ratelimit-reset": "1757097867",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7dbdf5e2e2eed-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:46:06.557Z",
+    "cycle": 16,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:46:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7e3306cd2d88e-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:46:06.559Z\",\"uptime\":1015.131130227,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:46:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-LBq9eBWcixOhTj5GPmxHY2lOnAo\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "b7e2f2eb-3c7c-40b4",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757098867",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7e3324dcd2b73-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:51:06.569Z",
+    "cycle": 17,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:51:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7ea837a72cd1f-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:51:06.572Z\",\"uptime\":1315.144700461,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:51:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-soBMIQ2lcquH1HJV89pC7hObWy0\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "e3dcaac5-64cc-42c9",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "78",
+          "x-ratelimit-reset": "1757098867",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7ea8579bb58fe-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:56:06.579Z",
+    "cycle": 18,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:56:06 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7f1d68a995325-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T18:56:06.689Z\",\"uptime\":164.533045403,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 18:56:06 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-F6wiepsDfqI/lwdN13XvRHLw+is\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "c82faa16-caa6-4fad",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "87",
+          "x-ratelimit-reset": "1757099321",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7f1d92846cb9c-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:01:13.491Z",
+    "cycle": 19,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:01:13 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7f9551a00f7d9-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:01:13.613Z\",\"uptime\":213.919143853,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:01:13 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-y9YYP5xZqSc7t8Y9VXC3YIistpI\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "4859f832-16ab-427d",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "79",
+          "x-ratelimit-reset": "1757099572",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a7f957b8f12b75-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:06:13.503Z",
+    "cycle": 20,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:06:13 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a800a9a8f47bbb-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:06:13.842Z\",\"uptime\":514.148092572,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:06:13 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-jmdX+33an+ZmuSFrtE2R4MAqwNM\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "d7745812-9d31-4f3a",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "72",
+          "x-ratelimit-reset": "1757099572",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a800abecf7f7b1-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:11:13.518Z",
+    "cycle": 21,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:11:13 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a807fa9e5ecb83-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:11:13.414Z\",\"uptime\":813.720091885,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:11:13 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-MHO7BnhgdW5aN8eU0iqhmFRtOxo\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "937fcc6e-3c6b-4569",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "71",
+          "x-ratelimit-reset": "1757099572",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a807fc3f907d27-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:16:13.526Z",
+    "cycle": 22,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:16:13 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a80f4dadeee9e1-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:16:13.553Z\",\"uptime\":1113.85906125,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:16:13 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-R99++BIZSHvdlXND0dPHDZ+lFfU\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "53ad3e37-d5c8-46a1",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757100674",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a80f4fed3b2a94-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:21:16.524Z",
+    "cycle": 23,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:21:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a816b38e2014f4-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:21:16.613Z\",\"uptime\":1416.918849635,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:21:16 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-p9G2RALpUSpIHxg4oQ/Seh1Fi+w\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "9adb8271-4438-48d3",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "98",
+          "x-ratelimit-reset": "1757100674",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a816b6197b2ad3-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:26:16.536Z",
+    "cycle": 24,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:26:17 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a81e0ebbdc2f23-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:26:17.867Z\",\"uptime\":1718.172961842,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:26:17 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-rZjBbDclSLeSp4valgn/prHfMWM\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "6957d5f2-cf87-4c38",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "97",
+          "x-ratelimit-reset": "1757100674",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a81e10d96208d2-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:31:16.540Z",
+    "cycle": 25,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:31:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a82559692a2aac-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:31:17.561Z\",\"uptime\":2017.866383988,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:31:17 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-AxucXZNHAJXhCfit1zEVLI9tF8Q\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "674ba9de-ae0e-4f45",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757101578",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a825622b09f7b9-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:36:16.541Z",
+    "cycle": 26,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:36:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a82cac0abc2f20-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:36:16.737Z\",\"uptime\":2317.042762752,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:36:16 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-xHVCTA9qlKCEfzFuG4xDaQ8hyt4\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "a08bb578-9930-422e",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "96",
+          "x-ratelimit-reset": "1757101578",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a82cafec632b6d-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:41:16.542Z",
+    "cycle": 27,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:41:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a833ff2ddefc10-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:41:16.476Z\",\"uptime\":2616.781989821,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:41:16 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-1uPlQnhhzFyp2Z/d1zMvxPua1Es\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "f867e5ed-d417-47ba",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "95",
+          "x-ratelimit-reset": "1757101578",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a834015b9dd7ac-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:46:16.552Z",
+    "cycle": 28,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:46:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a83b528b4af7bb-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:46:16.578Z\",\"uptime\":2916.884144385,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:46:16 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-muol3LcPS7zeAINq36ROUZ380jk\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "78322916-d745-4c93",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "94",
+          "x-ratelimit-reset": "1757101578",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a83b54cab6fc10-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:51:16.555Z",
+    "cycle": 29,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": "write EPROTO EC220000:error:0A00010B:SSL routines:ssl3_get_record:wrong version number:c:\\ws\\deps\\openssl\\openssl\\ssl\\record\\ssl3_record.c:355:\n"
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:51:16 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a842a4ec037c29-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-05T19:51:16.393Z\",\"uptime\":3216.698631034,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Fri, 05 Sep 2025 19:51:16 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"133-vorSk4SCvG71rOCALT2B63ncSBo\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "3bfdfa83-14a3-45d9",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "99",
+          "x-ratelimit-reset": "1757102777",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97a842a6ca5c14fc-LAX",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  }
+]

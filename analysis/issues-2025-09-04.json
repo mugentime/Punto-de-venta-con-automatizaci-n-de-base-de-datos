@@ -1,0 +1,35 @@
+[
+  {
+    "timestamp": "2025-09-04T17:27:34.280Z",
+    "totalOpen": 1,
+    "categories": {
+      "critical": 1,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": [
+      {
+        "createdAt": "2025-09-04T17:13:59Z",
+        "labels": [
+          {
+            "id": "LA_kwDOPgsiJ88AAAACIJvZ5A",
+            "name": "bug",
+            "description": "Something isn't working",
+            "color": "d73a4a"
+          },
+          {
+            "id": "LA_kwDOPgsiJ88AAAACIJvZ_A",
+            "name": "help wanted",
+            "description": "Extra attention is needed",
+            "color": "008672"
+          }
+        ],
+        "number": 1,
+        "title": "[P0] Production Deployment Completely Down - Immediate Action Required",
+        "updatedAt": "2025-09-04T17:13:59Z"
+      }
+    ]
+  }
+]

@@ -1,0 +1,63 @@
+[
+  {
+    "type": "automation",
+    "description": "El corte automático no funciona",
+    "priority": "high",
+    "details": {
+      "module": "corte_automatico",
+      "functionality": "automated_cash_register_closing",
+      "impact": "Las operaciones de cierre no se ejecutan automáticamente",
+      "business_impact": "Requiere intervención manual constante",
+      "affected_components": ["scheduler", "cash_register", "closing_process"]
+    }
+  },
+  {
+    "type": "reports",
+    "description": "No se generan reportes con el corte de caja y la información anterior no está indexada",
+    "priority": "critical",
+    "details": {
+      "module": "reporting_system",
+      "functionality": "cash_register_reports",
+      "impact": "Pérdida de información histórica y reportes incompletos",
+      "business_impact": "Imposibilidad de generar reportes contables y de auditoría",
+      "affected_components": ["report_generator", "data_indexing", "historical_data"]
+    }
+  },
+  {
+    "type": "database",
+    "description": "Los cortes de caja manuales se duplican, el segundo sale con números en 0",
+    "priority": "high",
+    "details": {
+      "module": "manual_cash_closing",
+      "functionality": "manual_cash_register_closing",
+      "impact": "Datos duplicados e inconsistentes en la base de datos",
+      "business_impact": "Reportes incorrectos y problemas de conciliación",
+      "affected_components": ["database_transactions", "cash_closing_logic", "data_validation"]
+    }
+  },
+  {
+    "type": "performance",
+    "description": "Solo se pueden agregar 5 reportes, después se empiezan a eliminar otros reportes",
+    "priority": "critical",
+    "details": {
+      "module": "report_storage",
+      "functionality": "report_limit_management",
+      "impact": "Pérdida de datos históricos importantes",
+      "business_impact": "Imposibilidad de mantener historial completo de reportes",
+      "affected_components": ["storage_management", "report_archiving", "data_retention"]
+    }
+  },
+  {
+    "type": "features",
+    "description": "No está implementado el sistema de registro de gastos (luz, agua, teléfono, insumos, sueldos, etc)",
+    "priority": "medium",
+    "details": {
+      "module": "expense_management",
+      "functionality": "expense_tracking_system",
+      "impact": "Funcionalidad crítica para contabilidad no implementada",
+      "business_impact": "Control financiero incompleto y problemas de gestión",
+      "affected_components": ["expense_categories", "expense_tracking", "financial_reports"],
+      "required_expenses": ["utilities", "supplies", "payroll", "maintenance", "services"]
+    }
+  }
+]

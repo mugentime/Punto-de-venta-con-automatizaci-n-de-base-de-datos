@@ -1,0 +1,157 @@
+openapi: 3.0.0
+info:
+  title: Render API - Minimal Integration
+  version: 1.0.0
+  description: Minimal Render API spec for deployment monitoring
+
+servers:
+  - url: https://api.render.com
+    description: Render API Production
+
+security:
+  - bearerAuth: []
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+paths:
+  /v1/services:
+    get:
+      summary: List services
+      description: Get all services for the authenticated user
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+        - name: cursor
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of services
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  services:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        name:
+                          type: string
+                        type:
+                          type: string
+                        repo:
+                          type: string
+                        autoDeploy:
+                          type: string
+                        branch:
+                          type: string
+                        serviceDetails:
+                          type: object
+
+  /v1/services/{serviceId}:
+    get:
+      summary: Get service details
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Service details
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  name:
+                    type: string
+                  type:
+                    type: string
+                  repo:
+                    type: string
+                  serviceDetails:
+                    type: object
+
+  /v1/services/{serviceId}/deploys:
+    get:
+      summary: Get service deployments
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of deployments
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deploys:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: string
+                        commit:
+                          type: object
+                        status:
+                          type: string
+                        createdAt:
+                          type: string
+                        updatedAt:
+                          type: string
+    post:
+      summary: Trigger deployment
+      parameters:
+        - name: serviceId
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                clearCache:
+                  type: boolean
+                  default: false
+      responses:
+        '201':
+          description: Deployment triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                  status:
+                    type: string

@@ -1,0 +1,31 @@
+[
+  {
+    "timestamp": "2025-09-08T15:01:16.381Z",
+    "localGit": {
+      "latestCommit": "ca3f14d 🔧 TaskMaster: Trigger Render deploy",
+      "recentCommits": [
+        "ca3f14d 🔧 TaskMaster: Trigger Render deploy\n2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T20:08:48Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  }
+]

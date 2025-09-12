@@ -1,0 +1,100 @@
+﻿[
+    {
+        "endpoint":  "/",
+        "method":  "GET",
+        "status":  200,
+        "length":  2813,
+        "note":  "OK"
+    },
+    {
+        "endpoint":  "/api/health",
+        "method":  "GET",
+        "status":  200,
+        "length":  177,
+        "note":  "OK"
+    },
+    {
+        "endpoint":  "/api/version",
+        "method":  "GET",
+        "status":  404,
+        "length":  0,
+        "note":  "Not Found"
+    },
+    {
+        "endpoint":  "/api/auth/login",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/auth/refresh",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/users",
+        "method":  "GET",
+        "status":  404,
+        "length":  0,
+        "note":  "Not Found"
+    },
+    {
+        "endpoint":  "/api/users/me",
+        "method":  "GET",
+        "status":  404,
+        "length":  0,
+        "note":  "Not Found"
+    },
+    {
+        "endpoint":  "/api/cashcuts",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/cashcuts/open",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/cashcuts/close",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/expenses",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/reports",
+        "method":  "GET",
+        "status":  404,
+        "length":  0,
+        "note":  "Not Found"
+    },
+    {
+        "endpoint":  "/api/products",
+        "method":  "GET",
+        "status":  503,
+        "length":  0,
+        "note":  "Service Unavailable"
+    },
+    {
+        "endpoint":  "/api/categories",
+        "method":  "GET",
+        "status":  404,
+        "length":  0,
+        "note":  "Not Found"
+    }
+]

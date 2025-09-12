@@ -1,0 +1,9 @@
+﻿{
+    "commit":  "c7fdf1f",
+    "verification_passed":  true,
+    "gastos_url":  "https://pos-conejo-negro.onrender.com/gastos.html",
+    "timestamp":  "2025-09-08 09:40:56",
+    "production_url":  "https://pos-conejo-negro.onrender.com",
+    "deploy_detected":  true,
+    "workflow_duration":  60
+}

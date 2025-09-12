@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Render Deploy Monitor Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
+
+        .card h3 {
+            color: #4a5568;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.3em;
+        }
+
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-running { background-color: #48bb78; }
+        .status-stopped { background-color: #e53e3e; }
+        .status-warning { background-color: #ed8936; }
+        .status-unknown { background-color: #a0aec0; }
+
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .metric:last-child {
+            border-bottom: none;
+        }
+
+        .metric-label {
+            font-weight: 500;
+            color: #4a5568;
+        }
+
+        .metric-value {
+            font-weight: 600;
+            color: #2d3748;
+            padding: 4px 8px;
+            border-radius: 6px;
+            background-color: #f7fafc;
+        }
+
+        .metric-value.success { background-color: #c6f6d5; color: #22543d; }
+        .metric-value.warning { background-color: #fbb6ce; color: #744210; }
+        .metric-value.error { background-color: #fed7d7; color: #742a2a; }
+
+        .deploy-history {
+            grid-column: 1 / -1;
+        }
+
+        .deploy-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            margin: 8px 0;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            border-left: 4px solid #e2e8f0;
+        }
+
+        .deploy-item.success { border-left-color: #48bb78; }
+        .deploy-item.failed { border-left-color: #e53e3e; }
+        .deploy-item.pending { border-left-color: #ed8936; }
+
+        .deploy-info {
+            display: flex;
+            flex-direction: column;
+            flex: 1;
+        }
+
+        .deploy-hash {
+            font-family: 'Courier New', monospace;
+            font-weight: 600;
+            color: #4a5568;
+        }
+
+        .deploy-time {
+            font-size: 0.9em;
+            color: #718096;
+        }
+
+        .deploy-status {
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .deploy-status.success {
+            background-color: #c6f6d5;
+            color: #22543d;
+        }
+
+        .deploy-status.failed {
+            background-color: #fed7d7;
+            color: #742a2a;
+        }
+
+        .deploy-status.pending {
+            background-color: #fbb6ce;
+            color: #744210;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+
+        .btn-primary {
+            background-color: #4299e1;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #3182ce;
+        }
+
+        .btn-secondary {
+            background-color: #a0aec0;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background-color: #718096;
+        }
+
+        .btn-danger {
+            background-color: #e53e3e;
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #c53030;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 20px;
+            color: #718096;
+        }
+
+        .loading::after {
+            content: "";
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 50%;
+            border-top-color: #4299e1;
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error {
+            background-color: #fed7d7;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 20px 0;
+            border-left: 4px solid #e53e3e;
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .deploy-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .deploy-status {
+                margin-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>🚀 Render Deploy Monitor</h1>
+            <p>Dashboard de monitoreo de deploys automáticos - POS Conejo Negro</p>
+        </header>
+
+        <div class="controls">
+            <button class="btn btn-primary" onclick="refreshDashboard()">🔄 Actualizar</button>
+            <button class="btn btn-secondary" onclick="runValidation()">✅ Validar</button>
+            <button class="btn btn-secondary" onclick="testNotifications()">📢 Test Notificaciones</button>
+        </div>
+
+        <div id="dashboard-content">
+            <div class="loading">Cargando datos del dashboard...</div>
+        </div>
+    </div>
+
+    <script>
+        class DeployDashboard {
+            constructor() {
+                this.refreshInterval = 30000; // 30 segundos
+                this.autoRefresh = true;
+                this.init();
+            }
+
+            async init() {
+                await this.loadDashboard();
+                if (this.autoRefresh) {
+                    setInterval(() => this.loadDashboard(), this.refreshInterval);
+                }
+            }
+
+            async loadDashboard() {
+                try {
+                    // Simular carga de datos (en producción vendría de la API del agente)
+                    const data = await this.generateMockData();
+                    this.renderDashboard(data);
+                } catch (error) {
+                    this.showError('Error cargando datos del dashboard: ' + error.message);
+                }
+            }
+
+            async generateMockData() {
+                // Simular datos del dashboard - en producción vendría del agente
+                return {
+                    agent: {
+                        running: true,
+                        uptime: 'Activo desde hace 2h 15m'
+                    },
+                    monitor: {
+                        service: 'pos-conejo-negro',
+                        repository: 'mugentime/POS-CONEJONEGRO',
+                        branch: 'main',
+                        lastCommitHash: 'a1b2c3d4',
+                        isMonitoring: true,
+                        totalDeploys: 12
+                    },
+                    validator: {
+                        lastValidation: '2025-01-05T17:30:00Z',
+                        recentPassRate: '92.5%',
+                        totalValidations: 25
+                    },
+                    notifications: {
+                        totalAlerts: 8,
+                        alertsLast24h: 3
+                    },
+                    recentDeploys: [
+                        {
+                            hash: 'a1b2c3d4',
+                            status: 'success',
+                            timestamp: new Date(Date.now() - 30 * 60 * 1000).toISOString(),
+                            message: 'Fix authentication bug'
+                        },
+                        {
+                            hash: 'e5f6g7h8',
+                            status: 'success',
+                            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+                            message: 'Update dependencies'
+                        },
+                        {
+                            hash: 'i9j0k1l2',
+                            status: 'failed',
+                            timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString(),
+                            message: 'Add new expense categories'
+                        },
+                        {
+                            hash: 'm3n4o5p6',
+                            status: 'success',
+                            timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(),
+                            message: 'Performance improvements'
+                        },
+                        {
+                            hash: 'q7r8s9t0',
+                            status: 'pending',
+                            timestamp: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+                            message: 'UI improvements'
+                        }
+                    ]
+                };
+            }
+
+            renderDashboard(data) {
+                const content = document.getElementById('dashboard-content');
+                
+                const agentStatus = data.agent.running ? 'running' : 'stopped';
+                const monitorStatus = data.monitor.isMonitoring ? 'running' : 'stopped';
+                
+                content.innerHTML = `
+                    <div class="dashboard-grid">
+                        <!-- Agent Status -->
+                        <div class="card">
+                            <h3>
+                                <span class="status-indicator status-${agentStatus}"></span>
+                                Estado del Agente
+                            </h3>
+                            <div class="metric">
+                                <span class="metric-label">Estado</span>
+                                <span class="metric-value ${data.agent.running ? 'success' : 'error'}">
+                                    ${data.agent.running ? '✅ Activo' : '❌ Detenido'}
+                                </span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Uptime</span>
+                                <span class="metric-value">${data.agent.uptime}</span>
+                            </div>
+                        </div>
+
+                        <!-- Monitor Status -->
+                        <div class="card">
+                            <h3>
+                                <span class="status-indicator status-${monitorStatus}"></span>
+                                Monitor de Deploys
+                            </h3>
+                            <div class="metric">
+                                <span class="metric-label">Servicio</span>
+                                <span class="metric-value">${data.monitor.service}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Repositorio</span>
+                                <span class="metric-value">${data.monitor.repository}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Branch</span>
+                                <span class="metric-value">${data.monitor.branch}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Último Commit</span>
+                                <span class="metric-value">${data.monitor.lastCommitHash}</span>
+                            </div>
+                        </div>
+
+                        <!-- Validation Metrics -->
+                        <div class="card">
+                            <h3>
+                                <span class="status-indicator status-running"></span>
+                                Validaciones
+                            </h3>
+                            <div class="metric">
+                                <span class="metric-label">Tasa de Éxito</span>
+                                <span class="metric-value success">${data.validator.recentPassRate}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Total Validaciones</span>
+                                <span class="metric-value">${data.validator.totalValidations}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Última Validación</span>
+                                <span class="metric-value">${this.formatTime(data.validator.lastValidation)}</span>
+                            </div>
+                        </div>
+
+                        <!-- Deploy Metrics -->
+                        <div class="card">
+                            <h3>
+                                <span class="status-indicator status-running"></span>
+                                Métricas de Deploy
+                            </h3>
+                            <div class="metric">
+                                <span class="metric-label">Total Deploys</span>
+                                <span class="metric-value">${data.monitor.totalDeploys}</span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Alertas (24h)</span>
+                                <span class="metric-value ${data.notifications.alertsLast24h > 0 ? 'warning' : 'success'}">
+                                    ${data.notifications.alertsLast24h}
+                                </span>
+                            </div>
+                            <div class="metric">
+                                <span class="metric-label">Total Alertas</span>
+                                <span class="metric-value">${data.notifications.totalAlerts}</span>
+                            </div>
+                        </div>
+
+                        <!-- Deploy History -->
+                        <div class="card deploy-history">
+                            <h3>
+                                <span class="status-indicator status-running"></span>
+                                Historial de Deploys Recientes
+                            </h3>
+                            ${this.renderDeployHistory(data.recentDeploys)}
+                        </div>
+                    </div>
+                `;
+            }
+
+            renderDeployHistory(deploys) {
+                return deploys.map(deploy => `
+                    <div class="deploy-item ${deploy.status}">
+                        <div class="deploy-info">
+                            <div class="deploy-hash">${deploy.hash}</div>
+                            <div class="deploy-time">${this.formatTime(deploy.timestamp)} - ${deploy.message}</div>
+                        </div>
+                        <div class="deploy-status ${deploy.status}">
+                            ${this.getStatusText(deploy.status)}
+                        </div>
+                    </div>
+                `).join('');
+            }
+
+            getStatusText(status) {
+                const statusMap = {
+                    'success': '✅ Exitoso',
+                    'failed': '❌ Fallido',
+                    'pending': '⏳ Pendiente'
+                };
+                return statusMap[status] || status;
+            }
+
+            formatTime(timestamp) {
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diffMs = now - date;
+                const diffMins = Math.floor(diffMs / (1000 * 60));
+                const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+
+                if (diffMins < 60) {
+                    return `Hace ${diffMins} minutos`;
+                } else if (diffHours < 24) {
+                    return `Hace ${diffHours} horas`;
+                } else {
+                    return date.toLocaleDateString('es-ES', {
+                        day: '2-digit',
+                        month: '2-digit',
+                        year: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                    });
+                }
+            }
+
+            showError(message) {
+                const content = document.getElementById('dashboard-content');
+                content.innerHTML = `<div class="error">❌ ${message}</div>`;
+            }
+
+            showLoading(message = 'Cargando...') {
+                const content = document.getElementById('dashboard-content');
+                content.innerHTML = `<div class="loading">${message}</div>`;
+            }
+        }
+
+        // Funciones globales para los botones
+        async function refreshDashboard() {
+            window.dashboard.showLoading('Actualizando dashboard...');
+            await window.dashboard.loadDashboard();
+        }
+
+        async function runValidation() {
+            window.dashboard.showLoading('Ejecutando validaciones...');
+            // Simular validación
+            setTimeout(async () => {
+                alert('✅ Validación completada exitosamente');
+                await window.dashboard.loadDashboard();
+            }, 2000);
+        }
+
+        async function testNotifications() {
+            window.dashboard.showLoading('Enviando notificación de prueba...');
+            // Simular test de notificaciones
+            setTimeout(async () => {
+                alert('📢 Notificación de prueba enviada');
+                await window.dashboard.loadDashboard();
+            }, 1500);
+        }
+
+        // Inicializar dashboard cuando la página carga
+        document.addEventListener('DOMContentLoaded', () => {
+            window.dashboard = new DeployDashboard();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,195 @@
+{
+  "name": "POS-CONEJONEGRO-REPAIR-SYSTEM",
+  "version": "1.0.0",
+  "mode": "active_repair",
+  "project": {
+    "name": "POS-CONEJONEGRO",
+    "repository": "mugentime/POS-CONEJONEGRO",
+    "branch": "main",
+    "production_url": "https://pos-conejo-negro.onrender.com"
+  },
+  "repair_workflow": {
+    "enabled": true,
+    "auto_commit": true,
+    "auto_push": true,
+    "auto_deploy": true,
+    "auto_review": true,
+    "auto_debug": true
+  },
+  "repair_agents": {
+    "TM-AUTOMATION": {
+      "error_type": "automation",
+      "priority": "high",
+      "description": "Reparar corte automático no funciona",
+      "target_files": [
+        "server.js",
+        "routes/cortes.js",
+        "public/js/corte-automatico.js",
+        "scheduler/cron-jobs.js"
+      ],
+      "repair_actions": [
+        "analyze_scheduler_configuration",
+        "fix_cron_job_setup",
+        "implement_automatic_closing",
+        "add_error_handling",
+        "test_automated_process"
+      ],
+      "git_workflow": {
+        "branch": "fix/automatic-cash-closing",
+        "commit_message": "🔧 FIX: Implementar corte automático de caja",
+        "auto_push": true
+      }
+    },
+    "TM-REPORTS": {
+      "error_type": "reports",
+      "priority": "critical",
+      "description": "Reparar sistema de reportes y indexación",
+      "target_files": [
+        "routes/reportes.js",
+        "models/Reporte.js",
+        "public/js/reportes.js",
+        "views/reportes.html",
+        "database/migrations/"
+      ],
+      "repair_actions": [
+        "fix_report_generation_logic",
+        "implement_data_indexing",
+        "create_historical_data_retrieval",
+        "add_report_templates",
+        "implement_data_persistence"
+      ],
+      "git_workflow": {
+        "branch": "fix/reports-and-indexing",
+        "commit_message": "🚨 CRITICAL: Reparar generación de reportes e indexación",
+        "auto_push": true
+      }
+    },
+    "TM-DATABASE": {
+      "error_type": "database",
+      "priority": "high", 
+      "description": "Reparar duplicación de cortes manuales",
+      "target_files": [
+        "models/CorteManual.js",
+        "routes/cortes.js",
+        "database/queries.js",
+        "public/js/corte-manual.js"
+      ],
+      "repair_actions": [
+        "fix_duplicate_transaction_logic",
+        "add_unique_constraints",
+        "implement_transaction_validation",
+        "fix_zero_values_bug",
+        "add_data_integrity_checks"
+      ],
+      "git_workflow": {
+        "branch": "fix/manual-cash-closing-duplicates",
+        "commit_message": "🔧 FIX: Eliminar duplicación en cortes manuales",
+        "auto_push": true
+      }
+    },
+    "TM-PERFORMANCE": {
+      "error_type": "performance",
+      "priority": "critical",
+      "description": "Reparar límite de 5 reportes y eliminación automática",
+      "target_files": [
+        "models/Reporte.js",
+        "storage/report-storage.js",
+        "config/storage-limits.js",
+        "services/data-retention.js"
+      ],
+      "repair_actions": [
+        "remove_arbitrary_report_limit",
+        "implement_proper_data_archiving", 
+        "fix_automatic_deletion_logic",
+        "add_storage_management",
+        "implement_data_retention_policies"
+      ],
+      "git_workflow": {
+        "branch": "fix/report-storage-limits",
+        "commit_message": "🚨 CRITICAL: Eliminar límite de reportes y arreglar almacenamiento",
+        "auto_push": true
+      }
+    },
+    "TM-FEATURES": {
+      "error_type": "features",
+      "priority": "medium",
+      "description": "Implementar sistema completo de registro de gastos",
+      "target_files": [
+        "models/Gasto.js",
+        "routes/gastos.js", 
+        "public/js/gastos.js",
+        "views/gastos.html",
+        "database/migrations/create_gastos.sql"
+      ],
+      "repair_actions": [
+        "create_expense_management_module",
+        "implement_expense_categories",
+        "add_expense_tracking_interface",
+        "create_expense_reports",
+        "integrate_with_financial_reports"
+      ],
+      "git_workflow": {
+        "branch": "feature/expense-management-system",
+        "commit_message": "✨ FEATURE: Implementar sistema completo de registro de gastos",
+        "auto_push": true
+      }
+    }
+  },
+  "repair_pipeline": {
+    "steps": [
+      {
+        "name": "analyze",
+        "description": "Analizar código existente y identificar problema",
+        "timeout": 300
+      },
+      {
+        "name": "repair",
+        "description": "Aplicar reparación específica al código",
+        "timeout": 600
+      },
+      {
+        "name": "test",
+        "description": "Probar la reparación localmente",
+        "timeout": 180
+      },
+      {
+        "name": "commit",
+        "description": "Crear commit con los cambios",
+        "timeout": 60
+      },
+      {
+        "name": "push",
+        "description": "Push a GitHub en branch específico",
+        "timeout": 120
+      },
+      {
+        "name": "deploy",
+        "description": "Trigger deployment en Render",
+        "timeout": 300
+      },
+      {
+        "name": "review",
+        "description": "Verificar deployment y funcionalidad",
+        "timeout": 180
+      },
+      {
+        "name": "debug",
+        "description": "Debug adicional si es necesario",
+        "timeout": 300
+      }
+    ]
+  },
+  "monitoring": {
+    "deployment_check_interval": 30,
+    "health_check_interval": 60,
+    "repair_status_interval": 120,
+    "max_repair_attempts": 3,
+    "rollback_on_failure": true
+  },
+  "notifications": {
+    "github_issues": true,
+    "commit_messages": true,
+    "deployment_status": true,
+    "repair_completion": true
+  }
+}

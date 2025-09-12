@@ -1,0 +1,64 @@
+[
+  {
+    "timestamp": "2025-09-08T15:01:15.339Z",
+    "cycle": 1,
+    "checks": {
+      "local": {
+        "status": "ERROR",
+        "error": ""
+      },
+      "renderExpected": {
+        "status": "OK",
+        "statusCode": 404,
+        "response": "Not Found\n",
+        "headers": {
+          "date": "Mon, 08 Sep 2025 15:01:12 GMT",
+          "content-type": "text/plain; charset=utf-8",
+          "content-length": "10",
+          "connection": "keep-alive",
+          "x-content-type-options": "nosniff",
+          "x-render-routing": "no-server",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97bf51dfb9064766-DFW",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      },
+      "renderAlternate": {
+        "status": "OK",
+        "statusCode": 200,
+        "response": "{\"status\":\"OK\",\"timestamp\":\"2025-09-08T15:01:12.943Z\",\"uptime\":393.886408511,\"environment\":{\"railway\":false,\"node_env\":\"production\"},\"storage\":{\"type\":\"unknown\",\"available\":0,\"used\":0,\"isPersistent\":false,\"backupsCount\":0},\"database\":{\"type\":\"file-based\",\"ready\":true,\"status\":\"ready\",\"path\":\"file-based\"}}",
+        "headers": {
+          "date": "Mon, 08 Sep 2025 15:01:12 GMT",
+          "content-type": "application/json; charset=utf-8",
+          "transfer-encoding": "chunked",
+          "connection": "keep-alive",
+          "access-control-allow-credentials": "true",
+          "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+          "cross-origin-opener-policy": "same-origin",
+          "cross-origin-resource-policy": "same-origin",
+          "etag": "W/\"132-TNTmmP+Zf5H286ILRWk3eNiGV7s\"",
+          "origin-agent-cluster": "?1",
+          "referrer-policy": "no-referrer",
+          "rndr-id": "9583cba2-9954-474a",
+          "strict-transport-security": "max-age=15552000; includeSubDomains",
+          "vary": "Origin, Accept-Encoding",
+          "x-content-type-options": "nosniff",
+          "x-dns-prefetch-control": "off",
+          "x-download-options": "noopen",
+          "x-frame-options": "SAMEORIGIN",
+          "x-permitted-cross-domain-policies": "none",
+          "x-ratelimit-limit": "100",
+          "x-ratelimit-remaining": "76",
+          "x-ratelimit-reset": "1757344188",
+          "x-render-origin-server": "Render",
+          "x-xss-protection": "0",
+          "cf-cache-status": "DYNAMIC",
+          "server": "cloudflare",
+          "cf-ray": "97bf51e25e4828e5-DFW",
+          "alt-svc": "h3=\":443\"; ma=86400"
+        }
+      }
+    }
+  }
+]

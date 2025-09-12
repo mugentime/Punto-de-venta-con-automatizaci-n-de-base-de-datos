@@ -1,0 +1,8 @@
+﻿{
+    "Subject":  "CN=onrender.com",
+    "Issuer":  "CN=WE1, O=Google Trust Services, C=US",
+    "NotBefore":  "\/Date(1754330033000)\/",
+    "NotAfter":  "\/Date(1762109631000)\/",
+    "Thumbprint":  "352E63E4DAF7747C3B60F41B871E163E3AE208EF",
+    "HasPrivateKey":  false
+}

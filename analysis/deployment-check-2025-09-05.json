@@ -1,0 +1,437 @@
+[
+  {
+    "timestamp": "2025-09-05T17:31:03.642Z",
+    "localGit": {
+      "latestCommit": "83658f1 📝 Archive mobile scroll fix troubleshooting session",
+      "recentCommits": [
+        "83658f1 📝 Archive mobile scroll fix troubleshooting session\nabd8649 📚 DOCS: Create conversation archive system\naeacd53 CRITICAL FIX: Add mobile scrolling optimizations to index.html\na9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-04T17:32:05Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:41:04.962Z",
+    "localGit": {
+      "latestCommit": "83658f1 📝 Archive mobile scroll fix troubleshooting session",
+      "recentCommits": [
+        "83658f1 📝 Archive mobile scroll fix troubleshooting session\nabd8649 📚 DOCS: Create conversation archive system\naeacd53 CRITICAL FIX: Add mobile scrolling optimizations to index.html\na9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-04T17:32:05Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:51:04.974Z",
+    "localGit": {
+      "latestCommit": "83658f1 📝 Archive mobile scroll fix troubleshooting session",
+      "recentCommits": [
+        "83658f1 📝 Archive mobile scroll fix troubleshooting session\nabd8649 📚 DOCS: Create conversation archive system\naeacd53 CRITICAL FIX: Add mobile scrolling optimizations to index.html\na9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-04T17:32:05Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:01:05.629Z",
+    "localGit": {
+      "latestCommit": "83658f1 📝 Archive mobile scroll fix troubleshooting session",
+      "recentCommits": [
+        "83658f1 📝 Archive mobile scroll fix troubleshooting session\nabd8649 📚 DOCS: Create conversation archive system\naeacd53 CRITICAL FIX: Add mobile scrolling optimizations to index.html\na9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors"
+      ],
+      "branch": "fix/automatic-cash-closing"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:00:57Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:11:05.633Z",
+    "localGit": {
+      "latestCommit": "db76368 Merge pull request #3 from mugentime/fix/reports-and-indexing",
+      "recentCommits": [
+        "db76368 Merge pull request #3 from mugentime/fix/reports-and-indexing\nef7bb2b 🔧 FIX: Sistema optimizado de reportes e indexación con ElasticSearch\n330cd67 Merge pull request #2 from mugentime/fix/automatic-cash-closing\nad8ff65 🔧 FIX: Mejorar sistema de corte automático con integración al supervisor\n83658f1 📝 Archive mobile scroll fix troubleshooting session"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:11:03Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:21:05.644Z",
+    "localGit": {
+      "latestCommit": "83658f1 📝 Archive mobile scroll fix troubleshooting session",
+      "recentCommits": [
+        "83658f1 📝 Archive mobile scroll fix troubleshooting session\nabd8649 📚 DOCS: Create conversation archive system\naeacd53 CRITICAL FIX: Add mobile scrolling optimizations to index.html\na9fd6cc 🔧 CRITICAL FIX: Restore proper mobile scrolling\n64e2434 🐛 Fix coworking module JavaScript errors"
+      ],
+      "branch": "feature/expense-management-system"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:20:52Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:31:05.657Z",
+    "localGit": {
+      "latestCommit": "8552260 Merge pull request #6 from mugentime/feature/expense-management-system",
+      "recentCommits": [
+        "8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento\n3694546 Merge pull request #4 from mugentime/fix/manual-cash-closing-duplicates"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:25:34Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:41:05.664Z",
+    "localGit": {
+      "latestCommit": "8552260 Merge pull request #6 from mugentime/feature/expense-management-system",
+      "recentCommits": [
+        "8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento\n3694546 Merge pull request #4 from mugentime/fix/manual-cash-closing-duplicates"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:25:34Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:51:05.680Z",
+    "localGit": {
+      "latestCommit": "8552260 Merge pull request #6 from mugentime/feature/expense-management-system",
+      "recentCommits": [
+        "8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento\n3694546 Merge pull request #4 from mugentime/fix/manual-cash-closing-duplicates"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:25:34Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:01:12.753Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:11:12.766Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:21:12.776Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:31:12.782Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:41:12.789Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:51:12.791Z",
+    "localGit": {
+      "latestCommit": "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts",
+      "recentCommits": [
+        "2c263a1 🔧 TaskMaster: Fix duplicate cash cuts with zero amounts\n8552260 Merge pull request #6 from mugentime/feature/expense-management-system\ndc26d2c 🚀 FEATURE: Sistema completo de gestión de gastos empresariales\n1c0d560 Merge pull request #5 from mugentime/fix/report-storage-limits\nd6551f1 🔧 FIX: Sistema inteligente de gestión de límites de almacenamiento"
+      ],
+      "branch": "main"
+    },
+    "github": {
+      "defaultBranchRef": {
+        "name": "main"
+      },
+      "description": "LISTO PARA RAILWAY",
+      "name": "POS-CONEJONEGRO",
+      "pushedAt": "2025-09-05T18:55:45Z",
+      "visibility": "PUBLIC"
+    },
+    "renderDebug": {
+      "configuredServiceName": "pos-conejo-negro",
+      "expectedUrl": "https://conejo-negro-pos.onrender.com",
+      "alternateUrl": "https://pos-conejo-negro.onrender.com",
+      "renderYamlCheck": {
+        "hasAutoDeploy": true,
+        "hasBranchMain": true,
+        "serviceName": "pos-conejo-negro"
+      }
+    }
+  }
+]

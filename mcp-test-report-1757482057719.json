@@ -1,0 +1,686 @@
+{
+  "testResults": [
+    {
+      "timestamp": "2025-09-10T05:27:05.662Z",
+      "level": "INFO",
+      "message": "🚀 Starting MCP-supervised comprehensive POS test",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:05.888Z",
+      "level": "INFO",
+      "message": "🌐 TEST 1: System Availability Check",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.620Z",
+      "level": "SUCCESS",
+      "message": "Main page loaded successfully",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.621Z",
+      "level": "INFO",
+      "message": "🔐 TEST 2: Authentication System",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.652Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in auth: Email input field not found",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482028652",
+          "component": "auth",
+          "issue": "Email input field not found",
+          "severity": "high",
+          "context": {},
+          "timestamp": "2025-09-10T05:27:08.652Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.653Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482028652",
+      "data": {
+        "bugId": "BUG-1757482028652",
+        "component": "auth",
+        "issue": "Email input field not found",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "CRITICAL",
+        "timestamp": "2025-09-10T05:27:08.653Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.653Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in auth: Password input field not found",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482028653",
+          "component": "auth",
+          "issue": "Password input field not found",
+          "severity": "high",
+          "context": {},
+          "timestamp": "2025-09-10T05:27:08.653Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.653Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482028653",
+      "data": {
+        "bugId": "BUG-1757482028653",
+        "component": "auth",
+        "issue": "Password input field not found",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "CRITICAL",
+        "timestamp": "2025-09-10T05:27:08.653Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.653Z",
+      "level": "INFO",
+      "message": "🧭 TEST 3: Navigation System",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:08.654Z",
+      "level": "INFO",
+      "message": "Testing Dashboard page...",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:12.502Z",
+      "level": "SUCCESS",
+      "message": "Dashboard page loaded",
+      "data": {
+        "title": "Conejo Negro - Café Coworking Online",
+        "url": "/online"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:12.523Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in navigation: Dashboard page shows error content",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482032523",
+          "component": "navigation",
+          "issue": "Dashboard page shows error content",
+          "severity": "medium",
+          "context": {
+            "url": "/online",
+            "title": "Conejo Negro - Café Coworking Online"
+          },
+          "timestamp": "2025-09-10T05:27:12.523Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:12.524Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482032523",
+      "data": {
+        "bugId": "BUG-1757482032523",
+        "component": "navigation",
+        "issue": "Dashboard page shows error content",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:12.524Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:12.524Z",
+      "level": "INFO",
+      "message": "Testing Clientes page...",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:16.085Z",
+      "level": "SUCCESS",
+      "message": "Clientes page loaded",
+      "data": {
+        "title": "Gestión de Clientes - POS Conejo Negro",
+        "url": "/clientes"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:16.098Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in navigation: Clientes page shows error content",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482036098",
+          "component": "navigation",
+          "issue": "Clientes page shows error content",
+          "severity": "medium",
+          "context": {
+            "url": "/clientes",
+            "title": "Gestión de Clientes - POS Conejo Negro"
+          },
+          "timestamp": "2025-09-10T05:27:16.098Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:16.099Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482036098",
+      "data": {
+        "bugId": "BUG-1757482036098",
+        "component": "navigation",
+        "issue": "Clientes page shows error content",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:16.099Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:16.099Z",
+      "level": "INFO",
+      "message": "Testing Coworking page...",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:19.949Z",
+      "level": "SUCCESS",
+      "message": "Coworking page loaded",
+      "data": {
+        "title": "Conejo Negro - POS System",
+        "url": "/coworking"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:19.960Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in navigation: Coworking page shows error content",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482039960",
+          "component": "navigation",
+          "issue": "Coworking page shows error content",
+          "severity": "medium",
+          "context": {
+            "url": "/coworking",
+            "title": "Conejo Negro - POS System"
+          },
+          "timestamp": "2025-09-10T05:27:19.960Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:19.960Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482039960",
+      "data": {
+        "bugId": "BUG-1757482039960",
+        "component": "navigation",
+        "issue": "Coworking page shows error content",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:19.960Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:19.960Z",
+      "level": "INFO",
+      "message": "Testing Gastos page...",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:23.134Z",
+      "level": "SUCCESS",
+      "message": "Gastos page loaded",
+      "data": {
+        "title": "",
+        "url": "/gastos"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:23.146Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in navigation: Gastos page shows error content",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482043146",
+          "component": "navigation",
+          "issue": "Gastos page shows error content",
+          "severity": "medium",
+          "context": {
+            "url": "/gastos",
+            "title": ""
+          },
+          "timestamp": "2025-09-10T05:27:23.146Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:23.146Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482043146",
+      "data": {
+        "bugId": "BUG-1757482043146",
+        "component": "navigation",
+        "issue": "Gastos page shows error content",
+        "recommendedActions": [
+          "Generic debugging required"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:23.146Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:23.146Z",
+      "level": "INFO",
+      "message": "🎨 TEST 4: UI Elements and Styling",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:27.694Z",
+      "level": "SUCCESS",
+      "message": "Found 7 navigation elements",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:27.697Z",
+      "level": "SUCCESS",
+      "message": "Found 13 interface elements",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:27.697Z",
+      "level": "INFO",
+      "message": "🔗 TEST 5: API Endpoints",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.013Z",
+      "level": "SUCCESS",
+      "message": "API endpoint /api/health responding",
+      "data": {
+        "status": 200
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.178Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in api: API endpoint /api/stats failed",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482048177",
+          "component": "api",
+          "issue": "API endpoint /api/stats failed",
+          "severity": "medium",
+          "context": {
+            "status": 401,
+            "statusText": "Unauthorized"
+          },
+          "timestamp": "2025-09-10T05:27:28.177Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.181Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482048177",
+      "data": {
+        "bugId": "BUG-1757482048177",
+        "component": "api",
+        "issue": "API endpoint /api/stats failed",
+        "recommendedActions": [
+          "Check API endpoint availability",
+          "Verify database connection",
+          "Test authentication middleware",
+          "Validate request/response format"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:28.181Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.339Z",
+      "level": "ERROR",
+      "message": "🐛 Bug detected in api: API endpoint /api/products failed",
+      "data": {
+        "bug": {
+          "id": "BUG-1757482048339",
+          "component": "api",
+          "issue": "API endpoint /api/products failed",
+          "severity": "medium",
+          "context": {
+            "status": 401,
+            "statusText": "Unauthorized"
+          },
+          "timestamp": "2025-09-10T05:27:28.339Z",
+          "status": "detected"
+        }
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.340Z",
+      "level": "INFO",
+      "message": "🧠 Hive Mind analysis triggered for BUG-1757482048339",
+      "data": {
+        "bugId": "BUG-1757482048339",
+        "component": "api",
+        "issue": "API endpoint /api/products failed",
+        "recommendedActions": [
+          "Check API endpoint availability",
+          "Verify database connection",
+          "Test authentication middleware",
+          "Validate request/response format"
+        ],
+        "priority": "HIGH",
+        "timestamp": "2025-09-10T05:27:28.339Z"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:28.340Z",
+      "level": "INFO",
+      "message": "📱 TEST 6: Responsive Design",
+      "data": {},
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:29.364Z",
+      "level": "SUCCESS",
+      "message": "Page responsive at Desktop Large",
+      "data": {
+        "width": 1920,
+        "height": 1080,
+        "name": "Desktop Large"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:30.389Z",
+      "level": "SUCCESS",
+      "message": "Page responsive at Desktop Standard",
+      "data": {
+        "width": 1200,
+        "height": 800,
+        "name": "Desktop Standard"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:31.419Z",
+      "level": "SUCCESS",
+      "message": "Page responsive at Tablet",
+      "data": {
+        "width": 768,
+        "height": 1024,
+        "name": "Tablet"
+      },
+      "source": "TaskMaster-MCP"
+    },
+    {
+      "timestamp": "2025-09-10T05:27:32.447Z",
+      "level": "SUCCESS",
+      "message": "Page responsive at Mobile",
+      "data": {
+        "width": 375,
+        "height": 667,
+        "name": "Mobile"
+      },
+      "source": "TaskMaster-MCP"
+    }
+  ],
+  "bugReports": [
+    {
+      "id": "BUG-1757482028652",
+      "component": "auth",
+      "issue": "Email input field not found",
+      "severity": "high",
+      "context": {},
+      "timestamp": "2025-09-10T05:27:08.652Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482028653",
+      "component": "auth",
+      "issue": "Password input field not found",
+      "severity": "high",
+      "context": {},
+      "timestamp": "2025-09-10T05:27:08.653Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482032523",
+      "component": "navigation",
+      "issue": "Dashboard page shows error content",
+      "severity": "medium",
+      "context": {
+        "url": "/online",
+        "title": "Conejo Negro - Café Coworking Online"
+      },
+      "timestamp": "2025-09-10T05:27:12.523Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482036098",
+      "component": "navigation",
+      "issue": "Clientes page shows error content",
+      "severity": "medium",
+      "context": {
+        "url": "/clientes",
+        "title": "Gestión de Clientes - POS Conejo Negro"
+      },
+      "timestamp": "2025-09-10T05:27:16.098Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482039960",
+      "component": "navigation",
+      "issue": "Coworking page shows error content",
+      "severity": "medium",
+      "context": {
+        "url": "/coworking",
+        "title": "Conejo Negro - POS System"
+      },
+      "timestamp": "2025-09-10T05:27:19.960Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482043146",
+      "component": "navigation",
+      "issue": "Gastos page shows error content",
+      "severity": "medium",
+      "context": {
+        "url": "/gastos",
+        "title": ""
+      },
+      "timestamp": "2025-09-10T05:27:23.146Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482048177",
+      "component": "api",
+      "issue": "API endpoint /api/stats failed",
+      "severity": "medium",
+      "context": {
+        "status": 401,
+        "statusText": "Unauthorized"
+      },
+      "timestamp": "2025-09-10T05:27:28.177Z",
+      "status": "detected"
+    },
+    {
+      "id": "BUG-1757482048339",
+      "component": "api",
+      "issue": "API endpoint /api/products failed",
+      "severity": "medium",
+      "context": {
+        "status": 401,
+        "statusText": "Unauthorized"
+      },
+      "timestamp": "2025-09-10T05:27:28.339Z",
+      "status": "detected"
+    }
+  ],
+  "hiveMindReports": [
+    {
+      "bugId": "BUG-1757482028652",
+      "component": "auth",
+      "issue": "Email input field not found",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "CRITICAL",
+      "timestamp": "2025-09-10T05:27:08.653Z"
+    },
+    {
+      "bugId": "BUG-1757482028653",
+      "component": "auth",
+      "issue": "Password input field not found",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "CRITICAL",
+      "timestamp": "2025-09-10T05:27:08.653Z"
+    },
+    {
+      "bugId": "BUG-1757482032523",
+      "component": "navigation",
+      "issue": "Dashboard page shows error content",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:12.524Z"
+    },
+    {
+      "bugId": "BUG-1757482036098",
+      "component": "navigation",
+      "issue": "Clientes page shows error content",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:16.099Z"
+    },
+    {
+      "bugId": "BUG-1757482039960",
+      "component": "navigation",
+      "issue": "Coworking page shows error content",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:19.960Z"
+    },
+    {
+      "bugId": "BUG-1757482043146",
+      "component": "navigation",
+      "issue": "Gastos page shows error content",
+      "recommendedActions": [
+        "Generic debugging required"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:23.146Z"
+    },
+    {
+      "bugId": "BUG-1757482048177",
+      "component": "api",
+      "issue": "API endpoint /api/stats failed",
+      "recommendedActions": [
+        "Check API endpoint availability",
+        "Verify database connection",
+        "Test authentication middleware",
+        "Validate request/response format"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:28.181Z"
+    },
+    {
+      "bugId": "BUG-1757482048339",
+      "component": "api",
+      "issue": "API endpoint /api/products failed",
+      "recommendedActions": [
+        "Check API endpoint availability",
+        "Verify database connection",
+        "Test authentication middleware",
+        "Validate request/response format"
+      ],
+      "priority": "HIGH",
+      "timestamp": "2025-09-10T05:27:28.339Z"
+    }
+  ],
+  "summary": {
+    "totalTests": 39,
+    "bugsFound": 8,
+    "hiveMindAnalyses": 8,
+    "criticalIssues": 2,
+    "recommendations": [
+      "Generic debugging required",
+      "Generic debugging required",
+      "Generic debugging required",
+      "Generic debugging required",
+      "Generic debugging required",
+      "Generic debugging required",
+      "Check API endpoint availability",
+      "Verify database connection",
+      "Test authentication middleware",
+      "Validate request/response format",
+      "Check API endpoint availability",
+      "Verify database connection",
+      "Test authentication middleware",
+      "Validate request/response format"
+    ],
+    "timestamp": "2025-09-10T05:27:37.718Z"
+  }
+}

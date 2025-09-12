@@ -1,0 +1,171 @@
+{
+  "name": "conejo-negro-pos-taskmaster",
+  "version": "1.0.0",
+  "mode": "agent",
+  "agentMode": true,
+  "project": {
+    "name": "POS-CONEJONEGRO",
+    "repository": "mugentime/POS-CONEJONEGRO",
+    "owner": "mugentime",
+    "defaultBranch": "main"
+  },
+  "schedules": {
+    "healthChecks": "*/5 * * * *",
+    "deploymentChecks": "*/10 * * * *",
+    "issueSync": "*/15 * * * *"
+  },
+  "environment": {
+    "variables": {
+      "REPO_OWNER": "mugentime",
+      "REPO_NAME": "POS-CONEJONEGRO",
+      "REPO_SLUG": "mugentime/POS-CONEJONEGRO",
+      "RENDER_SERVICE_NAME": "pos-conejo-negro",
+      "RENDER_SERVICE_ID": "srv-d2sf0q7diees738qcq3g",
+      "PRODUCTION_URL": "https://pos-conejo-negro.onrender.com"
+    },
+    "secrets": {
+      "GITHUB_TOKEN": "${GITHUB_TOKEN}",
+      "RENDER_API_KEY": "${RENDER_API_KEY}"
+    }
+  },
+  "mcp": {
+    "servers": {
+      "github": {
+        "type": "stdio",
+        "command": "gh",
+        "args": ["api"],
+        "description": "GitHub CLI-based MCP for repository operations"
+      },
+      "render": {
+        "type": "http",
+        "baseUrl": "https://api.render.com",
+        "authentication": {
+          "type": "bearer",
+          "token": "${RENDER_API_KEY}"
+        },
+        "description": "Render API for deployment monitoring"
+      }
+    }
+  },
+  "monitors": {
+    "health": {
+      "targets": [
+        "http://localhost:3000",
+        "https://conejo-negro-pos.onrender.com",
+        "https://pos-conejo-negro.onrender.com"
+      ],
+      "timeoutMs": 8000,
+      "expectStatus": 200,
+      "alerting": {
+        "onFailure": "create_github_issue",
+        "severity": "P0"
+      }
+    },
+    "deployments": {
+      "render": {
+        "serviceName": "pos-conejo-negro",
+        "watchEvents": true
+      },
+      "git": {
+        "repo": "mugentime/POS-CONEJONEGRO",
+        "watchBranches": ["main"],
+        "includeCommitDiffSummary": true
+      }
+    },
+    "issues": {
+      "repo": "mugentime/POS-CONEJONEGRO",
+      "labelsToSync": ["P0", "P1", "bug", "production", "outage"],
+      "categorization": {
+        "priority": {
+          "P0": "critical",
+          "P1": "high"
+        }
+      }
+    }
+  },
+  "workflows": {
+    "monitoring": {
+      "healthCheck": {
+        "enabled": true,
+        "interval": "5m",
+        "endpoints": [
+          "${PRODUCTION_URL}/api/health",
+          "${PRODUCTION_URL}/"
+        ],
+        "alerting": {
+          "onFailure": "create_github_issue",
+          "severity": "P0"
+        }
+      },
+      "deploymentMonitoring": {
+        "enabled": true,
+        "interval": "10m",
+        "actions": [
+          "check_render_deploy_status",
+          "validate_recent_commits"
+        ]
+      },
+      "issueSync": {
+        "enabled": true,
+        "interval": "15m",
+        "actions": [
+          "fetch_github_issues",
+          "categorize_and_prioritize",
+          "update_project_status"
+        ]
+      }
+    }
+  },
+  "outputs": {
+    "logs": "./logs",
+    "analysis": "./analysis",
+    "reports": "./analysis"
+  },
+  "policies": {
+    "rateLimiting": {
+      "github": {
+        "requestsPerHour": 5000,
+        "burstLimit": 100
+      },
+      "render": {
+        "requestsPerHour": 1000,
+        "burstLimit": 50
+      }
+    },
+    "retryPolicy": {
+      "maxRetries": 3,
+      "backoffMultiplier": 2,
+      "initialDelay": "1s"
+    }
+  },
+  "notifications": {
+    "channels": ["console", "githubIssues"],
+    "onFailure": ["log", "github.issueComment"],
+    "onCritical": ["log", "github.issueLabel", "github.issueAssign"],
+    "github": {
+      "type": "github_issue",
+      "repository": "mugentime/POS-CONEJONEGRO",
+      "labels": ["alert", "taskmaster"]
+    },
+    "rules": [
+      {
+        "condition": "health_check_failure",
+        "severity": "P0",
+        "channel": "github",
+        "template": "production_down_alert"
+      },
+      {
+        "condition": "deployment_failure",
+        "severity": "P1", 
+        "channel": "github",
+        "template": "deployment_failure_alert"
+      }
+    ]
+  },
+  "logging": {
+    "level": "info",
+    "file": "logs/taskmaster-agent.log",
+    "maxSizeMb": 10,
+    "maxFiles": 5
+  }
+}

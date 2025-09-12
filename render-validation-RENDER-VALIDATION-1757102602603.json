@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-09-05T20:03:23.408Z",
+  "correlationId": "RENDER-VALIDATION-1757102602603",
+  "renderUrl": "https://pos-conejo-negro.onrender.com",
+  "serviceId": "srv-d2sf0q7diees738qcq3g",
+  "totalTests": 4,
+  "passedTests": 3,
+  "failedTests": 1,
+  "deployStatus": "RUNNING_OLD_VERSION",
+  "results": [
+    {
+      "test": "basic_health",
+      "passed": true,
+      "details": {
+        "uptime": 3942.434246817,
+        "environment": {
+          "railway": false,
+          "node_env": "production"
+        }
+      }
+    },
+    {
+      "test": "taskmaster_files",
+      "passed": true,
+      "details": "Files check completed"
+    },
+    {
+      "test": "cashcuts_endpoint",
+      "passed": true,
+      "details": "Endpoint exists, requires auth"
+    },
+    {
+      "test": "recent_deploy",
+      "passed": false,
+      "details": {
+        "uptime": 3942.88391778,
+        "indication": "No recent restart detected"
+      }
+    }
+  ],
+  "recommendation": "Activar deploy manual de Render - Cambios no desplegados"
+}

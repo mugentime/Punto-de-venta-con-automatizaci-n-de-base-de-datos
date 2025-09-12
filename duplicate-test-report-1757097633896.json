@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-09-05T18:40:34.151Z",
+  "correlationId": "1757097633896",
+  "summary": {
+    "testsRun": 3,
+    "duplicatesDetected": false,
+    "zeroAmountsDetected": false
+  },
+  "testResults": [
+    {
+      "test": "sequential_duplicates",
+      "error": "Request failed with status code 401",
+      "response": {
+        "error": "No token provided"
+      }
+    },
+    {
+      "test": "concurrent_duplicates",
+      "totalRequests": 10,
+      "successful": 0,
+      "failed": 10,
+      "uniqueCashCuts": 0,
+      "zeroAmountResponses": 0,
+      "duplicatesCreated": 0,
+      "details": {
+        "uniqueIds": [],
+        "zeroAmountResponses": [],
+        "failedRequests": [
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401",
+          "Request failed with status code 401"
+        ]
+      }
+    },
+    {
+      "test": "database_state",
+      "totalRecentCuts": 0,
+      "duplicateGroups": 0,
+      "details": []
+    }
+  ]
+}

@@ -1,0 +1,548 @@
+[
+  {
+    "timestamp": "2025-09-05T17:50:27.766Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 300.0503179,
+        "timestamp": "2025-09-05T17:50:27.765Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T17:55:27.771Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 600.0547432,
+        "timestamp": "2025-09-05T17:55:27.769Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:00:27.785Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 900.0691252,
+        "timestamp": "2025-09-05T18:00:27.784Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:05:27.796Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 1200.080252,
+        "timestamp": "2025-09-05T18:05:27.794Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:10:27.808Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 1500.0917396,
+        "timestamp": "2025-09-05T18:10:27.807Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:15:27.820Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 1800.1032047,
+        "timestamp": "2025-09-05T18:15:27.818Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:20:27.821Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 2100.1044959,
+        "timestamp": "2025-09-05T18:20:27.819Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:25:27.835Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 2400.1182596,
+        "timestamp": "2025-09-05T18:25:27.833Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:30:27.846Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 2700.1301551,
+        "timestamp": "2025-09-05T18:30:27.845Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:35:27.848Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 3000.1317958,
+        "timestamp": "2025-09-05T18:35:27.847Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:40:27.862Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 3300.1461469,
+        "timestamp": "2025-09-05T18:40:27.860Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:45:27.873Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 3600.1565323,
+        "timestamp": "2025-09-05T18:45:27.872Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:50:27.885Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 3900.168701,
+        "timestamp": "2025-09-05T18:50:27.884Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T18:55:27.898Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 4200.1826723,
+        "timestamp": "2025-09-05T18:55:27.897Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:00:27.900Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 4500.1847184,
+        "timestamp": "2025-09-05T19:00:27.899Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:05:27.915Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 4800.1988321,
+        "timestamp": "2025-09-05T19:05:27.914Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:10:27.925Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 5100.2092669,
+        "timestamp": "2025-09-05T19:10:27.924Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:15:27.936Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 5400.2205489,
+        "timestamp": "2025-09-05T19:15:27.935Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:20:27.947Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 5700.2312584,
+        "timestamp": "2025-09-05T19:20:27.946Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:25:27.951Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 6000.2357423,
+        "timestamp": "2025-09-05T19:25:27.950Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:30:27.952Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 6300.2358794,
+        "timestamp": "2025-09-05T19:30:27.950Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:35:27.962Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 6600.2471904,
+        "timestamp": "2025-09-05T19:35:27.961Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:40:27.977Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 6900.2607155,
+        "timestamp": "2025-09-05T19:40:27.976Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:45:27.984Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 7200.2688776,
+        "timestamp": "2025-09-05T19:45:27.983Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:50:27.986Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 7500.2700875,
+        "timestamp": "2025-09-05T19:50:27.984Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  },
+  {
+    "timestamp": "2025-09-05T19:55:27.986Z",
+    "status": {
+      "supervisor": {
+        "id": "SUPERVISOR-MAIN",
+        "status": "running",
+        "uptime": 7800.2710152,
+        "timestamp": "2025-09-05T19:55:27.985Z"
+      },
+      "instances": {
+        "total": 0,
+        "active": 0,
+        "list": []
+      },
+      "errorTypes": [],
+      "communication": {
+        "port": 3001,
+        "server_status": "active"
+      }
+    }
+  }
+]

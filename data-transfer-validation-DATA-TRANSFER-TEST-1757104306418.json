@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-09-05T20:31:46.485Z",
+  "correlationId": "DATA-TRANSFER-TEST-1757104306418",
+  "testType": "cash_cut_data_transfer_validation",
+  "summary": {
+    "totalTests": 2,
+    "passedTests": 1,
+    "failedTests": 1,
+    "allTestsPassed": false,
+    "dataTransferFixed": false,
+    "duplicatePreventionIntact": true
+  },
+  "testResults": [
+    {
+      "test": "data_transfer",
+      "passed": false,
+      "details": {
+        "expected": {
+          "records": 4,
+          "income": 785.5,
+          "cost": 175
+        },
+        "actual": {
+          "records": 3,
+          "income": 485.5,
+          "cost": 175
+        },
+        "validations": {
+          "recordsMatch": false,
+          "incomeCorrect": false,
+          "costsCorrect": true,
+          "hasPaymentBreakdown": true,
+          "hasServiceBreakdown": true,
+          "hasTaskMasterProtection": true
+        },
+        "cashCutId": "1757104306457xbo1a4dci"
+      }
+    },
+    {
+      "test": "duplicate_prevention",
+      "passed": true,
+      "details": {
+        "cut1Id": "1757104306472fbcdw8dwj",
+        "cut2Id": "1757104306472fbcdw8dwj",
+        "duplicatesPrevented": true,
+        "dataConsistent": true
+      }
+    }
+  ]
+}

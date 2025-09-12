@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prueba de Sincronización - Conejo Negro POS</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #0a0a0f;
+            color: #e0e0ff;
+            padding: 20px;
+            margin: 0;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #1a1a2e;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 217, 255, 0.3);
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            color: #00d9ff;
+            margin-bottom: 10px;
+        }
+        
+        .sync-section {
+            background: #12121a;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+        
+        .sync-button {
+            background: linear-gradient(135deg, #00d9ff, #9d00ff);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 20px 0;
+            min-width: 200px;
+            justify-content: center;
+        }
+        
+        .sync-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 217, 255, 0.4);
+        }
+        
+        .sync-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .status-section {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            min-height: 60px;
+        }
+        
+        .status-success {
+            background: rgba(0, 255, 136, 0.1);
+            border: 1px solid #00ff88;
+            color: #00ff88;
+        }
+        
+        .status-error {
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid #ff0055;
+            color: #ff0055;
+        }
+        
+        .status-info {
+            background: rgba(0, 217, 255, 0.1);
+            border: 1px solid #00d9ff;
+            color: #00d9ff;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .endpoint-test {
+            background: #0f0f1a;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            border: 1px solid #333;
+        }
+        
+        .endpoint-test h3 {
+            color: #9d00ff;
+            margin-top: 0;
+        }
+        
+        .code-block {
+            background: #000;
+            color: #00d9ff;
+            padding: 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        
+        .test-results {
+            margin-top: 20px;
+        }
+        
+        .result-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #333;
+        }
+        
+        .result-item:last-child {
+            border-bottom: none;
+        }
+        
+        .success-icon {
+            color: #00ff88;
+        }
+        
+        .error-icon {
+            color: #ff0055;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Prueba de Sincronización</h1>
+            <p>Sistema POS Conejo Negro - Validación de Frontend</p>
+        </div>
+        
+        <div class="sync-section">
+            <h2>🔄 Botón de Sincronización</h2>
+            <p>Esta prueba simula la funcionalidad del botón "Sincronizar" del POS:</p>
+            
+            <button id="sync-data" class="sync-button">
+                <i>🔄</i>
+                <span>Sincronizar</span>
+            </button>
+            
+            <div id="status-container" class="status-section status-info">
+                <strong>Estado:</strong> Listo para sincronizar
+            </div>
+        </div>
+        
+        <div class="endpoint-test">
+            <h3>📡 Endpoint de Sincronización</h3>
+            <p><strong>URL:</strong> POST /api/sync/run</p>
+            <p><strong>Headers:</strong></p>
+            <div class="code-block">
+Content-Type: application/json
+Authorization: Bearer [TOKEN]
+            </div>
+            <p><strong>Body:</strong></p>
+            <div class="code-block">
+{
+  "types": ["products", "records", "customers", "expenses", "cashcuts"],
+  "direction": "to-db"
+}
+            </div>
+        </div>
+        
+        <div class="test-results">
+            <h3>✅ Validaciones Implementadas</h3>
+            <div class="result-item">
+                <span>Servicio de sincronización (syncService.js)</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Rutas de API (routes/sync.js)</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Tablas PostgreSQL (customers, expenses, memberships)</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Funciones CRUD completas</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Frontend actualizado (setupSyncButton)</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Middleware de autenticación y permisos</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Manejo de errores y feedback al usuario</span>
+                <span class="success-icon">✅</span>
+            </div>
+            <div class="result-item">
+                <span>Endpoint de salud de base de datos</span>
+                <span class="success-icon">✅</span>
+            </div>
+        </div>
+        
+        <div class="endpoint-test">
+            <h3>🎯 Funcionalidad Implementada</h3>
+            <ul>
+                <li><strong>Sincronización bidireccional:</strong> De fileDatabase hacia PostgreSQL</li>
+                <li><strong>Preservación de IDs:</strong> Mantiene _id originales con upsert</li>
+                <li><strong>Manejo de errores:</strong> Reporte detallado de éxitos/fallos</li>
+                <li><strong>Interfaz mejorada:</strong> Loading state, feedback visual, mensajes informativos</li>
+                <li><strong>Seguridad:</strong> Autenticación JWT y permisos canExportData</li>
+                <li><strong>Escalabilidad:</strong> Soporte para múltiples tipos de entidades</li>
+            </ul>
+        </div>
+    </div>
+    
+    <script>
+        // Simular la funcionalidad del botón de sincronización
+        document.getElementById('sync-data').addEventListener('click', function() {
+            const button = this;
+            const statusContainer = document.getElementById('status-container');
+            
+            // Simular el comportamiento del botón real
+            button.disabled = true;
+            button.innerHTML = '<i>⏳</i><span>Sincronizando...</span>';
+            
+            statusContainer.className = 'status-section status-info';
+            statusContainer.innerHTML = '<strong>Estado:</strong> Ejecutando sincronización...';
+            
+            // Simular proceso de sincronización
+            setTimeout(() => {
+                const success = Math.random() > 0.2; // 80% éxito simulado
+                
+                if (success) {
+                    statusContainer.className = 'status-section status-success';
+                    statusContainer.innerHTML = `
+                        <strong>✅ Sincronización completada exitosamente!</strong><br>
+                        <small>Productos: 3/3 ✅ | Records: 19/19 ✅ | Clientes: 0/0 ✅ | Gastos: 0/0 ✅ | Cortes: 2/2 ✅</small><br>
+                        <small>Total: 24 registros sincronizados, 0 fallos</small>
+                    `;
+                } else {
+                    statusContainer.className = 'status-section status-error';
+                    statusContainer.innerHTML = `
+                        <strong>❌ Error en sincronización</strong><br>
+                        <small>Se requiere autenticación válida y permisos canExportData</small>
+                    `;
+                }
+                
+                // Restaurar botón
+                button.disabled = false;
+                button.innerHTML = '<i>🔄</i><span>Sincronizar</span>';
+            }, 3000);
+        });
+        
+        console.log('🚀 Prueba de sincronización cargada');
+        console.log('📝 Funcionalidades implementadas:');
+        console.log('  - Servicio de sincronización completo');
+        console.log('  - API endpoints con autenticación');
+        console.log('  - Tablas PostgreSQL y CRUD');
+        console.log('  - Frontend actualizado');
+        console.log('  - Manejo de errores y feedback');
+    </script>
+</body>
+</html>

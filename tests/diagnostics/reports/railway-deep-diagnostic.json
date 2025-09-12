@@ -1,0 +1,272 @@
+{
+  "timestamp": "2025-09-12T13:57:14.125Z",
+  "url": "https://pos-conejonegro-production.up.railway.app",
+  "htmlContent": "<!DOCTYPE html><html><head>\n    <title>Conejo Negro POS</title>\n    <style>\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Helvetica Neue\", Arial, sans-serif;\n            max-width: 800px;\n            margin: 0 auto;\n            padding: 2rem;\n            line-height: 1.5;\n        }\n        h1 {\n            color: #333;\n            text-align: center;\n        }\n        .status {\n            padding: 1rem;\n            border-radius: 4px;\n            background: #f5f5f5;\n            margin: 1rem 0;\n        }\n        button {\n            padding: 0.5rem 1rem;\n            border: none;\n            border-radius: 4px;\n            background: #007bff;\n            color: white;\n            cursor: pointer;\n        }\n        button:hover {\n            background: #0056b3;\n        }\n        #output {\n            margin-top: 1rem;\n            padding: 1rem;\n            background: #f8f9fa;\n            border-radius: 4px;\n            white-space: pre-wrap;\n        }\n    </style>\n</head>\n<body>\n    <h1>Conejo Negro POS System</h1>\n    <div class=\"status\">\n        <h2>Server Status</h2>\n        <div id=\"status\">Server is running</div>\n    </div>\n    <button onclick=\"checkStatus()\">Check Status</button>\n    <button onclick=\"checkUsers()\">Check Users</button>\n    <div id=\"output\">{\n  \"status\": \"ok\",\n  \"databaseType\": \"file-based-with-git-sync\",\n  \"isDatabaseReady\": true,\n  \"dataPath\": \"/app/data\",\n  \"environment\": \"production\",\n  \"uptime\": 70125.407555098,\n  \"timestamp\": \"2025-09-12T13:57:20.214Z\",\n  \"storageInfo\": {\n    \"type\": \"File-based with Git synchronization\",\n    \"persistent\": true,\n    \"cost\": \"Free\",\n    \"backup\": \"Automatic via Git repository\"\n  }\n}</div>\n    \n    <script>\n        // Function to format JSON output\n        function formatJSON(obj) {\n            return JSON.stringify(obj, null, 2);\n        }\n        \n        // Function to update output\n        function updateOutput(text) {\n            document.getElementById('output').textContent = text;\n        }\n        \n        // Function to update status\n        function updateStatus(text) {\n            document.getElementById('status').textContent = text;\n        }\n        \n        // Function to check server status\n        async function checkStatus() {\n            try {\n                const response = await fetch('/api/health');\n                const data = await response.json();\n                updateStatus('Server is running');\n                updateOutput(formatJSON(data));\n            } catch (error) {\n                updateStatus('Server error');\n                updateOutput('Error checking server status: ' + error.message);\n            }\n        }\n        \n        // Function to check users\n        async function checkUsers() {\n            try {\n                const response = await fetch('/api/debug/users');\n                const data = await response.json();\n                updateOutput(formatJSON(data));\n            } catch (error) {\n                updateOutput('Error checking users: ' + error.message);\n            }\n        }\n        \n        // Check status on load\n        checkStatus();\n    </script>\n\n\n</body></html>",
+  "pageTitle": "Conejo Negro POS",
+  "httpStatus": null,
+  "responseHeaders": {},
+  "jsFiles": [],
+  "cssFiles": [],
+  "apiEndpoints": [
+    {
+      "url": "https://pos-conejonegro-production.up.railway.app/api/health",
+      "status": 200,
+      "method": "GET"
+    },
+    {
+      "url": "/api/health",
+      "status": 200,
+      "statusText": "OK"
+    },
+    {
+      "url": "/api/auth/login",
+      "status": 404,
+      "statusText": "Not Found"
+    },
+    {
+      "url": "/api/products",
+      "status": 404,
+      "statusText": "Not Found"
+    },
+    {
+      "url": "/health",
+      "status": 404,
+      "statusText": "Not Found"
+    },
+    {
+      "url": "/login.html",
+      "status": 404,
+      "statusText": "Not Found"
+    },
+    {
+      "url": "/index.html",
+      "status": 200,
+      "statusText": "OK"
+    },
+    {
+      "url": "https://pos-conejonegro-production.up.railway.app/api/health",
+      "status": 200,
+      "method": "GET"
+    }
+  ],
+  "domStructure": {
+    "tagName": "HTML",
+    "id": null,
+    "className": null,
+    "text": "\n    Conejo Negro POS\n    \n        body {\n            font-family: -apple-system, BlinkMacSystemFont",
+    "childCount": 2,
+    "children": [
+      {
+        "tagName": "HEAD",
+        "id": null,
+        "className": null,
+        "text": "\n    Conejo Negro POS\n    \n        body {\n            font-family: -apple-system, BlinkMacSystemFont",
+        "childCount": 2,
+        "children": [
+          {
+            "tagName": "TITLE",
+            "id": null,
+            "className": null,
+            "text": "Conejo Negro POS",
+            "childCount": 0,
+            "children": []
+          },
+          {
+            "tagName": "STYLE",
+            "id": null,
+            "className": null,
+            "text": "\n        body {\n            font-family: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, \"Hel",
+            "childCount": 0,
+            "children": []
+          }
+        ]
+      },
+      {
+        "tagName": "BODY",
+        "id": null,
+        "className": null,
+        "text": "\n    Conejo Negro POS System\n    \n        Server Status\n        Server is running\n    \n    Check Sta",
+        "childCount": 6,
+        "children": [
+          {
+            "tagName": "H1",
+            "id": null,
+            "className": null,
+            "text": "Conejo Negro POS System",
+            "childCount": 0,
+            "children": []
+          },
+          {
+            "tagName": "DIV",
+            "id": null,
+            "className": "status",
+            "text": "\n        Server Status\n        Server is running\n    ",
+            "childCount": 2,
+            "children": [
+              {
+                "tagName": "H2",
+                "id": null,
+                "className": null,
+                "text": "Server Status",
+                "childCount": 0,
+                "children": []
+              },
+              {
+                "tagName": "DIV",
+                "id": "status",
+                "className": null,
+                "text": "Server is running",
+                "childCount": 0,
+                "children": []
+              }
+            ]
+          },
+          {
+            "tagName": "BUTTON",
+            "id": null,
+            "className": null,
+            "text": "Check Status",
+            "childCount": 0,
+            "children": []
+          },
+          {
+            "tagName": "BUTTON",
+            "id": null,
+            "className": null,
+            "text": "Check Users",
+            "childCount": 0,
+            "children": []
+          },
+          {
+            "tagName": "DIV",
+            "id": "output",
+            "className": null,
+            "text": "{\n  \"status\": \"ok\",\n  \"databaseType\": \"file-based-with-git-sync\",\n  \"isDatabaseReady\": true,\n  \"data",
+            "childCount": 0,
+            "children": []
+          }
+        ]
+      }
+    ]
+  },
+  "networkRequests": [
+    {
+      "url": "https://pos-conejonegro-production.up.railway.app/",
+      "method": "GET",
+      "resourceType": "document",
+      "headers": {
+        "upgrade-insecure-requests": "1",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": "\"Windows\""
+      }
+    },
+    {
+      "url": "https://pos-conejonegro-production.up.railway.app/api/health",
+      "method": "GET",
+      "resourceType": "fetch",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://pos-conejonegro-production.up.railway.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    },
+    {
+      "url": "https://pos-conejonegro-production.up.railway.app/api/health",
+      "method": "GET",
+      "resourceType": "fetch",
+      "headers": {
+        "sec-ch-ua-platform": "\"Windows\"",
+        "referer": "https://pos-conejonegro-production.up.railway.app/",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/140.0.0.0 Safari/537.36",
+        "sec-ch-ua": "\"Not=A?Brand\";v=\"24\", \"Chromium\";v=\"140\"",
+        "sec-ch-ua-mobile": "?0"
+      }
+    }
+  ],
+  "consoleMessages": [
+    {
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 ()",
+      "location": {
+        "url": "https://pos-conejonegro-production.up.railway.app/favicon.ico",
+        "lineNumber": 0,
+        "columnNumber": 0
+      }
+    }
+  ],
+  "cookies": [],
+  "localStorage": {},
+  "actualContent": "Conejo Negro POS System\nServer Status\nServer is running\nCheck Status Check Users\n{\n  \"status\": \"ok\",\n  \"databaseType\": \"file-based-with-git-sync\",\n  \"isDatabaseReady\": true,\n  \"dataPath\": \"/app/data\",\n  \"environment\": \"production\",\n  \"uptime\": 70125.407555098,\n  \"timestamp\": \"2025-09-12T13:57:20.214Z\",\n  \"storageInfo\": {\n    \"type\": \"File-based with Git synchronization\",\n    \"persistent\": true,\n    \"cost\": \"Free\",\n    \"backup\": \"Automatic via Git repository\"\n  }\n}",
+  "diagnostics": [
+    {
+      "element": "Forms",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Input fields",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Buttons",
+      "found": true,
+      "count": 2
+    },
+    {
+      "element": "Links",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Navigation",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Header",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Main content",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Footer",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Tables",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Login section",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Dashboard",
+      "found": false,
+      "count": 0
+    },
+    {
+      "element": "Script tags",
+      "found": true,
+      "count": 1
+    },
+    {
+      "element": "Stylesheets",
+      "found": false,
+      "count": 0
+    }
+  ],
+  "framework": "Unknown/None"
+}

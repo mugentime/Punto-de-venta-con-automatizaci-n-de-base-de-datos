@@ -1,0 +1,9 @@
+﻿{
+    "status":  "ok",
+    "databaseType":  "postgresql",
+    "isDatabaseReady":  false,
+    "dataPath":  "/opt/render/project/src/data",
+    "environment":  "production",
+    "railwayEnv":  "none",
+    "renderEnv":  "active"
+}

@@ -1,0 +1,17 @@
+[
+    {
+        "priority":  "critical",
+        "description":  "Error de conexion a la base de datos",
+        "type":  "database"
+    },
+    {
+        "priority":  "high",
+        "description":  "Endpoint /api/users devuelve 500",
+        "type":  "api"
+    },
+    {
+        "priority":  "medium",
+        "description":  "Boton de login no responde en movil",
+        "type":  "ui"
+    }
+]

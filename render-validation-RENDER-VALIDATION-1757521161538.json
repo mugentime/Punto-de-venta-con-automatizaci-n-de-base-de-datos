@@ -1,0 +1,42 @@
+{
+  "timestamp": "2025-09-10T16:19:22.887Z",
+  "correlationId": "RENDER-VALIDATION-1757521161538",
+  "renderUrl": "https://pos-conejo-negro.onrender.com",
+  "serviceId": "srv-d2sf0q7diees738qcq3g",
+  "totalTests": 4,
+  "passedTests": 4,
+  "failedTests": 0,
+  "deployStatus": "RECENTLY_DEPLOYED",
+  "results": [
+    {
+      "test": "basic_health",
+      "passed": true,
+      "details": {
+        "uptime": 183.885197322,
+        "environment": {
+          "railway": false,
+          "node_env": "production"
+        }
+      }
+    },
+    {
+      "test": "taskmaster_files",
+      "passed": true,
+      "details": "Files check completed"
+    },
+    {
+      "test": "cashcuts_endpoint",
+      "passed": true,
+      "details": "Endpoint exists, requires auth"
+    },
+    {
+      "test": "recent_deploy",
+      "passed": true,
+      "details": {
+        "uptime": 184.606070698,
+        "indication": "Recent restart detected"
+      }
+    }
+  ],
+  "recommendation": "Deploy detectado - Monitorear por 10-15 minutos"
+}

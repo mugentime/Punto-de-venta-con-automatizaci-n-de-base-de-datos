@@ -1,0 +1,36 @@
+{
+  "timestamp": "2025-09-08T16:44:34.930Z",
+  "url": "https://pos-conejo-negro.onrender.com",
+  "duration": 43614,
+  "totalChecks": 4,
+  "passedChecks": 1,
+  "success": false,
+  "checks": [
+    {
+      "name": "Health Endpoint",
+      "success": false,
+      "status": 0,
+      "message": "HTTP 502"
+    },
+    {
+      "name": "Página Principal",
+      "success": true,
+      "status": 200,
+      "message": "OK"
+    },
+    {
+      "name": "Recursos Estáticos",
+      "success": false,
+      "status": 0,
+      "message": "HTTP 404"
+    },
+    {
+      "name": "API Endpoints",
+      "success": false,
+      "status": 0,
+      "message": "HTTP 401"
+    }
+  ],
+  "environment": "development",
+  "version": "1.0.0"
+}

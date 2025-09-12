@@ -1,0 +1,85 @@
+{
+  "timestamp": "2025-09-05T18:44:39.732Z",
+  "correlationId": "1757097877691",
+  "testType": "direct_service_test",
+  "summary": {
+    "testsRun": 4,
+    "duplicatesDetected": true,
+    "zeroAmountsDetected": true
+  },
+  "testResults": [
+    {
+      "test": "sequential_manual_cuts",
+      "result1": {
+        "id": "1757097879698pwvz2nif9",
+        "totalIncome": 0,
+        "totalRecords": 0
+      },
+      "result2": {
+        "id": "1757097879703c8va4omfd",
+        "totalIncome": 0,
+        "totalRecords": 0
+      },
+      "isDuplicate": true,
+      "hasZeroAmounts": true
+    },
+    {
+      "test": "concurrent_manual_cuts",
+      "totalRequests": 5,
+      "successful": 5,
+      "failed": 0,
+      "uniqueCashCuts": 5,
+      "zeroAmountResults": 5,
+      "duplicatesCreated": 0,
+      "details": {
+        "uniqueIds": [
+          "1757097879716gvpg7y3x4",
+          "1757097879717lh9r97d4n",
+          "1757097879717r25zlblh2",
+          "1757097879717dtut6brgy",
+          "1757097879717rdbojvqy1"
+        ],
+        "zeroAmountResults": [
+          {
+            "index": 0,
+            "id": "1757097879716gvpg7y3x4",
+            "totalIncome": 0
+          },
+          {
+            "index": 1,
+            "id": "1757097879717lh9r97d4n",
+            "totalIncome": 0
+          },
+          {
+            "index": 2,
+            "id": "1757097879717r25zlblh2",
+            "totalIncome": 0
+          },
+          {
+            "index": 3,
+            "id": "1757097879717dtut6brgy",
+            "totalIncome": 0
+          },
+          {
+            "index": 4,
+            "id": "1757097879717rdbojvqy1",
+            "totalIncome": 0
+          }
+        ],
+        "failedRequests": []
+      }
+    },
+    {
+      "test": "concurrent_manual_cuts",
+      "error": "duplicatesCreated is not defined"
+    },
+    {
+      "test": "data_file_analysis",
+      "totalCashCuts": 2,
+      "recentCuts": 0,
+      "duplicateGroups": 0,
+      "hasZeroAmounts": false,
+      "recentCutDetails": []
+    }
+  ]
+}

@@ -1,0 +1,49 @@
+{
+  "timestamp": "2025-09-05T18:54:40.006Z",
+  "correlationId": "TASKMASTER-VALIDATION-1757098479847",
+  "totalTests": 4,
+  "passedTests": 4,
+  "failedTests": 0,
+  "allTestsPassed": true,
+  "results": [
+    {
+      "test": "service_works",
+      "passed": true,
+      "details": {
+        "processingCuts": 0,
+        "cachedCuts": 0,
+        "taskMasterActive": true,
+        "version": "1.0.0"
+      }
+    },
+    {
+      "test": "duplicate_prevention",
+      "passed": true,
+      "details": {
+        "firstId": "1757098479871ntt2af5gm",
+        "secondId": "1757098479871ntt2af5gm",
+        "duplicatesPrevented": true
+      }
+    },
+    {
+      "test": "correct_amounts",
+      "passed": true,
+      "details": {
+        "totalIncome": 0,
+        "totalCost": 0,
+        "taskMasterProtected": true,
+        "hasIdempotencyKey": true
+      }
+    },
+    {
+      "test": "concurrency_protection",
+      "passed": true,
+      "details": {
+        "operationsCount": 3,
+        "uniqueIds": 1,
+        "allReturnedSameId": true
+      }
+    }
+  ],
+  "deployRecommendation": "PROCEED_WITH_DEPLOY"
+}

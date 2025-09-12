@@ -1,0 +1,161 @@
+[
+  {
+    "timestamp": "2025-09-05T17:31:04.392Z",
+    "totalOpen": 1,
+    "categories": {
+      "critical": 1,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": [
+      {
+        "createdAt": "2025-09-04T17:13:59Z",
+        "labels": [
+          {
+            "id": "LA_kwDOPgsiJ88AAAACIJvZ5A",
+            "name": "bug",
+            "description": "Something isn't working",
+            "color": "d73a4a"
+          },
+          {
+            "id": "LA_kwDOPgsiJ88AAAACIJvZ_A",
+            "name": "help wanted",
+            "description": "Extra attention is needed",
+            "color": "008672"
+          },
+          {
+            "id": "LA_kwDOPgsiJ88AAAACJkk-LA",
+            "name": "P0",
+            "description": "Critical priority - immediate action required",
+            "color": "dc3545"
+          },
+          {
+            "id": "LA_kwDOPgsiJ88AAAACJklAZw",
+            "name": "production",
+            "description": "Production environment issue",
+            "color": "ff6900"
+          },
+          {
+            "id": "LA_kwDOPgsiJ88AAAACJklCrw",
+            "name": "outage",
+            "description": "Service outage or downtime",
+            "color": "000000"
+          }
+        ],
+        "number": 1,
+        "title": "[P0] Production Deployment Completely Down - Immediate Action Required",
+        "updatedAt": "2025-09-05T17:30:47Z"
+      }
+    ]
+  },
+  {
+    "timestamp": "2025-09-05T17:46:04.964Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T18:01:04.967Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T18:16:04.976Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T18:31:04.976Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T18:46:04.979Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T19:01:04.994Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T19:16:05.003Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T19:31:05.012Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  },
+  {
+    "timestamp": "2025-09-05T19:46:05.024Z",
+    "totalOpen": 0,
+    "categories": {
+      "critical": 0,
+      "deployment": 0,
+      "bug": 0,
+      "enhancement": 0,
+      "other": 0
+    },
+    "issues": []
+  }
+]

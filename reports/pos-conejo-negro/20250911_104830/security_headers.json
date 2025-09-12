@@ -1,0 +1,11 @@
+﻿{
+    "ContentSecurityPolicy":  "default-src \u0027self\u0027;script-src \u0027self\u0027 \u0027unsafe-inline\u0027 \u0027unsafe-eval\u0027 \u0027unsafe-hashes\u0027 https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src \u0027self\u0027 \u0027unsafe-inline\u0027 https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src \u0027self\u0027 https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src \u0027self\u0027 data: https:;connect-src \u0027self\u0027 https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri \u0027self\u0027;form-action \u0027self\u0027;frame-ancestors \u0027self\u0027;object-src \u0027none\u0027;script-src-attr \u0027none\u0027;upgrade-insecure-requests",
+    "StrictTransportSecurity":  "max-age=15552000; includeSubDomains",
+    "XContentTypeOptions":  "nosniff",
+    "XFrameOptions":  "SAMEORIGIN",
+    "ReferrerPolicy":  "no-referrer",
+    "PermissionsPolicy":  null,
+    "AccessControlAllowOrigin":  null,
+    "AccessControlAllowCredentials":  "true",
+    "Server":  "cloudflare"
+}

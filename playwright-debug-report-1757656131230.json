@@ -1,0 +1,173 @@
+{
+  "debugger": "Playwright Debug Loop",
+  "timestamp": "2025-09-12T05:48:51.230Z",
+  "summary": {
+    "totalTests": 1,
+    "screenshotsTaken": 1,
+    "networkRequests": 5,
+    "consoleMessages": 1
+  },
+  "results": [
+    {
+      "url": "https://pos-conejonegro-production-f389.up.railway.app",
+      "timestamp": "2025-09-12T05:48:45.951Z",
+      "tests": [
+        {
+          "test": "page_load_performance",
+          "result": "PASS",
+          "loadTime": 4471,
+          "status": 200
+        },
+        {
+          "test": "pos_elements",
+          "result": "PASS",
+          "elementsFound": 4,
+          "elementDetails": [
+            "h1, h2, h3: 2 found",
+            "button: 2 found"
+          ]
+        },
+        {
+          "test": "api_endpoints",
+          "result": "PASS",
+          "workingEndpoints": 2,
+          "failedEndpoints": 1,
+          "details": [
+            "/api/health: ✅ 200",
+            "/api/version: ✅ 200",
+            "/api/auth/login: ❌ 404"
+          ]
+        },
+        {
+          "test": "javascript_errors",
+          "result": "FAIL",
+          "errorCount": 1,
+          "errors": [
+            {
+              "timestamp": "2025-09-12T05:48:51.212Z",
+              "type": "error",
+              "text": "Failed to load resource: the server responded with a status of 404 ()"
+            }
+          ]
+        },
+        {
+          "test": "network_analysis",
+          "result": "WARN",
+          "issues": [
+            "1 failed HTTP requests"
+          ]
+        },
+        {
+          "test": "authentication_flow",
+          "result": "FAIL",
+          "details": {
+            "loginFormFound": false,
+            "loginButtonFound": false,
+            "inputFields": 0,
+            "canAttemptLogin": false
+          }
+        }
+      ],
+      "issues": [
+        "JavaScript errors detected: 1"
+      ],
+      "recommendations": [
+        "PRIORITY: Fix failed functionality tests",
+        "ADDRESS: Resolve identified system issues",
+        "CRITICAL: Fix JavaScript errors affecting functionality",
+        "IMPORTANT: Fix authentication system accessibility"
+      ]
+    }
+  ],
+  "networkLogs": [
+    {
+      "timestamp": "2025-09-12T05:48:49.673Z",
+      "url": "https://pos-conejonegro-production-f389.up.railway.app/",
+      "status": 200,
+      "headers": {
+        "accept-ranges": "bytes",
+        "cache-control": "public, max-age=0",
+        "content-length": "2813",
+        "content-type": "text/html; charset=UTF-8",
+        "date": "Fri, 12 Sep 2025 05:48:48 GMT",
+        "etag": "W/\"afd-1993a10a750\"",
+        "last-modified": "Thu, 11 Sep 2025 18:36:34 GMT",
+        "server": "railway-edge",
+        "x-powered-by": "Express",
+        "x-railway-edge": "railway/us-west2",
+        "x-railway-request-id": "Orint1ZBQzem8IKV0_TJvA"
+      }
+    },
+    {
+      "timestamp": "2025-09-12T05:48:49.917Z",
+      "url": "https://pos-conejonegro-production-f389.up.railway.app/api/health",
+      "status": 200,
+      "headers": {
+        "etag": "W/\"147-iDXCau7glUWJUL4QU7T2hCbqRtU\"",
+        "content-length": "327",
+        "date": "Fri, 12 Sep 2025 05:48:49 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "x-powered-by": "Express",
+        "server": "railway-edge",
+        "x-railway-request-id": "nwbyhRgESyiFA6IY0_TJvA",
+        "x-railway-edge": "railway/us-west2"
+      }
+    },
+    {
+      "timestamp": "2025-09-12T05:48:50.770Z",
+      "url": "https://pos-conejonegro-production-f389.up.railway.app/api/health",
+      "status": 200,
+      "headers": {
+        "etag": "W/\"147-Fw5QM261LPzNn8EHCKzee5jwA7Y\"",
+        "content-length": "327",
+        "date": "Fri, 12 Sep 2025 05:48:49 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "x-powered-by": "Express",
+        "server": "railway-edge",
+        "x-railway-request-id": "IQQPh-JYTaaUl_c70_TJvA",
+        "x-railway-edge": "railway/us-west2"
+      }
+    },
+    {
+      "timestamp": "2025-09-12T05:48:50.988Z",
+      "url": "https://pos-conejonegro-production-f389.up.railway.app/api/version",
+      "status": 200,
+      "headers": {
+        "etag": "W/\"82-bO2xMqRZ/V9RoKmjV3qHQf9Lb60\"",
+        "content-length": "130",
+        "date": "Fri, 12 Sep 2025 05:48:50 GMT",
+        "content-type": "application/json; charset=utf-8",
+        "x-powered-by": "Express",
+        "server": "railway-edge",
+        "x-railway-request-id": "yduBhzByShKWwZLA0_TJvA",
+        "x-railway-edge": "railway/us-west2"
+      }
+    },
+    {
+      "timestamp": "2025-09-12T05:48:51.212Z",
+      "url": "https://pos-conejonegro-production-f389.up.railway.app/api/auth/login",
+      "status": 404,
+      "headers": {
+        "x-railway-request-id": "izwXr4M9TfeVa0L90_TJvA",
+        "content-security-policy": "default-src 'none'",
+        "x-content-type-options": "nosniff",
+        "content-length": "153",
+        "date": "Fri, 12 Sep 2025 05:48:50 GMT",
+        "content-type": "text/html; charset=utf-8",
+        "x-railway-edge": "railway/us-west2",
+        "x-powered-by": "Express",
+        "server": "railway-edge"
+      }
+    }
+  ],
+  "consoleMessages": [
+    {
+      "timestamp": "2025-09-12T05:48:51.212Z",
+      "type": "error",
+      "text": "Failed to load resource: the server responded with a status of 404 ()"
+    }
+  ],
+  "screenshots": [
+    "debug-screenshot-1757656130423.png"
+  ]
+}
