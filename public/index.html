@@ -40,47 +40,6 @@
         }
     </style>
 </head>
-<body>
-    <h1>Conejo Negro POS System</h1>
-    <div class="status">
-        <h2>Server Status</h2>
-        <div id="status">Checking server status...</div>
-    </div>
-    <button onclick="checkStatus()">Check Status</button>
-    <button onclick="checkUsers()">Check Users</button>
-    <div id="output"></div>
-    
-    <script>
-        // Function to format JSON output
-        function formatJSON(obj) {
-            return JSON.stringify(obj, null, 2);
-        }
-        
-        // Function to update output
-        function updateOutput(text) {
-            document.getElementById('output').textContent = text;
-        }
-        
-        // Function to update status
-        function updateStatus(text) {
-            document.getElementById('status').textContent = text;
-        }
-        
-        // Function to check server status
-        async function checkStatus() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                updateStatus('Server is running');
-                updateOutput(formatJSON(data));
-            } catch (error) {
-                updateStatus('Server error');
-                updateOutput('Error checking server status: ' + error.message);
-            }
-        }
-        
-        // Function to check users
-        async function checkUsers() {
             try {
                 const response = await fetch('/api/debug/users');
                 const data = await response.json();

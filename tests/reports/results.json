@@ -14,7 +14,7 @@
       "Test Suite": "POS Conejo Negro E2E Tests",
       "Environment": "development",
       "Base URL": "http://localhost:3000",
-      "Timestamp": "2025-09-12T17:10:59.493Z",
+      "Timestamp": "2025-09-12T17:34:49.066Z",
       "actualWorkers": 1
     },
     "preserveOutput": "always",
@@ -54,7 +54,7 @@
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-12T17:10:59.493Z",
+          "Timestamp": "2025-09-12T17:34:49.066Z",
           "actualWorkers": 1
         },
         "id": "setup",
@@ -74,7 +74,7 @@
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-12T17:10:59.493Z",
+          "Timestamp": "2025-09-12T17:34:49.066Z",
           "actualWorkers": 1
         },
         "id": "chromium",
@@ -105,14 +105,14 @@
   },
   "suites": [
     {
-      "title": "landing-login.spec.js",
-      "file": "landing-login.spec.js",
+      "title": "capture-landing-dom.spec.js",
+      "file": "capture-landing-dom.spec.js",
       "column": 0,
       "line": 0,
       "specs": [
         {
-          "title": "La landing muestra el login",
-          "ok": false,
+          "title": "Captura el DOM de la landing",
+          "ok": true,
           "tags": [],
           "tests": [
             {
@@ -125,63 +125,23 @@
                 {
                   "workerIndex": 0,
                   "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 17211,
-                  "error": {
-                    "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form#login-form')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('form#login-form')\u001b[22m\n",
-                    "stack": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form#login-form')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('form#login-form')\u001b[22m\n\n    at /workspaces/POS-CONEJONEGRO/tests/e2e/landing-login.spec.js:9:49",
-                    "location": {
-                      "file": "/workspaces/POS-CONEJONEGRO/tests/e2e/landing-login.spec.js",
-                      "column": 49,
-                      "line": 9
-                    },
-                    "snippet": "\u001b[0m \u001b[90m  7 |\u001b[39m test(\u001b[32m'La landing muestra el login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  8 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[33mBASE_URL\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'form#login-form'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Iniciar sesión'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "/workspaces/POS-CONEJONEGRO/tests/e2e/landing-login.spec.js",
-                        "column": 49,
-                        "line": 9
-                      },
-                      "message": "Error: \u001b[2mexpect(\u001b[22m\u001b[31mlocator\u001b[39m\u001b[2m).\u001b[22mtoBeVisible\u001b[2m()\u001b[22m failed\n\nLocator:  locator('form#login-form')\nExpected: visible\nReceived: <element(s) not found>\nTimeout:  15000ms\n\nCall log:\n\u001b[2m  - Expect \"toBeVisible\" with timeout 15000ms\u001b[22m\n\u001b[2m  - waiting for locator('form#login-form')\u001b[22m\n\n\n\u001b[0m \u001b[90m  7 |\u001b[39m test(\u001b[32m'La landing muestra el login'\u001b[39m\u001b[33m,\u001b[39m \u001b[36masync\u001b[39m ({ page }) \u001b[33m=>\u001b[39m {\n \u001b[90m  8 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mgoto(\u001b[33mBASE_URL\u001b[39m)\u001b[33m;\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m  9 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'form#login-form'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible({ timeout\u001b[33m:\u001b[39m \u001b[35m15000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m                                                 \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 10 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'text=Iniciar sesión'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\n \u001b[90m 11 |\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m 12 |\u001b[39m\u001b[0m\n\u001b[2m    at /workspaces/POS-CONEJONEGRO/tests/e2e/landing-login.spec.js:9:49\u001b[22m"
-                    }
-                  ],
+                  "status": "passed",
+                  "duration": 6522,
+                  "errors": [],
                   "stdout": [],
                   "stderr": [],
                   "retry": 0,
-                  "startTime": "2025-09-12T17:11:00.334Z",
+                  "startTime": "2025-09-12T17:34:49.946Z",
                   "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "/workspaces/POS-CONEJONEGRO/tests/results/landing-login-La-landing-muestra-el-login-chromium/test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "/workspaces/POS-CONEJONEGRO/tests/results/landing-login-La-landing-muestra-el-login-chromium/video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "/workspaces/POS-CONEJONEGRO/tests/results/landing-login-La-landing-muestra-el-login-chromium/error-context.md"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "/workspaces/POS-CONEJONEGRO/tests/e2e/landing-login.spec.js",
-                    "column": 49,
-                    "line": 9
-                  }
+                  "attachments": []
                 }
               ],
-              "status": "unexpected"
+              "status": "expected"
             }
           ],
-          "id": "5319c596ad01629e771a-0f1cd5043592cf2ea767",
-          "file": "landing-login.spec.js",
-          "line": 7,
+          "id": "393d4b029f194178679f-dd30cd7332c557ea002b",
+          "file": "capture-landing-dom.spec.js",
+          "line": 6,
           "column": 1
         }
       ]
@@ -189,11 +149,11 @@
   ],
   "errors": [],
   "stats": {
-    "startTime": "2025-09-12T17:10:59.502Z",
-    "duration": 18462.247,
-    "expected": 0,
+    "startTime": "2025-09-12T17:34:49.073Z",
+    "duration": 7915.232,
+    "expected": 1,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }
