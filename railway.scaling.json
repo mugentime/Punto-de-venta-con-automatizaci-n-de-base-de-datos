@@ -1,0 +1,195 @@
+{
+    "$schema": "https://railway.app/railway.schema.json",
+    "name": "POS Conejo Negro - Auto Scaling Configuration",
+    "description": "Production-grade scaling configuration for Point of Sale system",
+    
+    "scaling": {
+        "enabled": true,
+        "policy": "horizontal",
+        "metrics": {
+            "cpu": {
+                "enabled": true,
+                "targetUtilization": 70,
+                "scaleUpThreshold": 80,
+                "scaleDownThreshold": 30
+            },
+            "memory": {
+                "enabled": true,
+                "targetUtilization": 75,
+                "scaleUpThreshold": 85,
+                "scaleDownThreshold": 40
+            },
+            "requestRate": {
+                "enabled": true,
+                "requestsPerSecond": 100,
+                "scaleUpThreshold": 150,
+                "scaleDownThreshold": 50
+            },
+            "responseTime": {
+                "enabled": true,
+                "targetMs": 1000,
+                "scaleUpThreshold": 2000,
+                "scaleDownThreshold": 500
+            }
+        },
+        
+        "instances": {
+            "min": 1,
+            "max": 3,
+            "target": 1,
+            "cooldownPeriod": "5m",
+            "warmupPeriod": "2m"
+        },
+        
+        "resources": {
+            "baseline": {
+                "cpu": "0.5",
+                "memory": "1Gi",
+                "storage": "5Gi"
+            },
+            "scaled": {
+                "cpu": "1.0", 
+                "memory": "2Gi",
+                "storage": "10Gi"
+            }
+        }
+    },
+    
+    "loadBalancing": {
+        "enabled": true,
+        "algorithm": "round_robin",
+        "healthCheck": {
+            "path": "/api/health",
+            "interval": "30s",
+            "timeout": "10s",
+            "unhealthyThreshold": 3,
+            "healthyThreshold": 2
+        },
+        "sessionAffinity": {
+            "enabled": true,
+            "type": "cookie",
+            "cookieName": "pos_session",
+            "ttl": "1h"
+        }
+    },
+    
+    "circuitBreaker": {
+        "enabled": true,
+        "failureThreshold": 5,
+        "recoveryTimeout": "30s",
+        "monitoringWindow": "1m"
+    },
+    
+    "caching": {
+        "enabled": true,
+        "redis": {
+            "enabled": false,
+            "ttl": "15m"
+        },
+        "inMemory": {
+            "enabled": true,
+            "maxSize": "256MB",
+            "ttl": "5m"
+        },
+        "staticAssets": {
+            "enabled": true,
+            "ttl": "24h",
+            "compression": "gzip"
+        }
+    },
+    
+    "monitoring": {
+        "metrics": {
+            "collection_interval": "10s",
+            "retention_period": "7d"
+        },
+        "alerts": {
+            "cpu_high": {
+                "threshold": 90,
+                "duration": "2m",
+                "severity": "warning"
+            },
+            "memory_high": {
+                "threshold": 95,
+                "duration": "1m", 
+                "severity": "critical"
+            },
+            "response_time_high": {
+                "threshold": 5000,
+                "duration": "30s",
+                "severity": "warning"
+            },
+            "error_rate_high": {
+                "threshold": 5,
+                "duration": "1m",
+                "severity": "critical"
+            }
+        }
+    },
+    
+    "backup": {
+        "database": {
+            "enabled": true,
+            "schedule": "0 2 * * *",
+            "retention": "30d",
+            "compression": true
+        },
+        "files": {
+            "enabled": true,
+            "schedule": "0 3 * * *",
+            "retention": "7d",
+            "paths": ["/app/data", "/app/uploads", "/app/logs"]
+        }
+    },
+    
+    "security": {
+        "rateLimiting": {
+            "global": {
+                "windowMs": 900000,
+                "maxRequests": 1000
+            },
+            "api": {
+                "windowMs": 900000,
+                "maxRequests": 500
+            },
+            "auth": {
+                "windowMs": 900000,
+                "maxRequests": 50
+            }
+        },
+        "ddosProtection": {
+            "enabled": true,
+            "threshold": 10000,
+            "banDuration": "1h"
+        }
+    },
+    
+    "performance": {
+        "compression": {
+            "enabled": true,
+            "algorithm": "gzip",
+            "level": 6,
+            "minSize": 1024
+        },
+        "keepAlive": {
+            "enabled": true,
+            "timeout": 65000,
+            "maxRequests": 100
+        },
+        "clustering": {
+            "enabled": false,
+            "workers": "auto"
+        }
+    },
+    
+    "experimental": {
+        "edgeComputing": {
+            "enabled": false,
+            "regions": ["us-west", "us-east"]
+        },
+        "serverlessFunction": {
+            "enabled": false,
+            "coldStartOptimization": true
+        }
+    }
+}

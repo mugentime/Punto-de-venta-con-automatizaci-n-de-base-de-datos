@@ -1,4 +1,78 @@
 {
-    "environment":  "production",
-    "project":  "d395ae99-1dc9-4aae-96b6-0c805960665f"
+    "$schema": "https://railway.app/railway.schema.json",
+    "build": {
+        "builder": "dockerfile",
+        "dockerfilePath": "Dockerfile",
+        "buildArgs": {
+            "NODE_ENV": "production",
+            "BUILD_DATE": "$RAILWAY_GIT_COMMIT_TIMESTAMP",
+            "COMMIT_SHA": "$RAILWAY_GIT_COMMIT_SHA"
+        }
+    },
+    "deploy": {
+        "numReplicas": 1,
+        "sleepApplication": false,
+        "restartPolicyType": "on_failure",
+        "restartPolicyMaxRetries": 3
+    },
+    "healthcheck": {
+        "enabled": true,
+        "path": "/api/health",
+        "timeout": 10,
+        "interval": 30,
+        "retries": 3
+    },
+    "resources": {
+        "cpu": "0.5",
+        "memory": "1Gi",
+        "storage": "5Gi"
+    },
+    "networking": {
+        "serviceDomain": "pos-conejonegro.railway.app"
+    },
+    "env": {
+        "NODE_ENV": "production",
+        "PORT": "3000",
+        "TZ": "America/Mexico_City",
+        "RAILWAY_ENVIRONMENT": "production"
+    },
+    "volumes": [
+        {
+            "name": "pos-data",
+            "mountPath": "/app/data"
+        },
+        {
+            "name": "pos-logs", 
+            "mountPath": "/app/logs"
+        },
+        {
+            "name": "pos-backups",
+            "mountPath": "/app/backups"
+        }
+    ],
+    "monitoring": {
+        "enabled": true,
+        "metrics": {
+            "cpu": true,
+            "memory": true,
+            "network": true,
+            "disk": true
+        },
+        "logging": {
+            "level": "info",
+            "retention": "7d"
+        }
+    },
+    "security": {
+        "allowedOrigins": ["https://*.railway.app"],
+        "headers": {
+            "X-Frame-Options": "DENY",
+            "X-Content-Type-Options": "nosniff",
+            "Strict-Transport-Security": "max-age=31536000; includeSubDomains; preload",
+            "Referrer-Policy": "strict-origin-when-cross-origin"
+        }
+    },
+    "experimental": {
+        "configAsCode": true
+    }
 }
