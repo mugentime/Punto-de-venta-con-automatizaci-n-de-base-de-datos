@@ -9,8 +9,8 @@ module.exports = defineConfig({
   testDir: './tests/e2e',
   
   // Global setup and teardown
-  globalSetup: require.resolve('./tests/setup/global-setup.js'),
-  globalTeardown: require.resolve('./tests/setup/global-teardown.js'),
+    // globalSetup: require.resolve('./tests/setup/global-setup.js'),
+    // globalTeardown: require.resolve('./tests/setup/global-teardown.js'),
   
   // Run tests in files in parallel
   fullyParallel: false, // Disable for database tests
