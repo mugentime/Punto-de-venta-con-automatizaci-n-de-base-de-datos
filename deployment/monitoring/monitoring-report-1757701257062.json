@@ -1,0 +1,29 @@
+{
+  "timestamp": "2025-09-12T18:20:57.062Z",
+  "service": {
+    "name": "POS-CONEJONEGRO",
+    "url": "https://pos-conejo-negro.railway.app"
+  },
+  "uptime": {
+    "milliseconds": 80,
+    "human": "0s"
+  },
+  "health": {
+    "totalRequests": 0,
+    "successCount": 0,
+    "errorCount": 0,
+    "successRate": 0,
+    "errorRate": 0
+  },
+  "performance": {
+    "averageResponseTime": 0,
+    "minResponseTime": 0,
+    "maxResponseTime": 0,
+    "memoryUsage": null
+  },
+  "alerts": {
+    "total": 0,
+    "active": 0,
+    "recent": []
+  }
+}
