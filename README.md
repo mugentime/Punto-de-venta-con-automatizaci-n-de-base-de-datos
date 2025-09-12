@@ -21,7 +21,6 @@ A complete Point of Sale system for Conejo Negro Café with authentication, inve
 Before you begin, ensure you have the following installed:
 
 - **Node.js** (v18 or higher)
-- **MongoDB** (v5.0 or higher)
 - **npm** or **yarn**
 
 ## 🛠️ Installation
@@ -44,7 +43,7 @@ Edit the `.env` file with your configuration:
 
 ```env
 # Database Configuration
-MONGODB_URI=mongodb://localhost:27017/conejo-negro-pos
+# (No se requiere configuración de MongoDB)
 
 # JWT Secret (Generate a strong secret key)
 JWT_SECRET=your-super-secret-jwt-key-here
@@ -117,8 +116,7 @@ npm run setup
 
 This will:
 - Create an admin user (admin@conejonegro.com / admin123)
-- Add sample products for cafetería and refrigerador
-- Set up the database indexes
+- Add sample products para cafetería y refrigerador
 
 ### 5. Start the Server
 
@@ -411,7 +409,7 @@ curl -X POST http://localhost:3000/api/backup/create \\
 
 | Variable | Description | Default |
 |----------|-------------|---------|
-| `MONGODB_URI` | MongoDB connection string | `mongodb://localhost:27017/conejo-negro-pos` |
+| `MONGODB_URI` | (No usado) | |
 | `JWT_SECRET` | JWT signing secret | Required |
 | `PORT` | Server port | `3000` |
 | `NODE_ENV` | Environment mode | `development` |
@@ -437,9 +435,7 @@ NODE_ENV=production
 ```
 
 ### 2. Database
-- Use a production MongoDB instance
-- Set up MongoDB Atlas or self-hosted MongoDB
-- Configure backup and monitoring
+  # No se requiere MongoDB para producción
 
 ### 3. Reverse Proxy
 Set up nginx or similar:
@@ -471,9 +467,7 @@ pm2 save
 
 ### Common Issues
 
-1. **MongoDB Connection Error**
-   - Ensure MongoDB is running
-   - Check connection string in `.env`
+1. (No aplica error de conexión a MongoDB)
 
 2. **Google Drive Authentication Failed**
    - Verify OAuth2 credentials
@@ -508,7 +502,6 @@ For support or questions:
 1. Check the troubleshooting section
 2. Review environment configuration
 3. Verify Google Drive setup
-4. Check MongoDB connection
 
 ## 🔄 Updates
 
