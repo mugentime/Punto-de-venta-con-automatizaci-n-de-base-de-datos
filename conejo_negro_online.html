@@ -1573,43 +1573,6 @@
     </style>
 </head>
 <body>
-    <!-- Mobile Hamburger Menu -->
-    <div class="hamburger-menu">
-        <i class="fas fa-bars"></i>
-    </div>
-    
-    <!-- Mobile Bottom Navigation -->
-    <div class="mobile-bottom-nav">
-        <a href="#" class="nav-item mobile-nav-btn" data-section="registro">
-            <i class="fas fa-cash-register"></i>
-            <span>Registro</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="coworking">
-            <i class="fas fa-laptop"></i>
-            <span>Coworking</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-refrigerador">
-            <i class="fas fa-snowflake"></i>
-            <span>Refriger.</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="inventario-cafeteria">
-            <i class="fas fa-coffee"></i>
-            <span>Cafetería</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="reportes">
-            <i class="fas fa-chart-bar"></i>
-            <span>Reportes</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="corte-caja">
-            <i class="fas fa-cut"></i>
-            <span>Corte</span>
-        </a>
-        <a href="#" class="nav-item mobile-nav-btn" data-section="gastos">
-            <i class="fas fa-receipt"></i>
-            <span>Gastos</span>
-        </a>
-    </div>
-    
     <div class="cyber-grid"></div>
     
     <!-- Pantalla de Login -->
@@ -2587,17 +2550,19 @@
             records: [],
             reports: []
         };
-        
+        // Al cargar la página, mostrar la pantalla de login por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('login-screen').style.display = 'flex';
+            document.getElementById('main-app').style.display = 'none';
+        });
         // ===========================================
         // GESTIÓN DE PERMISOS
         // ===========================================
-        
         // Verificar si el usuario puede gestionar gastos
         function canManageExpenses() {
             if (!currentUser) {
                 return false;
             }
-            
             // Administradores siempre pueden gestionar gastos
             if (currentUser.role === 'admin') {
                 return true;
