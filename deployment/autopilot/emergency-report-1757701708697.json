@@ -1,0 +1,31 @@
+{
+  "timestamp": "2025-09-12T18:28:28.697Z",
+  "error": {
+    "message": "Deployment failed at phase(s): railway-deployment, health-validation",
+    "phase": "deployment",
+    "stack": "Error: Deployment failed at phase(s): railway-deployment, health-validation\n    at RailwayAutopilot.executeDeployment (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\deployment\\autopilot\\railway-autopilot.js:122:19)\n    at async RailwayAutopilot.execute (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\deployment\\autopilot\\railway-autopilot.js:48:13)"
+  },
+  "autopilotState": {
+    "phase": "deployment",
+    "startTime": 1757701255140,
+    "agents": {
+      "coordinator": "active",
+      "monitor": "active",
+      "validator": "initializing"
+    },
+    "deploymentSuccess": false,
+    "rollbackExecuted": false
+  },
+  "emergencyActions": {
+    "rollbackExecuted": false,
+    "monitoringStopped": true,
+    "emergencyProceduresCompleted": true
+  },
+  "recommendations": [
+    "Review deployment logs for error root cause",
+    "Check Railway service status and configuration",
+    "Verify environment variables and secrets",
+    "Test deployment in staging environment first",
+    "Contact Railway support if platform issues suspected"
+  ]
+}

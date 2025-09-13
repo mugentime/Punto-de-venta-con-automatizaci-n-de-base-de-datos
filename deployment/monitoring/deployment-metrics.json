@@ -1,0 +1,66 @@
+{
+  "timestamp": "2025-09-12T18:28:28.695Z",
+  "deployment": {
+    "phase": "performance-monitoring",
+    "startTime": 1757701255140,
+    "checkpoints": [
+      {
+        "phase": "pre-deployment-validation",
+        "timestamp": 1757701260205,
+        "status": "completed",
+        "duration": 1648
+      },
+      {
+        "phase": "build-preparation",
+        "timestamp": 1757701261853,
+        "status": "completed",
+        "duration": 57
+      },
+      {
+        "phase": "dependency-installation",
+        "timestamp": 1757701261910,
+        "status": "completed",
+        "duration": 112998
+      },
+      {
+        "phase": "railway-deployment",
+        "timestamp": 1757701374908,
+        "status": "failed",
+        "error": "Railway deployment timed out"
+      },
+      {
+        "phase": "health-validation",
+        "timestamp": 1757701706748,
+        "status": "failed",
+        "error": "Health check failed: HTTP 404"
+      }
+    ],
+    "metrics": {
+      "timestamp": 1757701708695,
+      "deploymentDuration": 453555,
+      "memoryUsage": {
+        "rss": 59232256,
+        "heapTotal": 11784192,
+        "heapUsed": 10808096,
+        "external": 3706510,
+        "arrayBuffers": 294086
+      },
+      "phase": "performance-monitoring",
+      "checkpointCount": 5
+    }
+  },
+  "metrics": {
+    "timestamp": 1757701708695,
+    "deploymentDuration": 453555,
+    "memoryUsage": {
+      "rss": 59232256,
+      "heapTotal": 11784192,
+      "heapUsed": 10808096,
+      "external": 3706510,
+      "arrayBuffers": 294086
+    },
+    "phase": "performance-monitoring",
+    "checkpointCount": 5
+  },
+  "topology": "hierarchical"
+}

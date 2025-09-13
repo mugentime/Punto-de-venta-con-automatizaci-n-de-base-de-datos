@@ -1,0 +1,425 @@
+{
+  "timestamp": "2025-09-12T18:26:57.139Z",
+  "service": {
+    "name": "POS-CONEJONEGRO",
+    "url": "https://pos-conejo-negro.railway.app"
+  },
+  "uptime": {
+    "milliseconds": 360157,
+    "human": "6m 0s"
+  },
+  "health": {
+    "totalRequests": 57,
+    "successCount": 19,
+    "errorCount": 38,
+    "successRate": 0.3333333333333333,
+    "errorRate": 0.6666666666666666
+  },
+  "performance": {
+    "averageResponseTime": 3824.4561403508774,
+    "minResponseTime": 689,
+    "maxResponseTime": 7481,
+    "memoryUsage": null
+  },
+  "alerts": {
+    "total": 49,
+    "active": 49,
+    "recent": [
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:16.165Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 6894
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:16.415Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 7144
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:32.961Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 1371
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:33.940Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 2350
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:53.856Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 3339
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:22:54.249Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 3731
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_response_time",
+        "timestamp": "2025-09-12T18:22:57.096Z",
+        "data": {
+          "average": 3477.904761904762,
+          "threshold": 3000
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_error_rate",
+        "timestamp": "2025-09-12T18:22:57.096Z",
+        "data": {
+          "errorRate": 0.6666666666666666,
+          "threshold": 0.1,
+          "totalRequests": 21
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:12.610Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 3228
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:12.750Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 3368
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:34.103Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 6264
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:34.422Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 6583
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:55.531Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 5202
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:23:55.712Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 5383
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_response_time",
+        "timestamp": "2025-09-12T18:23:57.112Z",
+        "data": {
+          "average": 3989.1666666666665,
+          "threshold": 3000
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_error_rate",
+        "timestamp": "2025-09-12T18:23:57.112Z",
+        "data": {
+          "errorRate": 0.6666666666666666,
+          "threshold": 0.1,
+          "totalRequests": 30
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:17.667Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 6641
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:17.892Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 6865
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:34.433Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 1399
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:34.595Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 1561
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:51.351Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 1475
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:24:51.572Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 1696
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_response_time",
+        "timestamp": "2025-09-12T18:24:57.119Z",
+        "data": {
+          "average": 3848.5641025641025,
+          "threshold": 3000
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_error_rate",
+        "timestamp": "2025-09-12T18:24:57.119Z",
+        "data": {
+          "errorRate": 0.6666666666666666,
+          "threshold": 0.1,
+          "totalRequests": 39
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:10.235Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 3393
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:10.374Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 3532
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:30.741Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 5272
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:30.887Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 5418
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:49.202Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 3221
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:25:49.354Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 3373
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_response_time",
+        "timestamp": "2025-09-12T18:25:57.134Z",
+        "data": {
+          "average": 3893.2083333333335,
+          "threshold": 3000
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_error_rate",
+        "timestamp": "2025-09-12T18:25:57.134Z",
+        "data": {
+          "errorRate": 0.6666666666666666,
+          "threshold": 0.1,
+          "totalRequests": 48
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:07.847Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 3394
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:07.986Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 3533
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:28.364Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 5295
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:28.502Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 5433
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:44.799Z",
+        "data": {
+          "endpoint": "/api/health",
+          "status": 404,
+          "responseTime": 1207
+        },
+        "resolved": false
+      },
+      {
+        "type": "health_check_failed",
+        "timestamp": "2025-09-12T18:26:45.115Z",
+        "data": {
+          "endpoint": "/api/status",
+          "status": 404,
+          "responseTime": 1524
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_response_time",
+        "timestamp": "2025-09-12T18:26:57.139Z",
+        "data": {
+          "average": 3824.4561403508774,
+          "threshold": 3000
+        },
+        "resolved": false
+      },
+      {
+        "type": "high_error_rate",
+        "timestamp": "2025-09-12T18:26:57.139Z",
+        "data": {
+          "errorRate": 0.6666666666666666,
+          "threshold": 0.1,
+          "totalRequests": 57
+        },
+        "resolved": false
+      }
+    ]
+  }
+}
