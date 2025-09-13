@@ -1,0 +1,75 @@
+{
+  "previousFailure": "4548f92b-d5dd-49ff-8840-3768b72daec3",
+  "checks": [
+    {
+      "check": 1,
+      "timestamp": "2025-09-13T22:26:46.654Z",
+      "httpStatus": 200,
+      "loadTime": 2636,
+      "title": "",
+      "states": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "hasError": false,
+        "hasBuildError": false,
+        "isLoading": false
+      },
+      "healthStatus": 404,
+      "deploymentState": "PLACEHOLDER",
+      "isSuccess": false
+    },
+    {
+      "check": 2,
+      "timestamp": "2025-09-13T22:27:17.073Z",
+      "httpStatus": 200,
+      "loadTime": 204,
+      "title": "",
+      "states": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "hasError": false,
+        "hasBuildError": false,
+        "isLoading": false
+      },
+      "healthStatus": 404,
+      "deploymentState": "PLACEHOLDER",
+      "isSuccess": false
+    },
+    {
+      "check": 3,
+      "timestamp": "2025-09-13T22:27:52.687Z",
+      "httpStatus": 200,
+      "loadTime": 5418,
+      "title": "",
+      "states": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "hasError": false,
+        "hasBuildError": false,
+        "isLoading": false
+      },
+      "healthStatus": 404,
+      "deploymentState": "PLACEHOLDER",
+      "isSuccess": false
+    },
+    {
+      "check": 4,
+      "timestamp": "2025-09-13T22:28:23.426Z",
+      "httpStatus": 200,
+      "loadTime": 387,
+      "title": "",
+      "states": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "hasError": false,
+        "hasBuildError": false,
+        "isLoading": false
+      },
+      "healthStatus": 404,
+      "deploymentState": "PLACEHOLDER",
+      "isSuccess": false
+    }
+  ],
+  "lastUpdate": "2025-09-13T22:28:23.427Z",
+  "totalChecks": 4
+}

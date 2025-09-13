@@ -1,33 +1,7 @@
-# Use Node.js 18 Alpine for smaller image size
 FROM node:18-alpine
-
-# Set working directory
 WORKDIR /app
-
-# Copy package files first for better layer caching
 COPY package*.json ./
-
-# Install dependencies
-RUN npm ci --only=production --no-audit --no-fund && \
-    npm cache clean --force
-
-# Copy application source code
+RUN npm install --production
 COPY . .
-
-# Create non-root user for security
-RUN addgroup -g 1001 -S nodejs && \
-    adduser -S nodeuser -u 1001 && \
-    chown -R nodeuser:nodejs /app
-
-# Switch to non-root user
-USER nodeuser
-
-# Expose port (Railway will set this automatically)
-EXPOSE $PORT
-
-# Add health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
-  CMD node -e "const http=require('http'); const port=process.env.PORT||3000; http.get(`http://localhost:${port}/api/health`, (res) => { process.exit(res.statusCode === 200 ? 0 : 1); }).on('error', () => { process.exit(1); });"
-
-# Start the application
+EXPOSE 3000
 CMD ["npm", "start"]
