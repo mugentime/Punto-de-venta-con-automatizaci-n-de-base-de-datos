@@ -1,0 +1,466 @@
+{
+  "timestamp": "2025-09-13T07:29:50.686Z",
+  "baseUrl": "https://pos-conejonegro-production.up.railway.app",
+  "tests": [
+    {
+      "name": "Basic Connectivity",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:57.076Z",
+      "duration": 6386,
+      "message": "Server responding with status 200",
+      "responseSize": 292239,
+      "responseHeaders": {
+        "accept-ranges": "bytes",
+        "access-control-allow-credentials": "true",
+        "cache-control": "public, max-age=0",
+        "content-length": "292602",
+        "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+        "content-type": "text/html; charset=UTF-8",
+        "cross-origin-opener-policy": "same-origin",
+        "cross-origin-resource-policy": "same-origin",
+        "date": "Sat, 13 Sep 2025 07:29:55 GMT",
+        "etag": "W/\"476fa-19941297cb0\"",
+        "last-modified": "Sat, 13 Sep 2025 03:41:02 GMT",
+        "origin-agent-cluster": "?1",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "railway-edge",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "vary": "Origin",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "off",
+        "x-download-options": "noopen",
+        "x-frame-options": "DENY",
+        "x-railway-edge": "railway/us-west2",
+        "x-railway-request-id": "B0c3xGTDShaYbGiznpoFkQ",
+        "x-request-id": "f07e0e7e-428d-4c29-8821-1bfb27e46d17",
+        "x-xss-protection": "0"
+      }
+    },
+    {
+      "name": "Health: Health Check",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:57.283Z",
+      "duration": 207,
+      "message": "Endpoint responding correctly",
+      "path": "/api/health",
+      "data": {
+        "status": "ok",
+        "databaseType": "file-based-with-git-sync",
+        "isDatabaseReady": true,
+        "dataPath": "/app/data",
+        "environment": "production",
+        "railwayEnv": "production",
+        "renderEnv": "none",
+        "uptime": 13696.184449307,
+        "databaseResponseTime": 1,
+        "timestamp": "2025-09-13T07:29:56.078Z",
+        "storageInfo": {
+          "type": "File-based with Git synchronization",
+          "persistent": true,
+          "cost": "Free",
+          "backup": "Automatic via Git repository"
+        }
+      }
+    },
+    {
+      "name": "Health: Version Info",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:57.489Z",
+      "duration": 206,
+      "message": "Endpoint responding correctly",
+      "path": "/api/version",
+      "data": {
+        "name": "pos-conejo-negro",
+        "version": "1.0.0",
+        "description": "Point of Sale system for Conejo Negro Cafe with cloud backup",
+        "commit": "unknown",
+        "serviceId": "72109cc7-28c6-48c9-871b-1bb4fe8faedf",
+        "buildTime": "2025-09-13T07:29:56.284Z",
+        "nodeVersion": "v18.20.5",
+        "environment": "production",
+        "platform": "linux",
+        "arch": "x64",
+        "uptime": 13696.391004104,
+        "timestamp": "2025-09-13T07:29:56.284Z"
+      }
+    },
+    {
+      "name": "Health: Build Info",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:57.696Z",
+      "duration": 207,
+      "message": "Endpoint responding correctly",
+      "path": "/api/build-info",
+      "data": {
+        "build": {
+          "timestamp": "2025-09-13T07:29:56.489Z",
+          "version": "1.0.0",
+          "status": "runtime-generated",
+          "commit": "unknown"
+        },
+        "taskMaster": {
+          "enabled": true,
+          "architect": "primary",
+          "configPresent": false
+        },
+        "note": "Build info not found, generated at runtime"
+      }
+    },
+    {
+      "name": "Health: Sync Status",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:57.913Z",
+      "duration": 217,
+      "message": "Endpoint responding correctly",
+      "path": "/api/sync/status",
+      "data": {
+        "timestamp": "2025-09-13T07:29:56.697Z",
+        "dataDirectory": "/app/data",
+        "backupDirectory": "/app/backups",
+        "syncInProgress": false,
+        "dataFiles": {
+          "users.json": {
+            "exists": true,
+            "size": 2123,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 4
+          },
+          "products.json": {
+            "exists": true,
+            "size": 1090,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 3
+          },
+          "records.json": {
+            "exists": true,
+            "size": 9113,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 12
+          },
+          "cash_cuts.json": {
+            "exists": true,
+            "size": 11333,
+            "modified": "2025-09-13T06:00:00.415Z",
+            "records": 10
+          },
+          "expenses.json": {
+            "exists": true,
+            "size": 5774,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 8
+          }
+        },
+        "backups": [],
+        "gitStatus": {
+          "error": "Not a git repository or git not available"
+        },
+        "system": "File-based with Git synchronization",
+        "cost": "Free",
+        "persistent": true
+      }
+    },
+    {
+      "name": "Authentication: Login",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:29:58.494Z",
+      "duration": 581,
+      "message": "Admin login successful",
+      "hasToken": true,
+      "userRole": "admin"
+    },
+    {
+      "name": "Authentication: Protected Route",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:29:58.696Z",
+      "duration": 0,
+      "message": "Protected endpoint returned status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "Authentication: Invalid Token",
+      "status": "WARN",
+      "timestamp": "2025-09-13T07:29:58.900Z",
+      "duration": 0,
+      "message": "Invalid token handling unexpected: status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "Database: User Operations",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:29:59.104Z",
+      "duration": 0,
+      "message": "User query failed with status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "API: Statistics",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:29:59.512Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/stats"
+    },
+    {
+      "name": "API: Data Sync",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:29:59.512Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/sync"
+    },
+    {
+      "name": "API: Backup Creation",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:29:59.721Z",
+      "duration": 209,
+      "message": "Endpoint returned status 429",
+      "path": "/api/sync/backup",
+      "responseStatus": 429,
+      "responseBody": {}
+    },
+    {
+      "name": "API: Products List",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:29:59.721Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/products"
+    },
+    {
+      "name": "API: Records List",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:29:59.721Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/records"
+    },
+    {
+      "name": "Performance: Load Test",
+      "status": "WARN",
+      "timestamp": "2025-09-13T07:30:00.258Z",
+      "duration": 0,
+      "message": "10 concurrent requests completed",
+      "metrics": {
+        "requests": [
+          {
+            "index": 0,
+            "success": false,
+            "responseTime": 221,
+            "status": 429
+          },
+          {
+            "index": 1,
+            "success": false,
+            "responseTime": 518,
+            "status": 429
+          },
+          {
+            "index": 2,
+            "success": false,
+            "responseTime": 534,
+            "status": 429
+          },
+          {
+            "index": 3,
+            "success": false,
+            "responseTime": 518,
+            "status": 429
+          },
+          {
+            "index": 4,
+            "success": false,
+            "responseTime": 515,
+            "status": 429
+          },
+          {
+            "index": 5,
+            "success": false,
+            "responseTime": 513,
+            "status": 429
+          },
+          {
+            "index": 6,
+            "success": false,
+            "responseTime": 513,
+            "status": 429
+          },
+          {
+            "index": 7,
+            "success": false,
+            "responseTime": 507,
+            "status": 429
+          },
+          {
+            "index": 8,
+            "success": false,
+            "responseTime": 510,
+            "status": 429
+          },
+          {
+            "index": 9,
+            "success": false,
+            "responseTime": 508,
+            "status": 429
+          }
+        ],
+        "totalTime": 536,
+        "averageResponseTime": null,
+        "maxResponseTime": null,
+        "minResponseTime": null,
+        "successRate": 0
+      }
+    },
+    {
+      "name": "Security: Headers",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:30:01.101Z",
+      "duration": 0,
+      "message": "5/5 security headers present",
+      "securityHeaders": {
+        "strict-transport-security": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "content-security-policy": true,
+        "x-xss-protection": true
+      },
+      "allHeaders": {
+        "accept-ranges": "bytes",
+        "access-control-allow-credentials": "true",
+        "cache-control": "public, max-age=0",
+        "content-length": "292602",
+        "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+        "content-type": "text/html; charset=UTF-8",
+        "cross-origin-opener-policy": "same-origin",
+        "cross-origin-resource-policy": "same-origin",
+        "date": "Sat, 13 Sep 2025 07:29:59 GMT",
+        "etag": "W/\"476fa-19941297cb0\"",
+        "last-modified": "Sat, 13 Sep 2025 03:41:02 GMT",
+        "origin-agent-cluster": "?1",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "railway-edge",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "vary": "Origin",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "off",
+        "x-download-options": "noopen",
+        "x-frame-options": "DENY",
+        "x-railway-edge": "railway/us-west2",
+        "x-railway-request-id": "CGAJSoTLR4qs17pWxtoGcA",
+        "x-request-id": "8afa3580-bb56-4c7b-a6ca-7dd0909e11b5",
+        "x-xss-protection": "0"
+      }
+    },
+    {
+      "name": "Environment: Configuration",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:30:01.305Z",
+      "duration": 0,
+      "message": "Environment check endpoint failed with status 429",
+      "responseStatus": 429
+    }
+  ],
+  "metrics": {
+    "health": {
+      "status": "ok",
+      "databaseType": "file-based-with-git-sync",
+      "isDatabaseReady": true,
+      "dataPath": "/app/data",
+      "environment": "production",
+      "railwayEnv": "production",
+      "renderEnv": "none",
+      "uptime": 13696.184449307,
+      "databaseResponseTime": 1,
+      "timestamp": "2025-09-13T07:29:56.078Z",
+      "storageInfo": {
+        "type": "File-based with Git synchronization",
+        "persistent": true,
+        "cost": "Free",
+        "backup": "Automatic via Git repository"
+      }
+    },
+    "performance": {
+      "requests": [
+        {
+          "index": 0,
+          "success": false,
+          "responseTime": 221,
+          "status": 429
+        },
+        {
+          "index": 1,
+          "success": false,
+          "responseTime": 518,
+          "status": 429
+        },
+        {
+          "index": 2,
+          "success": false,
+          "responseTime": 534,
+          "status": 429
+        },
+        {
+          "index": 3,
+          "success": false,
+          "responseTime": 518,
+          "status": 429
+        },
+        {
+          "index": 4,
+          "success": false,
+          "responseTime": 515,
+          "status": 429
+        },
+        {
+          "index": 5,
+          "success": false,
+          "responseTime": 513,
+          "status": 429
+        },
+        {
+          "index": 6,
+          "success": false,
+          "responseTime": 513,
+          "status": 429
+        },
+        {
+          "index": 7,
+          "success": false,
+          "responseTime": 507,
+          "status": 429
+        },
+        {
+          "index": 8,
+          "success": false,
+          "responseTime": 510,
+          "status": 429
+        },
+        {
+          "index": 9,
+          "success": false,
+          "responseTime": 508,
+          "status": 429
+        }
+      ],
+      "totalTime": 536,
+      "averageResponseTime": null,
+      "maxResponseTime": null,
+      "minResponseTime": null,
+      "successRate": 0
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "summary": {
+    "totalTests": 17,
+    "passed": 7,
+    "failed": 4,
+    "warnings": 2,
+    "skipped": 4,
+    "totalErrors": 0,
+    "totalWarnings": 0,
+    "averageDuration": 471.3529411764706,
+    "successRate": "41.2%",
+    "overallHealth": "DEGRADED",
+    "deploymentReady": false
+  }
+}

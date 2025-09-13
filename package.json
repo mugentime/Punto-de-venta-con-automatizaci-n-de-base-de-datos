@@ -88,7 +88,14 @@
         "analyze:bundle": "node scripts/analyze-bundle.js",
         "prestart": "npm run optimize:assets",
         "railway:start": "NODE_OPTIONS='--max-old-space-size=400 --optimize-for-size' node server.js",
-        "railway:deploy": "npm run optimize:assets && npm run railway:start"
+        "railway:deploy": "npm run optimize:assets && npm run railway:start",
+        "validate:production": "node tests/production-validator.js",
+        "validate:deployment": "node scripts/deploy-validator.js",
+        "monitor:railway": "node scripts/railway-monitoring.js start",
+        "monitor:status": "node scripts/railway-monitoring.js status",
+        "monitor:dashboard": "node scripts/railway-monitoring.js dashboard",
+        "health:check": "node scripts/health-check.js",
+        "railway:validate": "npm run health:check && npm run validate:production && npm run validate:deployment"
     },
     "keywords": [
         "pos",

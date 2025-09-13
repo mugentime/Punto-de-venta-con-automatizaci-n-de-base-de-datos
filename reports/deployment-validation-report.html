@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Railway Deployment Validation Report</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 3rem; margin-bottom: 0.5rem; }
+        .header .subtitle { font-size: 1.3rem; opacity: 0.9; margin-bottom: 1rem; }
+        .header .timestamp { font-size: 1rem; opacity: 0.8; }
+        
+        .status-section {
+            text-align: center;
+            padding: 3rem 2rem;
+            background: #f8f9fa;
+        }
+        .deployment-status {
+            display: inline-block;
+            padding: 1.5rem 3rem;
+            border-radius: 50px;
+            font-weight: bold;
+            font-size: 2rem;
+            margin: 1rem 0;
+            color: white;
+            background: #ffc107;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .ready-indicator {
+            font-size: 1.5rem;
+            margin-top: 1rem;
+            color: #dc3545;
+        }
+        
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2rem;
+            padding: 3rem 2rem;
+            background: white;
+        }
+        .summary-card {
+            background: #f8f9fa;
+            padding: 2rem;
+            border-radius: 16px;
+            text-align: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+        .summary-card:hover { transform: translateY(-8px); }
+        .summary-card .value {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 0.5rem;
+        }
+        .summary-card .label {
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .content { padding: 2rem; }
+        .section { margin-bottom: 3rem; }
+        .section h2 {
+            font-size: 2rem;
+            margin-bottom: 1.5rem;
+            color: #495057;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 0.5rem;
+        }
+        
+        .stages-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+        .stage-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+        }
+        .stage-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+        }
+        .stage-header {
+            padding: 2rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .stage-header.pass { border-left: 6px solid #28a745; }
+        .stage-header.fail { border-left: 6px solid #dc3545; }
+        .stage-header.warn { border-left: 6px solid #ffc107; }
+        
+        .stage-info {
+            flex: 1;
+        }
+        .stage-name {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .stage-summary {
+            color: #6c757d;
+            font-size: 1rem;
+        }
+        .stage-status {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .stage-icon {
+            font-size: 2.5rem;
+        }
+        .stage-body {
+            padding: 2rem;
+        }
+        .stage-details {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 12px;
+            border-left: 4px solid #667eea;
+            margin-top: 1rem;
+        }
+        .stage-details pre {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+            margin: 0;
+        }
+        
+        .recommendations {
+            background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+            border: 2px solid #ffc107;
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 2rem 0;
+        }
+        .recommendations h3 {
+            color: #856404;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+        }
+        .recommendations ul {
+            list-style: none;
+            padding: 0;
+        }
+        .recommendations li {
+            background: white;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 8px;
+            border-left: 4px solid #ffc107;
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 3rem 2rem;
+            text-align: center;
+        }
+        .footer h3 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .footer p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🚀 Railway Deployment Validation</h1>
+            <div class="subtitle">https://pos-conejonegro-production.up.railway.app</div>
+            <div class="timestamp">Generated: 13/9/2025, 1:31:50 a.m.</div>
+        </div>
+        
+        <div class="status-section">
+            <div class="deployment-status">
+                NEEDS ATTENTION
+            </div>
+            <div class="ready-indicator">
+                ⚠️ DEPLOYMENT NOT RECOMMENDED
+            </div>
+        </div>
+        
+        <div class="summary-grid">
+            <div class="summary-card">
+                <div class="value">1/6</div>
+                <div class="label">Stages Passed</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">2</div>
+                <div class="label">Stages Failed</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">3</div>
+                <div class="label">Warnings</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">16.7%</div>
+                <div class="label">Success Rate</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>Validation Stages</h2>
+                <div class="stages-grid">
+                    
+                        <div class="stage-card">
+                            <div class="stage-header fail">
+                                <div class="stage-info">
+                                    <div class="stage-name">Health Check</div>
+                                    <div class="stage-summary">Health check stage failed</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">❌</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> FAIL</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:31:50 a.m.</div>
+                                <div style="color: #dc3545; margin-top: 0.5rem;"><strong>Error:</strong> HealthChecker is not a constructor</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="stage-card">
+                            <div class="stage-header fail">
+                                <div class="stage-info">
+                                    <div class="stage-name">Production Validation</div>
+                                    <div class="stage-summary">7/17 validations passed</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">❌</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> FAIL</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:31:55 a.m.</div>
+                                
+                                <div class="stage-details">
+                                    <strong>Details:</strong>
+                                    <pre>{
+  "timestamp": "2025-09-13T07:31:50.120Z",
+  "baseUrl": "https://pos-conejonegro-production.up.railway.app",
+  "tests": [
+    {
+      "name": "Basic Connectivity",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:51.508Z",
+      "duration": 1387,
+      "message": "Server responding with status 200",
+      "responseSize": 292239,
+      "responseHeaders": {
+        "accept-ranges": "bytes",
+        "access-control-allow-credentials": "true",
+        "cache-control": "public, max-age=0",
+        "content-length": "292602",
+        "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+        "content-type": "text/html; charset=UTF-8",
+        "cross-origin-opener-policy": "same-origin",
+        "cross-origin-resource-policy": "same-origin",
+        "date": "Sat, 13 Sep 2025 07:31:49 GMT",
+        "etag": "W/\"476fa-19941297cb0\"",
+        "last-modified": "Sat, 13 Sep 2025 03:41:02 GMT",
+        "origin-agent-cluster": "?1",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "railway-edge",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "vary": "Origin",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "off",
+        "x-download-options": "noopen",
+        "x-frame-options": "DENY",
+        "x-railway-edge": "railway/us-west2",
+        "x-railway-request-id": "9JLkzXhGRbubwR6XnpoFkQ",
+        "x-request-id": "8820738f-d938-48eb-9584-32fffa8a7047",
+        "x-xss-protection": "0"
+      }
+    },
+    {
+      "name": "Health: Health Check",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:51.723Z",
+      "duration": 215,
+      "message": "Endpoint responding correctly",
+      "path": "/api/health",
+      "data": {
+        "status": "ok",
+        "databaseType": "file-based-with-git-sync",
+        "isDatabaseReady": true,
+        "dataPath": "/app/data",
+        "environment": "production",
+        "railwayEnv": "production",
+        "renderEnv": "none",
+        "uptime": 13810.615836949,
+        "databaseResponseTime": 1,
+        "timestamp": "2025-09-13T07:31:50.509Z",
+        "storageInfo": {
+          "type": "File-based with Git synchronization",
+          "persistent": true,
+          "cost": "Free",
+          "backup": "Automatic via Git repository"
+        }
+      }
+    },
+    {
+      "name": "Health: Version Info",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:51.928Z",
+      "duration": 205,
+      "message": "Endpoint responding correctly",
+      "path": "/api/version",
+      "data": {
+        "name": "pos-conejo-negro",
+        "version": "1.0.0",
+        "description": "Point of Sale system for Conejo Negro Cafe with cloud backup",
+        "commit": "unknown",
+        "serviceId": "72109cc7-28c6-48c9-871b-1bb4fe8faedf",
+        "buildTime": "2025-09-13T07:31:50.719Z",
+        "nodeVersion": "v18.20.5",
+        "environment": "production",
+        "platform": "linux",
+        "arch": "x64",
+        "uptime": 13810.825883276,
+        "timestamp": "2025-09-13T07:31:50.719Z"
+      }
+    },
+    {
+      "name": "Health: Build Info",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:52.132Z",
+      "duration": 204,
+      "message": "Endpoint responding correctly",
+      "path": "/api/build-info",
+      "data": {
+        "build": {
+          "timestamp": "2025-09-13T07:31:50.923Z",
+          "version": "1.0.0",
+          "status": "runtime-generated",
+          "commit": "unknown"
+        },
+        "taskMaster": {
+          "enabled": true,
+          "architect": "primary",
+          "configPresent": false
+        },
+        "note": "Build info not found, generated at runtime"
+      }
+    },
+    {
+      "name": "Health: Sync Status",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:52.343Z",
+      "duration": 211,
+      "message": "Endpoint responding correctly",
+      "path": "/api/sync/status",
+      "data": {
+        "timestamp": "2025-09-13T07:31:51.126Z",
+        "dataDirectory": "/app/data",
+        "backupDirectory": "/app/backups",
+        "syncInProgress": false,
+        "dataFiles": {
+          "users.json": {
+            "exists": true,
+            "size": 2123,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 4
+          },
+          "products.json": {
+            "exists": true,
+            "size": 1090,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 3
+          },
+          "records.json": {
+            "exists": true,
+            "size": 9113,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 12
+          },
+          "cash_cuts.json": {
+            "exists": true,
+            "size": 11333,
+            "modified": "2025-09-13T06:00:00.415Z",
+            "records": 10
+          },
+          "expenses.json": {
+            "exists": true,
+            "size": 5774,
+            "modified": "2025-09-13T03:41:02.000Z",
+            "records": 8
+          }
+        },
+        "backups": [],
+        "gitStatus": {
+          "error": "Not a git repository or git not available"
+        },
+        "system": "File-based with Git synchronization",
+        "cost": "Free",
+        "persistent": true
+      }
+    },
+    {
+      "name": "Authentication: Login",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:52.926Z",
+      "duration": 583,
+      "message": "Admin login successful",
+      "hasToken": true,
+      "userRole": "admin"
+    },
+    {
+      "name": "Authentication: Protected Route",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:31:53.132Z",
+      "duration": 0,
+      "message": "Protected endpoint returned status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "Authentication: Invalid Token",
+      "status": "WARN",
+      "timestamp": "2025-09-13T07:31:53.339Z",
+      "duration": 0,
+      "message": "Invalid token handling unexpected: status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "Database: User Operations",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:31:53.546Z",
+      "duration": 0,
+      "message": "User query failed with status 429",
+      "responseStatus": 429
+    },
+    {
+      "name": "API: Statistics",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:31:53.959Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/stats"
+    },
+    {
+      "name": "API: Data Sync",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:31:53.959Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/sync"
+    },
+    {
+      "name": "API: Backup Creation",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:31:54.168Z",
+      "duration": 209,
+      "message": "Endpoint returned status 429",
+      "path": "/api/sync/backup",
+      "responseStatus": 429,
+      "responseBody": {}
+    },
+    {
+      "name": "API: Products List",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:31:54.168Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/products"
+    },
+    {
+      "name": "API: Records List",
+      "status": "SKIP",
+      "timestamp": "2025-09-13T07:31:54.168Z",
+      "duration": 0,
+      "message": "Skipped due to missing authentication token",
+      "path": "/api/records"
+    },
+    {
+      "name": "Performance: Load Test",
+      "status": "WARN",
+      "timestamp": "2025-09-13T07:31:54.684Z",
+      "duration": 0,
+      "message": "10 concurrent requests completed",
+      "metrics": {
+        "requests": [
+          {
+            "index": 0,
+            "success": false,
+            "responseTime": 215,
+            "status": 429
+          },
+          {
+            "index": 1,
+            "success": false,
+            "responseTime": 504,
+            "status": 429
+          },
+          {
+            "index": 2,
+            "success": false,
+            "responseTime": 512,
+            "status": 429
+          },
+          {
+            "index": 3,
+            "success": false,
+            "responseTime": 502,
+            "status": 429
+          },
+          {
+            "index": 4,
+            "success": false,
+            "responseTime": 481,
+            "status": 429
+          },
+          {
+            "index": 5,
+            "success": false,
+            "responseTime": 353,
+            "status": 429
+          },
+          {
+            "index": 6,
+            "success": false,
+            "responseTime": 507,
+            "status": 429
+          },
+          {
+            "index": 7,
+            "success": false,
+            "responseTime": 497,
+            "status": 429
+          },
+          {
+            "index": 8,
+            "success": false,
+            "responseTime": 505,
+            "status": 429
+          },
+          {
+            "index": 9,
+            "success": false,
+            "responseTime": 503,
+            "status": 429
+          }
+        ],
+        "totalTime": 515,
+        "averageResponseTime": null,
+        "maxResponseTime": null,
+        "minResponseTime": null,
+        "successRate": 0
+      }
+    },
+    {
+      "name": "Security: Headers",
+      "status": "PASS",
+      "timestamp": "2025-09-13T07:31:55.575Z",
+      "duration": 0,
+      "message": "5/5 security headers present",
+      "securityHeaders": {
+        "strict-transport-security": true,
+        "x-content-type-options": true,
+        "x-frame-options": true,
+        "content-security-policy": true,
+        "x-xss-protection": true
+      },
+      "allHeaders": {
+        "accept-ranges": "bytes",
+        "access-control-allow-credentials": "true",
+        "cache-control": "public, max-age=0",
+        "content-length": "292602",
+        "content-security-policy": "default-src 'self';script-src 'self' 'unsafe-inline' 'unsafe-eval' 'unsafe-hashes' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com;font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com;img-src 'self' data: https:;connect-src 'self' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net;base-uri 'self';form-action 'self';frame-ancestors 'self';object-src 'none';script-src-attr 'none';upgrade-insecure-requests",
+        "content-type": "text/html; charset=UTF-8",
+        "cross-origin-opener-policy": "same-origin",
+        "cross-origin-resource-policy": "same-origin",
+        "date": "Sat, 13 Sep 2025 07:31:53 GMT",
+        "etag": "W/\"476fa-19941297cb0\"",
+        "last-modified": "Sat, 13 Sep 2025 03:41:02 GMT",
+        "origin-agent-cluster": "?1",
+        "referrer-policy": "strict-origin-when-cross-origin",
+        "server": "railway-edge",
+        "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+        "vary": "Origin",
+        "x-content-type-options": "nosniff",
+        "x-dns-prefetch-control": "off",
+        "x-download-options": "noopen",
+        "x-frame-options": "DENY",
+        "x-railway-edge": "railway/us-west2",
+        "x-railway-request-id": "8Ax6OaQWRGmJp0Gh9I3ezw",
+        "x-request-id": "5c39f6ce-053a-473d-af57-0ca5926f4571",
+        "x-xss-protection": "0"
+      }
+    },
+    {
+      "name": "Environment: Configuration",
+      "status": "FAIL",
+      "timestamp": "2025-09-13T07:31:55.783Z",
+      "duration": 0,
+      "message": "Environment check endpoint failed with status 429",
+      "responseStatus": 429
+    }
+  ],
+  "metrics": {
+    "health": {
+      "status": "ok",
+      "databaseType": "file-based-with-git-sync",
+      "isDatabaseReady": true,
+      "dataPath": "/app/data",
+      "environment": "production",
+      "railwayEnv": "production",
+      "renderEnv": "none",
+      "uptime": 13810.615836949,
+      "databaseResponseTime": 1,
+      "timestamp": "2025-09-13T07:31:50.509Z",
+      "storageInfo": {
+        "type": "File-based with Git synchronization",
+        "persistent": true,
+        "cost": "Free",
+        "backup": "Automatic via Git repository"
+      }
+    },
+    "performance": {
+      "requests": [
+        {
+          "index": 0,
+          "success": false,
+          "responseTime": 215,
+          "status": 429
+        },
+        {
+          "index": 1,
+          "success": false,
+          "responseTime": 504,
+          "status": 429
+        },
+        {
+          "index": 2,
+          "success": false,
+          "responseTime": 512,
+          "status": 429
+        },
+        {
+          "index": 3,
+          "success": false,
+          "responseTime": 502,
+          "status": 429
+        },
+        {
+          "index": 4,
+          "success": false,
+          "responseTime": 481,
+          "status": 429
+        },
+        {
+          "index": 5,
+          "success": false,
+          "responseTime": 353,
+          "status": 429
+        },
+        {
+          "index": 6,
+          "success": false,
+          "responseTime": 507,
+          "status": 429
+        },
+        {
+          "index": 7,
+          "success": false,
+          "responseTime": 497,
+          "status": 429
+        },
+        {
+          "index": 8,
+          "success": false,
+          "responseTime": 505,
+          "status": 429
+        },
+        {
+          "index": 9,
+          "success": false,
+          "responseTime": 503,
+          "status": 429
+        }
+      ],
+      "totalTime": 515,
+      "averageResponseTime": null,
+      "maxResponseTime": null,
+      "minResponseTime": null,
+      "successRate": 0
+    }
+  },
+  "errors": [],
+  "warnings": [],
+  "summary": {
+    "totalTests": 17,
+    "passed": 7,
+    "failed": 4,
+    "warnings": 2,
+    "skipped": 4,
+    "totalErrors": 0,
+    "totalWarnings": 0,
+    "averageDuration": 177.2941176470588,
+    "successRate": "41.2%",
+    "overallHealth": "DEGRADED",
+    "deploymentReady": false
+  }
+}</pre>
+                                  </div>
+                            </div>
+                        </div>
+                      
+                        <div class="stage-card">
+                            <div class="stage-header warn">
+                                <div class="stage-info">
+                                    <div class="stage-name">Performance Testing</div>
+                                    <div class="stage-summary">0% success rate, NaNms avg response</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">⚠️</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> WARN</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:32:02 a.m.</div>
+                                
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="stage-card">
+                            <div class="stage-header pass">
+                                <div class="stage-info">
+                                    <div class="stage-name">Security Validation</div>
+                                    <div class="stage-summary">6/6 security checks passed</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">✅</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> PASS</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:32:02 a.m.</div>
+                                
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="stage-card">
+                            <div class="stage-header warn">
+                                <div class="stage-info">
+                                    <div class="stage-name">Data Persistence</div>
+                                    <div class="stage-summary">Data integrity: false, Backup system: false</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">⚠️</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> WARN</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:32:02 a.m.</div>
+                                
+                                <div class="stage-details">
+                                    <strong>Details:</strong>
+                                    <pre>{
+  "syncResponseStatus": 429,
+  "userResponseStatus": 429
+}</pre>
+                                  </div>
+                            </div>
+                        </div>
+                      
+                        <div class="stage-card">
+                            <div class="stage-header warn">
+                                <div class="stage-info">
+                                    <div class="stage-name">Monitoring Setup</div>
+                                    <div class="stage-summary">Health endpoints: false, Alerting: true</div>
+                                </div>
+                                <div class="stage-status">
+                                    <div class="stage-icon">⚠️</div>
+                                </div>
+                            </div>
+                            <div class="stage-body">
+                                <div><strong>Status:</strong> WARN</div>
+                                <div><strong>Completed:</strong> 13/9/2025, 1:32:03 a.m.</div>
+                                
+                                
+                            </div>
+                        </div>
+                      
+                </div>
+            </div>
+            
+            
+                <div class="recommendations">
+                    <h3>💡 Recommendations for Production Deployment</h3>
+                    <ul>
+                        <li>📋 Resolve production validation failures</li><li>📋 Check authentication and database connectivity</li><li>📋 Consider optimizing application performance</li><li>📋 Ensure data persistence and backup systems are working correctly</li><li>📋 Set up comprehensive monitoring and alerting</li>
+                    </ul>
+                </div>
+            
+        </div>
+        
+        <div class="footer">
+            <h3>Deployment Validation Complete</h3>
+            <p>
+                Status: <strong>NEEDS_ATTENTION</strong> • 
+                Production Ready: <strong>NO</strong>
+            </p>
+            <p style="margin-top: 1rem; font-size: 1rem;">
+                Railway Deployment Validator v1.0 • Generated 13/9/2025, 1:32:03 a.m.
+            </p>
+        </div>
+    </div>
+</body>
+</html>

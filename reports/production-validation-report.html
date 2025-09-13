@@ -1,0 +1,658 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Production Validation Report - 13/9/2025</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        .header h1 { font-size: 2.5rem; margin-bottom: 0.5rem; }
+        .header .subtitle { font-size: 1.2rem; opacity: 0.9; margin-bottom: 1rem; }
+        .header .timestamp { font-size: 0.9rem; opacity: 0.8; }
+        
+        .summary {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            padding: 2rem;
+            background: #f8f9fa;
+        }
+        .summary-card {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: transform 0.2s;
+        }
+        .summary-card:hover { transform: translateY(-4px); }
+        .summary-card .value {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+        }
+        .summary-card.healthy .value { color: #28a745; }
+        .summary-card.warning .value { color: #ffc107; }
+        .summary-card.error .value { color: #dc3545; }
+        .summary-card .label {
+            font-size: 0.9rem;
+            color: #6c757d;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .health-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 25px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin: 1rem 0;
+        }
+        .health-badge.healthy { background: #d4edda; color: #155724; }
+        .health-badge.degraded { background: #f8d7da; color: #721c24; }
+        
+        .content { padding: 2rem; }
+        .section { margin-bottom: 2rem; }
+        .section h2 {
+            font-size: 1.5rem;
+            margin-bottom: 1rem;
+            color: #495057;
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 0.5rem;
+        }
+        
+        .test-grid {
+            display: grid;
+            gap: 1rem;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        }
+        .test-card {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 12px;
+            overflow: hidden;
+            transition: all 0.3s;
+        }
+        .test-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        .test-header {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-bottom: 1px solid #dee2e6;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .test-status {
+            font-size: 1.5rem;
+            margin-right: 0.5rem;
+        }
+        .test-name {
+            font-weight: 600;
+            flex: 1;
+        }
+        .test-duration {
+            font-size: 0.8rem;
+            color: #6c757d;
+            background: #e9ecef;
+            padding: 0.2rem 0.5rem;
+            border-radius: 12px;
+        }
+        .test-body {
+            padding: 1rem;
+        }
+        .test-message {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+        .test-details {
+            font-size: 0.85rem;
+            background: #f8f9fa;
+            padding: 0.75rem;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+            overflow-x: auto;
+        }
+        .test-details pre {
+            margin: 0;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .metric-card {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            border-left: 4px solid #28a745;
+        }
+        .metric-card h4 {
+            margin-bottom: 0.5rem;
+            color: #495057;
+        }
+        
+        .errors-section {
+            background: #fff5f5;
+            border: 1px solid #feb2b2;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-top: 2rem;
+        }
+        .errors-section h3 {
+            color: #c53030;
+            margin-bottom: 1rem;
+        }
+        .error-item {
+            background: white;
+            padding: 0.75rem;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            border-left: 4px solid #dc3545;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 2rem;
+            text-align: center;
+            color: #6c757d;
+            border-top: 1px solid #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Production Validation Report</h1>
+            <div class="subtitle">https://pos-conejonegro-production.up.railway.app</div>
+            <div class="timestamp">Generated: 13/9/2025, 1:29:50 a.m.</div>
+            <div class="health-badge degraded">
+                DEGRADED ⚠️
+            </div>
+        </div>
+        
+        <div class="summary">
+            <div class="summary-card healthy">
+                <div class="value">7</div>
+                <div class="label">Tests Passed</div>
+            </div>
+            <div class="summary-card error">
+                <div class="value">4</div>
+                <div class="label">Tests Failed</div>
+            </div>
+            <div class="summary-card warning">
+                <div class="value">2</div>
+                <div class="label">Warnings</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">41.2%</div>
+                <div class="label">Success Rate</div>
+            </div>
+            <div class="summary-card">
+                <div class="value">471ms</div>
+                <div class="label">Avg Response</div>
+            </div>
+            <div class="summary-card error">
+                <div class="value">❌</div>
+                <div class="label">Deploy Ready</div>
+            </div>
+        </div>
+        
+        <div class="content">
+            <div class="section">
+                <h2>Test Results</h2>
+                <div class="test-grid">
+                    
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Basic Connectivity</span>
+                                </div>
+                                <span class="test-duration">6386ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Server responding with status 200</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Health: Health Check</span>
+                                </div>
+                                <span class="test-duration">207ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Endpoint responding correctly</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Health: Version Info</span>
+                                </div>
+                                <span class="test-duration">206ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Endpoint responding correctly</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Health: Build Info</span>
+                                </div>
+                                <span class="test-duration">207ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Endpoint responding correctly</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Health: Sync Status</span>
+                                </div>
+                                <span class="test-duration">217ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Endpoint responding correctly</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Authentication: Login</span>
+                                </div>
+                                <span class="test-duration">581ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Admin login successful</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">❌</span>
+                                    <span class="test-name">Authentication: Protected Route</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Protected endpoint returned status 429</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⚠️</span>
+                                    <span class="test-name">Authentication: Invalid Token</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Invalid token handling unexpected: status 429</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">❌</span>
+                                    <span class="test-name">Database: User Operations</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">User query failed with status 429</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⏭️</span>
+                                    <span class="test-name">API: Statistics</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Skipped due to missing authentication token</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⏭️</span>
+                                    <span class="test-name">API: Data Sync</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Skipped due to missing authentication token</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">❌</span>
+                                    <span class="test-name">API: Backup Creation</span>
+                                </div>
+                                <span class="test-duration">209ms</span>
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Endpoint returned status 429</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⏭️</span>
+                                    <span class="test-name">API: Products List</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Skipped due to missing authentication token</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⏭️</span>
+                                    <span class="test-name">API: Records List</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Skipped due to missing authentication token</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">⚠️</span>
+                                    <span class="test-name">Performance: Load Test</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">10 concurrent requests completed</div>
+                                <div class="test-details">
+                                    <pre>{
+  "requests": [
+    {
+      "index": 0,
+      "success": false,
+      "responseTime": 221,
+      "status": 429
+    },
+    {
+      "index": 1,
+      "success": false,
+      "responseTime": 518,
+      "status": 429
+    },
+    {
+      "index": 2,
+      "success": false,
+      "responseTime": 534,
+      "status": 429
+    },
+    {
+      "index": 3,
+      "success": false,
+      "responseTime": 518,
+      "status": 429
+    },
+    {
+      "index": 4,
+      "success": false,
+      "responseTime": 515,
+      "status": 429
+    },
+    {
+      "index": 5,
+      "success": false,
+      "responseTime": 513,
+      "status": 429
+    },
+    {
+      "index": 6,
+      "success": false,
+      "responseTime": 513,
+      "status": 429
+    },
+    {
+      "index": 7,
+      "success": false,
+      "responseTime": 507,
+      "status": 429
+    },
+    {
+      "index": 8,
+      "success": false,
+      "responseTime": 510,
+      "status": 429
+    },
+    {
+      "index": 9,
+      "success": false,
+      "responseTime": 508,
+      "status": 429
+    }
+  ],
+  "totalTime": 536,
+  "averageResponseTime": null,
+  "maxResponseTime": null,
+  "minResponseTime": null,
+  "successRate": 0
+}</pre>
+                                  </div>
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">✅</span>
+                                    <span class="test-name">Security: Headers</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">5/5 security headers present</div>
+                                
+                            </div>
+                        </div>
+                      
+                        <div class="test-card">
+                            <div class="test-header">
+                                <div>
+                                    <span class="test-status">❌</span>
+                                    <span class="test-name">Environment: Configuration</span>
+                                </div>
+                                
+                            </div>
+                            <div class="test-body">
+                                <div class="test-message">Environment check endpoint failed with status 429</div>
+                                
+                            </div>
+                        </div>
+                      
+                </div>
+            </div>
+            
+            
+                <div class="section">
+                    <h2>Performance Metrics</h2>
+                    <div class="metrics-grid">
+                        
+                            <div class="metric-card">
+                                <h4>Health</h4>
+                                <pre>{
+  "status": "ok",
+  "databaseType": "file-based-with-git-sync",
+  "isDatabaseReady": true,
+  "dataPath": "/app/data",
+  "environment": "production",
+  "railwayEnv": "production",
+  "renderEnv": "none",
+  "uptime": 13696.184449307,
+  "databaseResponseTime": 1,
+  "timestamp": "2025-09-13T07:29:56.078Z",
+  "storageInfo": {
+    "type": "File-based with Git synchronization",
+    "persistent": true,
+    "cost": "Free",
+    "backup": "Automatic via Git repository"
+  }
+}</pre>
+                            </div>
+                        
+                            <div class="metric-card">
+                                <h4>Performance</h4>
+                                <pre>{
+  "requests": [
+    {
+      "index": 0,
+      "success": false,
+      "responseTime": 221,
+      "status": 429
+    },
+    {
+      "index": 1,
+      "success": false,
+      "responseTime": 518,
+      "status": 429
+    },
+    {
+      "index": 2,
+      "success": false,
+      "responseTime": 534,
+      "status": 429
+    },
+    {
+      "index": 3,
+      "success": false,
+      "responseTime": 518,
+      "status": 429
+    },
+    {
+      "index": 4,
+      "success": false,
+      "responseTime": 515,
+      "status": 429
+    },
+    {
+      "index": 5,
+      "success": false,
+      "responseTime": 513,
+      "status": 429
+    },
+    {
+      "index": 6,
+      "success": false,
+      "responseTime": 513,
+      "status": 429
+    },
+    {
+      "index": 7,
+      "success": false,
+      "responseTime": 507,
+      "status": 429
+    },
+    {
+      "index": 8,
+      "success": false,
+      "responseTime": 510,
+      "status": 429
+    },
+    {
+      "index": 9,
+      "success": false,
+      "responseTime": 508,
+      "status": 429
+    }
+  ],
+  "totalTime": 536,
+  "averageResponseTime": null,
+  "maxResponseTime": null,
+  "minResponseTime": null,
+  "successRate": 0
+}</pre>
+                            </div>
+                        
+                    </div>
+                </div>
+            
+            
+            
+        </div>
+        
+        <div class="footer">
+            <p>Production Validation Suite v1.0 • Generated at 13/9/2025, 1:30:01 a.m.</p>
+            <p>Deployment Status: <strong>NEEDS ATTENTION</strong></p>
+        </div>
+    </div>
+</body>
+</html>
