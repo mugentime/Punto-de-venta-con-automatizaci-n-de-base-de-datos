@@ -5,6 +5,28 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
 class FileDatabase {
+  /**
+   * Actualiza los datos de un usuario por su email o id
+   * @param {string} identifier - email o id del usuario
+   * @param {Object} updates - campos a actualizar
+   * @returns {Object|null} usuario actualizado o null si no existe
+   */
+  async updateUser(identifier, updates) {
+    const users = JSON.parse(await fs.readFile(this.usersFile, 'utf8'));
+    let updatedUser = null;
+    for (let i = 0; i < users.length; i++) {
+      if (users[i].email === identifier || users[i]._id === identifier) {
+        users[i] = { ...users[i], ...updates };
+        updatedUser = users[i];
+        break;
+      }
+    }
+    if (updatedUser) {
+      await fs.writeFile(this.usersFile, JSON.stringify(users, null, 2));
+      return updatedUser;
+    }
+    return null;
+  }
   constructor() {
     // Usar siempre /workspaces/POS-CONEJONEGRO/data para evitar problemas de permisos en entornos restringidos
     this.dataPath = path.join(__dirname, '..', 'data');
