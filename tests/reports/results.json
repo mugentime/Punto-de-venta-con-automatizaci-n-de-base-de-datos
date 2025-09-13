@@ -1,11 +1,11 @@
 {
   "config": {
-    "configFile": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\playwright.config.js",
-    "rootDir": "C:/Users/je2al/Documents/01-aplicaciones/POS Conejo negro/POS-CONEJONEGRO/tests/e2e",
+    "configFile": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\playwright.config.js",
+    "rootDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
-    "globalSetup": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\setup\\global-setup.js",
-    "globalTeardown": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\setup\\global-teardown.js",
+    "globalSetup": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\setup\\global-setup.js",
+    "globalTeardown": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\setup\\global-teardown.js",
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
@@ -14,8 +14,7 @@
       "Test Suite": "POS Conejo Negro E2E Tests",
       "Environment": "development",
       "Base URL": "http://localhost:3000",
-      "Timestamp": "2025-09-03T15:44:29.323Z",
-      "actualWorkers": 1
+      "Timestamp": "2025-09-13T14:39:55.736Z"
     },
     "preserveOutput": "always",
     "reporter": [
@@ -47,19 +46,18 @@
     "quiet": false,
     "projects": [
       {
-        "outputDir": "C:/Users/je2al/Documents/01-aplicaciones/POS Conejo negro/POS-CONEJONEGRO/tests/results",
+        "outputDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-03T15:44:29.323Z",
-          "actualWorkers": 1
+          "Timestamp": "2025-09-13T14:39:55.736Z"
         },
         "id": "setup",
         "name": "setup",
-        "testDir": "C:/Users/je2al/Documents/01-aplicaciones/POS Conejo negro/POS-CONEJONEGRO/tests/e2e",
+        "testDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "/.*\\.setup\\.js/"
@@ -67,19 +65,18 @@
         "timeout": 120000
       },
       {
-        "outputDir": "C:/Users/je2al/Documents/01-aplicaciones/POS Conejo negro/POS-CONEJONEGRO/tests/results",
+        "outputDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/results",
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
-          "Timestamp": "2025-09-03T15:44:29.323Z",
-          "actualWorkers": 1
+          "Timestamp": "2025-09-13T14:39:55.736Z"
         },
         "id": "chromium",
         "name": "chromium",
-        "testDir": "C:/Users/je2al/Documents/01-aplicaciones/POS Conejo negro/POS-CONEJONEGRO/tests/e2e",
+        "testDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -103,137 +100,19 @@
       }
     }
   },
-  "suites": [
+  "suites": [],
+  "errors": [
     {
-      "title": "auth.setup.js",
-      "file": "auth.setup.js",
-      "column": 0,
-      "line": 0,
-      "specs": [
-        {
-          "title": "authenticate",
-          "ok": false,
-          "tags": [],
-          "tests": [
-            {
-              "timeout": 120000,
-              "annotations": [],
-              "expectedStatus": "passed",
-              "projectId": "setup",
-              "projectName": "setup",
-              "results": [
-                {
-                  "workerIndex": 0,
-                  "parallelIndex": 0,
-                  "status": "failed",
-                  "duration": 36578,
-                  "error": {
-                    "message": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n",
-                    "stack": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:93:14",
-                    "location": {
-                      "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
-                      "column": 14,
-                      "line": 93
-                    },
-                    "snippet": "\u001b[0m \u001b[90m 91 |\u001b[39m   \n \u001b[90m 92 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m   \n \u001b[90m 95 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 96 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m"
-                  },
-                  "errors": [
-                    {
-                      "location": {
-                        "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
-                        "column": 14,
-                        "line": 93
-                      },
-                      "message": "TimeoutError: page.waitForSelector: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('#main-app') to be visible\u001b[22m\n\u001b[2m    63 × locator resolved to hidden <div id=\"main-app\">…</div>\u001b[22m\n\n\n\u001b[0m \u001b[90m 91 |\u001b[39m   \n \u001b[90m 92 |\u001b[39m   \u001b[90m// Wait for successful login - main app should become visible\u001b[39m\n\u001b[31m\u001b[1m>\u001b[22m\u001b[39m\u001b[90m 93 |\u001b[39m   \u001b[36mawait\u001b[39m page\u001b[33m.\u001b[39mwaitForSelector(\u001b[32m'#main-app'\u001b[39m\u001b[33m,\u001b[39m { state\u001b[33m:\u001b[39m \u001b[32m'visible'\u001b[39m\u001b[33m,\u001b[39m timeout\u001b[33m:\u001b[39m \u001b[35m30000\u001b[39m })\u001b[33m;\u001b[39m\n \u001b[90m    |\u001b[39m              \u001b[31m\u001b[1m^\u001b[22m\u001b[39m\n \u001b[90m 94 |\u001b[39m   \n \u001b[90m 95 |\u001b[39m   \u001b[90m// Verify login was successful\u001b[39m\n \u001b[90m 96 |\u001b[39m   \u001b[36mawait\u001b[39m expect(page\u001b[33m.\u001b[39mlocator(\u001b[32m'#main-app'\u001b[39m))\u001b[33m.\u001b[39mtoBeVisible()\u001b[33m;\u001b[39m\u001b[0m\n\u001b[2m    at C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js:93:14\u001b[22m"
-                    }
-                  ],
-                  "stdout": [
-                    {
-                      "text": "🔐 Setting up authentication...\n"
-                    },
-                    {
-                      "text": "Page title: Conejo Negro - Café Coworking Online\n"
-                    },
-                    {
-                      "text": "Page URL: http://localhost:3000/online\n"
-                    },
-                    {
-                      "text": "Main app status:\n"
-                    },
-                    {
-                      "text": "- #main-app exists: \u001b[33mtrue\u001b[39m\n"
-                    },
-                    {
-                      "text": "- #main-app visible: \u001b[33mfalse\u001b[39m\n"
-                    },
-                    {
-                      "text": "Login screen found\n"
-                    },
-                    {
-                      "text": "Login form elements found, proceeding with authentication...\n"
-                    },
-                    {
-                      "text": "Filled credentials, submitting form...\n"
-                    },
-                    {
-                      "text": "After login attempt:\n"
-                    },
-                    {
-                      "text": "- Login screen visible: \u001b[33mtrue\u001b[39m\n"
-                    },
-                    {
-                      "text": "- Main app visible: \u001b[33mfalse\u001b[39m\n"
-                    },
-                    {
-                      "text": "Still on login screen, checking for JavaScript errors...\n"
-                    }
-                  ],
-                  "stderr": [],
-                  "retry": 0,
-                  "startTime": "2025-09-03T15:44:32.294Z",
-                  "annotations": [],
-                  "attachments": [
-                    {
-                      "name": "screenshot",
-                      "contentType": "image/png",
-                      "path": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\results\\auth.setup.js-authenticate-setup\\test-failed-1.png"
-                    },
-                    {
-                      "name": "video",
-                      "contentType": "video/webm",
-                      "path": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\results\\auth.setup.js-authenticate-setup\\video.webm"
-                    },
-                    {
-                      "name": "error-context",
-                      "contentType": "text/markdown",
-                      "path": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\results\\auth.setup.js-authenticate-setup\\error-context.md"
-                    }
-                  ],
-                  "errorLocation": {
-                    "file": "C:\\Users\\je2al\\Documents\\01-aplicaciones\\POS Conejo negro\\POS-CONEJONEGRO\\tests\\e2e\\auth.setup.js",
-                    "column": 14,
-                    "line": 93
-                  }
-                }
-              ],
-              "status": "unexpected"
-            }
-          ],
-          "id": "f376efe52c54b1a876fd-9d03a3bb502e264caa3f",
-          "file": "auth.setup.js",
-          "line": 9,
-          "column": 1
-        }
-      ]
+      "message": "Error: No tests found",
+      "stack": "Error: No tests found"
     }
   ],
-  "errors": [],
   "stats": {
-    "startTime": "2025-09-03T15:44:29.329Z",
-    "duration": 40227.989,
+    "startTime": "2025-09-13T14:39:55.742Z",
+    "duration": 41.76800000000003,
     "expected": 0,
     "skipped": 0,
-    "unexpected": 1,
+    "unexpected": 0,
     "flaky": 0
   }
 }

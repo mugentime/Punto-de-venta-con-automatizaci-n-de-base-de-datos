@@ -1,0 +1,40 @@
+{
+  "timestamp": "2025-09-13T14:41:35.030Z",
+  "tests": [
+    {
+      "name": "Basic Connectivity",
+      "status": "PASS",
+      "details": "HTTP 200"
+    },
+    {
+      "name": "Content Analysis",
+      "status": "WARNING",
+      "details": "API placeholder instead of POS app"
+    },
+    {
+      "name": "Health Endpoints",
+      "status": "FAIL",
+      "details": "Health: 404, Status: 404"
+    },
+    {
+      "name": "Mobile Responsiveness",
+      "status": "PASS",
+      "details": "Responsive design confirmed"
+    },
+    {
+      "name": "Performance",
+      "status": "PASS",
+      "details": "1605ms avg"
+    },
+    {
+      "name": "Security Headers",
+      "status": "WARNING",
+      "details": "0% coverage (low)"
+    }
+  ],
+  "summary": {
+    "passed": 3,
+    "failed": 3,
+    "total": 6
+  }
+}

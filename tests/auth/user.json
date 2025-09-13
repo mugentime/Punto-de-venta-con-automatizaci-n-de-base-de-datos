@@ -1,0 +1,18 @@
+{
+  "cookies": [],
+  "origins": [
+    {
+      "origin": "http://localhost:3000",
+      "localStorage": [
+        {
+          "name": "authToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VySWQiOiJlMGNiZDI3NDI5ZWFhMjBhY2Y0OGNjMjMiLCJlbWFpbCI6ImFkbWluQGNvbmVqb25lZ3JvLmNvbSIsInJvbGUiOiJhZG1pbiIsImlhdCI6MTc1Nzc3NDI3MiwiZXhwIjoxNzU4Mzc5MDcyfQ.tx6Mqm0VttF4rBW3cDnnqKfmeDPs-yxwIXqatf2Xfxs"
+        },
+        {
+          "name": "currentUser",
+          "value": "{\"name\":\"Administrator\",\"email\":\"admin@conejonegro.com\",\"role\":\"admin\",\"permissions\":{\"canManageInventory\":true,\"canRegisterClients\":true,\"canViewReports\":true,\"canManageUsers\":true,\"canExportData\":true,\"canDeleteRecords\":true}}"
+        }
+      ]
+    }
+  ]
+}
