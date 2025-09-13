@@ -1,0 +1,132 @@
+{
+  "startTime": "2025-09-13T21:44:33.900Z",
+  "currentTime": "2025-09-13T21:46:12.450Z",
+  "totalChecks": 4,
+  "results": [
+    {
+      "iteration": 1,
+      "railway": {
+        "timestamp": "2025-09-13T21:44:33.900Z",
+        "url": "https://pos-conejo-negro.railway.app",
+        "status": 200,
+        "loadTime": 3472,
+        "title": "No title",
+        "hasApiPlaceholder": true,
+        "hasPosElements": false,
+        "healthStatus": 404,
+        "assessment": "api_placeholder"
+      },
+      "local": {
+        "timestamp": "2025-09-13T21:44:34.902Z",
+        "url": "http://localhost:3000",
+        "status": 200,
+        "loadTime": 984,
+        "title": "Conejo Negro - POS System",
+        "hasApiPlaceholder": false,
+        "hasPosElements": true,
+        "healthStatus": 200,
+        "assessment": "fully_deployed"
+      },
+      "comparison": {
+        "railwayWorking": false,
+        "localWorking": true,
+        "syncNeeded": true
+      }
+    },
+    {
+      "iteration": 2,
+      "railway": {
+        "timestamp": "2025-09-13T21:45:05.556Z",
+        "url": "https://pos-conejo-negro.railway.app",
+        "status": 200,
+        "loadTime": 404,
+        "title": "No title",
+        "hasApiPlaceholder": true,
+        "hasPosElements": false,
+        "healthStatus": 404,
+        "assessment": "api_placeholder"
+      },
+      "local": {
+        "timestamp": "2025-09-13T21:45:05.751Z",
+        "url": "http://localhost:3000",
+        "status": 200,
+        "loadTime": 180,
+        "title": "Conejo Negro - POS System",
+        "hasApiPlaceholder": false,
+        "hasPosElements": true,
+        "healthStatus": 200,
+        "assessment": "fully_deployed"
+      },
+      "comparison": {
+        "railwayWorking": false,
+        "localWorking": true,
+        "syncNeeded": true
+      }
+    },
+    {
+      "iteration": 3,
+      "railway": {
+        "timestamp": "2025-09-13T21:45:36.494Z",
+        "url": "https://pos-conejo-negro.railway.app",
+        "status": 200,
+        "loadTime": 466,
+        "title": "No title",
+        "hasApiPlaceholder": true,
+        "hasPosElements": false,
+        "healthStatus": 404,
+        "assessment": "api_placeholder"
+      },
+      "local": {
+        "timestamp": "2025-09-13T21:45:36.754Z",
+        "url": "http://localhost:3000",
+        "status": 200,
+        "loadTime": 248,
+        "title": "Conejo Negro - POS System",
+        "hasApiPlaceholder": false,
+        "hasPosElements": true,
+        "healthStatus": 200,
+        "assessment": "fully_deployed"
+      },
+      "comparison": {
+        "railwayWorking": false,
+        "localWorking": true,
+        "syncNeeded": true
+      }
+    },
+    {
+      "iteration": 4,
+      "railway": {
+        "timestamp": "2025-09-13T21:46:12.198Z",
+        "url": "https://pos-conejo-negro.railway.app",
+        "status": 200,
+        "loadTime": 297,
+        "title": "No title",
+        "hasApiPlaceholder": true,
+        "hasPosElements": false,
+        "healthStatus": 404,
+        "assessment": "api_placeholder"
+      },
+      "local": {
+        "timestamp": "2025-09-13T21:46:12.450Z",
+        "url": "http://localhost:3000",
+        "status": 200,
+        "loadTime": 240,
+        "title": "Conejo Negro - POS System",
+        "hasApiPlaceholder": false,
+        "hasPosElements": true,
+        "healthStatus": 200,
+        "assessment": "fully_deployed"
+      },
+      "comparison": {
+        "railwayWorking": false,
+        "localWorking": true,
+        "syncNeeded": true
+      }
+    }
+  ],
+  "summary": {
+    "railwayWorking": 0,
+    "apiPlaceholder": 4,
+    "offline": 0
+  }
+}

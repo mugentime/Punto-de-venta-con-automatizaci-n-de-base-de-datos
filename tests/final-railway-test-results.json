@@ -1,0 +1,54 @@
+{
+  "timestamp": "2025-09-13T21:50:30.371Z",
+  "url": "https://pos-conejo-negro.railway.app",
+  "tests": [
+    {
+      "name": "Connectivity",
+      "status": "PASS",
+      "httpStatus": 200,
+      "details": "HTTP 200"
+    },
+    {
+      "name": "Content Analysis",
+      "status": "FAIL",
+      "title": "",
+      "hasPOS": false,
+      "hasPlaceholder": true,
+      "details": "API placeholder detected"
+    },
+    {
+      "name": "Health Endpoints",
+      "status": "FAIL",
+      "healthStatus": 404,
+      "statusStatus": 404,
+      "details": "Health: 404, Status: 404"
+    },
+    {
+      "name": "POS Functionality",
+      "status": "FAIL",
+      "loginForms": 0,
+      "navElements": 0,
+      "posElements": 0,
+      "buttons": 0,
+      "details": "No UI elements found"
+    },
+    {
+      "name": "Performance",
+      "status": "PASS",
+      "averageLoadTime": 656,
+      "loadTimes": [
+        776,
+        595,
+        596
+      ],
+      "details": "656ms average load time"
+    }
+  ],
+  "summary": {
+    "totalTests": 5,
+    "passed": 2,
+    "failed": 3,
+    "successRate": 40
+  },
+  "overallStatus": "DEPLOYMENT_PENDING"
+}
