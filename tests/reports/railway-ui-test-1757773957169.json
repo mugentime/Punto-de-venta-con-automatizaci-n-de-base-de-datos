@@ -1,0 +1,199 @@
+{
+  "timestamp": "2025-09-13T14:32:33.104Z",
+  "url": "https://pos-conejonegro.railway.app",
+  "tests": [
+    {
+      "name": "Railway deployment is accessible",
+      "status": "failed",
+      "error": "response.timing is not a function"
+    },
+    {
+      "name": "Health endpoint responds correctly",
+      "status": "failed",
+      "error": "Health endpoint returned 404"
+    },
+    {
+      "name": "Status endpoint responds correctly",
+      "status": "failed",
+      "error": "Status endpoint returned 404"
+    },
+    {
+      "name": "Page loads within acceptable time",
+      "status": "passed",
+      "duration": 112,
+      "loadTime": 103,
+      "metrics": {
+        "domContentLoaded": 0,
+        "loadComplete": 0
+      }
+    },
+    {
+      "name": "Static assets load correctly",
+      "status": "passed",
+      "duration": 96,
+      "cssCount": 0,
+      "jsCount": 0,
+      "imageCount": 0,
+      "totalAssets": 0
+    },
+    {
+      "name": "Main navigation elements exist",
+      "status": "failed",
+      "error": "No navigation elements found"
+    },
+    {
+      "name": "Login page is accessible",
+      "status": "failed",
+      "error": "Login page returned error: 404"
+    },
+    {
+      "name": "Desktop viewport (1920x1080)",
+      "status": "passed",
+      "duration": 186,
+      "viewport": {
+        "name": "Desktop",
+        "width": 1920,
+        "height": 1080
+      },
+      "screenshot": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\screenshots\\desktop-1757773955660.png",
+      "hasHorizontalScroll": false
+    },
+    {
+      "name": "Tablet viewport (768x1024)",
+      "status": "passed",
+      "duration": 147,
+      "viewport": {
+        "name": "Tablet",
+        "width": 768,
+        "height": 1024
+      },
+      "screenshot": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\screenshots\\tablet-1757773955849.png",
+      "hasHorizontalScroll": false
+    },
+    {
+      "name": "Mobile viewport (375x667)",
+      "status": "passed",
+      "duration": 136,
+      "viewport": {
+        "name": "Mobile",
+        "width": 375,
+        "height": 667
+      },
+      "screenshot": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\screenshots\\mobile-1757773955992.png",
+      "hasHorizontalScroll": false
+    },
+    {
+      "name": "Forms have proper validation",
+      "status": "passed",
+      "duration": 91,
+      "forms": []
+    },
+    {
+      "name": "Page has proper heading structure",
+      "status": "failed",
+      "error": "No H1 heading found"
+    },
+    {
+      "name": "Images have alt text",
+      "status": "passed",
+      "duration": 88,
+      "total": 0,
+      "missingAlt": 0,
+      "issues": []
+    },
+    {
+      "name": "Form inputs have labels",
+      "status": "passed",
+      "duration": 96,
+      "total": 0,
+      "missingLabels": 0,
+      "issues": []
+    },
+    {
+      "name": "Security headers are present",
+      "status": "passed",
+      "duration": 87,
+      "totalExpected": 4,
+      "present": 0,
+      "headers": {}
+    },
+    {
+      "name": "404 page handles non-existent routes",
+      "status": 404,
+      "duration": 621,
+      "has404Content": true
+    },
+    {
+      "name": "POS pages are accessible",
+      "status": "passed",
+      "duration": 0,
+      "pages": [
+        {
+          "page": "Inventory",
+          "path": "/inventory",
+          "status": "error",
+          "accessible": false,
+          "error": "page.goto is not a function"
+        },
+        {
+          "page": "Sales",
+          "path": "/sales",
+          "status": "error",
+          "accessible": false,
+          "error": "page.goto is not a function"
+        },
+        {
+          "page": "Reports",
+          "path": "/reports",
+          "status": "error",
+          "accessible": false,
+          "error": "page.goto is not a function"
+        }
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "test": "Railway deployment is accessible",
+      "message": "response.timing is not a function",
+      "stack": "TypeError: response.timing is not a function\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:137:30\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:124:5)"
+    },
+    {
+      "test": "Health endpoint responds correctly",
+      "message": "Health endpoint returned 404",
+      "stack": "Error: Health endpoint returned 404\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:145:19\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:141:5)"
+    },
+    {
+      "test": "Status endpoint responds correctly",
+      "message": "Status endpoint returned 404",
+      "stack": "Error: Status endpoint returned 404\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:160:19\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:156:5)"
+    },
+    {
+      "test": "Main navigation elements exist",
+      "message": "No navigation elements found",
+      "stack": "Error: No navigation elements found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:255:19\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:241:5)"
+    },
+    {
+      "test": "Login page is accessible",
+      "message": "Login page returned error: 404",
+      "stack": "Error: Login page returned error: 404\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:268:19\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:261:5)"
+    },
+    {
+      "test": "Page has proper heading structure",
+      "message": "No H1 heading found",
+      "stack": "Error: No H1 heading found\n    at C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:372:19\n    at async runTest (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:51:24)\n    at async runComprehensiveTests (C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\run-railway-ui-tests.js:359:5)"
+    }
+  ],
+  "performance": [
+    {
+      "domContentLoaded": 0,
+      "loadComplete": 0
+    }
+  ],
+  "accessibility": [],
+  "summary": {
+    "total": 17,
+    "passed": 11,
+    "failed": 6
+  }
+}
