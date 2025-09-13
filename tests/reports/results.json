@@ -1,11 +1,20 @@
 {
   "config": {
+<<<<<<< HEAD
     "configFile": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\playwright.config.js",
     "rootDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
     "forbidOnly": false,
     "fullyParallel": false,
     "globalSetup": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\setup\\global-setup.js",
     "globalTeardown": "C:\\Users\\je2al\\Desktop\\POS-CONEJONEGRO\\tests\\setup\\global-teardown.js",
+=======
+    "configFile": "/workspaces/POS-CONEJONEGRO/playwright.config.js",
+    "rootDir": "/workspaces/POS-CONEJONEGRO/tests/e2e",
+    "forbidOnly": false,
+    "fullyParallel": false,
+    "globalSetup": null,
+    "globalTeardown": null,
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
     "globalTimeout": 0,
     "grep": {},
     "grepInvert": null,
@@ -14,7 +23,12 @@
       "Test Suite": "POS Conejo Negro E2E Tests",
       "Environment": "development",
       "Base URL": "http://localhost:3000",
+<<<<<<< HEAD
       "Timestamp": "2025-09-13T14:39:55.736Z"
+=======
+      "Timestamp": "2025-09-12T17:34:49.066Z",
+      "actualWorkers": 1
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
     },
     "preserveOutput": "always",
     "reporter": [
@@ -46,18 +60,31 @@
     "quiet": false,
     "projects": [
       {
+<<<<<<< HEAD
         "outputDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/results",
+=======
+        "outputDir": "/workspaces/POS-CONEJONEGRO/tests/results",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
+<<<<<<< HEAD
           "Timestamp": "2025-09-13T14:39:55.736Z"
         },
         "id": "setup",
         "name": "setup",
         "testDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
+=======
+          "Timestamp": "2025-09-12T17:34:49.066Z",
+          "actualWorkers": 1
+        },
+        "id": "setup",
+        "name": "setup",
+        "testDir": "/workspaces/POS-CONEJONEGRO/tests/e2e",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "testIgnore": [],
         "testMatch": [
           "/.*\\.setup\\.js/"
@@ -65,18 +92,31 @@
         "timeout": 120000
       },
       {
+<<<<<<< HEAD
         "outputDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/results",
+=======
+        "outputDir": "/workspaces/POS-CONEJONEGRO/tests/results",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "repeatEach": 1,
         "retries": 0,
         "metadata": {
           "Test Suite": "POS Conejo Negro E2E Tests",
           "Environment": "development",
           "Base URL": "http://localhost:3000",
+<<<<<<< HEAD
           "Timestamp": "2025-09-13T14:39:55.736Z"
         },
         "id": "chromium",
         "name": "chromium",
         "testDir": "C:/Users/je2al/Desktop/POS-CONEJONEGRO/tests/e2e",
+=======
+          "Timestamp": "2025-09-12T17:34:49.066Z",
+          "actualWorkers": 1
+        },
+        "id": "chromium",
+        "name": "chromium",
+        "testDir": "/workspaces/POS-CONEJONEGRO/tests/e2e",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "testIgnore": [],
         "testMatch": [
           "**/*.@(spec|test).?(c|m)[jt]s?(x)"
@@ -88,7 +128,7 @@
     "updateSnapshots": "missing",
     "updateSourceMethod": "patch",
     "version": "1.55.0",
-    "workers": 6,
+    "workers": 1,
     "webServer": {
       "command": "npm start",
       "port": 3000,
@@ -103,14 +143,63 @@
   "suites": [],
   "errors": [
     {
+<<<<<<< HEAD
       "message": "Error: No tests found",
       "stack": "Error: No tests found"
+=======
+      "title": "capture-landing-dom.spec.js",
+      "file": "capture-landing-dom.spec.js",
+      "column": 0,
+      "line": 0,
+      "specs": [
+        {
+          "title": "Captura el DOM de la landing",
+          "ok": true,
+          "tags": [],
+          "tests": [
+            {
+              "timeout": 120000,
+              "annotations": [],
+              "expectedStatus": "passed",
+              "projectId": "chromium",
+              "projectName": "chromium",
+              "results": [
+                {
+                  "workerIndex": 0,
+                  "parallelIndex": 0,
+                  "status": "passed",
+                  "duration": 6522,
+                  "errors": [],
+                  "stdout": [],
+                  "stderr": [],
+                  "retry": 0,
+                  "startTime": "2025-09-12T17:34:49.946Z",
+                  "annotations": [],
+                  "attachments": []
+                }
+              ],
+              "status": "expected"
+            }
+          ],
+          "id": "393d4b029f194178679f-dd30cd7332c557ea002b",
+          "file": "capture-landing-dom.spec.js",
+          "line": 6,
+          "column": 1
+        }
+      ]
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
     }
   ],
   "stats": {
+<<<<<<< HEAD
     "startTime": "2025-09-13T14:39:55.742Z",
     "duration": 41.76800000000003,
     "expected": 0,
+=======
+    "startTime": "2025-09-12T17:34:49.073Z",
+    "duration": 7915.232,
+    "expected": 1,
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
     "skipped": 0,
     "unexpected": 0,
     "flaky": 0

@@ -1,6 +1,4 @@
-<!DOCTYPE html>
-<html>
-<head>
+<!DOCTYPE html><html><head>
     <title>Conejo Negro POS</title>
     <style>
         body {
@@ -40,7 +38,7 @@
         }
     </style>
 </head>
-            try {
+            <body>try {
                 const response = await fetch('/api/debug/users');
                 const data = await response.json();
                 updateOutput(formatJSON(data));
@@ -51,6 +49,7 @@
         
         // Check status on load
         checkStatus();
-    </script>
-</body>
-</html>
+    
+
+
+</body></html>

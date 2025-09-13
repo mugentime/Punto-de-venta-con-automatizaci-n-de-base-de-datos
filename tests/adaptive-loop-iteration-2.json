@@ -1,0 +1,42 @@
+{
+  "iteration": 2,
+  "url": "https://pos-conejo-negro.railway.app",
+  "timestamp": "2025-09-13T15:54:18.906Z",
+  "tests": [
+    {
+      "name": "Connectivity",
+      "passed": true,
+      "status": 200,
+      "details": "HTTP 200"
+    },
+    {
+      "name": "Health Endpoints",
+      "passed": false,
+      "healthStatus": 404,
+      "statusStatus": 404,
+      "details": "Health: 404, Status: 404"
+    },
+    {
+      "name": "Content Analysis",
+      "passed": false,
+      "issue": "api_placeholder",
+      "hasPosElements": false,
+      "details": "API placeholder"
+    },
+    {
+      "name": "Security Headers",
+      "passed": false,
+      "score": 0,
+      "found": [],
+      "missing": [
+        "x-content-type-options",
+        "x-frame-options",
+        "x-xss-protection",
+        "strict-transport-security",
+        "content-security-policy"
+      ],
+      "details": "0% coverage (low)"
+    }
+  ],
+  "fixes": []
+}

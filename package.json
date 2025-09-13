@@ -47,9 +47,15 @@
         "monitor:start": "node scripts/monitoring/monitor-service.js start",
         "monitor:stop": "node scripts/monitoring/monitor-service.js stop",
         "monitor:restart": "node scripts/monitoring/monitor-service.js restart",
+<<<<<<< HEAD
         "monitor:status": "node scripts/railway-monitoring.js status",
         "monitor:test": "node scripts/monitoring/monitor-service.js test",
         "monitor:dashboard": "node scripts/railway-monitoring.js dashboard",
+=======
+        "monitor:status": "node scripts/monitoring/monitor-service.js status",
+        "monitor:test": "node scripts/monitoring/monitor-service.js test",
+        "monitor:dashboard": "node scripts/monitoring/health-dashboard.js generate",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "monitor:dashboard:serve": "node scripts/monitoring/health-dashboard.js serve",
         "monitor:alerts": "node scripts/monitoring/alert-system.js test",
         "monitor:install": "node scripts/monitoring/install-service.js",
@@ -82,6 +88,7 @@
         "health": "curl -f http://localhost:${PORT:-3000}/health || echo 'Service not responding'",
         "inspect": "node --inspect-brk server.js",
         "format": "prettier --write *.js **/*.js",
+<<<<<<< HEAD
         "format:check": "prettier --check *.js **/*.js",
         "optimize:assets": "node scripts/optimize-assets.js",
         "optimize:images": "node scripts/optimize-images.js",
@@ -94,6 +101,9 @@
         "monitor:railway": "node scripts/railway-monitoring.js start",
         "health:check": "node scripts/health-check.js",
         "railway:validate": "npm run health:check && npm run validate:production && npm run validate:deployment"
+=======
+        "format:check": "prettier --check *.js **/*.js"
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
     },
     "keywords": [
         "pos",
@@ -105,16 +115,22 @@
     "author": "Conejo Negro Cafe",
     "license": "MIT",
     "dependencies": {
+<<<<<<< HEAD
         "@axe-core/playwright": "^4.10.2",
         "axios": "^1.12.1",
         "bcryptjs": "^2.4.3",
         "compression": "^1.7.4",
+=======
+        "axios": "^1.11.0",
+        "bcryptjs": "^2.4.3",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "cors": "^2.8.5",
         "dotenv": "^16.3.1",
         "express": "^4.18.2",
         "express-rate-limit": "^7.1.5",
         "helmet": "^7.1.0",
         "jsonwebtoken": "^9.0.2",
+<<<<<<< HEAD
         "lighthouse": "^12.8.2",
         "lru-cache": "^10.0.1",
         "mongoose": "^8.0.0",
@@ -127,6 +143,14 @@
         "playwright-chromium": "^1.55.0",
         "redis": "^5.8.2",
         "serve-static": "^1.15.0",
+=======
+        "mongoose": "^8.0.0",
+        "multer": "^2.0.2",
+        "node-cron": "^3.0.2",
+        "node-fetch": "^2.7.0",
+        "pg": "^8.11.3",
+        "redis": "^5.8.2",
+>>>>>>> be76fdbb40e9228d1ec4a918389af48d6f521a1b
         "task-master-ai": "^0.25.1"
     },
     "devDependencies": {
