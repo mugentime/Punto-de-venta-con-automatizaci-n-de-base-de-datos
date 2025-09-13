@@ -6,8 +6,8 @@ const jwt = require('jsonwebtoken');
 
 class FileDatabase {
   constructor() {
-      // Usar siempre /app/data para evitar problemas de permisos en Render/Railway
-      this.dataPath = '/app/data';
+    // Usar siempre /workspaces/POS-CONEJONEGRO/data para evitar problemas de permisos en entornos restringidos
+    this.dataPath = path.join(__dirname, '..', 'data');
       this.usersFile = path.join(this.dataPath, 'users.json');
       this.productsFile = path.join(this.dataPath, 'products.json');
     this.recordsFile = path.join(this.dataPath, 'records.json');

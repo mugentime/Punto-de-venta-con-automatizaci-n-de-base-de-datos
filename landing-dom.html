@@ -38,65 +38,7 @@
         }
     </style>
 </head>
-<body>
-    <h1>Conejo Negro POS System</h1>
-    <div class="status">
-        <h2>Server Status</h2>
-        <div id="status">Server is running</div>
-    </div>
-    <button onclick="checkStatus()">Check Status</button>
-    <button onclick="checkUsers()">Check Users</button>
-    <div id="output">{
-  "status": "ok",
-  "databaseType": "file-based-with-git-sync",
-  "isDatabaseReady": true,
-  "dataPath": "/app/data",
-  "environment": "production",
-  "railwayEnv": "production",
-  "renderEnv": "none",
-  "uptime": 735.558435453,
-  "databaseResponseTime": 1,
-  "timestamp": "2025-09-12T17:34:51.053Z",
-  "storageInfo": {
-    "type": "File-based with Git synchronization",
-    "persistent": true,
-    "cost": "Free",
-    "backup": "Automatic via Git repository"
-  }
-}</div>
-    
-    <script>
-        // Function to format JSON output
-        function formatJSON(obj) {
-            return JSON.stringify(obj, null, 2);
-        }
-        
-        // Function to update output
-        function updateOutput(text) {
-            document.getElementById('output').textContent = text;
-        }
-        
-        // Function to update status
-        function updateStatus(text) {
-            document.getElementById('status').textContent = text;
-        }
-        
-        // Function to check server status
-        async function checkStatus() {
-            try {
-                const response = await fetch('/api/health');
-                const data = await response.json();
-                updateStatus('Server is running');
-                updateOutput(formatJSON(data));
-            } catch (error) {
-                updateStatus('Server error');
-                updateOutput('Error checking server status: ' + error.message);
-            }
-        }
-        
-        // Function to check users
-        async function checkUsers() {
-            try {
+            <body>try {
                 const response = await fetch('/api/debug/users');
                 const data = await response.json();
                 updateOutput(formatJSON(data));
@@ -107,7 +49,7 @@
         
         // Check status on load
         checkStatus();
-    </script>
+    
 
 
 </body></html>

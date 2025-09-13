@@ -209,7 +209,7 @@ app.use((req, res, next) => {
 });
 
 // Serve static files
-app.use(express.static(path.join(__dirname, 'public')));
+app.use('/static', express.static(__dirname));
 
 /**
  * Manual Database Initialization Endpoint
