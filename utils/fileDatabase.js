@@ -6,18 +6,10 @@ const jwt = require('jsonwebtoken');
 
 class FileDatabase {
   constructor() {
-    // Use Render storage or local
-    this.isRender = process.env.RENDER || process.env.NODE_ENV === 'production';
-    
-    if (this.isRender) {
-      // For Render, use project source directory
-      this.dataPath = '/opt/render/project/src/data';
-    } else {
-      this.dataPath = path.join(__dirname, '..', 'data');
-    }
-    
-    this.usersFile = path.join(this.dataPath, 'users.json');
-    this.productsFile = path.join(this.dataPath, 'products.json');
+      // Usar siempre /app/data para evitar problemas de permisos en Render/Railway
+      this.dataPath = '/app/data';
+      this.usersFile = path.join(this.dataPath, 'users.json');
+      this.productsFile = path.join(this.dataPath, 'products.json');
     this.recordsFile = path.join(this.dataPath, 'records.json');
     this.cashCutsFile = path.join(this.dataPath, 'cash_cuts.json');
     this.membershipsFile = path.join(this.dataPath, 'memberships.json');

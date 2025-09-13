@@ -123,7 +123,10 @@ require('./utils/scheduler');
 const cashCutModule = require('./src/modules/cashcut');
 require('./utils/membershipNotificationService');
 
+
 const app = express();
+// Configuración para soportar proxies en Railway/Render
+app.set('trust proxy', 1);
 
 // CRITICAL FIX: Enhanced Security middleware with HSTS and additional headers
 app.use(helmet({

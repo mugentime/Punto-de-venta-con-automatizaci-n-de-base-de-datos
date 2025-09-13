@@ -44,6 +44,21 @@ module.exports = {
     }
   },
   ERROR_MESSAGES: {
+    GENERAL: {
+      INTERNAL_ERROR: 'Error interno del servidor.',
+      INVALID_TOKEN: 'Token inválido.',
+      EXPIRED_TOKEN: 'Token expirado.'
+    },
+    AUTH: {
+      CIRCUIT_BREAKER: 'Circuit breaker activado. Intenta más tarde.',
+      NO_TOKEN: 'No se proporcionó token.',
+      INVALID_TOKEN: 'Token de autenticación inválido.',
+      EXPIRED_TOKEN: 'El token ha expirado.',
+      USER_NOT_FOUND: 'Usuario no encontrado.',
+      ADMIN_REQUIRED: 'Permisos de administrador requeridos.',
+      MANAGER_REQUIRED: 'Permisos de gerente requeridos.',
+      ACCESS_DENIED: 'Acceso denegado.'
+    },
     GENERIC: 'Ocurrió un error inesperado.',
     UNAUTHORIZED: 'No autorizado.',
     NOT_FOUND: 'No encontrado.'
