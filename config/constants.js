@@ -36,7 +36,7 @@ const SERVER = {
   CORS_ENABLED: true,
   COMPRESSION_ENABLED: true,
   REQUEST_SIZE_LIMIT: '50mb',
-  HEALTH_CHECK_PATHS: ['/health', '/api/health', '/ping', '/status'],
+  HEALTH_CHECK_PATHS: ['/health', '/api/health', '/ping', '/status', '/api/status'],
   AUTH_PATHS: ['/api/auth/login', '/api/auth/register', '/api/auth/refresh']
 };
 

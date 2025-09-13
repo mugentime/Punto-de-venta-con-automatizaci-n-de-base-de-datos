@@ -328,6 +328,67 @@ app.get('/api/health', async (req, res) => {
 });
 
 /**
+ * Status Endpoint - Railway Health Check
+ * Provides Railway-specific health monitoring status
+ * @route GET /api/status
+ * @returns {Object} Railway status information
+ */
+app.get('/api/status', async (req, res) => {
+  try {
+    console.log('🚂 Railway status check request received');
+    
+    // Basic system checks for Railway monitoring
+    const systemStatus = {
+      status: 'healthy',
+      timestamp: new Date().toISOString(),
+      service: 'POS-CONEJONEGRO',
+      environment: process.env.RAILWAY_ENVIRONMENT || process.env.NODE_ENV || 'development',
+      uptime: Math.floor(process.uptime()),
+      memory: {
+        used: Math.round(process.memoryUsage().heapUsed / 1024 / 1024),
+        total: Math.round(process.memoryUsage().heapTotal / 1024 / 1024)
+      }
+    };
+
+    // Database health check
+    if (isDatabaseReady) {
+      try {
+        const dbStart = Date.now();
+        await databaseManager.getUsers();
+        systemStatus.database = {
+          status: 'connected',
+          type: process.env.DATABASE_URL ? 'postgresql' : 'file-based',
+          responseTime: Date.now() - dbStart
+        };
+      } catch (error) {
+        systemStatus.database = {
+          status: 'error',
+          error: error.message
+        };
+        systemStatus.status = 'degraded';
+      }
+    } else {
+      systemStatus.database = {
+        status: 'initializing'
+      };
+      systemStatus.status = 'starting';
+    }
+
+    // Set appropriate HTTP status
+    const httpStatus = systemStatus.status === 'healthy' ? 200 : 503;
+    res.status(httpStatus).json(systemStatus);
+    
+  } catch (error) {
+    console.error('❌ Status endpoint error:', error);
+    res.status(503).json({
+      status: 'error',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
+});
+
+/**
  * Version Endpoint
  * Provides version, git commit, build info for deployment tracking
  * @route GET /api/version
