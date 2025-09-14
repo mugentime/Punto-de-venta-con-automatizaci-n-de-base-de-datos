@@ -1,8 +1,8 @@
 {
   "build": {
-    "builder": "dockerfile"
+    "builder": "nixpacks"
   },
   "deploy": {
-    "startCommand": "npm start"
+    "startCommand": "node server-emergency.js"
   }
 }
