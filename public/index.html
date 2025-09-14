@@ -3,72 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Conejo Negro - POS System</title>
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Railway Deployment Fix: Redirect to main POS application -->
-    <script>
-        // Immediate redirect to prevent Railway API placeholder
-        window.location.href = '/conejo_negro_online.html';
-    </script>
+    <title>POS Conejo Negro - Loading...</title>
+    <meta http-equiv="refresh" content="0; url=/online">
+    <script>window.location.replace("/online");</script>
     <style>
         body {
-            font-family: 'Roboto', sans-serif;
-            background: linear-gradient(135deg, #0a0a0f 0%, #12121a 100%);
-            color: #e0e0ff;
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
             text-align: center;
-        }
-        .loading {
-            background: rgba(26, 26, 46, 0.9);
-            padding: 40px;
-            border-radius: 15px;
-            border: 1px solid #00d9ff;
-            box-shadow: 0 0 30px rgba(0, 217, 255, 0.3);
-        }
-        .logo {
-            font-size: 2.5rem;
-            color: #00d9ff;
-            margin-bottom: 20px;
-        }
-        .spinner {
-            border: 3px solid rgba(0, 217, 255, 0.3);
-            border-top: 3px solid #00d9ff;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-            margin: 20px auto;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
 <body>
-    <div class="loading">
-        <div class="logo">
-            <i class="fas fa-coffee"></i>
-            Conejo Negro
-        </div>
-        <div class="spinner"></div>
-        <p>Cargando Sistema POS...</p>
-        <p><small>Redirecting to POS System...</small></p>
+    <div>
+        <h1>POS Conejo Negro</h1>
+        <p>Loading...</p>
+        <p>If not redirected, <a href="/online" style="color: white;">click here</a></p>
     </div>
-    
-    <script>
-        // Fallback redirect in case the immediate redirect doesn't work
-        setTimeout(() => {
-            if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-                window.location.href = '/conejo_negro_online.html';
-            }
-        }, 2000);
-    </script>
 </body>
 </html>
