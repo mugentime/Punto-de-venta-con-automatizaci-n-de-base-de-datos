@@ -1,0 +1,2110 @@
+{
+  "success": false,
+  "totalChecks": 100,
+  "successfulChecks": 0,
+  "successRate": "0.0%",
+  "monitoringDuration": "1000 seconds",
+  "timestamp": "2025-09-14T13:21:04.817Z",
+  "results": [
+    {
+      "check": 1,
+      "timestamp": "7:01:24 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 1,
+        "lastModified": "6:58:34 a.m."
+      }
+    },
+    {
+      "check": 2,
+      "timestamp": "7:01:38 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 1,
+        "lastModified": "6:58:34 a.m."
+      }
+    },
+    {
+      "check": 3,
+      "timestamp": "7:01:53 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 1,
+        "lastModified": "6:58:34 a.m."
+      }
+    },
+    {
+      "check": 4,
+      "timestamp": "7:02:03 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 5,
+      "timestamp": "7:02:18 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 6,
+      "timestamp": "7:02:29 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 7,
+      "timestamp": "7:02:39 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 8,
+      "timestamp": "7:02:49 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 9,
+      "timestamp": "7:02:59 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 10,
+      "timestamp": "7:03:12 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 11,
+      "timestamp": "7:03:22 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 12,
+      "timestamp": "7:03:33 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 13,
+      "timestamp": "7:03:43 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 14,
+      "timestamp": "7:03:59 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 15,
+      "timestamp": "7:04:10 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 16,
+      "timestamp": "7:04:26 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 17,
+      "timestamp": "7:04:36 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 18,
+      "timestamp": "7:04:48 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 19,
+      "timestamp": "7:04:58 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 20,
+      "timestamp": "7:05:08 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 21,
+      "timestamp": "7:05:18 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 2,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 22,
+      "timestamp": "7:05:30 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 23,
+      "timestamp": "7:05:40 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 24,
+      "timestamp": "7:05:55 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 25,
+      "timestamp": "7:06:08 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 26,
+      "timestamp": "7:06:20 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 27,
+      "timestamp": "7:06:30 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 28,
+      "timestamp": "7:06:45 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 29,
+      "timestamp": "7:06:55 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 30,
+      "timestamp": "7:07:05 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 31,
+      "timestamp": "7:07:15 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 32,
+      "timestamp": "7:07:26 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 33,
+      "timestamp": "7:07:36 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 34,
+      "timestamp": "7:07:46 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 35,
+      "timestamp": "7:07:56 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 36,
+      "timestamp": "7:08:06 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 37,
+      "timestamp": "7:08:20 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 38,
+      "timestamp": "7:08:30 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 39,
+      "timestamp": "7:08:43 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 3,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 40,
+      "timestamp": "7:08:59 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 41,
+      "timestamp": "7:09:09 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 42,
+      "timestamp": "7:09:26 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 43,
+      "timestamp": "7:09:39 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 44,
+      "timestamp": "7:09:49 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 45,
+      "timestamp": "7:09:59 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 46,
+      "timestamp": "7:10:09 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 47,
+      "timestamp": "7:10:20 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 48,
+      "timestamp": "7:10:33 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 49,
+      "timestamp": "7:10:43 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 50,
+      "timestamp": "7:10:56 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 51,
+      "timestamp": "7:11:12 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 52,
+      "timestamp": "7:11:22 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 53,
+      "timestamp": "7:11:33 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 54,
+      "timestamp": "7:11:44 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 55,
+      "timestamp": "7:11:54 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 56,
+      "timestamp": "7:12:05 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 4,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 57,
+      "timestamp": "7:12:15 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 58,
+      "timestamp": "7:12:31 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 59,
+      "timestamp": "7:12:41 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 60,
+      "timestamp": "7:12:52 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 61,
+      "timestamp": "7:13:02 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 62,
+      "timestamp": "7:13:12 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 63,
+      "timestamp": "7:13:22 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 64,
+      "timestamp": "7:13:35 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 65,
+      "timestamp": "7:13:45 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 66,
+      "timestamp": "7:13:55 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 67,
+      "timestamp": "7:14:08 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 68,
+      "timestamp": "7:14:18 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 69,
+      "timestamp": "7:14:29 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 70,
+      "timestamp": "7:14:39 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 71,
+      "timestamp": "7:14:54 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 72,
+      "timestamp": "7:15:04 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 73,
+      "timestamp": "7:15:19 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 74,
+      "timestamp": "7:15:30 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 75,
+      "timestamp": "7:15:46 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": true,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 5,
+        "lastModified": "7:12:21 a.m."
+      }
+    },
+    {
+      "check": 76,
+      "timestamp": "7:16:01 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 77,
+      "timestamp": "7:16:16 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 78,
+      "timestamp": "7:16:26 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 79,
+      "timestamp": "7:16:37 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 80,
+      "timestamp": "7:16:52 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 81,
+      "timestamp": "7:17:02 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 82,
+      "timestamp": "7:17:12 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 83,
+      "timestamp": "7:17:24 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 84,
+      "timestamp": "7:17:39 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 85,
+      "timestamp": "7:17:49 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 86,
+      "timestamp": "7:18:00 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 87,
+      "timestamp": "7:18:11 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 88,
+      "timestamp": "7:18:22 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 89,
+      "timestamp": "7:18:32 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 90,
+      "timestamp": "7:18:45 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 91,
+      "timestamp": "7:19:00 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 92,
+      "timestamp": "7:19:14 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 6,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 93,
+      "timestamp": "7:19:29 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 94,
+      "timestamp": "7:19:39 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 95,
+      "timestamp": "7:19:51 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 96,
+      "timestamp": "7:20:01 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 97,
+      "timestamp": "7:20:16 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 98,
+      "timestamp": "7:20:29 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 99,
+      "timestamp": "7:20:41 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    },
+    {
+      "check": 100,
+      "timestamp": "7:20:51 a.m.",
+      "railway": {
+        "statusCode": 200,
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "responseSize": 332,
+        "title": "No title",
+        "hasHealthEndpoint": false
+      },
+      "files": {
+        "railwayJson": true,
+        "dockerfile": false,
+        "packageJson": true,
+        "serverJs": true,
+        "publicIndex": true,
+        "emergencyTriggers": 7,
+        "lastModified": "Unknown"
+      }
+    }
+  ]
+}
