@@ -1,0 +1,265 @@
+{
+  "monitoring": {
+    "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+    "baseUrl": "https://fed11c6d-a65a-4d93-90e6-955e16b6753f.railway.app",
+    "startTime": "2025-09-14T01:02:01.961Z",
+    "uptime": 47751,
+    "totalChecks": 3,
+    "checkInterval": 15000,
+    "lastUpdate": "2025-09-14T01:02:49.712Z"
+  },
+  "summary": {
+    "overallSuccessRate": "0.0",
+    "avgResponseTime": 0,
+    "totalAlerts": 2,
+    "activeAlerts": 2,
+    "consecutiveFailures": 3,
+    "uptime": "48s"
+  },
+  "alerts": [
+    {
+      "type": "high_error_rate",
+      "message": "Error rate 100.0% exceeds threshold",
+      "timestamp": "2025-09-14T01:02:26.493Z",
+      "acknowledged": false
+    },
+    {
+      "type": "consecutive_failures",
+      "message": "3 consecutive failures detected",
+      "timestamp": "2025-09-14T01:02:49.712Z",
+      "acknowledged": false
+    }
+  ],
+  "recentChecks": [
+    {
+      "id": "check_1757811721964",
+      "timestamp": "2025-09-14T01:02:01.964Z",
+      "uptime": 3,
+      "endpoints": {
+        "/api/health": {
+          "success": false,
+          "status": 404,
+          "responseTime": 352,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/status": {
+          "success": false,
+          "status": 404,
+          "responseTime": 263,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/version": {
+          "success": false,
+          "status": 404,
+          "responseTime": 80,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/emergency-test": {
+          "success": false,
+          "status": 404,
+          "responseTime": 78,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/debug/env": {
+          "success": false,
+          "status": 404,
+          "responseTime": 80,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        }
+      },
+      "summary": {
+        "total": 5,
+        "success": 0,
+        "failed": 5,
+        "avgResponseTime": 0,
+        "totalResponseTime": 853
+      },
+      "railwayStatus": {
+        "available": true,
+        "version": "railway 4.7.3",
+        "user": "Logged in as je2alvarela@gmail.com 👋",
+        "status": "Project: POS"
+      },
+      "networkTest": {
+        "status": "Poor",
+        "successful": 0,
+        "total": 3
+      }
+    },
+    {
+      "id": "check_1757811740016",
+      "timestamp": "2025-09-14T01:02:20.016Z",
+      "uptime": 18056,
+      "endpoints": {
+        "/api/health": {
+          "success": false,
+          "status": 404,
+          "responseTime": 4235,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/status": {
+          "success": false,
+          "status": 404,
+          "responseTime": 263,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/version": {
+          "success": false,
+          "status": 404,
+          "responseTime": 79,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/emergency-test": {
+          "success": false,
+          "status": 404,
+          "responseTime": 76,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/debug/env": {
+          "success": false,
+          "status": 404,
+          "responseTime": 78,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        }
+      },
+      "summary": {
+        "total": 5,
+        "success": 0,
+        "failed": 5,
+        "avgResponseTime": 0,
+        "totalResponseTime": 4731
+      },
+      "railwayStatus": {
+        "available": true,
+        "version": "railway 4.7.3",
+        "user": "Logged in as je2alvarela@gmail.com 👋",
+        "status": "Project: POS"
+      },
+      "networkTest": {
+        "status": "Poor",
+        "successful": 0,
+        "total": 3
+      }
+    },
+    {
+      "id": "check_1757811761496",
+      "timestamp": "2025-09-14T01:02:41.496Z",
+      "uptime": 39535,
+      "endpoints": {
+        "/api/health": {
+          "success": false,
+          "status": 404,
+          "responseTime": 3487,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/status": {
+          "success": false,
+          "status": 404,
+          "responseTime": 79,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/version": {
+          "success": false,
+          "status": 404,
+          "responseTime": 77,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/emergency-test": {
+          "success": false,
+          "status": 404,
+          "responseTime": 79,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        },
+        "/api/debug/env": {
+          "success": false,
+          "status": 404,
+          "responseTime": 79,
+          "contentLength": 9,
+          "data": "Not Found",
+          "headers": {
+            "content-type": "text/plain; charset=utf-8"
+          }
+        }
+      },
+      "summary": {
+        "total": 5,
+        "success": 0,
+        "failed": 5,
+        "avgResponseTime": 0,
+        "totalResponseTime": 3801
+      },
+      "railwayStatus": {
+        "available": true,
+        "version": "railway 4.7.3",
+        "user": "Logged in as je2alvarela@gmail.com 👋",
+        "status": "Project: POS"
+      },
+      "networkTest": {
+        "status": "Poor",
+        "successful": 0,
+        "total": 3
+      }
+    }
+  ],
+  "thresholds": {
+    "responseTime": 5000,
+    "errorRate": 0.1,
+    "consecutiveFailures": 3
+  }
+}

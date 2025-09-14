@@ -1,0 +1,164 @@
+{
+  "execution": {
+    "timestamp": "2025-09-14T00:59:26.122Z",
+    "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+    "totalCommands": 13,
+    "executedCommands": 13
+  },
+  "summary": {
+    "successful": 5,
+    "failed": 3,
+    "criticalFailures": 4,
+    "skipped": 1
+  },
+  "results": [
+    {
+      "name": "Check Railway CLI Version",
+      "command": "railway --version",
+      "description": "Verify Railway CLI installation and version",
+      "critical": true,
+      "status": "success",
+      "duration": "110ms",
+      "stdout": "railway 4.7.3\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "Check Authentication Status",
+      "command": "railway whoami",
+      "description": "Verify user authentication with Railway",
+      "critical": true,
+      "status": "success",
+      "duration": "665ms",
+      "stdout": "Logged in as je2alvarela@gmail.com 👋\n",
+      "stderr": ""
+    },
+    {
+      "name": "Link to Project",
+      "command": "railway link fed11c6d-a65a-4d93-90e6-955e16b6753f",
+      "description": "Link CLI to project fed11c6d-a65a-4d93-90e6-955e16b6753f",
+      "critical": true,
+      "status": "critical_failure",
+      "error": "Command failed: railway link fed11c6d-a65a-4d93-90e6-955e16b6753f\nerror: unexpected argument 'fed11c6d-a65a-4d93-90e6-955e16b6753f' found\n\nUsage: railway.exe link [OPTIONS]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Get Project Status",
+      "command": "railway status",
+      "description": "Get current project and deployment status",
+      "critical": false,
+      "status": "success",
+      "duration": "785ms",
+      "stdout": "Project: POS\nEnvironment: production\nService: POS-CONEJONEGRO\n",
+      "stderr": ""
+    },
+    {
+      "name": "List Project Variables",
+      "command": "railway variables",
+      "description": "List all environment variables",
+      "critical": false,
+      "status": "success",
+      "duration": "1073ms",
+      "stdout": "╔════════════════════════ Variables for POS-CONEJONEGRO ═══════════════════════╗\n║ ADMIN_EMAIL                            │ gerencia@conejonegro.mx             ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ ADMIN_PASSWORD                         │ conejonegro2024                     ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ CREATE_DEFAULT_USERS                   │ true                                ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ DATABASE_URL                           │ postgresql://                       ║\n║                                        │ postgres:aezVREfCHRpQHBfwweXHEaANsb ║\n║                                        │ eIMeno@postgres.railway.internal:54 ║\n║                                        │ 32/railway                          ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ DATA_PERSIST                           │ true                                ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ DB_INIT_SQL                            │ INSERT INTO users (username,        ║\n║                                        │ password_hash, role, is_active)     ║\n║                                        │ VALUES ('gerencia@conejonegro.mx',  ║\n║                                        │ '$2b$10$rX8k7yPOmEtv7Eo8JNhqkuMjCzN ║\n║                                        │ qeXgT2XbCdEfGhIjKl3MnOpQrS',        ║\n║                                        │ 'admin', true) ON CONFLICT          ║\n║                                        │ (username) DO NOTHING;              ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ FORCE_DB_INIT                          │ 2025-08-29-fix-users                ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ JWT_SECRET                             │ 9571b02b3ab5402216178bb1309b8939a09 ║\n║                                        │ 83a6b256578625a8cc02fc2eb74b7       ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ NODE_ENV                               │ production                          ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_ENVIRONMENT                    │ production                          ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_ENVIRONMENT_ID                 │ 7bf2a439-4f31-4565-92ae-            ║\n║                                        │ 9c18bd76e0b8                        ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_ENVIRONMENT_NAME               │ production                          ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_PRIVATE_DOMAIN                 │ pos-conejonegro.railway.internal    ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_PROJECT_ID                     │ fed11c6d-a65a-4d93-90e6-            ║\n║                                        │ 955e16b6753f                        ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_PROJECT_NAME                   │ POS                                 ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_PUBLIC_DOMAIN                  │ pos-conejonegro-                    ║\n║                                        │ production.up.railway.app           ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_SERVICE_CLAUDE_TASK_MASTER_URL │ claude-task-master-                 ║\n║                                        │ production.up.railway.app           ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_SERVICE_ID                     │ 72109cc7-28c6-48c9-871b-            ║\n║                                        │ 1bb4fe8faedf                        ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_SERVICE_NAME                   │ POS-CONEJONEGRO                     ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_SERVICE_POS_CONEJONEGRO_URL    │ pos-conejonegro-                    ║\n║                                        │ production.up.railway.app           ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_STATIC_URL                     │ pos-conejonegro-                    ║\n║                                        │ production.up.railway.app           ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_TOKEN                          │ 11b99841-2a30-4c90-9013-            ║\n║                                        │ ed0dbb2b6f16                        ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ RAILWAY_VOLUME_MOUNT_PATH              │ /app/data                           ║\n║──────────────────────────────────────────────────────────────────────────────║\n║ SKIP_DB_INIT_ON_BUILD                  │ true                                ║\n╚══════════════════════════════════════════════════════════════════════════════╝\n\n",
+      "stderr": ""
+    },
+    {
+      "name": "Get Project Info",
+      "command": "railway info",
+      "description": "Get detailed project information",
+      "critical": false,
+      "status": "failure",
+      "error": "Command failed: railway info\nerror: unrecognized subcommand 'info'\n\nUsage: railway.exe [COMMAND]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Check Deployments",
+      "command": "railway deployments",
+      "description": "List recent deployments and their status",
+      "critical": false,
+      "status": "failure",
+      "error": "Command failed: railway deployments\nerror: unrecognized subcommand 'deployments'\n\n  tip: a similar subcommand exists: 'deploy'\n\nUsage: railway.exe [COMMAND]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Get Project Domain",
+      "command": "railway domain",
+      "description": "Get project domain information",
+      "critical": false,
+      "status": "success",
+      "duration": "946ms",
+      "stdout": "Domains already exists on the service:\n🚀 https://pos-conejonegro-production.up.railway.app\n",
+      "stderr": ""
+    },
+    {
+      "name": "Set NODE_ENV",
+      "command": "railway variables set NODE_ENV=production",
+      "description": "Set production environment variable",
+      "critical": true,
+      "skipIfExists": "NODE_ENV",
+      "status": "critical_failure",
+      "error": "Command failed: railway variables set NODE_ENV=production\nerror: unexpected argument 'set' found\n\nUsage: railway.exe variables [OPTIONS]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Set PORT",
+      "command": "railway variables set PORT=3000",
+      "description": "Set port environment variable",
+      "critical": true,
+      "skipIfExists": "PORT",
+      "status": "critical_failure",
+      "error": "Command failed: railway variables set PORT=3000\nerror: unexpected argument 'set' found\n\nUsage: railway.exe variables [OPTIONS]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Set Railway Environment Flag",
+      "command": "railway variables set RAILWAY_ENVIRONMENT=true",
+      "description": "Set Railway environment detection flag",
+      "critical": true,
+      "skipIfExists": "RAILWAY_ENVIRONMENT",
+      "status": "critical_failure",
+      "error": "Command failed: railway variables set RAILWAY_ENVIRONMENT=true\nerror: unexpected argument 'set' found\n\nUsage: railway.exe variables [OPTIONS]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    },
+    {
+      "name": "Deploy Project",
+      "command": "railway up --detach",
+      "description": "Deploy project to Railway",
+      "critical": true,
+      "confirmRequired": true,
+      "status": "skipped",
+      "reason": "confirmation_required",
+      "manual_command": "railway up --detach"
+    },
+    {
+      "name": "Check Logs",
+      "command": "railway logs --follow=false --lines=50",
+      "description": "Get recent deployment logs",
+      "critical": false,
+      "status": "failure",
+      "error": "Command failed: railway logs --follow=false --lines=50\nerror: unexpected argument '--follow' found\n\n  tip: to pass '--follow' as a value, use '-- --follow'\n\nUsage: railway.exe logs [OPTIONS] [DEPLOYMENT_ID]\n\nFor more information, try '--help'.\n\n",
+      "suggestion": "Check Railway documentation or dashboard for more details"
+    }
+  ],
+  "recommendations": [
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Check Railway documentation or dashboard for more details",
+    "Verify project ID and access permissions"
+  ],
+  "manualCommands": [
+    "railway up --detach"
+  ],
+  "nextSteps": [
+    "Resolve critical failures first",
+    "Install Railway CLI if not found",
+    "Login to Railway if not authenticated",
+    "Verify project access permissions",
+    "Start monitoring with: node scripts/railway-monitor.js",
+    "Visit Railway dashboard: https://railway.app/project/fed11c6d-a65a-4d93-90e6-955e16b6753f",
+    "Review deployment logs for any runtime issues"
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+  "monitoringEndpoints": [
+    "/api/health",
+    "/api/status",
+    "/api/version",
+    "/api/emergency-test"
+  ],
+  "alertThresholds": {
+    "responseTime": 5000,
+    "errorRate": 0.1,
+    "uptimeRequired": 0.99
+  },
+  "checkInterval": 30000
+}

@@ -1,7 +1,8 @@
 FROM node:18-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --production
+RUN npm ci --only=production && npm cache clean --force
 COPY . .
-EXPOSE 3000
+USER 1000
+EXPOSE $PORT
 CMD ["npm", "start"]

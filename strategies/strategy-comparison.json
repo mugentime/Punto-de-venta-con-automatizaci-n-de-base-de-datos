@@ -1,0 +1,61 @@
+{
+  "timestamp": "2025-09-14T00:59:28.319Z",
+  "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+  "totalStrategies": 5,
+  "strategies": [
+    {
+      "name": "nixpacks",
+      "description": "Railway Nixpacks auto-detection (recommended)",
+      "complexity": "Medium",
+      "recommendedFor": "Standard deployment, Railway default",
+      "deploymentSpeed": "Medium",
+      "reliability": "Very Good"
+    },
+    {
+      "name": "dockerfile",
+      "description": "Custom Dockerfile with Alpine Linux",
+      "complexity": "Medium",
+      "recommendedFor": "Custom requirements, advanced configuration",
+      "deploymentSpeed": "Slow",
+      "reliability": "Excellent"
+    },
+    {
+      "name": "nodejs",
+      "description": "Simple Node.js deployment without Docker",
+      "complexity": "Medium",
+      "recommendedFor": "Simple applications, development",
+      "deploymentSpeed": "Fast",
+      "reliability": "Good"
+    },
+    {
+      "name": "minimal",
+      "description": "Minimal configuration for emergency deployment",
+      "complexity": "Low",
+      "recommendedFor": "Emergency deployment, quick testing",
+      "deploymentSpeed": "Fastest",
+      "reliability": "Basic"
+    },
+    {
+      "name": "production",
+      "description": "Production-hardened deployment with all optimizations",
+      "complexity": "High",
+      "recommendedFor": "Production systems, maximum reliability",
+      "deploymentSpeed": "Slowest",
+      "reliability": "Maximum"
+    }
+  ],
+  "recommendations": [
+    "Try strategies in order of complexity: minimal → nodejs → nixpacks → dockerfile → production",
+    "Use minimal strategy for emergency deployment",
+    "Use production strategy for final deployment",
+    "Monitor deployment logs for each strategy attempt"
+  ],
+  "usageInstructions": [
+    "1. Choose a strategy based on your needs",
+    "2. Copy strategy files to project root",
+    "3. Set environment variables in Railway dashboard",
+    "4. Deploy using: railway up",
+    "5. Monitor deployment status",
+    "6. Try next strategy if deployment fails"
+  ]
+}

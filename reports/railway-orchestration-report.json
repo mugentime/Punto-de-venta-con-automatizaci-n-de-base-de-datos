@@ -1,0 +1,48 @@
+{
+  "orchestration": {
+    "timestamp": "2025-09-14T00:58:50.443Z",
+    "duration": "8450ms",
+    "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+    "failedDeploymentId": "4548f92b-d5dd-49ff-8840-3768b72daec3",
+    "success": true
+  },
+  "diagnostics": {
+    "total": 5,
+    "types": [
+      "project_status",
+      "build_logs",
+      "service_health",
+      "environment_validation",
+      "network_connectivity"
+    ],
+    "summary": "Comprehensive Railway deployment analysis completed"
+  },
+  "fixes": {
+    "total": 5,
+    "applied": [
+      "railway_config_fix",
+      "dockerfile_fix",
+      "environment_template",
+      "deployment_script",
+      "monitoring_script"
+    ],
+    "recommendations": [
+      "Deploy using: railway up",
+      "Monitor with: node scripts/railway-monitor.js",
+      "Check health at: /api/health",
+      "Review logs in Railway dashboard"
+    ]
+  },
+  "nextSteps": [
+    "Execute: node scripts/railway-deploy-recovery.js",
+    "Start monitoring: node scripts/railway-monitor.js",
+    "Verify deployment at: https://fed11c6d-a65a-4d93-90e6-955e16b6753f.railway.app",
+    "Check Railway dashboard for deployment status",
+    "Review application logs for any runtime issues"
+  ],
+  "emergencyContacts": {
+    "railwayDashboard": "https://railway.app/project/fed11c6d-a65a-4d93-90e6-955e16b6753f",
+    "healthCheck": "https://fed11c6d-a65a-4d93-90e6-955e16b6753f.railway.app/api/health",
+    "supportDocs": "https://docs.railway.app/"
+  }
+}
