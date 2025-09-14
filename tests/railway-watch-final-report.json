@@ -1,0 +1,26 @@
+{
+  "watchingPeriod": {
+    "totalChecks": 24,
+    "duration": "720 seconds",
+    "startTime": "2025-09-13T21:51:51.029Z",
+    "endTime": "2025-09-13T22:40:43.876Z"
+  },
+  "deploymentProgress": {
+    "fullyDeployedChecks": 0,
+    "posDeployedChecks": 0,
+    "placeholderChecks": 24,
+    "successRate": 0
+  },
+  "finalStatus": {
+    "check": 20,
+    "timestamp": "2025-09-13T22:40:43.876Z",
+    "httpStatus": 200,
+    "loadTime": 389,
+    "title": "",
+    "hasPOS": false,
+    "hasPlaceholder": true,
+    "healthStatus": 404,
+    "assessment": "API_PLACEHOLDER"
+  },
+  "recommendation": "Railway is still showing API placeholder. Check deployment logs and configuration."
+}
