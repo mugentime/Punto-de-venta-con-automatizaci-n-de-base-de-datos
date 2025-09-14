@@ -1,0 +1,569 @@
+{
+  "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+  "url": "https://pos-conejo-negro.railway.app",
+  "totalChecks": 40,
+  "successfulChecks": 0,
+  "timestamp": "2025-09-14T03:30:57.134Z",
+  "results": [
+    {
+      "timestamp": "2025-09-14T03:18:32.440Z",
+      "checkNumber": 1,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:18:50.392Z",
+      "checkNumber": 2,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:19:09.073Z",
+      "checkNumber": 3,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:19:25.973Z",
+      "checkNumber": 4,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:19:46.673Z",
+      "checkNumber": 5,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:20:05.235Z",
+      "checkNumber": 6,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:20:27.059Z",
+      "checkNumber": 7,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:20:45.840Z",
+      "checkNumber": 8,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:21:06.224Z",
+      "checkNumber": 9,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:21:27.923Z",
+      "checkNumber": 10,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:21:48.566Z",
+      "checkNumber": 11,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:22:05.144Z",
+      "checkNumber": 12,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:22:21.725Z",
+      "checkNumber": 13,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:22:37.238Z",
+      "checkNumber": 14,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:22:53.883Z",
+      "checkNumber": 15,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:23:09.211Z",
+      "checkNumber": 16,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:23:31.021Z",
+      "checkNumber": 17,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:23:52.464Z",
+      "checkNumber": 18,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:24:12.942Z",
+      "checkNumber": 19,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:24:33.361Z",
+      "checkNumber": 20,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:24:53.815Z",
+      "checkNumber": 21,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:25:12.442Z",
+      "checkNumber": 22,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:25:31.059Z",
+      "checkNumber": 23,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:25:47.682Z",
+      "checkNumber": 24,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:26:03.271Z",
+      "checkNumber": 25,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:26:22.489Z",
+      "checkNumber": 26,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:26:37.890Z",
+      "checkNumber": 27,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:26:59.541Z",
+      "checkNumber": 28,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:27:15.192Z",
+      "checkNumber": 29,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:27:35.582Z",
+      "checkNumber": 30,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:27:50.976Z",
+      "checkNumber": 31,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:28:12.369Z",
+      "checkNumber": 32,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:28:27.685Z",
+      "checkNumber": 33,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:28:48.374Z",
+      "checkNumber": 34,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:29:04.990Z",
+      "checkNumber": 35,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:29:20.622Z",
+      "checkNumber": 36,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:29:41.187Z",
+      "checkNumber": 37,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:30:00.007Z",
+      "checkNumber": 38,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:30:21.695Z",
+      "checkNumber": 39,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    },
+    {
+      "timestamp": "2025-09-14T03:30:42.125Z",
+      "checkNumber": 40,
+      "success": false,
+      "details": {
+        "hasPOS": false,
+        "hasPlaceholder": true,
+        "healthOK": false,
+        "statusOK": false,
+        "mainStatus": 200,
+        "healthStatus": 404,
+        "statusStatus": 404
+      }
+    }
+  ]
+}

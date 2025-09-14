@@ -1,0 +1,16 @@
+{
+  "projectId": "fed11c6d-a65a-4d93-90e6-955e16b6753f",
+  "url": "https://pos-conejo-negro.railway.app",
+  "interval": 15000,
+  "maxChecks": 40,
+  "healthEndpoints": [
+    "/api/health",
+    "/api/status",
+    "/"
+  ],
+  "successCriteria": {
+    "hasPOS": true,
+    "hasPlaceholder": false,
+    "healthStatus": 200
+  }
+}
