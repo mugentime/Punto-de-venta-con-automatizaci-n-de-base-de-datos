@@ -93,6 +93,7 @@ async function setupAndGetDataStore() {
                 total NUMERIC(10, 2) DEFAULT 0,
                 "paymentMethod" VARCHAR(50),
                 status VARCHAR(50) DEFAULT 'active',
+                "consumedExtras" JSONB DEFAULT '[]'::jsonb,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
               );
             `);
@@ -476,7 +477,8 @@ async function startServer() {
             res.json(result.rows.map(session => ({
                 ...session,
                 hourlyRate: parseFloat(session.hourlyRate),
-                total: parseFloat(session.total)
+                total: parseFloat(session.total),
+                consumedExtras: session.consumedExtras || []
             })));
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
@@ -490,14 +492,15 @@ async function startServer() {
             const { clientName, startTime, hourlyRate } = req.body;
             const id = `coworking-${Date.now()}`;
             const result = await pool.query(
-                'INSERT INTO coworking_sessions (id, "clientName", "startTime", "hourlyRate") VALUES ($1, $2, $3, $4) RETURNING *',
-                [id, clientName, startTime, hourlyRate || 50]
+                'INSERT INTO coworking_sessions (id, "clientName", "startTime", "hourlyRate", "consumedExtras") VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                [id, clientName, startTime, hourlyRate || 50, JSON.stringify([])]
             );
             const newSession = result.rows[0];
             res.status(201).json({
                 ...newSession,
                 hourlyRate: parseFloat(newSession.hourlyRate),
-                total: parseFloat(newSession.total)
+                total: parseFloat(newSession.total),
+                consumedExtras: newSession.consumedExtras || []
             });
         } catch (error) {
             console.error("Error creating coworking session:", error);
@@ -508,10 +511,10 @@ async function startServer() {
     app.put('/api/coworking-sessions/:id', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { endTime, duration, total, paymentMethod, status } = req.body;
+            const { endTime, duration, total, paymentMethod, status, consumedExtras } = req.body;
             const result = await pool.query(
-                'UPDATE coworking_sessions SET "endTime" = $1, duration = $2, total = $3, "paymentMethod" = $4, status = $5 WHERE id = $6 RETURNING *',
-                [endTime, duration, total, paymentMethod, status, req.params.id]
+                'UPDATE coworking_sessions SET "endTime" = $1, duration = $2, total = $3, "paymentMethod" = $4, status = $5, "consumedExtras" = $6 WHERE id = $7 RETURNING *',
+                [endTime, duration, total, paymentMethod, status, JSON.stringify(consumedExtras || []), req.params.id]
             );
             if (result.rows.length === 0) {
                 return res.status(404).json({ error: 'Coworking session not found' });
@@ -520,7 +523,8 @@ async function startServer() {
             res.json({
                 ...updatedSession,
                 hourlyRate: parseFloat(updatedSession.hourlyRate),
-                total: parseFloat(updatedSession.total)
+                total: parseFloat(updatedSession.total),
+                consumedExtras: updatedSession.consumedExtras || []
             });
         } catch (error) {
             console.error("Error updating coworking session:", error);
