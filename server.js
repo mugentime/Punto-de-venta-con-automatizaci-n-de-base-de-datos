@@ -78,7 +78,12 @@ async function setupAndGetDataStore() {
         async getAll() {
             if (!useDb) return initialProducts;
             const result = await pool.query('SELECT * FROM products ORDER BY name ASC');
-            return result.rows;
+            return result.rows.map(product => ({
+                ...product,
+                price: parseFloat(product.price),
+                cost: parseFloat(product.cost),
+                stock: parseInt(product.stock)
+            }));
         },
         async create(productData) {
             if (!useDb) {
