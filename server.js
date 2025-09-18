@@ -97,7 +97,13 @@ async function setupAndGetDataStore() {
                 'INSERT INTO products (id, name, price, cost, stock, description, "imageUrl", category) VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
                 [id, name, price, cost, stock, description, imageUrl, category]
             );
-            return result.rows[0];
+            const newProduct = result.rows[0];
+            return {
+                ...newProduct,
+                price: parseFloat(newProduct.price),
+                cost: parseFloat(newProduct.cost),
+                stock: parseInt(newProduct.stock)
+            };
         },
         async update(id, productData) {
             if (!useDb) {
@@ -113,7 +119,13 @@ async function setupAndGetDataStore() {
                 'UPDATE products SET name = $1, price = $2, cost = $3, stock = $4, description = $5, "imageUrl" = $6, category = $7 WHERE id = $8 RETURNING *',
                 [name, price, cost, stock, description, imageUrl, category, id]
             );
-            return result.rows[0];
+            const updatedProduct = result.rows[0];
+            return {
+                ...updatedProduct,
+                price: parseFloat(updatedProduct.price),
+                cost: parseFloat(updatedProduct.cost),
+                stock: parseInt(updatedProduct.stock)
+            };
         },
         async delete(id) {
             if (!useDb) {
