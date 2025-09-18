@@ -135,6 +135,14 @@ async function setupAndGetDataStore() {
                 );
                 console.log('Admin user seeded successfully.');
             }
+
+            // Add consumedExtras column if it doesn't exist
+            try {
+                await client.query('ALTER TABLE coworking_sessions ADD COLUMN IF NOT EXISTS "consumedExtras" JSONB DEFAULT \'[]\'::jsonb');
+                console.log('Added consumedExtras column to coworking_sessions if needed.');
+            } catch (err) {
+                console.log('consumedExtras column already exists or error:', err.message);
+            }
             client.release();
             useDb = true;
             console.log("Running in Database Mode.");
