@@ -713,10 +713,10 @@ async function startServer() {
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Professional product photo of ${productName}. High quality, well-lit, commercial photography style. Clean white background. Realistic and appealing food/beverage photography. Studio lighting. Product centered in frame.`;
+      const prompt = `Dibujo minimalista de "${productName}". Estilo line art, con líneas limpias y simples. El producto debe estar centrado sobre un fondo de color gris claro sólido (#f3f4f6).`;
       try {
         const response = await ai.models.generateImages({
-            model: 'imagen-3.0-generate-001',
+            model: 'imagen-4.0-generate-001',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '1:1' },
         });
