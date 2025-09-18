@@ -713,7 +713,7 @@ async function startServer() {
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Dibujo minimalista de "${productName}". Estilo line art, con líneas limpias y simples. Sin texto, sin letras, sin palabras. Solo el producto centrado sobre un fondo sólido color #f5f5f5 (gris claro). Diseño limpio y minimalista.`;
+      const prompt = `Dibujo minimalista de "${productName}". Estilo line art, con líneas limpias y simples. Sin texto, sin letras, sin palabras. Solo el producto centrado sobre un fondo sólido color #f3f4f6 (bg-gray-100 de Tailwind). Diseño limpio y minimalista.`;
       try {
         const response = await ai.models.generateImages({
             model: 'imagen-4.0-generate-001',
