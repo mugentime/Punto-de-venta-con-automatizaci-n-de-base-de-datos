@@ -716,7 +716,7 @@ async function startServer() {
       const prompt = `Professional product photo of ${productName}. High quality, well-lit, commercial photography style. Clean white background. Realistic and appealing food/beverage photography. Studio lighting. Product centered in frame.`;
       try {
         const response = await ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
+            model: 'imagen-3.0-generate-001',
             prompt: prompt,
             config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '1:1' },
         });
