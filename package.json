@@ -8,8 +8,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "start": "node server.js",
-    "db:init": "node scripts/init-db.js",
-    "deploy": "npm run db:init && npm run build && npm start"
+    "db:init": "node scripts/init-db.js"
   },
   "dependencies": {
     "@google/genai": "^1.19.0",
