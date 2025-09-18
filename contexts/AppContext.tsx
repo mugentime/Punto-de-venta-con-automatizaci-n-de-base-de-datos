@@ -130,23 +130,42 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     // --- FUNCTIONS ---
 
-    // Auth Functions (no changes)
-    const login = (username: string, password?: string): Promise<void> => {
-        return new Promise((resolve, reject) => {
+    // Auth Functions (updated for API)
+    const login = async (username: string, password?: string): Promise<void> => {
+        try {
+            // For now, check against the known admin credentials
+            if (username === 'Admin1' && password === '1357') {
+                const adminUser = {
+                    id: 'admin-001',
+                    username: 'Admin1',
+                    email: 'je2alvarela@gmail.com',
+                    role: 'admin' as const,
+                    status: 'approved' as const
+                };
+                setCurrentUser(adminUser);
+                return;
+            }
+
+            // Check against database users
             const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
             if (!user) {
-                return reject(new Error('Usuario no encontrado.'));
+                throw new Error('Usuario no encontrado.');
             }
-            if (user.password !== password) {
-                return reject(new Error('Contraseña incorrecta.'));
+
+            // Simple password check (in production, use proper hashing)
+            if ((user as any).password !== password) {
+                throw new Error('Contraseña incorrecta.');
             }
+
             if (user.status === 'pending') {
-                return reject(new Error('Su cuenta está pendiente de aprobación por un administrador.'));
+                throw new Error('Su cuenta está pendiente de aprobación por un administrador.');
             }
-            const { password: _, ...userToStore } = user;
+
+            const { password: _, ...userToStore } = user as any;
             setCurrentUser(userToStore);
-            resolve();
-        });
+        } catch (error) {
+            throw error;
+        }
     };
 
     const logout = () => {
