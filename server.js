@@ -199,7 +199,7 @@ async function startServer() {
     // --- EXPRESS APP SETUP ---
     const app = express();
     const port = process.env.PORT || 3001;
-    app.use(express.json());
+    app.use(express.json({ limit: '50mb' }));
 
     // --- GEMINI API SETUP ---
     const apiKey = process.env.API_KEY;
