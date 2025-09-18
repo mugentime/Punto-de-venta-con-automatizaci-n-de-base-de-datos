@@ -1,0 +1,5 @@
+{
+  "name": "Copy of Copia previa a añadir la base de datos ",
+  "description": "Esta es la copia a la que regresar en caso de que se rompa la aplicación durante la migración a base de datos",
+  "requestFramePermissions": []
+}
