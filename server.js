@@ -39,7 +39,78 @@ async function setupAndGetDataStore() {
                 stock INTEGER NOT NULL,
                 description TEXT,
                 "imageUrl" TEXT,
-                category VARCHAR(255) NOT NULL
+                category VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS users (
+                id VARCHAR(255) PRIMARY KEY,
+                username VARCHAR(255) NOT NULL UNIQUE,
+                email VARCHAR(255) NOT NULL UNIQUE,
+                password VARCHAR(255) NOT NULL,
+                role VARCHAR(50) NOT NULL DEFAULT 'user',
+                status VARCHAR(50) NOT NULL DEFAULT 'pending',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS orders (
+                id VARCHAR(255) PRIMARY KEY,
+                "clientName" VARCHAR(255) NOT NULL,
+                "serviceType" VARCHAR(50) NOT NULL,
+                "paymentMethod" VARCHAR(50) NOT NULL,
+                items JSONB NOT NULL,
+                subtotal NUMERIC(10, 2) NOT NULL,
+                total NUMERIC(10, 2) NOT NULL,
+                "userId" VARCHAR(255),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS expenses (
+                id VARCHAR(255) PRIMARY KEY,
+                description VARCHAR(255) NOT NULL,
+                amount NUMERIC(10, 2) NOT NULL,
+                category VARCHAR(255) NOT NULL,
+                "userId" VARCHAR(255),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS coworking_sessions (
+                id VARCHAR(255) PRIMARY KEY,
+                "clientName" VARCHAR(255) NOT NULL,
+                "startTime" TIMESTAMP WITH TIME ZONE NOT NULL,
+                "endTime" TIMESTAMP WITH TIME ZONE,
+                duration INTEGER DEFAULT 0,
+                "hourlyRate" NUMERIC(10, 2) DEFAULT 50,
+                total NUMERIC(10, 2) DEFAULT 0,
+                "paymentMethod" VARCHAR(50),
+                status VARCHAR(50) DEFAULT 'active',
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS cash_sessions (
+                id VARCHAR(255) PRIMARY KEY,
+                "startAmount" NUMERIC(10, 2) NOT NULL,
+                "endAmount" NUMERIC(10, 2),
+                "startTime" TIMESTAMP WITH TIME ZONE NOT NULL,
+                "endTime" TIMESTAMP WITH TIME ZONE,
+                "totalSales" NUMERIC(10, 2) DEFAULT 0,
+                "totalExpenses" NUMERIC(10, 2) DEFAULT 0,
+                "expectedCash" NUMERIC(10, 2) DEFAULT 0,
+                difference NUMERIC(10, 2) DEFAULT 0,
+                status VARCHAR(50) DEFAULT 'active',
+                "userId" VARCHAR(255),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
               );
             `);
 
@@ -278,6 +349,300 @@ async function startServer() {
         } catch (error) {
             console.error("Error importing products:", error);
             res.status(500).json({ error: 'Failed to import products' });
+        }
+    });
+
+    // --- ORDERS API ---
+    app.get('/api/orders', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+            res.json(result.rows.map(order => ({
+                ...order,
+                subtotal: parseFloat(order.subtotal),
+                total: parseFloat(order.total)
+            })));
+        } catch (error) {
+            console.error("Error fetching orders:", error);
+            res.status(500).json({ error: 'Failed to fetch orders' });
+        }
+    });
+
+    app.post('/api/orders', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { clientName, serviceType, paymentMethod, items, subtotal, total, userId } = req.body;
+            const id = `order-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, total, "userId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
+                [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId]
+            );
+            const newOrder = result.rows[0];
+            res.status(201).json({
+                ...newOrder,
+                subtotal: parseFloat(newOrder.subtotal),
+                total: parseFloat(newOrder.total)
+            });
+        } catch (error) {
+            console.error("Error creating order:", error);
+            res.status(500).json({ error: 'Failed to create order' });
+        }
+    });
+
+    // --- EXPENSES API ---
+    app.get('/api/expenses', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT * FROM expenses ORDER BY created_at DESC');
+            res.json(result.rows.map(expense => ({
+                ...expense,
+                amount: parseFloat(expense.amount)
+            })));
+        } catch (error) {
+            console.error("Error fetching expenses:", error);
+            res.status(500).json({ error: 'Failed to fetch expenses' });
+        }
+    });
+
+    app.post('/api/expenses', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { description, amount, category, userId } = req.body;
+            const id = `expense-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO expenses (id, description, amount, category, "userId") VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                [id, description, amount, category, userId]
+            );
+            const newExpense = result.rows[0];
+            res.status(201).json({
+                ...newExpense,
+                amount: parseFloat(newExpense.amount)
+            });
+        } catch (error) {
+            console.error("Error creating expense:", error);
+            res.status(500).json({ error: 'Failed to create expense' });
+        }
+    });
+
+    app.put('/api/expenses/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { description, amount, category } = req.body;
+            const result = await pool.query(
+                'UPDATE expenses SET description = $1, amount = $2, category = $3 WHERE id = $4 RETURNING *',
+                [description, amount, category, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Expense not found' });
+            }
+            const updatedExpense = result.rows[0];
+            res.json({
+                ...updatedExpense,
+                amount: parseFloat(updatedExpense.amount)
+            });
+        } catch (error) {
+            console.error("Error updating expense:", error);
+            res.status(500).json({ error: 'Failed to update expense' });
+        }
+    });
+
+    app.delete('/api/expenses/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            await pool.query('DELETE FROM expenses WHERE id = $1', [req.params.id]);
+            res.status(204).send();
+        } catch (error) {
+            console.error("Error deleting expense:", error);
+            res.status(500).json({ error: 'Failed to delete expense' });
+        }
+    });
+
+    // --- COWORKING SESSIONS API ---
+    app.get('/api/coworking-sessions', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT * FROM coworking_sessions ORDER BY created_at DESC');
+            res.json(result.rows.map(session => ({
+                ...session,
+                hourlyRate: parseFloat(session.hourlyRate),
+                total: parseFloat(session.total)
+            })));
+        } catch (error) {
+            console.error("Error fetching coworking sessions:", error);
+            res.status(500).json({ error: 'Failed to fetch coworking sessions' });
+        }
+    });
+
+    app.post('/api/coworking-sessions', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { clientName, startTime, hourlyRate } = req.body;
+            const id = `coworking-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO coworking_sessions (id, "clientName", "startTime", "hourlyRate") VALUES ($1, $2, $3, $4) RETURNING *',
+                [id, clientName, startTime, hourlyRate || 50]
+            );
+            const newSession = result.rows[0];
+            res.status(201).json({
+                ...newSession,
+                hourlyRate: parseFloat(newSession.hourlyRate),
+                total: parseFloat(newSession.total)
+            });
+        } catch (error) {
+            console.error("Error creating coworking session:", error);
+            res.status(500).json({ error: 'Failed to create coworking session' });
+        }
+    });
+
+    app.put('/api/coworking-sessions/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { endTime, duration, total, paymentMethod, status } = req.body;
+            const result = await pool.query(
+                'UPDATE coworking_sessions SET "endTime" = $1, duration = $2, total = $3, "paymentMethod" = $4, status = $5 WHERE id = $6 RETURNING *',
+                [endTime, duration, total, paymentMethod, status, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Coworking session not found' });
+            }
+            const updatedSession = result.rows[0];
+            res.json({
+                ...updatedSession,
+                hourlyRate: parseFloat(updatedSession.hourlyRate),
+                total: parseFloat(updatedSession.total)
+            });
+        } catch (error) {
+            console.error("Error updating coworking session:", error);
+            res.status(500).json({ error: 'Failed to update coworking session' });
+        }
+    });
+
+    // --- CASH SESSIONS API ---
+    app.get('/api/cash-sessions', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT * FROM cash_sessions ORDER BY created_at DESC');
+            res.json(result.rows.map(session => ({
+                ...session,
+                startAmount: parseFloat(session.startAmount),
+                endAmount: session.endAmount ? parseFloat(session.endAmount) : null,
+                totalSales: parseFloat(session.totalSales),
+                totalExpenses: parseFloat(session.totalExpenses),
+                expectedCash: parseFloat(session.expectedCash),
+                difference: parseFloat(session.difference)
+            })));
+        } catch (error) {
+            console.error("Error fetching cash sessions:", error);
+            res.status(500).json({ error: 'Failed to fetch cash sessions' });
+        }
+    });
+
+    app.post('/api/cash-sessions', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { startAmount, startTime, userId } = req.body;
+            const id = `cash-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO cash_sessions (id, "startAmount", "startTime", "userId") VALUES ($1, $2, $3, $4) RETURNING *',
+                [id, startAmount, startTime, userId]
+            );
+            const newSession = result.rows[0];
+            res.status(201).json({
+                ...newSession,
+                startAmount: parseFloat(newSession.startAmount),
+                endAmount: newSession.endAmount ? parseFloat(newSession.endAmount) : null,
+                totalSales: parseFloat(newSession.totalSales),
+                totalExpenses: parseFloat(newSession.totalExpenses),
+                expectedCash: parseFloat(newSession.expectedCash),
+                difference: parseFloat(newSession.difference)
+            });
+        } catch (error) {
+            console.error("Error creating cash session:", error);
+            res.status(500).json({ error: 'Failed to create cash session' });
+        }
+    });
+
+    app.put('/api/cash-sessions/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { endAmount, endTime, totalSales, totalExpenses, expectedCash, difference, status } = req.body;
+            const result = await pool.query(
+                'UPDATE cash_sessions SET "endAmount" = $1, "endTime" = $2, "totalSales" = $3, "totalExpenses" = $4, "expectedCash" = $5, difference = $6, status = $7 WHERE id = $8 RETURNING *',
+                [endAmount, endTime, totalSales, totalExpenses, expectedCash, difference, status, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Cash session not found' });
+            }
+            const updatedSession = result.rows[0];
+            res.json({
+                ...updatedSession,
+                startAmount: parseFloat(updatedSession.startAmount),
+                endAmount: updatedSession.endAmount ? parseFloat(updatedSession.endAmount) : null,
+                totalSales: parseFloat(updatedSession.totalSales),
+                totalExpenses: parseFloat(updatedSession.totalExpenses),
+                expectedCash: parseFloat(updatedSession.expectedCash),
+                difference: parseFloat(updatedSession.difference)
+            });
+        } catch (error) {
+            console.error("Error updating cash session:", error);
+            res.status(500).json({ error: 'Failed to update cash session' });
+        }
+    });
+
+    // --- USERS API ---
+    app.get('/api/users', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT id, username, email, role, status, created_at FROM users ORDER BY created_at DESC');
+            res.json(result.rows);
+        } catch (error) {
+            console.error("Error fetching users:", error);
+            res.status(500).json({ error: 'Failed to fetch users' });
+        }
+    });
+
+    app.post('/api/users', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { username, email, password, role, status } = req.body;
+            const id = `user-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO users (id, username, email, password, role, status) VALUES ($1, $2, $3, $4, $5, $6) RETURNING id, username, email, role, status, created_at',
+                [id, username, email, password, role || 'user', status || 'pending']
+            );
+            res.status(201).json(result.rows[0]);
+        } catch (error) {
+            console.error("Error creating user:", error);
+            res.status(500).json({ error: 'Failed to create user' });
+        }
+    });
+
+    app.put('/api/users/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { username, email, role, status } = req.body;
+            const result = await pool.query(
+                'UPDATE users SET username = $1, email = $2, role = $3, status = $4 WHERE id = $5 RETURNING id, username, email, role, status, created_at',
+                [username, email, role, status, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'User not found' });
+            }
+            res.json(result.rows[0]);
+        } catch (error) {
+            console.error("Error updating user:", error);
+            res.status(500).json({ error: 'Failed to update user' });
+        }
+    });
+
+    app.delete('/api/users/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            await pool.query('DELETE FROM users WHERE id = $1', [req.params.id]);
+            res.status(204).send();
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            res.status(500).json({ error: 'Failed to delete user' });
         }
     });
 

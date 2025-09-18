@@ -58,44 +58,73 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // --- STATE MANAGEMENT ---
 
-    // Auth State (still uses localStorage)
-    const [users, setUsers] = useLocalStorage<User[]>('users', []);
+    // All State (now fetched from backend)
+    const [users, setUsers] = useState<User[]>([]);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
-
-    // Product State (now fetched from backend)
     const [products, setProducts] = useState<Product[]>([]);
-
-    // Other Local State (still uses localStorage or component state)
     const [cart, setCart] = useState<CartItem[]>([]);
-    const [orders, setOrders] = useLocalStorage<Order[]>('orders', []);
-    const [expenses, setExpenses] = useLocalStorage<Expense[]>('expenses', []);
-    const [coworkingSessions, setCoworkingSessions] = useLocalStorage<CoworkingSession[]>('coworkingSessions', []);
-    const [cashSessions, setCashSessions] = useLocalStorage<CashSession[]>('cashSessions', []);
+    const [orders, setOrders] = useState<Order[]>([]);
+    const [expenses, setExpenses] = useState<Expense[]>([]);
+    const [coworkingSessions, setCoworkingSessions] = useState<CoworkingSession[]>([]);
+    const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
     
     // --- EFFECTS ---
 
-    // Seed initial admin user if not present
+    // Fetch all data from database on app load
     useEffect(() => {
-        const adminExists = users.some(u => u.role === 'admin' && u.username === 'Admin1');
-        if (!adminExists) {
-            setUsers(prevUsers => [...prevUsers, initialAdmin]);
-        }
-    }, [users, setUsers]);
-    
-    // Fetch initial products from the database on app load
-    useEffect(() => {
-        const fetchProducts = async () => {
+        const fetchAllData = async () => {
             try {
-                const response = await fetch('/api/products');
-                if (!response.ok) throw new Error('Network response was not ok');
-                const data: Product[] = await response.json();
-                setProducts(data);
+                // Fetch products
+                const productsResponse = await fetch('/api/products');
+                if (productsResponse.ok) {
+                    const productsData: Product[] = await productsResponse.json();
+                    setProducts(productsData);
+                }
+
+                // Fetch orders
+                const ordersResponse = await fetch('/api/orders');
+                if (ordersResponse.ok) {
+                    const ordersData: Order[] = await ordersResponse.json();
+                    setOrders(ordersData);
+                }
+
+                // Fetch expenses
+                const expensesResponse = await fetch('/api/expenses');
+                if (expensesResponse.ok) {
+                    const expensesData: Expense[] = await expensesResponse.json();
+                    setExpenses(expensesData);
+                }
+
+                // Fetch coworking sessions
+                const coworkingResponse = await fetch('/api/coworking-sessions');
+                if (coworkingResponse.ok) {
+                    const coworkingData: CoworkingSession[] = await coworkingResponse.json();
+                    setCoworkingSessions(coworkingData);
+                }
+
+                // Fetch cash sessions
+                const cashResponse = await fetch('/api/cash-sessions');
+                if (cashResponse.ok) {
+                    const cashData: CashSession[] = await cashResponse.json();
+                    setCashSessions(cashData);
+                }
+
+                // Fetch users
+                const usersResponse = await fetch('/api/users');
+                if (usersResponse.ok) {
+                    const usersData: User[] = await usersResponse.json();
+                    setUsers(usersData);
+                } else {
+                    // Fallback to initial admin if API fails
+                    setUsers([initialAdmin]);
+                }
             } catch (error) {
-                console.error("Failed to fetch products:", error);
-                // Optionally set an error state to show in the UI
+                console.error("Failed to fetch data:", error);
+                // Fallback to initial admin if everything fails
+                setUsers([initialAdmin]);
             }
         };
-        fetchProducts();
+        fetchAllData();
     }, []);
 
 
@@ -264,58 +293,127 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     }
 
-    // Order Function (updated for stock management)
+    // Order Function (updated for API)
     const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; }) => {
         if(cart.length === 0) return;
-        
-        // Decrease stock via API
-        const stockUpdates = cart.map(cartItem => ({ id: cartItem.id, quantity: cartItem.quantity }));
-        await updateStockForSale(stockUpdates);
 
-        const totalCost = cart.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
+        try {
+            const orderData = {
+                ...orderDetails,
+                items: cart,
+                subtotal: cartSubtotal,
+                total: cartTotal,
+                userId: currentUser?.id || 'guest',
+            };
 
-        const newOrder: Order = {
-            id: `ORD-${Date.now()}`,
-            date: new Date().toISOString(),
-            items: cart,
-            subtotal: cartSubtotal,
-            total: cartTotal,
-            totalCost: totalCost,
-            ...orderDetails
-        };
-        setOrders(prev => [newOrder, ...prev]);
-        clearCart();
+            // Create order in database
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData),
+            });
+
+            if (!response.ok) throw new Error('Failed to create order');
+            const newOrder = await response.json();
+
+            // Update local state
+            setOrders(prev => [newOrder, ...prev]);
+
+            // Update stock for all items in the cart
+            const stockUpdates = cart.map(item => ({
+                id: item.id,
+                quantity: item.quantity
+            }));
+            await updateStockForSale(stockUpdates);
+
+            // Clear cart after successful order
+            clearCart();
+        } catch (error) {
+            console.error("Error creating order:", error);
+        }
     };
 
     const cartSubtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const cartTotal = cartSubtotal;
 
-    // Expense Functions (no changes)
-    const addExpense = (expense: Omit<Expense, 'id'>) => {
-        setExpenses(prev => [...prev, { ...expense, id: `EXP-${Date.now()}` }]);
+    // Expense Functions (updated for API)
+    const addExpense = async (expense: Omit<Expense, 'id'>) => {
+        try {
+            const response = await fetch('/api/expenses', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ ...expense, userId: currentUser?.id }),
+            });
+            if (!response.ok) throw new Error('Failed to create expense');
+            const newExpense = await response.json();
+            setExpenses(prev => [newExpense, ...prev]);
+        } catch (error) {
+            console.error("Error adding expense:", error);
+        }
     };
-    const updateExpense = (updatedExpense: Expense) => {
-        setExpenses(prev => prev.map(e => e.id === updatedExpense.id ? updatedExpense : e));
+    const updateExpense = async (updatedExpense: Expense) => {
+        try {
+            const response = await fetch(`/api/expenses/${updatedExpense.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updatedExpense),
+            });
+            if (!response.ok) throw new Error('Failed to update expense');
+            const returnedExpense = await response.json();
+            setExpenses(prev => prev.map(e => e.id === returnedExpense.id ? returnedExpense : e));
+        } catch (error) {
+            console.error("Error updating expense:", error);
+        }
     };
-    const deleteExpense = (expenseId: string) => {
-        setExpenses(prev => prev.filter(e => e.id !== expenseId));
+    const deleteExpense = async (expenseId: string) => {
+        try {
+            const response = await fetch(`/api/expenses/${expenseId}`, {
+                method: 'DELETE',
+            });
+            if (!response.ok) throw new Error('Failed to delete expense');
+            setExpenses(prev => prev.filter(e => e.id !== expenseId));
+        } catch (error) {
+            console.error("Error deleting expense:", error);
+        }
     };
     
-    // Coworking Functions (updated for stock management)
-    const startCoworkingSession = (clientName: string) => {
-        const newSession: CoworkingSession = {
-            id: `cowork-${Date.now()}`,
-            clientName: clientName || 'Cliente',
-            startTime: new Date().toISOString(),
-            endTime: null,
-            status: 'active',
-            consumedExtras: [],
-        };
-        setCoworkingSessions(prev => [newSession, ...prev]);
+    // Coworking Functions (updated for API)
+    const startCoworkingSession = async (clientName: string) => {
+        try {
+            const sessionData = {
+                clientName: clientName || 'Cliente',
+                startTime: new Date().toISOString(),
+                hourlyRate: 50,
+            };
+
+            const response = await fetch('/api/coworking-sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionData),
+            });
+
+            if (!response.ok) throw new Error('Failed to create coworking session');
+            const newSession = await response.json();
+            setCoworkingSessions(prev => [newSession, ...prev]);
+        } catch (error) {
+            console.error("Error starting coworking session:", error);
+        }
     };
 
-    const updateCoworkingSession = (sessionId: string, updates: Partial<CoworkingSession>) => {
-        setCoworkingSessions(prev => prev.map(s => (s.id === sessionId ? { ...s, ...updates } : s)));
+    const updateCoworkingSession = async (sessionId: string, updates: Partial<CoworkingSession>) => {
+        try {
+            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+            });
+
+            if (!response.ok) throw new Error('Failed to update coworking session');
+            const updatedSession = await response.json();
+            setCoworkingSessions(prev => prev.map(s => s.id === sessionId ? updatedSession : s));
+        } catch (error) {
+            console.error("Error updating coworking session:", error);
+        }
     };
     
     const finishCoworkingSession = async (sessionId: string, paymentMethod: 'Efectivo' | 'Tarjeta') => {
