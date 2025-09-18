@@ -372,7 +372,9 @@ async function startServer() {
             res.json(result.rows.map(order => ({
                 ...order,
                 subtotal: parseFloat(order.subtotal),
-                total: parseFloat(order.total)
+                total: parseFloat(order.total),
+                date: order.created_at,  // Map created_at to date for frontend compatibility
+                totalCost: order.items ? order.items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
             })));
         } catch (error) {
             console.error("Error fetching orders:", error);
@@ -393,7 +395,9 @@ async function startServer() {
             res.status(201).json({
                 ...newOrder,
                 subtotal: parseFloat(newOrder.subtotal),
-                total: parseFloat(newOrder.total)
+                total: parseFloat(newOrder.total),
+                date: newOrder.created_at,  // Map created_at to date for frontend compatibility
+                totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
             });
         } catch (error) {
             console.error("Error creating order:", error);
