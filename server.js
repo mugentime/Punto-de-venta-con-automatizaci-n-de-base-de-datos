@@ -123,6 +123,17 @@ async function setupAndGetDataStore() {
                 }
                 console.log('Database seeded successfully.');
             }
+
+            // Seed initial admin user
+            const userRes = await client.query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
+            if (userRes.rows[0].count === '0') {
+                console.log('Seeding initial admin user...');
+                await client.query(
+                    'INSERT INTO users (id, username, email, password, role, status) VALUES ($1, $2, $3, $4, $5, $6)',
+                    ['admin-001', 'Admin1', 'je2alvarela@gmail.com', '1357', 'admin', 'approved']
+                );
+                console.log('Admin user seeded successfully.');
+            }
             client.release();
             useDb = true;
             console.log("Running in Database Mode.");
