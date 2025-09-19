@@ -712,11 +712,33 @@ async function startServer() {
       if (!ai) {
         return res.status(503).json({ error: 'AI features are not configured on the server.' });
       }
-      const { productName } = req.body;
+      const { productName, description } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Dibujo minimalista de "${productName}". Estilo line art, con líneas limpias y simples. Sin texto, sin letras, sin palabras, sin números. Solo el dibujo del producto centrado sobre un fondo de color gris claro sólido (#f3f4f6).`;
+
+      // Create a detailed context from name and description
+      const productContext = description ? `${productName} - ${description}` : productName;
+
+      const prompt = `CRITICAL: NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS anywhere in the image.
+
+Create a minimalist line art drawing of: ${productContext}
+
+STYLE REQUIREMENTS:
+- Pure line art style with clean, simple lines
+- Minimalist design
+- Product centered on solid light gray background (#f3f4f6)
+- No decorative elements
+- No labels or text of any kind
+
+ABSOLUTE RESTRICTIONS:
+- NEVER include any text, letters, words, or numbers
+- NEVER include brand names or product labels
+- NEVER include written descriptions
+- NEVER include any typography or signage
+- Only the visual representation of the product itself
+
+Draw only the physical object/product with clean line art.`;
       try {
         const response = await ai.models.generateImages({
             model: 'imagen-4.0-generate-001',

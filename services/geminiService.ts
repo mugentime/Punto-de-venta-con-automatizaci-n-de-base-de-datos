@@ -20,12 +20,12 @@ export const generateDescription = async (productName: string, keywords: string)
   }
 };
 
-export const generateImage = async (productName: string): Promise<string> => {
+export const generateImage = async (productName: string, description?: string): Promise<string> => {
   try {
     const response = await fetch('/api/generate-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ productName }),
+        body: JSON.stringify({ productName, description }),
     });
     
     if (!response.ok) {

@@ -54,7 +54,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
     }
     setIsGeneratingImg(true);
     try {
-      const imageUrl = await generateImage(product.name);
+      const imageUrl = await generateImage(product.name, product.description);
       setProduct(prev => ({...prev, imageUrl}));
     } catch (error) {
        console.error(error);
