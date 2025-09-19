@@ -171,8 +171,8 @@ const CashReportScreen: React.FC = () => {
     setSelectedDate(e.target.value);
   };
   
-  const filteredOrders = orders.filter(order => order.date.startsWith(selectedDate));
-  const filteredExpenses = expenses.filter(expense => expense.date.startsWith(selectedDate));
+  const filteredOrders = orders.filter(order => order.date && order.date.startsWith(selectedDate));
+  const filteredExpenses = expenses.filter(expense => expense.date && expense.date.startsWith(selectedDate));
 
   const totalSalesHist = filteredOrders.reduce((sum, order) => sum + order.total, 0);
   const totalExpensesHist = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);

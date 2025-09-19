@@ -420,7 +420,8 @@ async function startServer() {
             const result = await pool.query('SELECT * FROM expenses ORDER BY created_at DESC');
             res.json(result.rows.map(expense => ({
                 ...expense,
-                amount: parseFloat(expense.amount)
+                amount: parseFloat(expense.amount),
+                date: expense.created_at  // Map created_at to date for frontend compatibility
             })));
         } catch (error) {
             console.error("Error fetching expenses:", error);
@@ -440,7 +441,8 @@ async function startServer() {
             const newExpense = result.rows[0];
             res.status(201).json({
                 ...newExpense,
-                amount: parseFloat(newExpense.amount)
+                amount: parseFloat(newExpense.amount),
+                date: newExpense.created_at  // Map created_at to date for frontend compatibility
             });
         } catch (error) {
             console.error("Error creating expense:", error);
@@ -462,7 +464,8 @@ async function startServer() {
             const updatedExpense = result.rows[0];
             res.json({
                 ...updatedExpense,
-                amount: parseFloat(updatedExpense.amount)
+                amount: parseFloat(updatedExpense.amount),
+                date: updatedExpense.created_at  // Map created_at to date for frontend compatibility
             });
         } catch (error) {
             console.error("Error updating expense:", error);
