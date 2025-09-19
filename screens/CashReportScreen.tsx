@@ -182,7 +182,7 @@ const CashReportScreen: React.FC = () => {
   const totalOrdersHist = filteredOrders.length;
   
   return (
-    <div>
+    <div className="pb-6 lg:pb-0">
         <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
           <div>
             <h1 className="text-3xl font-bold text-slate-800">Reporte de Caja</h1>

@@ -129,7 +129,7 @@ const ReportsScreen: React.FC = () => {
     };
     
     return (
-        <div id="report-content">
+        <div id="report-content" className="pb-6 lg:pb-0">
             <h1 className="text-3xl font-bold text-slate-800 mb-6">Reportes Financieros</h1>
 
             {/* Date Filters */}

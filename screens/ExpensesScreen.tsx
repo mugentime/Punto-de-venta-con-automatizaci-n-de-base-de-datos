@@ -38,7 +38,7 @@ const ExpensesScreen: React.FC = () => {
   const sortedExpenses = expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
-    <div>
+    <div className="pb-6 lg:pb-0">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-3xl font-bold text-slate-800">Gestión de Gastos</h1>
         <button

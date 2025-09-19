@@ -47,7 +47,7 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="relative h-screen bg-gray-100/80 font-sans overflow-hidden">
-      <main className="absolute top-0 right-0 bottom-20 left-0 overflow-y-auto p-4 sm:p-6 lg:p-8">
+      <main className="absolute top-0 right-0 bottom-20 left-0 overflow-y-auto p-3 pb-6 sm:p-6 lg:p-8">
         {renderView()}
       </main>
       <BottomNav currentView={currentView} setCurrentView={setCurrentView} />

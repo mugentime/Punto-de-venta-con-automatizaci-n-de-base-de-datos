@@ -14,7 +14,7 @@ const NavItem: React.FC<{
     isActive: boolean;
     onClick: () => void;
 }> = ({ icon, label, isActive, onClick }) => {
-    const baseClasses = "flex flex-col items-center justify-center text-center w-full pt-2 pb-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white";
+    const baseClasses = "flex flex-col items-center justify-center text-center min-w-0 flex-1 pt-1 pb-1 transition-colors duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-white";
     const activeClasses = "text-white";
     const inactiveClasses = "text-gray-400 hover:text-white";
     
@@ -25,7 +25,7 @@ const NavItem: React.FC<{
             aria-label={label}
         >
             {icon}
-            <span className="text-xs mt-1">{label}</span>
+            <span className="text-xs mt-0.5 leading-tight truncate max-w-full">{label}</span>
         </button>
     );
 };
@@ -35,21 +35,21 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
   const { currentUser, logout } = useAppContext();
 
   const navItems = [
-    { id: 'sales', label: 'Ventas', icon: <SalesIcon className="h-6 w-6"/>, show: true },
-    { id: 'coworking', label: 'Coworking', icon: <CoworkingIcon className="h-6 w-6"/>, show: true },
-    { id: 'products', label: 'Productos', icon: <ProductsIcon className="h-6 w-6"/>, show: true },
-    { id: 'history', label: 'Historial', icon: <HistoryIcon className="h-6 w-6"/>, show: true },
-    { id: 'cash_report', label: 'Caja', icon: <CashIcon className="h-6 w-6"/>, show: true },
-    { id: 'expenses', label: 'Gastos', icon: <ExpenseIcon className="h-6 w-6"/>, show: true },
-    { id: 'reports', label: 'Reportes', icon: <ReportIcon className="h-6 w-6"/>, show: true },
-    { id: 'admin', label: 'Admin', icon: <UsersIcon className="h-6 w-6"/>, show: currentUser?.role === 'admin' },
+    { id: 'sales', label: 'Ventas', icon: <SalesIcon className="h-5 w-5"/>, show: true },
+    { id: 'products', label: 'Productos', icon: <ProductsIcon className="h-5 w-5"/>, show: true },
+    { id: 'cash_report', label: 'Caja', icon: <CashIcon className="h-5 w-5"/>, show: true },
+    { id: 'coworking', label: 'Cowork', icon: <CoworkingIcon className="h-5 w-5"/>, show: true },
+    { id: 'history', label: 'Historial', icon: <HistoryIcon className="h-5 w-5"/>, show: true },
+    { id: 'expenses', label: 'Gastos', icon: <ExpenseIcon className="h-5 w-5"/>, show: true },
+    { id: 'reports', label: 'Reportes', icon: <ReportIcon className="h-5 w-5"/>, show: true },
+    { id: 'admin', label: 'Admin', icon: <UsersIcon className="h-5 w-5"/>, show: currentUser?.role === 'admin' },
   ];
 
   const visibleItems = navItems.filter(item => item.show);
 
   return (
     <nav className="absolute bottom-0 left-0 right-0 h-20 bg-zinc-900 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] rounded-t-3xl z-50">
-        <div className="flex justify-around items-center h-full max-w-lg mx-auto px-2">
+        <div className="flex justify-around items-center h-full mx-auto px-1 overflow-x-auto">
             {visibleItems.map((item) => (
                 <NavItem
                     key={item.id}

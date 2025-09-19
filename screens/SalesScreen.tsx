@@ -104,7 +104,7 @@ const Cart: React.FC = () => {
                 </div>
             )}
 
-            <div className="p-4 border-t bg-slate-50 rounded-b-3xl">
+            <div className="p-4 pb-6 lg:pb-4 border-t bg-slate-50 rounded-b-3xl">
                  <div className="space-y-2 text-sm mb-4">
                      <div className="flex justify-between text-lg font-bold">
                         <span className="text-slate-900">Total:</span>
@@ -137,7 +137,7 @@ const SalesScreen: React.FC = () => {
     }, {} as Record<string, Product[]>);
   
     return (
-        <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:h-full">
+        <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:h-full mb-6 lg:mb-0">
             <div className="lg:col-span-2 lg:overflow-y-auto lg:pr-2">
                 <h1 className="text-3xl font-bold text-slate-800 mb-6 sticky top-0 bg-gray-100/80 backdrop-blur-sm py-2 z-10">Punto de Venta</h1>
                 {Object.entries(groupedProducts).map(([category, productsInCategory]) => (

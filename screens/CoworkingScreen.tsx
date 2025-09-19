@@ -72,7 +72,7 @@ const CoworkingScreen: React.FC = () => {
     const extraProducts = products.filter(p => p.category === 'Refrigerador' || p.category === 'Alimentos');
 
     return (
-        <div>
+        <div className="pb-6 lg:pb-0">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-3xl font-bold text-slate-800">Coworking</h1>
                 <button

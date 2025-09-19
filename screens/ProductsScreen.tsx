@@ -30,7 +30,7 @@ const ProductsScreen: React.FC = () => {
   };
 
   return (
-    <div>
+    <div className="pb-6 lg:pb-0">
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="text-3xl font-bold text-slate-800">Productos</h1>
         <div className="flex items-center space-x-2">
