@@ -71,9 +71,9 @@ const DashboardScreen: React.FC = () => {
     const topProducts = getTopSellingProducts();
 
     return (
-        <div className="pb-6 lg:pb-0">
+        <div>
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
-                <h1 className="text-3xl font-bold text-slate-800">Dashboard</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Dashboard</h1>
                 <div className="flex space-x-1 bg-slate-200 p-1 rounded-lg self-start sm:self-center">
                     <TimeframeButton label="Hoy" value="today" />
                     <TimeframeButton label="Semana" value="week" />

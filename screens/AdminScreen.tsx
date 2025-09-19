@@ -19,8 +19,8 @@ const AdminScreen: React.FC = () => {
   };
 
   return (
-    <div className="pb-6 lg:pb-0">
-      <h1 className="text-3xl font-bold text-slate-800 mb-6">Administrar Usuarios</h1>
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">Administrar Usuarios</h1>
       <div className="bg-white shadow-md rounded-3xl overflow-hidden">
         {/* Desktop Table View */}
         <div className="overflow-x-auto hidden md:block">

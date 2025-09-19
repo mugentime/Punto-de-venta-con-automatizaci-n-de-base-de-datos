@@ -72,9 +72,9 @@ const CoworkingScreen: React.FC = () => {
     const extraProducts = products.filter(p => p.category === 'Refrigerador' || p.category === 'Alimentos');
 
     return (
-        <div className="pb-6 lg:pb-0">
+        <div>
             <div className="flex justify-between items-center mb-6">
-                <h1 className="text-3xl font-bold text-slate-800">Coworking</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Coworking</h1>
                 <button
                     onClick={() => setIsStartModalOpen(true)}
                     className="flex items-center px-4 py-2 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800 transition-colors"

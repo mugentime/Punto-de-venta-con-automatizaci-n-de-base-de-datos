@@ -46,9 +46,11 @@ const MainLayout: React.FC = () => {
   };
 
   return (
-    <div className="relative h-screen bg-gray-100/80 font-sans overflow-hidden">
-      <main className="absolute top-0 right-0 bottom-20 left-0 overflow-y-auto p-3 pb-6 sm:p-6 lg:p-8">
-        {renderView()}
+    <div className="flex flex-col h-screen bg-gray-100/80 font-sans">
+      <main className="flex-1 overflow-y-auto p-2 pb-4 sm:p-4 md:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto">
+          {renderView()}
+        </div>
       </main>
       <BottomNav currentView={currentView} setCurrentView={setCurrentView} />
     </div>

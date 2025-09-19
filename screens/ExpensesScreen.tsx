@@ -38,9 +38,9 @@ const ExpensesScreen: React.FC = () => {
   const sortedExpenses = expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
-    <div className="pb-6 lg:pb-0">
+    <div>
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-3xl font-bold text-slate-800">Gestión de Gastos</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Gestión de Gastos</h1>
         <button
           onClick={() => openModal()}
           className="flex items-center px-4 py-2 bg-slate-800 text-white rounded-xl shadow-sm hover:bg-slate-900 transition-colors"

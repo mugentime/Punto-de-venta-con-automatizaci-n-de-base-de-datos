@@ -4,14 +4,14 @@ import { TrashIcon } from '../components/Icons';
 import type { Product, CartItem } from '../types';
 
 const ProductCard: React.FC<{ product: Product; onClick: () => void; }> = ({ product, onClick }) => (
-    <div 
+    <div
         onClick={onClick}
-        className="bg-white rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 group flex flex-col"
+        className="bg-white rounded-xl sm:rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 group flex flex-col h-full"
     >
-        <img src={product.imageUrl} alt={product.name} className="h-40 w-full object-cover" />
-        <div className="p-3 flex-1 flex flex-col justify-between">
-            <h3 className="text-sm font-semibold text-slate-800 truncate group-hover:text-zinc-700">{product.name}</h3>
-            <p className="text-lg font-bold text-slate-900 mt-1">${product.price.toFixed(2)}</p>
+        <img src={product.imageUrl} alt={product.name} className="h-24 sm:h-32 md:h-40 w-full object-cover" />
+        <div className="p-2 sm:p-3 flex-1 flex flex-col justify-between">
+            <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 group-hover:text-zinc-700">{product.name}</h3>
+            <p className="text-sm sm:text-lg font-bold text-slate-900 mt-1">${product.price.toFixed(2)}</p>
         </div>
     </div>
 );
@@ -66,11 +66,11 @@ const Cart: React.FC = () => {
     }
 
     return (
-        <div className="bg-white rounded-3xl shadow-md flex flex-col lg:h-full">
-            <div className="p-4 border-b">
-                <h2 className="text-xl font-bold text-slate-800">Orden Actual</h2>
+        <div className="bg-white rounded-xl sm:rounded-3xl shadow-md flex flex-col h-64 sm:h-80 lg:h-full">
+            <div className="p-3 sm:p-4 border-b">
+                <h2 className="text-lg sm:text-xl font-bold text-slate-800">Orden Actual</h2>
             </div>
-            <div className="flex-1 overflow-y-auto p-4">
+            <div className="flex-1 overflow-y-auto p-3 sm:p-4">
                 {cart.length > 0 ? (
                     cart.map(item => <CartItemRow key={item.id} item={item} />)
                 ) : (
@@ -137,13 +137,13 @@ const SalesScreen: React.FC = () => {
     }, {} as Record<string, Product[]>);
   
     return (
-        <div className="lg:grid lg:grid-cols-3 lg:gap-6 lg:h-full mb-6 lg:mb-0">
-            <div className="lg:col-span-2 lg:overflow-y-auto lg:pr-2">
-                <h1 className="text-3xl font-bold text-slate-800 mb-6 sticky top-0 bg-gray-100/80 backdrop-blur-sm py-2 z-10">Punto de Venta</h1>
+        <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-6 h-full">
+            <div className="flex-1 lg:col-span-2 lg:overflow-y-auto lg:pr-2 min-h-0">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4 sm:mb-6">Punto de Venta</h1>
                 {Object.entries(groupedProducts).map(([category, productsInCategory]) => (
                     <div key={category} className="mb-8">
                         <h2 className="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">{category}</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                             {productsInCategory.map(product => (
                                 <ProductCard key={product.id} product={product} onClick={() => addToCart(product)} />
                             ))}
@@ -151,7 +151,7 @@ const SalesScreen: React.FC = () => {
                     </div>
                 ))}
             </div>
-            <div className="mt-6 lg:mt-0 lg:col-span-1">
+            <div className="flex-shrink-0 mt-4 lg:mt-0 lg:col-span-1 lg:h-full">
                 <Cart />
             </div>
         </div>
