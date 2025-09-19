@@ -695,16 +695,34 @@ async function startServer() {
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Genera una descripción de producto atractiva y concisa para un sistema de punto de venta.
-      Nombre del Producto: "${productName}"
-      Palabras Clave: "${keywords || ''}"
-      La descripción debe ser breve, impactante y adecuada para un catálogo de productos. No uses markdown. Solo texto plano. Limita la respuesta a 2 o 3 frases.`;
+      const prompt = `Eres un experto en marketing y copywriting. Crea una descripción de producto elegante y persuasiva para un sistema de punto de venta premium.
+
+Producto: "${productName}"
+Palabras clave adicionales: "${keywords || ''}"
+
+INSTRUCCIONES:
+- Crea una descripción atractiva y profesional
+- Enfócate en beneficios y experiencia del usuario
+- Usa un tono elegante pero accesible
+- Incluye palabras que transmitan calidad y eficiencia
+- Máximo 2-3 frases concisas e impactantes
+- No uses markdown, solo texto plano
+
+Ejemplo de estilo deseado: "El sistema POS que fusiona elegancia con eficiencia, transformando cada venta en una experiencia fluida. Simplifica la gestión de tu negocio y potencia su crecimiento con tecnología intuitiva."
+
+Descripción:`;
       try {
-        const response = await ai.models.generateContent({ model: 'gemini-2.5-flash', contents: prompt });
-        res.json({ description: response.text.trim() });
+        console.log(`Generating description for product: ${productName} with keywords: ${keywords || 'none'}`);
+        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
+        const result = await model.generateContent(prompt);
+        const response = await result.response;
+        const description = response.text();
+        console.log(`Description generated successfully: ${description.substring(0, 100)}...`);
+        res.json({ description: description.trim() });
       } catch (error) {
         console.error("Error generating description with Gemini:", error);
-        res.status(500).json({ error: 'Failed to generate description' });
+        console.error("Error details:", error.message);
+        res.status(500).json({ error: `Failed to generate description: ${error.message}` });
       }
     });
     

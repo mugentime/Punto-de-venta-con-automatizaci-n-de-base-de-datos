@@ -38,10 +38,12 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
     }
     setIsGeneratingDesc(true);
     try {
-      const description = await generateDescription(product.name, '');
+      const keywords = product.category ? `${product.category}, premium, calidad` : 'premium, calidad';
+      const description = await generateDescription(product.name, keywords);
       setProduct(prev => ({...prev, description}));
     } catch (error) {
-       console.error(error);
+       console.error("Error generating description:", error);
+       alert(error instanceof Error ? error.message : "Error al generar la descripción");
     } finally {
         setIsGeneratingDesc(false);
     }

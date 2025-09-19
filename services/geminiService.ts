@@ -16,7 +16,10 @@ export const generateDescription = async (productName: string, keywords: string)
     return data.description;
   } catch (error) {
     console.error("Error fetching description:", error);
-    return "No se pudo generar la descripción. Por favor, inténtelo de nuevo.";
+    if (error instanceof Error) {
+      throw new Error(`Error al generar descripción: ${error.message}`);
+    }
+    throw new Error("No se pudo generar la descripción. Por favor, verifique su conexión e inténtelo de nuevo.");
   }
 };
 
