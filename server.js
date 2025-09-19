@@ -713,10 +713,11 @@ Ejemplo de estilo deseado: "El sistema POS que fusiona elegancia con eficiencia,
 Descripción:`;
       try {
         console.log(`Generating description for product: ${productName} with keywords: ${keywords || 'none'}`);
-        const model = ai.getGenerativeModel({ model: 'gemini-2.0-flash-exp' });
-        const result = await model.generateContent(prompt);
-        const response = await result.response;
-        const description = response.text();
+        const response = await ai.models.generateContent({
+          model: 'gemini-2.0-flash-exp',
+          contents: prompt
+        });
+        const description = response.text;
         console.log(`Description generated successfully: ${description.substring(0, 100)}...`);
         res.json({ description: description.trim() });
       } catch (error) {
