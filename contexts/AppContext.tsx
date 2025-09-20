@@ -443,35 +443,62 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const stockUpdates = session.consumedExtras.map(item => ({ id: item.id, quantity: item.quantity }));
         await updateStockForSale(stockUpdates);
         
-        // Create Order logic (as before, but stock is already handled)
+        // Create Order logic with correct coworking billing
         const endTime = new Date();
         const startTime = new Date(session.startTime);
         const durationMs = endTime.getTime() - startTime.getTime();
         const durationMinutes = Math.max(0, Math.ceil(durationMs / (1000 * 60)));
+        const durationHours = durationMinutes / 60;
+
         let baseCost = 0;
         if (durationMinutes > 0) {
-            if (durationMinutes <= 60) {
+            if (durationHours > 5) {
+                // Más de 5 horas = día completo
+                baseCost = 270;
+            } else if (durationMinutes <= 60) {
+                // Primera hora
                 baseCost = 58;
+            } else if (durationMinutes <= 90) {
+                // 1 hora + 30 minutos
+                baseCost = 58 + 30;
             } else {
-                const extraMinutes = durationMinutes - 60;
-                const halfHourBlocks = Math.ceil(extraMinutes / 30);
-                baseCost = 58 + (halfHourBlocks * 35);
+                // 2 o más horas completas
+                const fullHours = Math.ceil(durationHours);
+                baseCost = 58 * fullHours;
             }
         }
-        
+
+        // Separar items de cafetería (incluidos) vs otros (se cobran aparte)
+        const cafeItems = session.consumedExtras.filter(item => item.category === 'Cafetería');
+        const chargeableItems = session.consumedExtras.filter(item => item.category !== 'Cafetería');
+
+        // Crear descripción del servicio
+        const hours = Math.floor(durationMinutes / 60);
+        const minutes = durationMinutes % 60;
+        let serviceDescription = `Tiempo: ${hours}h ${minutes}m`;
+        if (durationHours > 5) {
+            serviceDescription += ` (Día completo)`;
+        }
+        if (cafeItems.length > 0) {
+            serviceDescription += ` | Café incluido: ${cafeItems.map(item => `${item.name} x${item.quantity}`).join(', ')}`;
+        }
+
         const coworkingServiceItem: CartItem = {
-            id: 'COWORK_SERVICE', name: `Servicio Coworking`, price: baseCost, cost: 0, 
-            quantity: 1, stock: Infinity, description: `Tiempo: ${durationMinutes} min.`,
+            id: 'COWORK_SERVICE', name: `Servicio Coworking`, price: baseCost, cost: 0,
+            quantity: 1, stock: Infinity, description: serviceDescription,
             imageUrl: '', category: 'Cafetería',
         };
-        
-        const allItems = [coworkingServiceItem, ...session.consumedExtras];
-        const subtotal = allItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+
+        // Solo incluir items cobrables en la orden, pero registrar todos para cálculo de costos
+        const allOrderItems = [coworkingServiceItem, ...chargeableItems];
+        const subtotal = allOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
         const total = subtotal;
+
+        // Calcular costos incluyendo TODOS los consumidos (para tracking de costos)
         const totalCost = session.consumedExtras.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
 
         const newOrder: Order = {
-            id: `ORD-${Date.now()}`, date: endTime.toISOString(), items: allItems,
+            id: `ORD-${Date.now()}`, date: endTime.toISOString(), items: allOrderItems,
             subtotal, total, totalCost, clientName: session.clientName,
             serviceType: 'Mesa', paymentMethod,
         };
