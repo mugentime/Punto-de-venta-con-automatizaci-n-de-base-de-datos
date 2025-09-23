@@ -452,19 +452,17 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
         let baseCost = 0;
         if (durationMinutes > 0) {
-            if (durationHours > 5) {
-                // Más de 5 horas = día completo
-                baseCost = 270;
+            if (durationHours >= 4) {
+                // 4+ horas = día completo
+                baseCost = 180;
             } else if (durationMinutes <= 60) {
                 // Primera hora
                 baseCost = 58;
-            } else if (durationMinutes <= 90) {
-                // 1 hora + 30 minutos
-                baseCost = 58 + 30;
             } else {
-                // 2 o más horas completas
-                const fullHours = Math.ceil(durationHours);
-                baseCost = 58 * fullHours;
+                // Después de la primera hora: $29 por cada bloque de 30 minutos
+                const extraMinutes = durationMinutes - 60;
+                const halfHourBlocks = Math.ceil(extraMinutes / 30);
+                baseCost = 58 + (halfHourBlocks * 29);
             }
         }
 
@@ -476,7 +474,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const hours = Math.floor(durationMinutes / 60);
         const minutes = durationMinutes % 60;
         let serviceDescription = `Tiempo: ${hours}h ${minutes}m`;
-        if (durationHours > 5) {
+        if (durationHours >= 4) {
             serviceDescription += ` (Día completo)`;
         }
         if (cafeItems.length > 0) {

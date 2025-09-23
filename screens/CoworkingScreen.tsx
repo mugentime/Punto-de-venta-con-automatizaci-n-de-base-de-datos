@@ -17,16 +17,22 @@ const calculateCoworkingCost = (startTime: string, endTime: string): { cost: num
     const end = new Date(endTime);
     const durationMs = end.getTime() - start.getTime();
     const durationMinutes = Math.max(0, Math.ceil(durationMs / (1000 * 60)));
+    const durationHours = durationMinutes / 60;
 
     let cost = 0;
     if (durationMinutes > 0) {
-      if (durationMinutes <= 60) {
-          cost = 58;
-      } else {
-          const extraMinutes = durationMinutes - 60;
-          const halfHourBlocks = Math.ceil(extraMinutes / 30);
-          cost = 58 + (halfHourBlocks * 35);
-      }
+        if (durationHours >= 4) {
+            // 4+ hours = day rate
+            cost = 180;
+        } else if (durationMinutes <= 60) {
+            // First hour: $58
+            cost = 58;
+        } else {
+            // After first hour: $29 per half-hour block
+            const extraMinutes = durationMinutes - 60;
+            const halfHourBlocks = Math.ceil(extraMinutes / 30);
+            cost = 58 + (halfHourBlocks * 29);
+        }
     }
     return { cost, minutes: durationMinutes };
 };
