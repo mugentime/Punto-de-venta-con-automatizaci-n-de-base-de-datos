@@ -502,7 +502,38 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             subtotal, total, totalCost, clientName: session.clientName,
             serviceType: 'Mesa', paymentMethod,
         };
-        setOrders(prev => [newOrder, ...prev]);
+
+        // CRITICAL FIX: Persist coworking order to database for profit tracking
+        try {
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    clientName: session.clientName,
+                    serviceType: 'Mesa',
+                    paymentMethod,
+                    items: allOrderItems,
+                    subtotal,
+                    total,
+                    totalCost,
+                    userId: currentUser?.id || 'coworking-system'
+                })
+            });
+
+            if (response.ok) {
+                const createdOrder = await response.json();
+                setOrders(prev => [createdOrder, ...prev]);
+                console.log('Coworking order successfully saved to database:', createdOrder.id);
+            } else {
+                console.error('Failed to save coworking order to database');
+                // Fallback to local state only
+                setOrders(prev => [newOrder, ...prev]);
+            }
+        } catch (error) {
+            console.error('Error saving coworking order:', error);
+            // Fallback to local state only
+            setOrders(prev => [newOrder, ...prev]);
+        }
 
         updateCoworkingSession(sessionId, { endTime: endTime.toISOString(), status: 'finished' });
     };
