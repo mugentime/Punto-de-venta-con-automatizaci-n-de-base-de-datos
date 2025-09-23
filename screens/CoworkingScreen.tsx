@@ -38,7 +38,7 @@ const calculateCoworkingCost = (startTime: string, endTime: string): { cost: num
 };
 
 const CoworkingScreen: React.FC = () => {
-    const { coworkingSessions, startCoworkingSession, products, updateCoworkingSession, finishCoworkingSession } = useAppContext();
+    const { coworkingSessions, startCoworkingSession, products, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession } = useAppContext();
     const [now, setNow] = useState(new Date());
     const [isStartModalOpen, setIsStartModalOpen] = useState(false);
     const [clientName, setClientName] = useState('');
@@ -73,8 +73,21 @@ const CoworkingScreen: React.FC = () => {
         const newExtras = session.consumedExtras.filter(item => item.id !== itemId);
         updateCoworkingSession(session.id, { consumedExtras: newExtras });
     };
+
+    const handleCancelSession = async (sessionId: string) => {
+        if (confirm('¿Estás seguro de que quieres cancelar esta sesión? Esta acción no se puede deshacer.')) {
+            await cancelCoworkingSession(sessionId);
+        }
+    };
+
+    const handleDeleteSession = async (sessionId: string) => {
+        if (confirm('¿Estás seguro de que quieres eliminar esta sesión? Esta acción no se puede deshacer.')) {
+            await deleteCoworkingSession(sessionId);
+        }
+    };
     
     const activeSessions = coworkingSessions.filter(s => s.status === 'active').sort((a,b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
+    const pastSessions = coworkingSessions.filter(s => s.status === 'finished').sort((a,b) => new Date(b.endTime || b.startTime).getTime() - new Date(a.endTime || a.startTime).getTime()).slice(0, 10);
     const extraProducts = products.filter(p => p.category === 'Refrigerador' || p.category === 'Alimentos');
 
     return (
@@ -119,14 +132,60 @@ const CoworkingScreen: React.FC = () => {
                                     )}
                                 </div>
                                 <div className="flex gap-2 mt-4">
-                                    <button onClick={() => setSessionForExtras(session)} className="w-full py-2 px-3 bg-slate-100 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-200">Extras</button>
-                                    <button onClick={() => setSessionToFinalize(session)} className="w-full py-2 px-3 bg-green-500 rounded-xl text-sm font-semibold text-white hover:bg-green-600">Finalizar</button>
+                                    <button onClick={() => setSessionForExtras(session)} className="flex-1 py-2 px-3 bg-slate-100 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-200">Extras</button>
+                                    <button onClick={() => handleCancelSession(session.id)} className="flex-1 py-2 px-3 bg-red-500 rounded-xl text-sm font-semibold text-white hover:bg-red-600">Cancelar</button>
+                                    <button onClick={() => setSessionToFinalize(session)} className="flex-1 py-2 px-3 bg-green-500 rounded-xl text-sm font-semibold text-white hover:bg-green-600">Finalizar</button>
                                 </div>
                             </div>
                         ))}
                     </div>
                 ) : (
                     <p className="text-center text-slate-500 py-4">No hay sesiones activas.</p>
+                )}
+            </div>
+
+            <div className="space-y-6 mt-8">
+                <h2 className="text-xl font-semibold text-slate-700">Últimas Sesiones</h2>
+                {pastSessions.length > 0 ? (
+                    <div className="space-y-3">
+                        {pastSessions.map(session => {
+                            const { cost, minutes } = calculateCoworkingCost(session.startTime, session.endTime || new Date().toISOString());
+                            const extrasCost = session.consumedExtras.reduce((acc, item) => acc + item.price * item.quantity, 0);
+                            const total = cost + extrasCost;
+                            return (
+                                <div key={session.id} className="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-4">
+                                            <div>
+                                                <h3 className="font-semibold text-slate-800">{session.clientName}</h3>
+                                                <p className="text-sm text-slate-500">
+                                                    {new Date(session.startTime).toLocaleDateString()} - {formatDuration(minutes * 60 * 1000)}
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="font-bold text-slate-800">${total.toFixed(2)}</p>
+                                                <p className="text-xs text-slate-500">{minutes} min</p>
+                                            </div>
+                                        </div>
+                                        {session.consumedExtras.length > 0 && (
+                                            <p className="text-xs text-slate-400 mt-1">
+                                                Extras: {session.consumedExtras.map(item => `${item.name} x${item.quantity}`).join(', ')}
+                                            </p>
+                                        )}
+                                    </div>
+                                    <button
+                                        onClick={() => handleDeleteSession(session.id)}
+                                        className="ml-4 p-2 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Eliminar sesión"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
+                                </div>
+                            );
+                        })}
+                    </div>
+                ) : (
+                    <p className="text-center text-slate-500 py-4">No hay sesiones completadas.</p>
                 )}
             </div>
             

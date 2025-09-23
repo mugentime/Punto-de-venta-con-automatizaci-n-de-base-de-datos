@@ -47,6 +47,8 @@ interface AppContextType {
     startCoworkingSession: (clientName: string) => void;
     updateCoworkingSession: (sessionId: string, updates: Partial<CoworkingSession>) => void;
     finishCoworkingSession: (sessionId: string, paymentMethod: 'Efectivo' | 'Tarjeta') => Promise<void>;
+    cancelCoworkingSession: (sessionId: string) => Promise<void>;
+    deleteCoworkingSession: (sessionId: string) => Promise<void>;
     // Cash
     cashSessions: CashSession[];
     startCashSession: (startAmount: number) => void;
@@ -536,6 +538,36 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         updateCoworkingSession(sessionId, { endTime: endTime.toISOString(), status: 'finished' });
     };
 
+    const cancelCoworkingSession = async (sessionId: string) => {
+        try {
+            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to cancel coworking session');
+            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+        } catch (error) {
+            console.error("Error canceling coworking session:", error);
+            // Fallback to local state update if API fails
+            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+        }
+    };
+
+    const deleteCoworkingSession = async (sessionId: string) => {
+        try {
+            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete coworking session');
+            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+        } catch (error) {
+            console.error("Error deleting coworking session:", error);
+            // Fallback to local state update if API fails
+            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+        }
+    };
+
     // Cash Session Functions (no changes)
     const startCashSession = (startAmount: number) => {
         const existingOpenSession = cashSessions.find(s => s.status === 'open');
@@ -570,7 +602,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             cartSubtotal, cartTotal,
             orders, createOrder,
             expenses, addExpense, updateExpense, deleteExpense,
-            coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession,
+            coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
             cashSessions, startCashSession, closeCashSession
         }}>
             {children}
