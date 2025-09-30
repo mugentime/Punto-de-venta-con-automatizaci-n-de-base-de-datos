@@ -214,17 +214,24 @@ const CoworkingScreen: React.FC = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
                     <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 flex flex-col max-h-[90vh]">
                          <h2 className="text-2xl font-bold text-slate-800 mb-4">Agregar Extras para {sessionForExtras.clientName}</h2>
-                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto">
+                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto mb-4">
                             {extraProducts.map(p => (
-                                <div key={p.id} onClick={() => handleAddExtra(p)} className="bg-slate-50 rounded-xl p-3 text-center cursor-pointer hover:bg-slate-200">
+                                <div key={p.id} className="bg-slate-50 rounded-xl p-3 text-center flex flex-col">
                                     <img src={p.imageUrl} alt={p.name} className="h-16 w-16 mx-auto rounded-lg object-cover mb-2" />
                                     <p className="text-xs font-semibold">{p.name}</p>
-                                    <p className="text-xs">${p.price.toFixed(2)}</p>
+                                    <p className="text-xs mb-2">${p.price.toFixed(2)}</p>
+                                    <button
+                                        onClick={() => handleAddExtra(p)}
+                                        className="mt-auto px-2 py-1 bg-zinc-900 text-white rounded-lg text-xs font-semibold hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1"
+                                    >
+                                        <PlusIcon className="h-3 w-3" />
+                                        Agregar
+                                    </button>
                                 </div>
                             ))}
                          </div>
-                         <div className="mt-4 text-right">
-                            <button onClick={() => setSessionForExtras(null)} className="px-4 py-2 bg-zinc-900 rounded-xl text-sm font-medium text-white">Cerrar</button>
+                         <div className="mt-4 flex justify-end">
+                            <button onClick={() => setSessionForExtras(null)} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-sm font-medium text-slate-800">Cerrar</button>
                          </div>
                     </div>
                 </div>
