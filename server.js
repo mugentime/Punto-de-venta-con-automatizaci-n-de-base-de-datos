@@ -526,11 +526,46 @@ async function startServer() {
     app.put('/api/coworking-sessions/:id', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { endTime, duration, total, paymentMethod, status, consumedExtras } = req.body;
-            const result = await pool.query(
-                'UPDATE coworking_sessions SET "endTime" = $1, duration = $2, total = $3, "paymentMethod" = $4, status = $5, "consumedExtras" = $6 WHERE id = $7 RETURNING *',
-                [endTime, duration, total, paymentMethod, status, JSON.stringify(consumedExtras || []), req.params.id]
-            );
+
+            // Build dynamic update query based on provided fields
+            const updates = [];
+            const values = [];
+            let paramCount = 1;
+
+            if (req.body.endTime !== undefined) {
+                updates.push(`"endTime" = $${paramCount++}`);
+                values.push(req.body.endTime);
+            }
+            if (req.body.duration !== undefined) {
+                updates.push(`duration = $${paramCount++}`);
+                values.push(req.body.duration);
+            }
+            if (req.body.total !== undefined) {
+                updates.push(`total = $${paramCount++}`);
+                values.push(req.body.total);
+            }
+            if (req.body.paymentMethod !== undefined) {
+                updates.push(`"paymentMethod" = $${paramCount++}`);
+                values.push(req.body.paymentMethod);
+            }
+            if (req.body.status !== undefined) {
+                updates.push(`status = $${paramCount++}`);
+                values.push(req.body.status);
+            }
+            if (req.body.consumedExtras !== undefined) {
+                updates.push(`"consumedExtras" = $${paramCount++}`);
+                values.push(JSON.stringify(req.body.consumedExtras));
+            }
+
+            if (updates.length === 0) {
+                return res.status(400).json({ error: 'No fields to update' });
+            }
+
+            values.push(req.params.id);
+            const query = `UPDATE coworking_sessions SET ${updates.join(', ')} WHERE id = $${paramCount} RETURNING *`;
+
+            const result = await pool.query(query, values);
+
             if (result.rows.length === 0) {
                 return res.status(404).json({ error: 'Coworking session not found' });
             }
