@@ -119,8 +119,8 @@ const ImportProductsModal: React.FC<ImportProductsModalProps> = ({ isOpen, onClo
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg">
-        <div className="p-6">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+        <div className="p-6 overflow-y-auto flex-1">
           <h2 className="text-2xl font-bold text-slate-800 mb-2">Importar Productos desde CSV</h2>
           <p className="text-sm text-slate-600 mb-4">
             Sube un archivo CSV para añadir nuevos productos o actualizar los existentes. El sistema buscará productos por el campo <code className="bg-slate-100 text-xs p-1 rounded">name</code> para actualizarlos.
@@ -157,10 +157,10 @@ const ImportProductsModal: React.FC<ImportProductsModalProps> = ({ isOpen, onClo
           {error && <p className="text-sm text-red-600 mt-2">{error}</p>}
         </div>
 
-        <div className="bg-slate-50 px-6 py-4 flex justify-end space-x-3 rounded-b-3xl">
+        <div className="bg-slate-50 px-6 py-4 flex justify-end space-x-3 rounded-b-3xl flex-shrink-0">
           <button type="button" onClick={onClose} className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50">Cancelar</button>
-          <button 
-            type="button" 
+          <button
+            type="button"
             onClick={handleImport}
             disabled={!file || isProcessing}
             className="px-4 py-2 bg-zinc-900 border border-transparent rounded-xl text-sm font-medium text-white hover:bg-zinc-800 disabled:bg-zinc-400 disabled:cursor-not-allowed">
