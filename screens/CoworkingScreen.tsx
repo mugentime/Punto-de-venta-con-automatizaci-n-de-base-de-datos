@@ -45,11 +45,21 @@ const CoworkingScreen: React.FC = () => {
 
     const [sessionToFinalize, setSessionToFinalize] = useState<CoworkingSession | null>(null);
     const [sessionForExtras, setSessionForExtras] = useState<CoworkingSession | null>(null);
-    
+
     useEffect(() => {
         const timer = setInterval(() => setNow(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    // Keep sessionForExtras in sync with coworkingSessions
+    useEffect(() => {
+        if (sessionForExtras) {
+            const updatedSession = coworkingSessions.find(s => s.id === sessionForExtras.id);
+            if (updatedSession) {
+                setSessionForExtras(updatedSession);
+            }
+        }
+    }, [coworkingSessions, sessionForExtras?.id]);
 
     const handleStartSession = () => {
         startCoworkingSession(clientName);
