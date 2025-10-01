@@ -214,21 +214,51 @@ const CoworkingScreen: React.FC = () => {
                 <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
                     <div className="bg-white rounded-3xl shadow-xl w-full max-w-md p-6 flex flex-col max-h-[90vh]">
                          <h2 className="text-2xl font-bold text-slate-800 mb-4">Agregar Extras para {sessionForExtras.clientName}</h2>
-                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto mb-4">
-                            {extraProducts.map(p => (
-                                <div key={p.id} className="bg-slate-50 rounded-xl p-3 text-center flex flex-col">
-                                    <img src={p.imageUrl} alt={p.name} className="h-16 w-16 mx-auto rounded-lg object-cover mb-2" />
-                                    <p className="text-xs font-semibold">{p.name}</p>
-                                    <p className="text-xs mb-2">${p.price.toFixed(2)}</p>
-                                    <button
-                                        onClick={() => handleAddExtra(p)}
-                                        className="mt-auto px-2 py-1 bg-zinc-900 text-white rounded-lg text-xs font-semibold hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1"
-                                    >
-                                        <PlusIcon className="h-3 w-3" />
-                                        Agregar
-                                    </button>
+
+                         {/* Current extras summary */}
+                         {sessionForExtras.consumedExtras.length > 0 && (
+                            <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl">
+                                <h3 className="text-sm font-semibold text-green-800 mb-2">Extras Agregados:</h3>
+                                <div className="space-y-1">
+                                    {sessionForExtras.consumedExtras.map(item => (
+                                        <div key={item.id} className="flex justify-between items-center text-xs">
+                                            <span className="text-green-700">{item.name} x{item.quantity}</span>
+                                            <span className="text-green-800 font-semibold">${(item.price * item.quantity).toFixed(2)}</span>
+                                        </div>
+                                    ))}
                                 </div>
-                            ))}
+                                <div className="mt-2 pt-2 border-t border-green-300 flex justify-between font-bold text-sm">
+                                    <span className="text-green-800">Total Extras:</span>
+                                    <span className="text-green-800">
+                                        ${sessionForExtras.consumedExtras.reduce((acc, item) => acc + item.price * item.quantity, 0).toFixed(2)}
+                                    </span>
+                                </div>
+                            </div>
+                         )}
+
+                         <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 overflow-y-auto mb-4">
+                            {extraProducts.map(p => {
+                                const currentQty = sessionForExtras.consumedExtras.find(e => e.id === p.id)?.quantity || 0;
+                                return (
+                                    <div key={p.id} className="bg-slate-50 rounded-xl p-3 text-center flex flex-col relative">
+                                        {currentQty > 0 && (
+                                            <span className="absolute -top-2 -right-2 bg-green-500 text-white text-xs font-bold rounded-full h-6 w-6 flex items-center justify-center">
+                                                {currentQty}
+                                            </span>
+                                        )}
+                                        <img src={p.imageUrl} alt={p.name} className="h-16 w-16 mx-auto rounded-lg object-cover mb-2" />
+                                        <p className="text-xs font-semibold">{p.name}</p>
+                                        <p className="text-xs mb-2">${p.price.toFixed(2)}</p>
+                                        <button
+                                            onClick={() => handleAddExtra(p)}
+                                            className="mt-auto px-2 py-1 bg-zinc-900 text-white rounded-lg text-xs font-semibold hover:bg-zinc-700 transition-colors flex items-center justify-center gap-1"
+                                        >
+                                            <PlusIcon className="h-3 w-3" />
+                                            Agregar
+                                        </button>
+                                    </div>
+                                );
+                            })}
                          </div>
                          <div className="mt-4 flex justify-end">
                             <button onClick={() => setSessionForExtras(null)} className="px-4 py-2 bg-slate-200 hover:bg-slate-300 rounded-xl text-sm font-medium text-slate-800">Cerrar</button>
