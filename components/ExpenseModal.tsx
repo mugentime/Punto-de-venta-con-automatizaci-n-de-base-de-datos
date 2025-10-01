@@ -50,10 +50,10 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[90vh] flex flex-col">
-        <form onSubmit={handleSubmit} className="flex flex-col max-h-full">
-          <div className="p-6 overflow-y-auto flex-1">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[90vh] my-auto flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
+          <div className="p-6 overflow-y-auto flex-1 min-h-0">
             <h2 className="text-2xl font-bold text-slate-800 mb-4">{expenseToEdit ? 'Editar Gasto' : 'Nuevo Gasto'}</h2>
             <div className="space-y-4">
                <div>

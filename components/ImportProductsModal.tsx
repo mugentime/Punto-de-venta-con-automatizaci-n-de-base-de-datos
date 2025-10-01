@@ -118,9 +118,9 @@ const ImportProductsModal: React.FC<ImportProductsModalProps> = ({ isOpen, onClo
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
-        <div className="p-6 overflow-y-auto flex-1">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-lg max-h-[90vh] my-auto flex flex-col">
+        <div className="p-6 overflow-y-auto flex-1 min-h-0">
           <h2 className="text-2xl font-bold text-slate-800 mb-2">Importar Productos desde CSV</h2>
           <p className="text-sm text-slate-600 mb-4">
             Sube un archivo CSV para añadir nuevos productos o actualizar los existentes. El sistema buscará productos por el campo <code className="bg-slate-100 text-xs p-1 rounded">name</code> para actualizarlos.
