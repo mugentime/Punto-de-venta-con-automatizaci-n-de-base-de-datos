@@ -47,7 +47,7 @@ const MainLayout: React.FC = () => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100/80 font-sans">
-      <main className="flex-1 overflow-y-auto p-2 pb-20 sm:p-4 sm:pb-24 md:p-6 md:pb-24 lg:p-8 lg:pb-24">
+      <main className="flex-1 overflow-y-auto p-2 pb-24 sm:p-4 sm:pb-28 md:p-6 md:pb-28 lg:p-8 lg:pb-28">
         <div className="max-w-7xl mx-auto">
           {renderView()}
         </div>

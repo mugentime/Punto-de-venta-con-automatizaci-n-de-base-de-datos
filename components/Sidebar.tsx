@@ -48,7 +48,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
   const visibleItems = navItems.filter(item => item.show);
 
   return (
-    <nav className="flex-shrink-0 h-16 sm:h-20 bg-zinc-900 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] rounded-t-3xl z-50">
+    <nav className="fixed bottom-0 left-0 right-0 flex-shrink-0 h-16 sm:h-20 bg-zinc-900 shadow-[0_-4px_16px_rgba(0,0,0,0.1)] rounded-t-3xl z-50">
         <div className="flex justify-around items-center h-full mx-auto px-1">
             {visibleItems.map((item) => (
                 <NavItem
