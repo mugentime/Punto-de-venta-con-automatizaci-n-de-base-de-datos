@@ -67,6 +67,7 @@ async function setupAndGetDataStore() {
                 subtotal NUMERIC(10, 2) NOT NULL,
                 total NUMERIC(10, 2) NOT NULL,
                 "userId" VARCHAR(255),
+                "customerId" VARCHAR(255),
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
               );
             `);
@@ -111,6 +112,32 @@ async function setupAndGetDataStore() {
                 difference NUMERIC(10, 2) DEFAULT 0,
                 status VARCHAR(50) DEFAULT 'active',
                 "userId" VARCHAR(255),
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS customers (
+                id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                phone VARCHAR(50),
+                "discountPercentage" NUMERIC(5, 2) DEFAULT 0,
+                "creditLimit" NUMERIC(10, 2) DEFAULT 0,
+                "currentCredit" NUMERIC(10, 2) DEFAULT 0,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS customer_credits (
+                id VARCHAR(255) PRIMARY KEY,
+                "customerId" VARCHAR(255) NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+                "orderId" VARCHAR(255),
+                amount NUMERIC(10, 2) NOT NULL,
+                type VARCHAR(50) NOT NULL,
+                status VARCHAR(50) DEFAULT 'pending',
+                description TEXT,
                 created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
               );
             `);
@@ -393,20 +420,49 @@ async function startServer() {
     app.post('/api/orders', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { clientName, serviceType, paymentMethod, items, subtotal, total, userId } = req.body;
+            const { clientName, serviceType, paymentMethod, items, subtotal, total, userId, customerId } = req.body;
             const id = `order-${Date.now()}`;
-            const result = await pool.query(
-                'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, total, "userId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8) RETURNING *',
-                [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId]
-            );
-            const newOrder = result.rows[0];
-            res.status(201).json({
-                ...newOrder,
-                subtotal: parseFloat(newOrder.subtotal),
-                total: parseFloat(newOrder.total),
-                date: newOrder.created_at,  // Map created_at to date for frontend compatibility
-                totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
-            });
+            const client = await pool.connect();
+
+            try {
+                await client.query('BEGIN');
+
+                // Insert order
+                const result = await client.query(
+                    'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
+                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId, customerId || null]
+                );
+                const newOrder = result.rows[0];
+
+                // If it's a credit payment and customer exists, create credit record
+                if (customerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
+                    await client.query(
+                        'INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, status, description) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                        [`credit-${Date.now()}`, customerId, id, total, 'charge', 'pending', `Orden #${id}`]
+                    );
+                    // Update customer's current credit
+                    await client.query(
+                        'UPDATE customers SET "currentCredit" = "currentCredit" + $1 WHERE id = $2',
+                        [total, customerId]
+                    );
+                }
+
+                await client.query('COMMIT');
+
+                res.status(201).json({
+                    ...newOrder,
+                    subtotal: parseFloat(newOrder.subtotal),
+                    total: parseFloat(newOrder.total),
+                    date: newOrder.created_at,
+                    customerId: newOrder.customerId,
+                    totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
+                });
+            } catch (error) {
+                await client.query('ROLLBACK');
+                throw error;
+            } finally {
+                client.release();
+            }
         } catch (error) {
             console.error("Error creating order:", error);
             res.status(500).json({ error: 'Failed to create order' });
@@ -718,6 +774,180 @@ async function startServer() {
         } catch (error) {
             console.error("Error updating stock:", error);
             res.status(500).json({ error: 'Failed to update stock' });
+        }
+    });
+
+    // --- CUSTOMERS ENDPOINTS ---
+    app.get('/api/customers', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const result = await pool.query('SELECT * FROM customers ORDER BY name ASC');
+            res.json(result.rows.map(c => ({
+                ...c,
+                discountPercentage: parseFloat(c.discountPercentage),
+                creditLimit: parseFloat(c.creditLimit),
+                currentCredit: parseFloat(c.currentCredit),
+                createdAt: c.created_at
+            })));
+        } catch (error) {
+            console.error("Error fetching customers:", error);
+            res.status(500).json({ error: 'Failed to fetch customers' });
+        }
+    });
+
+    app.post('/api/customers', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { name, email, phone, discountPercentage, creditLimit } = req.body;
+            const id = `cust-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO customers (id, name, email, phone, "discountPercentage", "creditLimit") VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+                [id, name, email || null, phone || null, discountPercentage || 0, creditLimit || 0]
+            );
+            const customer = result.rows[0];
+            res.status(201).json({
+                ...customer,
+                discountPercentage: parseFloat(customer.discountPercentage),
+                creditLimit: parseFloat(customer.creditLimit),
+                currentCredit: parseFloat(customer.currentCredit),
+                createdAt: customer.created_at
+            });
+        } catch (error) {
+            console.error("Error creating customer:", error);
+            res.status(500).json({ error: 'Failed to create customer' });
+        }
+    });
+
+    app.put('/api/customers/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { name, email, phone, discountPercentage, creditLimit } = req.body;
+            const result = await pool.query(
+                'UPDATE customers SET name = $1, email = $2, phone = $3, "discountPercentage" = $4, "creditLimit" = $5 WHERE id = $6 RETURNING *',
+                [name, email || null, phone || null, discountPercentage, creditLimit, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Customer not found' });
+            }
+            const customer = result.rows[0];
+            res.json({
+                ...customer,
+                discountPercentage: parseFloat(customer.discountPercentage),
+                creditLimit: parseFloat(customer.creditLimit),
+                currentCredit: parseFloat(customer.currentCredit),
+                createdAt: customer.created_at
+            });
+        } catch (error) {
+            console.error("Error updating customer:", error);
+            res.status(500).json({ error: 'Failed to update customer' });
+        }
+    });
+
+    app.delete('/api/customers/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            await pool.query('DELETE FROM customers WHERE id = $1', [req.params.id]);
+            res.status(204).send();
+        } catch (error) {
+            console.error("Error deleting customer:", error);
+            res.status(500).json({ error: 'Failed to delete customer' });
+        }
+    });
+
+    // --- CUSTOMER CREDITS ENDPOINTS ---
+    app.get('/api/customers/:id/credits', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const result = await pool.query(
+                'SELECT * FROM customer_credits WHERE "customerId" = $1 ORDER BY created_at DESC',
+                [req.params.id]
+            );
+            res.json(result.rows.map(c => ({
+                ...c,
+                amount: parseFloat(c.amount),
+                customerId: c.customerId,
+                orderId: c.orderId,
+                createdAt: c.created_at
+            })));
+        } catch (error) {
+            console.error("Error fetching customer credits:", error);
+            res.status(500).json({ error: 'Failed to fetch customer credits' });
+        }
+    });
+
+    app.post('/api/customers/:id/credits', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { amount, type, description, orderId } = req.body;
+            const creditId = `credit-${Date.now()}`;
+            const client = await pool.connect();
+
+            try {
+                await client.query('BEGIN');
+
+                // Insert credit record
+                const creditResult = await client.query(
+                    'INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, description, status) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+                    [creditId, req.params.id, orderId || null, amount, type, description || null, type === 'charge' ? 'pending' : 'paid']
+                );
+
+                // Update customer's current credit
+                if (type === 'charge') {
+                    await client.query(
+                        'UPDATE customers SET "currentCredit" = "currentCredit" + $1 WHERE id = $2',
+                        [amount, req.params.id]
+                    );
+                } else if (type === 'payment') {
+                    await client.query(
+                        'UPDATE customers SET "currentCredit" = "currentCredit" - $1 WHERE id = $2',
+                        [amount, req.params.id]
+                    );
+                }
+
+                await client.query('COMMIT');
+
+                const credit = creditResult.rows[0];
+                res.status(201).json({
+                    ...credit,
+                    amount: parseFloat(credit.amount),
+                    customerId: credit.customerId,
+                    orderId: credit.orderId,
+                    createdAt: credit.created_at
+                });
+            } catch (error) {
+                await client.query('ROLLBACK');
+                throw error;
+            } finally {
+                client.release();
+            }
+        } catch (error) {
+            console.error("Error creating customer credit:", error);
+            res.status(500).json({ error: 'Failed to create customer credit' });
+        }
+    });
+
+    app.put('/api/customer-credits/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { status } = req.body;
+            const result = await pool.query(
+                'UPDATE customer_credits SET status = $1 WHERE id = $2 RETURNING *',
+                [status, req.params.id]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Credit record not found' });
+            }
+            const credit = result.rows[0];
+            res.json({
+                ...credit,
+                amount: parseFloat(credit.amount),
+                customerId: credit.customerId,
+                orderId: credit.orderId,
+                createdAt: credit.created_at
+            });
+        } catch (error) {
+            console.error("Error updating customer credit:", error);
+            res.status(500).json({ error: 'Failed to update customer credit' });
         }
     });
 

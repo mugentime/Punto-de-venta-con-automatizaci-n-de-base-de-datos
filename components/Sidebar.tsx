@@ -39,6 +39,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
     { id: 'products', label: 'Productos', icon: <ProductsIcon className="h-5 w-5"/>, show: true },
     { id: 'cash_report', label: 'Caja', icon: <CashIcon className="h-5 w-5"/>, show: true },
     { id: 'coworking', label: 'Cowork', icon: <CoworkingIcon className="h-5 w-5"/>, show: true },
+    { id: 'customers', label: 'Clientes', icon: <UsersIcon className="h-5 w-5"/>, show: true },
     { id: 'history', label: 'Historial', icon: <HistoryIcon className="h-5 w-5"/>, show: true },
     { id: 'expenses', label: 'Gastos', icon: <ExpenseIcon className="h-5 w-5"/>, show: true },
     { id: 'reports', label: 'Reportes', icon: <ReportIcon className="h-5 w-5"/>, show: true },

@@ -63,3 +63,25 @@ export interface User {
   role: 'admin' | 'employee';
   status: 'pending' | 'approved';
 }
+
+export interface Customer {
+  id: string;
+  name: string;
+  email?: string;
+  phone?: string;
+  discountPercentage: number;
+  creditLimit: number;
+  currentCredit: number;
+  createdAt: string;
+}
+
+export interface CustomerCredit {
+  id: string;
+  customerId: string;
+  orderId?: string;
+  amount: number;
+  type: 'charge' | 'payment';
+  status: 'pending' | 'paid';
+  description?: string;
+  createdAt: string;
+}

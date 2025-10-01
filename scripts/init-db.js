@@ -44,6 +44,38 @@ async function initializeDatabase() {
 
         console.log('✅ Products table created successfully');
 
+        // Create customers table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS customers (
+                id VARCHAR(255) PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255),
+                phone VARCHAR(50),
+                "discountPercentage" NUMERIC(5, 2) DEFAULT 0,
+                "creditLimit" NUMERIC(10, 2) DEFAULT 0,
+                "currentCredit" NUMERIC(10, 2) DEFAULT 0,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        console.log('✅ Customers table created successfully');
+
+        // Create customer_credits table
+        await client.query(`
+            CREATE TABLE IF NOT EXISTS customer_credits (
+                id VARCHAR(255) PRIMARY KEY,
+                "customerId" VARCHAR(255) NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
+                "orderId" VARCHAR(255),
+                amount NUMERIC(10, 2) NOT NULL,
+                type VARCHAR(50) NOT NULL,
+                status VARCHAR(50) DEFAULT 'pending',
+                description TEXT,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+            );
+        `);
+
+        console.log('✅ Customer credits table created successfully');
+
         // Check if products already exist
         const existingProducts = await client.query('SELECT COUNT(*) FROM products');
         const productCount = parseInt(existingProducts.rows[0].count);

@@ -14,8 +14,9 @@ import { AppContextProvider, useAppContext } from './contexts/AppContext';
 import AdminScreen from './screens/AdminScreen';
 import LoginScreen from './screens/LoginScreen';
 import RegisterScreen from './screens/RegisterScreen';
+import CustomersScreen from './screens/CustomersScreen';
 
-export type View = 'dashboard' | 'sales' | 'products' | 'history' | 'cash_report' | 'expenses' | 'coworking' | 'reports' | 'admin';
+export type View = 'dashboard' | 'sales' | 'products' | 'history' | 'cash_report' | 'expenses' | 'coworking' | 'reports' | 'customers' | 'admin';
 
 const MainLayout: React.FC = () => {
   const [currentView, setCurrentView] = useState<View>('sales');
@@ -38,6 +39,8 @@ const MainLayout: React.FC = () => {
         return <CoworkingScreen />;
       case 'reports':
         return <ReportsScreen />;
+      case 'customers':
+        return <CustomersScreen />;
       case 'admin':
         return <AdminScreen />;
       default:

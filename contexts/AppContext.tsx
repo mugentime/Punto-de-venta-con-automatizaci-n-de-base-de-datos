@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
-import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User } from '../types';
+import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit } from '../types';
 
 const initialAdmin: User = {
     id: 'admin-001',
@@ -53,6 +53,12 @@ interface AppContextType {
     cashSessions: CashSession[];
     startCashSession: (startAmount: number) => void;
     closeCashSession: (endAmount: number) => void;
+    // Customers
+    customers: Customer[];
+    addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'currentCredit'>) => Promise<void>;
+    updateCustomer: (customer: Customer) => Promise<void>;
+    deleteCustomer: (customerId: string) => Promise<void>;
+    addCustomerCredit: (customerId: string, amount: number, type: 'charge' | 'payment', description: string) => Promise<void>;
 }
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
@@ -69,6 +75,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [coworkingSessions, setCoworkingSessions] = useState<CoworkingSession[]>([]);
     const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
+    const [customers, setCustomers] = useState<Customer[]>([]);
     
     // --- EFFECTS ---
 
@@ -119,6 +126,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 } else {
                     // Fallback to initial admin if API fails
                     setUsers([initialAdmin]);
+                }
+
+                // Fetch customers
+                const customersResponse = await fetch('/api/customers');
+                if (customersResponse.ok) {
+                    const customersData: Customer[] = await customersResponse.json();
+                    setCustomers(customersData);
                 }
             } catch (error) {
                 console.error("Failed to fetch data:", error);
@@ -594,6 +608,77 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         setCashSessions(prev => prev.map(s => s.id === currentSession.id ? updatedSession : s));
     };
 
+    // Customer Functions
+    const addCustomer = async (customerData: Omit<Customer, 'id' | 'createdAt' | 'currentCredit'>) => {
+        try {
+            const response = await fetch('/api/customers', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customerData),
+            });
+
+            if (!response.ok) throw new Error('Failed to add customer');
+            const newCustomer: Customer = await response.json();
+            setCustomers(prev => [...prev, newCustomer]);
+        } catch (error) {
+            console.error("Error adding customer:", error);
+            alert("Error al agregar el cliente");
+        }
+    };
+
+    const updateCustomer = async (customer: Customer) => {
+        try {
+            const response = await fetch(`/api/customers/${customer.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(customer),
+            });
+
+            if (!response.ok) throw new Error('Failed to update customer');
+            const updatedCustomer: Customer = await response.json();
+            setCustomers(prev => prev.map(c => c.id === customer.id ? updatedCustomer : c));
+        } catch (error) {
+            console.error("Error updating customer:", error);
+            alert("Error al actualizar el cliente");
+        }
+    };
+
+    const deleteCustomer = async (customerId: string) => {
+        try {
+            const response = await fetch(`/api/customers/${customerId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete customer');
+            setCustomers(prev => prev.filter(c => c.id !== customerId));
+        } catch (error) {
+            console.error("Error deleting customer:", error);
+            alert("Error al eliminar el cliente");
+        }
+    };
+
+    const addCustomerCredit = async (customerId: string, amount: number, type: 'charge' | 'payment', description: string) => {
+        try {
+            const response = await fetch(`/api/customers/${customerId}/credits`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ amount, type, description }),
+            });
+
+            if (!response.ok) throw new Error('Failed to add customer credit');
+
+            // Refresh customer data to get updated currentCredit
+            const customerResponse = await fetch('/api/customers');
+            if (customerResponse.ok) {
+                const customersData: Customer[] = await customerResponse.json();
+                setCustomers(customersData);
+            }
+        } catch (error) {
+            console.error("Error adding customer credit:", error);
+            alert("Error al agregar el crédito");
+        }
+    };
+
     return (
         <AppContext.Provider value={{
             users, currentUser, login, logout, register, approveUser, deleteUser,
@@ -603,7 +688,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             orders, createOrder,
             expenses, addExpense, updateExpense, deleteExpense,
             coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
-            cashSessions, startCashSession, closeCashSession
+            cashSessions, startCashSession, closeCashSession,
+            customers, addCustomer, updateCustomer, deleteCustomer, addCustomerCredit
         }}>
             {children}
         </AppContext.Provider>
