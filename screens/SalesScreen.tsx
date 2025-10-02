@@ -42,12 +42,19 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
 };
 
 const Cart: React.FC = () => {
-    const { cart, cartTotal, createOrder, clearCart } = useAppContext();
-    const [clientName, setClientName] = useState('');
+    const { cart, cartTotal, createOrder, clearCart, customers } = useAppContext();
+    const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
+    const [customClientName, setCustomClientName] = useState('');
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
-    const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta'>('Efectivo');
+    const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Crédito'>('Efectivo');
     const [isCheckingOut, setIsCheckingOut] = useState(false);
 
+    // Get selected customer
+    const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
+
+    // Calculate discount
+    const discount = selectedCustomer ? (cartTotal * selectedCustomer.discountPercentage / 100) : 0;
+    const finalTotal = cartTotal - discount;
 
     const handleCheckout = () => {
         if (cart.length === 0) return;
@@ -55,10 +62,18 @@ const Cart: React.FC = () => {
             setIsCheckingOut(true);
             return;
         }
-        createOrder({ clientName, serviceType, paymentMethod });
+
+        // Determine client name and customer ID
+        const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
+        const customerId = selectedCustomer ? selectedCustomer.id : undefined;
+
+        createOrder({ clientName, serviceType, paymentMethod, customerId });
+        clearCart();
         setIsCheckingOut(false);
-        setClientName('');
+        setSelectedCustomerId('');
+        setCustomClientName('');
         setServiceType('Mesa');
+        setPaymentMethod('Efectivo');
     };
 
     const handleCancelCheckout = () => {
@@ -83,9 +98,52 @@ const Cart: React.FC = () => {
                     <h3 className="text-md font-semibold text-slate-700 mb-3">Detalles de la Orden</h3>
                     <div className="space-y-3">
                         <div>
-                            <label htmlFor="clientName" className="block text-xs font-medium text-slate-600">Nombre del Cliente (Opcional)</label>
-                            <input type="text" name="clientName" id="clientName" value={clientName} onChange={(e) => setClientName(e.target.value)} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"/>
+                            <label htmlFor="customerSelect" className="block text-xs font-medium text-slate-600">Cliente</label>
+                            <select
+                                name="customerSelect"
+                                id="customerSelect"
+                                value={selectedCustomerId}
+                                onChange={(e) => {
+                                    setSelectedCustomerId(e.target.value);
+                                    if (e.target.value !== 'other') {
+                                        setCustomClientName('');
+                                    }
+                                }}
+                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"
+                            >
+                                <option value="">Seleccionar cliente...</option>
+                                {customers.map(customer => (
+                                    <option key={customer.id} value={customer.id}>
+                                        {customer.name} {customer.discountPercentage > 0 ? `(${customer.discountPercentage}% desc.)` : ''}
+                                    </option>
+                                ))}
+                                <option value="other">Otro (nombre personalizado)</option>
+                            </select>
                         </div>
+
+                        {selectedCustomerId === 'other' && (
+                            <div>
+                                <label htmlFor="customClientName" className="block text-xs font-medium text-slate-600">Nombre del Cliente</label>
+                                <input
+                                    type="text"
+                                    name="customClientName"
+                                    id="customClientName"
+                                    value={customClientName}
+                                    onChange={(e) => setCustomClientName(e.target.value)}
+                                    className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"
+                                    placeholder="Escribe el nombre..."
+                                />
+                            </div>
+                        )}
+
+                        {selectedCustomer && selectedCustomer.discountPercentage > 0 && (
+                            <div className="bg-green-50 border border-green-200 rounded-lg p-2">
+                                <p className="text-xs text-green-700">
+                                    <span className="font-semibold">Descuento aplicado:</span> {selectedCustomer.discountPercentage}% (-${discount.toFixed(2)})
+                                </p>
+                            </div>
+                        )}
+
                         <div>
                             <label htmlFor="serviceType" className="block text-xs font-medium text-slate-600">Tipo de Servicio</label>
                             <select name="serviceType" id="serviceType" value={serviceType} onChange={(e) => setServiceType(e.target.value as any)} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm">
@@ -98,17 +156,47 @@ const Cart: React.FC = () => {
                              <select name="paymentMethod" id="paymentMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as any)} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm">
                                 <option>Efectivo</option>
                                 <option>Tarjeta</option>
+                                {selectedCustomer && <option>Crédito</option>}
                             </select>
                         </div>
+
+                        {paymentMethod === 'Crédito' && selectedCustomer && (
+                            <div className={`border rounded-lg p-2 ${selectedCustomer.currentCredit + finalTotal > selectedCustomer.creditLimit ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
+                                <p className="text-xs">
+                                    <span className="font-semibold">Crédito actual:</span> ${selectedCustomer.currentCredit.toFixed(2)}
+                                </p>
+                                <p className="text-xs">
+                                    <span className="font-semibold">Nuevo crédito:</span> ${(selectedCustomer.currentCredit + finalTotal).toFixed(2)}
+                                </p>
+                                <p className="text-xs">
+                                    <span className="font-semibold">Límite:</span> ${selectedCustomer.creditLimit.toFixed(2)}
+                                </p>
+                                {selectedCustomer.currentCredit + finalTotal > selectedCustomer.creditLimit && (
+                                    <p className="text-xs text-red-600 font-semibold mt-1">⚠️ Excede el límite de crédito</p>
+                                )}
+                            </div>
+                        )}
                     </div>
                 </div>
             )}
 
             <div className="p-4 pb-6 lg:pb-4 border-t bg-slate-50 rounded-b-3xl">
                  <div className="space-y-2 text-sm mb-4">
+                     {discount > 0 && (
+                         <>
+                             <div className="flex justify-between text-sm text-slate-600">
+                                <span>Subtotal:</span>
+                                <span>${cartTotal.toFixed(2)}</span>
+                            </div>
+                            <div className="flex justify-between text-sm text-green-600">
+                                <span>Descuento ({selectedCustomer?.discountPercentage}%):</span>
+                                <span>-${discount.toFixed(2)}</span>
+                            </div>
+                         </>
+                     )}
                      <div className="flex justify-between text-lg font-bold">
                         <span className="text-slate-900">Total:</span>
-                        <span>${cartTotal.toFixed(2)}</span>
+                        <span>${finalTotal.toFixed(2)}</span>
                     </div>
                 </div>
                 <div className="flex space-x-2">
@@ -116,7 +204,7 @@ const Cart: React.FC = () => {
                         {isCheckingOut ? 'Cancelar' : 'Limpiar'}
                     </button>
                     <button onClick={handleCheckout} disabled={cart.length === 0} className="w-full py-3 px-4 bg-zinc-900 rounded-xl text-sm font-semibold text-white hover:bg-zinc-800 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed">
-                        {isCheckingOut ? `Pagar $${cartTotal.toFixed(2)}` : 'Cobrar'}
+                        {isCheckingOut ? `Pagar $${finalTotal.toFixed(2)}` : 'Cobrar'}
                     </button>
                 </div>
             </div>
