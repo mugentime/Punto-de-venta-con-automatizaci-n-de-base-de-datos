@@ -78,8 +78,8 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 overflow-y-auto">
-      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[90vh] my-auto flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4 pb-24 lg:pb-4 overflow-y-auto">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-md max-h-[85vh] lg:max-h-[90vh] my-auto flex flex-col">
         <form onSubmit={handleSubmit} className="flex flex-col h-full overflow-hidden">
           <div className="p-6 overflow-y-auto flex-1 min-h-0">
             <h2 className="text-2xl font-bold text-slate-800 mb-4">{productToEdit ? 'Editar Producto' : 'Nuevo Producto'}</h2>
@@ -147,7 +147,7 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
               </div>
             </div>
           </div>
-          <div className="bg-slate-50 px-6 py-4 flex justify-end space-x-3 rounded-b-3xl flex-shrink-0">
+          <div className="bg-slate-50 px-6 py-4 pb-6 lg:pb-4 flex justify-end space-x-3 rounded-b-3xl flex-shrink-0">
             <button type="button" onClick={onClose} className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500">Cancelar</button>
             <button type="submit" className="px-4 py-2 bg-zinc-900 border border-transparent rounded-xl text-sm font-medium text-white hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-zinc-500">Guardar</button>
           </div>
