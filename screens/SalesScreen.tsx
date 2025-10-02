@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { TrashIcon } from '../components/Icons';
+import Toast from '../components/Toast';
 import type { Product, CartItem } from '../types';
 
 const ProductCard: React.FC<{ product: Product; onClick: () => void; }> = ({ product, onClick }) => (
@@ -214,6 +215,15 @@ const Cart: React.FC = () => {
 
 const SalesScreen: React.FC = () => {
     const { products, addToCart } = useAppContext();
+    const [toastMessage, setToastMessage] = useState<{ message: string; productName: string } | null>(null);
+
+    const handleAddToCart = (product: Product) => {
+        addToCart(product);
+        setToastMessage({
+            message: 'Agregado al carrito',
+            productName: product.name
+        });
+    };
 
     const groupedProducts = products.reduce((acc, product) => {
         const category = product.category || 'Sin categoría';
@@ -226,6 +236,13 @@ const SalesScreen: React.FC = () => {
   
     return (
         <div className="flex flex-col lg:grid lg:grid-cols-3 lg:gap-6 h-full">
+            {toastMessage && (
+                <Toast
+                    message={toastMessage.message}
+                    productName={toastMessage.productName}
+                    onClose={() => setToastMessage(null)}
+                />
+            )}
             <div className="flex-1 lg:col-span-2 lg:overflow-y-auto lg:pr-2 min-h-0">
                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4 sm:mb-6">Punto de Venta</h1>
                 {Object.entries(groupedProducts).map(([category, productsInCategory]) => (
@@ -233,7 +250,7 @@ const SalesScreen: React.FC = () => {
                         <h2 className="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">{category}</h2>
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
                             {productsInCategory.map(product => (
-                                <ProductCard key={product.id} product={product} onClick={() => addToCart(product)} />
+                                <ProductCard key={product.id} product={product} onClick={() => handleAddToCart(product)} />
                             ))}
                         </div>
                     </div>
