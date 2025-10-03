@@ -4559,18 +4559,19 @@
 
         // Actualizar datos del reporte
         async function updateReportData(period, startDate = null, endDate = null) {
+            console.log(`📊 Loading report data - Period: ${period}, Start: ${startDate}, End: ${endDate}`);
             reportData.period = period;
             reportData.startDate = startDate;
             reportData.endDate = endDate;
-            
+
             try {
                 // First, check if we have local data that matches the period
                 let localRecords = [];
-                
+
                 if (period === 'today' && data.records && data.records.length > 0) {
                     // Use already loaded today's records
                     localRecords = data.records;
-                    console.log('Using local data for today:', localRecords.length, 'records');
+                    console.log('✅ Using local data for today:', localRecords.length, 'records');
                 } else {
                     // For other periods, try to fetch from API
                     let url = '/api/records?limit=1000';
@@ -4587,8 +4588,7 @@
                         url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
                     } else if (period === 'month') {
                         const end = new Date();
-                        const start = new Date();
-                        start.setDate(end.getDate() - 30);
+                        const start = new Date(end.getFullYear(), end.getMonth(), 1); // Primer día del mes actual
                         url += `&startDate=${start.toISOString().split('T')[0]}&endDate=${end.toISOString().split('T')[0]}`;
                     }
                     
@@ -4598,16 +4598,29 @@
                             'Authorization': `Bearer ${authToken}`
                         }
                     });
-                    
+
                     if (response.ok) {
-                        localRecords = await response.json();
+                        const responseData = await response.json();
+                        // Handle both array and object responses
+                        if (Array.isArray(responseData)) {
+                            localRecords = responseData;
+                        } else if (responseData.records && Array.isArray(responseData.records)) {
+                            localRecords = responseData.records;
+                        } else if (responseData.data && Array.isArray(responseData.data)) {
+                            localRecords = responseData.data;
+                        } else {
+                            console.error('Unexpected API response format:', responseData);
+                            localRecords = [];
+                        }
                         console.log('API returned:', localRecords.length, 'records');
+                        console.log('Sample record:', localRecords[0]);
                     } else {
                         console.error('API request failed:', response.status, response.statusText);
                     }
                 }
-                
+
                 reportData.records = localRecords || [];
+                console.log('ReportData.records set with', reportData.records.length, 'records');
                 
             } catch (error) {
                 console.error('Error fetching records:', error);
@@ -4927,12 +4940,13 @@
         // Actualizar visualización del reporte con gráficas modernas
         function updateReportDisplay() {
             let records = reportData.records;
-            
+            console.log(`📈 Updating report display with ${records?.length || 0} records`);
+
             // Check if we should use demo data
             if (shouldUseDemoData(records)) {
                 records = generateDemoData(reportData.period);
-                console.log('Using demo data for reports - generated', records.length, 'demo transactions');
-                
+                console.log('⚠️ Using demo data for reports - generated', records.length, 'demo transactions');
+
                 // Add a subtle indicator that this is demo data
                 const headerTitle = document.querySelector('.reports-title');
                 if (headerTitle && !headerTitle.textContent.includes('(Demo)')) {
@@ -4946,13 +4960,15 @@
                     headerTitle.innerHTML = '<i class="fas fa-chart-bar"></i> Dashboard de Análisis';
                 }
             }
-            
+
             // Calcular métricas básicas
             const totalClients = records.length;
             const totalIncome = records.reduce((sum, r) => sum + (r.total || 0), 0);
             const totalCosts = records.reduce((sum, r) => sum + (r.cost || 0), 0);
             const totalProfit = totalIncome - totalCosts;
             const averageTicket = totalClients > 0 ? totalIncome / totalClients : 0;
+
+            console.log(`💰 Calculated metrics - Income: $${totalIncome}, Costs: $${totalCosts}, Profit: $${totalProfit}, Clients: ${totalClients}`);
             
             // Actualizar tarjetas de métricas principales
             updateMetricCards(totalIncome, totalProfit, totalClients, averageTicket);
