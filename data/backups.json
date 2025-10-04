@@ -17,5 +17,24 @@
     "createdAt": "2025-08-27T08:00:01.007Z",
     "status": "completed",
     "checksum": "55afb4f34ad856dacff0086e9d79bbe6ec9f0430e48cec85513aa9214f147175"
+  },
+  {
+    "_id": "16965a2f61aa84eabac485b3",
+    "type": "daily",
+    "filename": "backup-daily-2025-10-04T08-00-00-030Z.json",
+    "size": 4145,
+    "dateRange": {
+      "from": "2025-10-03T08:00:00.028Z",
+      "to": "2025-10-04T08:00:00.028Z"
+    },
+    "counts": {
+      "users": 4,
+      "products": 3,
+      "records": 0
+    },
+    "createdBy": null,
+    "createdAt": "2025-10-04T08:00:00.033Z",
+    "status": "completed",
+    "checksum": "a1ce67e429938f943066d9f38a1afe7b9514edc4fff08fb2c6ff2c03183c4f9d"
   }
 ]

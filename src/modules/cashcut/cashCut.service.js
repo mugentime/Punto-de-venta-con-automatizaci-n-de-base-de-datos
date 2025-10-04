@@ -6,7 +6,16 @@
 const databaseManager = require('../../../utils/databaseManager');
 const fs = require('fs').promises;
 const path = require('path');
-const cron = require('node-cron');
+
+// Make node-cron optional - fallback to manual scheduling if not available
+let cron;
+try {
+    cron = require('node-cron');
+    console.log('✅ node-cron loaded successfully');
+} catch (error) {
+    console.warn('⚠️  node-cron not available, automated scheduling disabled');
+    cron = null;
+}
 
 class CashCutService {
     constructor() {
