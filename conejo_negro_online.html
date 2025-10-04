@@ -4685,12 +4685,16 @@
                     // Filter by date range and convert to record format
                     const convertedSessions = coworkingSessions
                         .filter(s => {
-                            // Only completed sessions
-                            if (s.status !== 'completed' && !s.endTime) return false;
+                            // Only completed sessions OR sessions with endTime
+                            if (s.status === 'active' && !s.endTime) return false;
 
-                            // Filter by date
-                            const sessionDate = new Date(s.endTime || s.createdAt);
-                            return sessionDate >= filterStartDate && sessionDate < filterEndDate;
+                            // Filter by date - use endTime, createdAt, or updatedAt
+                            const sessionDate = new Date(s.endTime || s.updatedAt || s.createdAt);
+                            const isInRange = sessionDate >= filterStartDate && sessionDate < filterEndDate;
+
+                            console.log(`Session ${s.client}: date=${sessionDate.toISOString()}, range=${filterStartDate.toISOString()} to ${filterEndDate.toISOString()}, included=${isInRange}`);
+
+                            return isInRange;
                         })
                         .map(session => ({
                             _id: session._id,
