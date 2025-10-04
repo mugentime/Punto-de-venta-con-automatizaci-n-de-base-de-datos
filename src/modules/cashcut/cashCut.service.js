@@ -63,6 +63,13 @@ class CashCutService {
      * 📅 Setup automatic cuts with cron
      */
     setupAutomaticCuts(cronExpression) {
+        // If node-cron is not available, skip scheduling
+        if (!cron) {
+            console.warn('⚠️  node-cron not available - automatic scheduling disabled');
+            console.log('💡 Manual cash cuts via API still work');
+            return;
+        }
+
         try {
             const job = cron.schedule(cronExpression, async () => {
                 try {
