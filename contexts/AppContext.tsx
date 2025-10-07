@@ -524,6 +524,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         };
 
         // CRITICAL FIX: Persist coworking order to database for profit tracking
+        console.log('💾 Attempting to save coworking order to database...', {
+            clientName: session.clientName,
+            total,
+            items: allOrderItems.length
+        });
+
         try {
             const response = await fetch('/api/orders', {
                 method: 'POST',
@@ -535,22 +541,27 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     items: allOrderItems,
                     subtotal,
                     total,
-                    totalCost,
                     userId: currentUser?.id || 'coworking-system'
                 })
             });
 
+            console.log('📡 Server response status:', response.status);
+
             if (response.ok) {
                 const createdOrder = await response.json();
                 setOrders(prev => [createdOrder, ...prev]);
-                console.log('Coworking order successfully saved to database:', createdOrder.id);
+                console.log('✅ Coworking order successfully saved to database:', createdOrder.id);
+                alert(`✅ Sesión de coworking guardada: ${session.clientName} - $${total.toFixed(2)}`);
             } else {
-                console.error('Failed to save coworking order to database');
+                const errorText = await response.text();
+                console.error('❌ Failed to save coworking order. Status:', response.status, 'Error:', errorText);
+                alert(`⚠️ Error al guardar la orden de coworking: ${response.status} - ${errorText}`);
                 // Fallback to local state only
                 setOrders(prev => [newOrder, ...prev]);
             }
         } catch (error) {
-            console.error('Error saving coworking order:', error);
+            console.error('❌ Error saving coworking order:', error);
+            alert(`⚠️ Error al guardar la orden de coworking: ${error.message}`);
             // Fallback to local state only
             setOrders(prev => [newOrder, ...prev]);
         }
