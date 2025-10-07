@@ -109,7 +109,7 @@ const CloseDayModal: React.FC<{
 
 
 const CashReportScreen: React.FC = () => {
-  const { orders, expenses, cashSessions, startCashSession, closeCashSession } = useAppContext();
+  const { orders, expenses, cashSessions, coworkingSessions, startCashSession, closeCashSession } = useAppContext();
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
@@ -119,12 +119,22 @@ const CashReportScreen: React.FC = () => {
   // Logic for the active session view
   const sessionOrders = currentSession ? orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate)) : [];
   const sessionExpenses = currentSession ? expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate)) : [];
+  const sessionCoworking = currentSession ? coworkingSessions.filter(s =>
+    s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
+  ) : [];
 
-  const totalSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
+  const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
+  const coworkingSales = sessionCoworking.reduce((sum, session) => sum + (session.total || 0), 0);
+  const totalSales = ordersSales + coworkingSales;
+
   const totalExpenses = sessionExpenses.reduce((sum, expense) => sum + expense.amount, 0);
-  const cashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+
+  const ordersCashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+  const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
+  const cashSales = ordersCashSales + coworkingCashSales;
+
   const cardSales = totalSales - cashSales;
-  const totalOrders = sessionOrders.length;
+  const totalOrders = sessionOrders.length + sessionCoworking.length;
   const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalExpenses : 0;
   
   if (currentSession) {
@@ -173,13 +183,23 @@ const CashReportScreen: React.FC = () => {
   
   const filteredOrders = orders.filter(order => order.date && order.date.startsWith(selectedDate));
   const filteredExpenses = expenses.filter(expense => expense.date && expense.date.startsWith(selectedDate));
+  const filteredCoworkingHist = coworkingSessions.filter(s =>
+    s.status === 'finished' && s.endTime && s.endTime.startsWith(selectedDate)
+  );
 
-  const totalSalesHist = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+  const ordersRevenueHist = filteredOrders.reduce((sum, order) => sum + order.total, 0);
+  const coworkingRevenueHist = filteredCoworkingHist.reduce((sum, session) => sum + (session.total || 0), 0);
+  const totalSalesHist = ordersRevenueHist + coworkingRevenueHist;
+
   const totalExpensesHist = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   const finalBalanceHist = totalSalesHist - totalExpensesHist;
-  const cashSalesHist = filteredOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+
+  const ordersCashHist = filteredOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+  const coworkingCashHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
+  const cashSalesHist = ordersCashHist + coworkingCashHist;
+
   const cardSalesHist = totalSalesHist - cashSalesHist;
-  const totalOrdersHist = filteredOrders.length;
+  const totalOrdersHist = filteredOrders.length + filteredCoworkingHist.length;
   
   return (
     <div>

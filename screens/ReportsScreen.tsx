@@ -7,7 +7,7 @@ import { SalesIcon, ProductsIcon, DashboardIcon, ExpenseIcon, CashIcon, HistoryI
 const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
-    const { orders, expenses } = useAppContext();
+    const { orders, expenses, coworkingSessions } = useAppContext();
     
     const today = new Date();
     const startOfMonth = toISODateString(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -41,6 +41,7 @@ const ReportsScreen: React.FC = () => {
     const {
         filteredOrders,
         filteredExpenses,
+        filteredCoworkingSessions,
         totalRevenue,
         totalCOGS,
         grossProfit,
@@ -61,25 +62,49 @@ const ReportsScreen: React.FC = () => {
             return expenseDate >= start && expenseDate <= end;
         });
 
-        const totalRevenue = currentFilteredOrders.reduce((acc, order) => acc + order.total, 0);
+        // Include finished coworking sessions in revenue calculation
+        const currentFilteredCoworkingSessions = coworkingSessions.filter(session => {
+            if (session.status !== 'finished' || !session.endTime) return false;
+            const sessionDate = new Date(session.endTime);
+            return sessionDate >= start && sessionDate <= end;
+        });
+
+        // Calculate revenue from orders
+        const ordersRevenue = currentFilteredOrders.reduce((acc, order) => acc + order.total, 0);
+
+        // Calculate revenue from finished coworking sessions
+        const coworkingRevenue = currentFilteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
+
+        // Total revenue includes both orders and coworking sessions
+        const totalRevenue = ordersRevenue + coworkingRevenue;
+
         const totalCOGS = currentFilteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
-        const grossProfit = totalRevenue - totalCOGS;
+
+        // Add cost from coworking extras
+        const coworkingCOGS = currentFilteredCoworkingSessions.reduce((acc, session) => {
+            const extrasCost = (session.consumedExtras || []).reduce((sum, item) => sum + (item.cost * item.quantity), 0);
+            return acc + extrasCost;
+        }, 0);
+
+        const totalCOGSWithCoworking = totalCOGS + coworkingCOGS;
+        const grossProfit = totalRevenue - totalCOGSWithCoworking;
         const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
         const netProfit = grossProfit - totalExpensesAmount;
-        const totalOrdersCount = currentFilteredOrders.length;
+        const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
         return {
             filteredOrders: currentFilteredOrders,
             filteredExpenses: currentFilteredExpenses,
+            filteredCoworkingSessions: currentFilteredCoworkingSessions,
             totalRevenue,
-            totalCOGS,
+            totalCOGS: totalCOGSWithCoworking,
             grossProfit,
             totalExpensesAmount,
             netProfit,
             averageTicket
         };
-    }, [startDate, endDate, orders, expenses]);
+    }, [startDate, endDate, orders, expenses, coworkingSessions]);
 
     const downloadCSV = (data: any[], filename: string) => {
         if (data.length === 0) {
