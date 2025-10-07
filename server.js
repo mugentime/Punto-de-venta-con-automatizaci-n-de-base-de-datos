@@ -1,7 +1,6 @@
 
 import 'dotenv/config';
 import express from 'express';
-import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
@@ -11,7 +10,6 @@ const { Pool } = pg;
 // --- CONFIGURATION ---
 let pool;
 let useDb = false;
-let openai = null; // OpenAI client for descriptions
 const initialProducts = [
     { id: '1', name: 'Espresso Americano', price: 35, cost: 12, stock: 100, description: 'Intenso y aromático, preparado con granos de especialidad.', imageUrl: 'https://picsum.photos/seed/americano/400', category: 'Cafetería' },
     { id: '2', name: 'Latte', price: 55, cost: 18, stock: 100, description: 'Cremoso y suave, con leche vaporizada a la perfección.', imageUrl: 'https://picsum.photos/seed/latte/400', category: 'Cafetería' },
@@ -332,19 +330,12 @@ async function startServer() {
     const port = process.env.PORT || 3001;
     app.use(express.json({ limit: '50mb' }));
 
-    // --- OPENAI API SETUP ---
-    const apiKey = process.env.OPENAI_API_KEY;
-    if (apiKey) {
-        openai = new OpenAI({ apiKey });
-        console.log("OpenAI client initialized successfully for descriptions.");
-    } else {
-        console.warn("*******************************************************************");
-        console.warn("*** WARNING: OPENAI_API_KEY is not set.                        ***");
-        console.warn("*** AI description generation will be disabled.                ***");
-        console.warn("*** Image generation will use free Pollinations.ai service.    ***");
-        console.warn("*** Set OPENAI_API_KEY to enable AI descriptions.              ***");
-        console.warn("*******************************************************************");
-    }
+    // --- AI SETUP ---
+    console.log("*******************************************************************");
+    console.log("*** AI Configuration:                                           ***");
+    console.log("*** - Image generation: Pollinations.ai (FREE, no API key)      ***");
+    console.log("*** - Text generation: HuggingFace Inference API (FREE)         ***");
+    console.log("*******************************************************************");
 
     // --- API ENDPOINTS ---
     app.get('/api/products', async (req, res) => {
@@ -1162,45 +1153,59 @@ async function startServer() {
 
     // --- AI ENDPOINTS ---
     app.post('/api/generate-description', async (req, res) => {
-      if (!openai) {
-        return res.status(503).json({ error: 'AI description features are not configured. Set OPENAI_API_KEY environment variable.' });
-      }
       const { productName, keywords } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Eres un experto en marketing y copywriting. Crea una descripción de producto elegante y persuasiva.
-
-Producto: "${productName}"
-Palabras clave adicionales: "${keywords || ''}"
-
-INSTRUCCIONES:
-- Crea una descripción atractiva y profesional
-- Enfócate en beneficios y experiencia del usuario
-- Usa un tono elegante pero accesible
-- Incluye palabras que transmitan calidad y eficiencia
-- Máximo 2-3 frases concisas e impactantes
-- No uses markdown, solo texto plano
-
-Ejemplo de estilo: "Café premium seleccionado de las mejores regiones cafetaleras. Sabor intenso y aromático que despierta tus sentidos con cada sorbo."
-
-Responde SOLO con la descripción, sin comillas ni formato adicional.`;
 
       try {
         console.log(`Generating description for product: ${productName} with keywords: ${keywords || 'none'}`);
-        const completion = await openai.chat.completions.create({
-          model: 'gpt-4o-mini',
-          messages: [{ role: 'user', content: prompt }],
-          temperature: 0.7,
-          max_tokens: 150
+
+        // Use HuggingFace Inference API (FREE, no API key needed for public models)
+        const prompt = `Escribe una descripción de producto profesional y atractiva para: ${productName}${keywords ? `. Palabras clave: ${keywords}` : ''}. La descripción debe ser elegante, concisa (máximo 2-3 frases), enfocarse en beneficios y calidad. Responde SOLO con la descripción, sin comillas.`;
+
+        const response = await fetch('https://api-inference.huggingface.co/models/mistralai/Mistral-7B-Instruct-v0.2', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            inputs: prompt,
+            parameters: {
+              max_new_tokens: 100,
+              temperature: 0.7,
+              top_p: 0.9,
+              return_full_text: false
+            }
+          })
         });
-        const description = completion.choices[0].message.content.trim();
+
+        if (!response.ok) {
+          throw new Error(`HuggingFace API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        let description = data[0]?.generated_text || '';
+
+        // Clean up the description
+        description = description
+          .trim()
+          .replace(/^["']|["']$/g, '') // Remove quotes
+          .split('\n')[0] // Take first paragraph
+          .substring(0, 300); // Limit length
+
         console.log(`Description generated successfully: ${description.substring(0, 100)}...`);
         res.json({ description });
       } catch (error) {
-        console.error("Error generating description with OpenAI:", error);
+        console.error("Error generating description with HuggingFace:", error);
         console.error("Error details:", error.message);
-        res.status(500).json({ error: `Failed to generate description: ${error.message}` });
+
+        // Fallback to template-based description
+        const category = keywords || 'calidad';
+        const fallbackDescription = `${productName} de ${category} premium. Producto seleccionado con los más altos estándares de calidad para garantizar tu satisfacción.`;
+
+        console.log('Using fallback description:', fallbackDescription);
+        res.json({ description: fallbackDescription });
       }
     });
     
