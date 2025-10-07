@@ -606,30 +606,108 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     };
 
-    // Cash Session Functions (no changes)
-    const startCashSession = (startAmount: number) => {
+    // Cash Session Functions (updated for API)
+    const startCashSession = async (startAmount: number) => {
         const existingOpenSession = cashSessions.find(s => s.status === 'open');
         if (existingOpenSession) {
             alert("Ya hay una sesión de caja abierta.");
             return;
         }
-        const newSession: CashSession = {
-            id: `CS-${Date.now()}`, startDate: new Date().toISOString(), endDate: null,
-            startAmount, endAmount: null, status: 'open'
-        };
-        setCashSessions(prev => [newSession, ...prev]);
+
+        try {
+            const sessionData = {
+                startAmount,
+                startTime: new Date().toISOString(),
+                userId: currentUser?.id || 'guest'
+            };
+
+            const response = await fetch('/api/cash-sessions', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(sessionData),
+            });
+
+            if (!response.ok) throw new Error('Failed to create cash session');
+            const newSession = await response.json();
+
+            // Map API response to frontend CashSession type
+            const mappedSession: CashSession = {
+                id: newSession.id,
+                startDate: newSession.startTime,
+                endDate: newSession.endTime,
+                startAmount: newSession.startAmount,
+                endAmount: newSession.endAmount,
+                status: newSession.status === 'active' ? 'open' : 'closed'
+            };
+
+            setCashSessions(prev => [mappedSession, ...prev]);
+        } catch (error) {
+            console.error("Error starting cash session:", error);
+            alert("Error al iniciar la sesión de caja");
+        }
     };
 
-    const closeCashSession = (endAmount: number) => {
+    const closeCashSession = async (endAmount: number) => {
         const currentSession = cashSessions.find(s => s.status === 'open');
         if (!currentSession) {
             alert("No hay una sesión de caja abierta para cerrar.");
             return;
         }
-        const updatedSession: CashSession = {
-            ...currentSession, endDate: new Date().toISOString(), endAmount, status: 'closed'
-        };
-        setCashSessions(prev => prev.map(s => s.id === currentSession.id ? updatedSession : s));
+
+        try {
+            // Calculate totals from current session data
+            const sessionOrders = orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate));
+            const sessionExpenses = expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate));
+            const sessionCoworking = coworkingSessions.filter(s =>
+                s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
+            );
+
+            const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
+            const coworkingSales = sessionCoworking.reduce((sum, session) => sum + ((session as any).total || 0), 0);
+            const totalSales = ordersSales + coworkingSales;
+            const totalExpenses = sessionExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+
+            const ordersCashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+            const coworkingCashSales = sessionCoworking.filter(s => (s as any).paymentMethod === 'Efectivo').reduce((sum, s) => sum + ((s as any).total || 0), 0);
+            const cashSales = ordersCashSales + coworkingCashSales;
+
+            const expectedCash = currentSession.startAmount + cashSales - totalExpenses;
+            const difference = endAmount - expectedCash;
+
+            const updateData = {
+                endAmount,
+                endTime: new Date().toISOString(),
+                totalSales,
+                totalExpenses,
+                expectedCash,
+                difference,
+                status: 'closed'
+            };
+
+            const response = await fetch(`/api/cash-sessions/${currentSession.id}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updateData),
+            });
+
+            if (!response.ok) throw new Error('Failed to close cash session');
+            const updatedSession = await response.json();
+
+            // Map API response to frontend CashSession type
+            const mappedSession: CashSession = {
+                id: updatedSession.id,
+                startDate: updatedSession.startTime,
+                endDate: updatedSession.endTime,
+                startAmount: updatedSession.startAmount,
+                endAmount: updatedSession.endAmount,
+                status: updatedSession.status === 'active' ? 'open' : 'closed'
+            };
+
+            setCashSessions(prev => prev.map(s => s.id === currentSession.id ? mappedSession : s));
+        } catch (error) {
+            console.error("Error closing cash session:", error);
+            alert("Error al cerrar la sesión de caja");
+        }
     };
 
     // Customer Functions
