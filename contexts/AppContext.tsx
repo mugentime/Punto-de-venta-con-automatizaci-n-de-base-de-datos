@@ -37,6 +37,7 @@ interface AppContextType {
     // Orders
     orders: Order[];
     createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; }) => Promise<void>;
+    deleteOrder: (orderId: string) => Promise<void>;
     // Expenses
     expenses: Expense[];
     addExpense: (expense: Omit<Expense, 'id'>) => void;
@@ -401,6 +402,26 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     const cartSubtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
     const cartTotal = cartSubtotal;
+
+    // Delete Order Function
+    const deleteOrder = async (orderId: string) => {
+        try {
+            const response = await fetch(`/api/orders/${orderId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete order');
+
+            // Update local state
+            setOrders(prev => prev.filter(o => o.id !== orderId));
+
+            console.log('✅ Order deleted successfully:', orderId);
+        } catch (error) {
+            console.error("Error deleting order:", error);
+            alert("Error al eliminar la orden");
+            throw error;
+        }
+    };
 
     // Expense Functions (updated for API)
     const addExpense = async (expense: Omit<Expense, 'id'>) => {
@@ -826,7 +847,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
             cartSubtotal, cartTotal,
-            orders, createOrder,
+            orders, createOrder, deleteOrder,
             expenses, addExpense, updateExpense, deleteExpense,
             coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
             cashSessions, startCashSession, closeCashSession,

@@ -488,6 +488,62 @@ async function startServer() {
         }
     });
 
+    app.delete('/api/orders/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+            console.log('🗑️  Deleting order:', req.params.id);
+
+            const client = await pool.connect();
+
+            try {
+                await client.query('BEGIN');
+
+                // First, check if order has associated customer credit and remove it
+                const creditCheck = await client.query(
+                    'SELECT * FROM customer_credits WHERE "orderId" = $1',
+                    [req.params.id]
+                );
+
+                if (creditCheck.rows.length > 0) {
+                    const credit = creditCheck.rows[0];
+                    console.log('💳 Reversing customer credit for order...');
+
+                    // Reverse the credit from customer's balance
+                    await client.query(
+                        'UPDATE customers SET "currentCredit" = "currentCredit" - $1 WHERE id = $2',
+                        [credit.amount, credit.customerId]
+                    );
+
+                    // Delete the credit record
+                    await client.query('DELETE FROM customer_credits WHERE "orderId" = $1', [req.params.id]);
+                }
+
+                // Delete the order
+                const result = await client.query('DELETE FROM orders WHERE id = $1 RETURNING *', [req.params.id]);
+
+                if (result.rows.length === 0) {
+                    await client.query('ROLLBACK');
+                    return res.status(404).json({ error: 'Order not found' });
+                }
+
+                await client.query('COMMIT');
+                console.log('✅ Order deleted successfully:', req.params.id);
+
+                res.status(204).send();
+            } catch (error) {
+                await client.query('ROLLBACK');
+                console.error('❌ Database transaction error:', error.message);
+                throw error;
+            } finally {
+                client.release();
+            }
+        } catch (error) {
+            console.error("❌ Error deleting order:", error.message);
+            res.status(500).json({ error: 'Failed to delete order' });
+        }
+    });
+
     // --- EXPENSES API ---
     app.get('/api/expenses', async (req, res) => {
         try {

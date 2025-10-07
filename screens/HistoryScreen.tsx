@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext';
+import { TrashIcon } from '../components/Icons';
 import type { Order } from '../types';
 
 const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ order, onClose }) => (
@@ -47,8 +48,19 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
 );
 
 const HistoryScreen: React.FC = () => {
-    const { orders } = useAppContext();
+    const { orders, deleteOrder } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+    const handleDelete = async (orderId: string) => {
+        if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {
+            try {
+                await deleteOrder(orderId);
+                alert('Orden eliminada exitosamente');
+            } catch (error) {
+                console.error('Error deleting order:', error);
+            }
+        }
+    };
 
     return (
         <div>
@@ -74,7 +86,16 @@ const HistoryScreen: React.FC = () => {
                                     <td className="p-4 text-sm text-slate-500">{order.items.reduce((acc, item) => acc + item.quantity, 0)}</td>
                                     <td className="p-4 text-sm text-slate-800 font-medium text-right">${order.total.toFixed(2)}</td>
                                     <td className="p-4 text-sm text-center">
-                                        <button onClick={() => setSelectedOrder(order)} className="text-zinc-700 hover:underline font-medium">Ver Detalles</button>
+                                        <div className="flex justify-center items-center space-x-2">
+                                            <button onClick={() => setSelectedOrder(order)} className="text-zinc-700 hover:underline font-medium">Ver Detalles</button>
+                                            <button
+                                                onClick={() => handleDelete(order.id)}
+                                                className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors"
+                                                title="Eliminar orden"
+                                            >
+                                                <TrashIcon className="h-5 w-5" />
+                                            </button>
+                                        </div>
                                     </td>
                                 </tr>
                             ))}
@@ -95,7 +116,16 @@ const HistoryScreen: React.FC = () => {
                             </div>
                             <div className="mt-2 flex justify-between items-center">
                                 <p className="text-sm text-slate-600">{order.items.reduce((acc, item) => acc + item.quantity, 0)} items</p>
-                                <button onClick={() => setSelectedOrder(order)} className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-200">Ver Detalles</button>
+                                <div className="flex items-center space-x-2">
+                                    <button onClick={() => setSelectedOrder(order)} className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-200">Ver Detalles</button>
+                                    <button
+                                        onClick={() => handleDelete(order.id)}
+                                        className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors"
+                                        title="Eliminar orden"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     ))}
