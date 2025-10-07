@@ -192,6 +192,7 @@ const CashReportScreen: React.FC = () => {
   const totalSalesHist = ordersRevenueHist + coworkingRevenueHist;
 
   const totalExpensesHist = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  // Expenses already include costs, so final balance is just sales minus expenses
   const finalBalanceHist = totalSalesHist - totalExpensesHist;
 
   const ordersCashHist = filteredOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
