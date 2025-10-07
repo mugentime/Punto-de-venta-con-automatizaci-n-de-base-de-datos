@@ -503,12 +503,18 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             imageUrl: '', category: 'Cafetería',
         };
 
-        // Solo incluir items cobrables en la orden, pero registrar todos para cálculo de costos
-        const allOrderItems = [coworkingServiceItem, ...chargeableItems];
+        // Convert cafe items to $0 price (complimentary) but keep cost for tracking
+        const cafeItemsWithZeroPrice = cafeItems.map(item => ({
+            ...item,
+            price: 0 // Complimentary for customers, but cost still tracked
+        }));
+
+        // Include ALL items: service + cafe items (at $0) + chargeable items
+        const allOrderItems = [coworkingServiceItem, ...cafeItemsWithZeroPrice, ...chargeableItems];
         const subtotal = allOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
         const total = subtotal;
 
-        // Calcular costos incluyendo TODOS los consumidos (para tracking de costos)
+        // Cost will be automatically calculated from allOrderItems by the server
         const totalCost = session.consumedExtras.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
 
         const newOrder: Order = {
