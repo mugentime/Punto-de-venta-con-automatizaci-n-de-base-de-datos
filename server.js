@@ -1056,6 +1056,54 @@ async function startServer() {
         }
     });
 
+    // --- TEMPORARY MIGRATION ENDPOINT ---
+    app.post('/api/admin/add-customerId-column', async (req, res) => {
+        if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+        try {
+            console.log('🔍 Checking if customerId column exists in orders table...');
+
+            // Check if customerId column already exists
+            const checkColumn = await pool.query(`
+                SELECT column_name
+                FROM information_schema.columns
+                WHERE table_name = 'orders'
+                AND column_name = 'customerId'
+            `);
+
+            if (checkColumn.rows.length > 0) {
+                console.log('ℹ️  Column customerId already exists in orders table');
+                return res.json({
+                    success: true,
+                    message: 'Column customerId already exists',
+                    alreadyExists: true
+                });
+            }
+
+            console.log('📝 Adding customerId column to orders table...');
+            await pool.query(`
+                ALTER TABLE orders
+                ADD COLUMN "customerId" VARCHAR(255)
+            `);
+
+            console.log('✅ Successfully added customerId column to orders table');
+
+            res.json({
+                success: true,
+                message: 'Successfully added customerId column to orders table',
+                alreadyExists: false
+            });
+
+        } catch (error) {
+            console.error('❌ Migration failed:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error.stack
+            });
+        }
+    });
+
     // --- AI ENDPOINTS ---
     app.post('/api/generate-description', async (req, res) => {
       if (!openai) {
