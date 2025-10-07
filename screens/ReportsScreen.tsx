@@ -49,36 +49,50 @@ const ReportsScreen: React.FC = () => {
         netProfit,
         averageTicket
     } = useMemo(() => {
-        const start = new Date(`${startDate}T00:00:00`);
-        const end = new Date(`${endDate}T23:59:59`);
+        // Helper to extract date in local timezone as YYYY-MM-DD
+        const getLocalDateString = (dateInput: string | Date): string => {
+            const date = new Date(dateInput);
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        };
 
         // DEBUG: Log date range and sample data
-        console.log('📅 Date Range:', { startDate, endDate, start, end });
+        console.log('📅 Date Range:', { startDate, endDate });
         console.log('📦 Total orders:', orders.length);
         console.log('🏢 Total coworking sessions:', coworkingSessions.length);
         if (orders.length > 0) {
-            console.log('Sample order dates:', orders.slice(0, 3).map(o => ({ date: o.date, parsed: new Date(o.date), total: o.total })));
+            console.log('Sample order dates:', orders.slice(0, 3).map(o => ({
+                date: o.date,
+                localDate: getLocalDateString(o.date),
+                total: o.total
+            })));
         }
         if (coworkingSessions.length > 0) {
-            console.log('Sample coworking dates:', coworkingSessions.slice(0, 3).map(s => ({ endTime: s.endTime, parsed: s.endTime ? new Date(s.endTime) : null, total: s.total })));
+            console.log('Sample coworking dates:', coworkingSessions.slice(0, 3).map(s => ({
+                endTime: s.endTime,
+                localDate: s.endTime ? getLocalDateString(s.endTime) : null,
+                total: s.total
+            })));
         }
 
         const currentFilteredOrders = orders.filter(o => {
-            const orderDate = new Date(o.date);
-            const isInRange = orderDate >= start && orderDate <= end;
+            const orderLocalDate = getLocalDateString(o.date);
+            const isInRange = orderLocalDate >= startDate && orderLocalDate <= endDate;
             return isInRange;
         });
 
         const currentFilteredExpenses = expenses.filter(e => {
-            const expenseDate = new Date(e.date);
-            return expenseDate >= start && expenseDate <= end;
+            const expenseLocalDate = getLocalDateString(e.date);
+            return expenseLocalDate >= startDate && expenseLocalDate <= endDate;
         });
 
         // Include finished coworking sessions in revenue calculation
         const currentFilteredCoworkingSessions = coworkingSessions.filter(session => {
             if (session.status !== 'finished' || !session.endTime) return false;
-            const sessionDate = new Date(session.endTime);
-            return sessionDate >= start && sessionDate <= end;
+            const sessionLocalDate = getLocalDateString(session.endTime);
+            return sessionLocalDate >= startDate && sessionLocalDate <= endDate;
         });
 
         console.log('✅ Filtered results:', {
