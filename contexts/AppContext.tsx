@@ -566,7 +566,14 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             setOrders(prev => [newOrder, ...prev]);
         }
 
-        updateCoworkingSession(sessionId, { endTime: endTime.toISOString(), status: 'finished' });
+        // Update session with calculated total, duration, and payment method for reporting
+        updateCoworkingSession(sessionId, {
+            endTime: endTime.toISOString(),
+            status: 'finished',
+            total: total,
+            duration: durationMinutes,
+            paymentMethod: paymentMethod
+        });
     };
 
     const cancelCoworkingSession = async (sessionId: string) => {
