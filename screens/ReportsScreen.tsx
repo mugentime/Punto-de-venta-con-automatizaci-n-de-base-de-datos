@@ -52,9 +52,21 @@ const ReportsScreen: React.FC = () => {
         const start = new Date(`${startDate}T00:00:00`);
         const end = new Date(`${endDate}T23:59:59`);
 
+        // DEBUG: Log date range and sample data
+        console.log('📅 Date Range:', { startDate, endDate, start, end });
+        console.log('📦 Total orders:', orders.length);
+        console.log('🏢 Total coworking sessions:', coworkingSessions.length);
+        if (orders.length > 0) {
+            console.log('Sample order dates:', orders.slice(0, 3).map(o => ({ date: o.date, parsed: new Date(o.date), total: o.total })));
+        }
+        if (coworkingSessions.length > 0) {
+            console.log('Sample coworking dates:', coworkingSessions.slice(0, 3).map(s => ({ endTime: s.endTime, parsed: s.endTime ? new Date(s.endTime) : null, total: s.total })));
+        }
+
         const currentFilteredOrders = orders.filter(o => {
             const orderDate = new Date(o.date);
-            return orderDate >= start && orderDate <= end;
+            const isInRange = orderDate >= start && orderDate <= end;
+            return isInRange;
         });
 
         const currentFilteredExpenses = expenses.filter(e => {
@@ -67,6 +79,12 @@ const ReportsScreen: React.FC = () => {
             if (session.status !== 'finished' || !session.endTime) return false;
             const sessionDate = new Date(session.endTime);
             return sessionDate >= start && sessionDate <= end;
+        });
+
+        console.log('✅ Filtered results:', {
+            orders: currentFilteredOrders.length,
+            coworking: currentFilteredCoworkingSessions.length,
+            expenses: currentFilteredExpenses.length
         });
 
         // Calculate revenue from orders
