@@ -49,6 +49,7 @@ const Cart: React.FC = () => {
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
     const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Crédito'>('Efectivo');
     const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Get selected customer
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
@@ -68,6 +69,7 @@ const Cart: React.FC = () => {
         const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
         const customerId = selectedCustomer ? selectedCustomer.id : undefined;
 
+        setIsProcessing(true);
         try {
             await createOrder({ clientName, serviceType, paymentMethod, customerId });
             // Cart is already cleared by createOrder on success
@@ -80,6 +82,8 @@ const Cart: React.FC = () => {
             // Error already alerted by createOrder, just reset checkout state
             console.error('Checkout failed:', error);
             setIsCheckingOut(false);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
@@ -207,11 +211,11 @@ const Cart: React.FC = () => {
                     </div>
                 </div>
                 <div className="flex space-x-2">
-                     <button onClick={isCheckingOut ? handleCancelCheckout : clearCart} className="w-full py-3 px-4 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors">
+                     <button onClick={isCheckingOut ? handleCancelCheckout : clearCart} disabled={isProcessing} className="w-full py-3 px-4 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                         {isCheckingOut ? 'Cancelar' : 'Limpiar'}
                     </button>
-                    <button onClick={handleCheckout} disabled={cart.length === 0} className="w-full py-3 px-4 bg-zinc-900 rounded-xl text-sm font-semibold text-white hover:bg-zinc-800 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed">
-                        {isCheckingOut ? `Pagar $${finalTotal.toFixed(2)}` : 'Cobrar'}
+                    <button onClick={handleCheckout} disabled={cart.length === 0 || isProcessing} className="w-full py-3 px-4 bg-zinc-900 rounded-xl text-sm font-semibold text-white hover:bg-zinc-800 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed">
+                        {isProcessing ? '⏳ Procesando...' : (isCheckingOut ? `Pagar $${finalTotal.toFixed(2)}` : 'Cobrar')}
                     </button>
                 </div>
             </div>
