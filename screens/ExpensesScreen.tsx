@@ -67,7 +67,13 @@ const ExpensesScreen: React.FC = () => {
             <tbody>
                 {sortedExpenses.map(expense => (
                 <tr key={expense.id} className="border-b hover:bg-slate-50">
-                    <td className="p-4 text-sm text-slate-500">{new Date(expense.date + 'T00:00:00').toLocaleDateString()}</td>
+                    <td className="p-4 text-sm text-slate-500">
+                        {new Date(expense.date).toLocaleDateString('es-MX', {
+                            year: 'numeric',
+                            month: 'short',
+                            day: 'numeric'
+                        })}
+                    </td>
                     <td className="p-4 text-sm text-slate-800 font-medium max-w-sm truncate">{expense.description}</td>
                     <td className="p-4 text-sm text-slate-500">{expense.category}</td>
                     <td className="p-4 text-sm text-slate-500">
@@ -99,7 +105,13 @@ const ExpensesScreen: React.FC = () => {
                     <div className="flex justify-between items-start">
                         <div className="flex-1 pr-4">
                             <p className="font-medium text-slate-800">{expense.description}</p>
-                            <p className="text-xs text-slate-500">{new Date(expense.date + 'T00:00:00').toLocaleDateString()}</p>
+                            <p className="text-xs text-slate-500">
+                                {new Date(expense.date).toLocaleDateString('es-MX', {
+                                    year: 'numeric',
+                                    month: 'short',
+                                    day: 'numeric'
+                                })}
+                            </p>
                         </div>
                         <p className="text-lg font-bold text-slate-800">${expense.amount.toFixed(2)}</p>
                     </div>
