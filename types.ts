@@ -53,6 +53,10 @@ export interface CashSession {
   startAmount: number;
   endAmount: number | null;
   status: 'open' | 'closed';
+  totalSales?: number;
+  totalExpenses?: number;
+  expectedCash?: number;
+  difference?: number;
 }
 
 export interface User {

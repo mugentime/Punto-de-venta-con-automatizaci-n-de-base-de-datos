@@ -114,8 +114,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 // Fetch cash sessions
                 const cashResponse = await fetch('/api/cash-sessions');
                 if (cashResponse.ok) {
-                    const cashData: CashSession[] = await cashResponse.json();
-                    setCashSessions(cashData);
+                    const cashData: any[] = await cashResponse.json();
+                    // Map API response to frontend CashSession type
+                    const mappedSessions: CashSession[] = cashData.map(session => ({
+                        id: session.id,
+                        startDate: session.startTime,
+                        endDate: session.endTime,
+                        startAmount: session.startAmount,
+                        endAmount: session.endAmount,
+                        status: session.status === 'active' ? 'open' : 'closed',
+                        totalSales: session.totalSales,
+                        totalExpenses: session.totalExpenses,
+                        expectedCash: session.expectedCash,
+                        difference: session.difference
+                    }));
+                    setCashSessions(mappedSessions);
                 }
 
                 // Fetch users
@@ -637,7 +650,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 endDate: newSession.endTime,
                 startAmount: newSession.startAmount,
                 endAmount: newSession.endAmount,
-                status: newSession.status === 'active' ? 'open' : 'closed'
+                status: newSession.status === 'active' ? 'open' : 'closed',
+                totalSales: newSession.totalSales || 0,
+                totalExpenses: newSession.totalExpenses || 0,
+                expectedCash: newSession.expectedCash || newSession.startAmount,
+                difference: newSession.difference || 0
             };
 
             setCashSessions(prev => [mappedSession, ...prev]);
@@ -700,7 +717,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 endDate: updatedSession.endTime,
                 startAmount: updatedSession.startAmount,
                 endAmount: updatedSession.endAmount,
-                status: updatedSession.status === 'active' ? 'open' : 'closed'
+                status: updatedSession.status === 'active' ? 'open' : 'closed',
+                totalSales: updatedSession.totalSales,
+                totalExpenses: updatedSession.totalExpenses,
+                expectedCash: updatedSession.expectedCash,
+                difference: updatedSession.difference
             };
 
             setCashSessions(prev => prev.map(s => s.id === currentSession.id ? mappedSession : s));

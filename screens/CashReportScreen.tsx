@@ -201,7 +201,13 @@ const CashReportScreen: React.FC = () => {
 
   const cardSalesHist = totalSalesHist - cashSalesHist;
   const totalOrdersHist = filteredOrders.length + filteredCoworkingHist.length;
-  
+
+  // Get last 20 closed sessions for history
+  const closedSessions = cashSessions
+    .filter(s => s.status === 'closed')
+    .sort((a, b) => new Date(b.endDate || b.startDate).getTime() - new Date(a.endDate || a.startDate).getTime())
+    .slice(0, 20);
+
   return (
     <div>
         <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
@@ -217,11 +223,11 @@ const CashReportScreen: React.FC = () => {
             Iniciar Día
           </button>
         </div>
-        
+
         <div className="flex justify-end mb-4">
-            <input 
-            type="date" 
-            value={selectedDate} 
+            <input
+            type="date"
+            value={selectedDate}
             onChange={handleDateChange}
             className="bg-white border border-slate-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 sm:text-sm"
             />
@@ -235,8 +241,75 @@ const CashReportScreen: React.FC = () => {
             <StatCard title="Ventas con Tarjeta" value={`$${cardSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
             <StatCard title="Total de Órdenes" value={totalOrdersHist.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
         </div>
-        
-        <StartDayModal 
+
+        {/* Cash Sessions History */}
+        <div className="bg-white p-6 rounded-xl shadow-md mt-8">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Historial de Cortes de Caja</h2>
+            {closedSessions.length > 0 ? (
+                <div className="overflow-x-auto">
+                    <table className="min-w-full divide-y divide-slate-200">
+                        <thead className="bg-slate-50">
+                            <tr>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fecha Apertura</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fecha Cierre</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Inicial</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Final</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Esperado</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Diferencia</th>
+                            </tr>
+                        </thead>
+                        <tbody className="bg-white divide-y divide-slate-200">
+                            {closedSessions.map((session: any) => {
+                                const difference = session.endAmount ? (session.endAmount - (session.expectedCash || session.startAmount)) : 0;
+                                return (
+                                    <tr key={session.id} className="hover:bg-slate-50">
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
+                                            {new Date(session.startDate).toLocaleString('es-MX', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            })}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
+                                            {session.endDate ? new Date(session.endDate).toLocaleString('es-MX', {
+                                                year: 'numeric',
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            }) : '-'}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-slate-900">
+                                            ${session.startAmount?.toFixed(2) || '0.00'}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-slate-900">
+                                            ${session.endAmount?.toFixed(2) || '0.00'}
+                                        </td>
+                                        <td className="px-4 py-3 whitespace-nowrap text-sm text-right text-slate-600">
+                                            ${(session.expectedCash || session.startAmount)?.toFixed(2) || '0.00'}
+                                        </td>
+                                        <td className={`px-4 py-3 whitespace-nowrap text-sm text-right font-bold ${
+                                            difference === 0 ? 'text-green-600' :
+                                            difference > 0 ? 'text-blue-600' : 'text-red-600'
+                                        }`}>
+                                            ${difference.toFixed(2)}
+                                            {difference > 0 && <span className="text-xs ml-1">(Sobra)</span>}
+                                            {difference < 0 && <span className="text-xs ml-1">(Falta)</span>}
+                                        </td>
+                                    </tr>
+                                );
+                            })}
+                        </tbody>
+                    </table>
+                </div>
+            ) : (
+                <p className="text-center text-slate-500 py-4">No hay sesiones de caja cerradas en el historial.</p>
+            )}
+        </div>
+
+        <StartDayModal
           isOpen={isStartModalOpen}
           onClose={() => setIsStartModalOpen(false)}
           onStart={startCashSession}
