@@ -36,7 +36,7 @@ interface AppContextType {
     cartTotal: number;
     // Orders
     orders: Order[];
-    createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; }) => Promise<void>;
+    createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; }) => Promise<void>;
     // Expenses
     expenses: Expense[];
     addExpense: (expense: Omit<Expense, 'id'>) => void;
@@ -342,8 +342,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     }
 
     // Order Function (updated for API)
-    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; }) => {
+    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; }) => {
         if(cart.length === 0) return;
+
+        console.log('💾 Creating order...', { clientName: orderDetails.clientName, total: cartTotal, items: cart.length, customerId: orderDetails.customerId });
 
         try {
             const orderData = {
@@ -352,7 +354,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 subtotal: cartSubtotal,
                 total: cartTotal,
                 userId: currentUser?.id || 'guest',
+                customerId: orderDetails.customerId || null,
             };
+
+            console.log('📡 Sending order to API...', orderData);
 
             // Create order in database
             const response = await fetch('/api/orders', {
@@ -361,8 +366,17 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 body: JSON.stringify(orderData),
             });
 
-            if (!response.ok) throw new Error('Failed to create order');
+            console.log('📡 Server response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Server error:', response.status, errorText);
+                alert(`❌ Error al guardar la orden: ${response.status} - ${errorText}`);
+                throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
+            }
+
             const newOrder = await response.json();
+            console.log('✅ Order saved successfully:', newOrder.id);
 
             // Update local state
             setOrders(prev => [newOrder, ...prev]);
@@ -376,8 +390,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             // Clear cart after successful order
             clearCart();
+
+            alert(`✅ Venta guardada: ${orderDetails.clientName} - $${cartTotal.toFixed(2)}`);
         } catch (error) {
-            console.error("Error creating order:", error);
+            console.error("❌ Error creating order:", error);
+            alert(`❌ ERROR: La venta NO se guardó. ${error.message || error}`);
+            throw error; // Re-throw so caller knows it failed
         }
     };
 

@@ -57,7 +57,7 @@ const Cart: React.FC = () => {
     const discount = selectedCustomer ? (cartTotal * selectedCustomer.discountPercentage / 100) : 0;
     const finalTotal = cartTotal - discount;
 
-    const handleCheckout = () => {
+    const handleCheckout = async () => {
         if (cart.length === 0) return;
         if (!isCheckingOut) {
             setIsCheckingOut(true);
@@ -68,13 +68,19 @@ const Cart: React.FC = () => {
         const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
         const customerId = selectedCustomer ? selectedCustomer.id : undefined;
 
-        createOrder({ clientName, serviceType, paymentMethod, customerId });
-        clearCart();
-        setIsCheckingOut(false);
-        setSelectedCustomerId('');
-        setCustomClientName('');
-        setServiceType('Mesa');
-        setPaymentMethod('Efectivo');
+        try {
+            await createOrder({ clientName, serviceType, paymentMethod, customerId });
+            // Cart is already cleared by createOrder on success
+            setIsCheckingOut(false);
+            setSelectedCustomerId('');
+            setCustomClientName('');
+            setServiceType('Mesa');
+            setPaymentMethod('Efectivo');
+        } catch (error) {
+            // Error already alerted by createOrder, just reset checkout state
+            console.error('Checkout failed:', error);
+            setIsCheckingOut(false);
+        }
     };
 
     const handleCancelCheckout = () => {
