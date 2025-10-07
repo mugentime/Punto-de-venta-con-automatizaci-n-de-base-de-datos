@@ -1,6 +1,7 @@
 
+import 'dotenv/config';
 import express from 'express';
-import { GoogleGenAI } from '@google/genai';
+import OpenAI from 'openai';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
@@ -10,7 +11,7 @@ const { Pool } = pg;
 // --- CONFIGURATION ---
 let pool;
 let useDb = false;
-let ai = null; // AI client is now nullable
+let openai = null; // OpenAI client for descriptions
 const initialProducts = [
     { id: '1', name: 'Espresso Americano', price: 35, cost: 12, stock: 100, description: 'Intenso y aromático, preparado con granos de especialidad.', imageUrl: 'https://picsum.photos/seed/americano/400', category: 'Cafetería' },
     { id: '2', name: 'Latte', price: 55, cost: 18, stock: 100, description: 'Cremoso y suave, con leche vaporizada a la perfección.', imageUrl: 'https://picsum.photos/seed/latte/400', category: 'Cafetería' },
@@ -331,16 +332,17 @@ async function startServer() {
     const port = process.env.PORT || 3001;
     app.use(express.json({ limit: '50mb' }));
 
-    // --- GEMINI API SETUP ---
-    const apiKey = process.env.API_KEY;
+    // --- OPENAI API SETUP ---
+    const apiKey = process.env.OPENAI_API_KEY;
     if (apiKey) {
-        ai = new GoogleGenAI({ apiKey });
-        console.log("Gemini AI client initialized successfully.");
+        openai = new OpenAI({ apiKey });
+        console.log("OpenAI client initialized successfully for descriptions.");
     } else {
         console.warn("*******************************************************************");
-        console.warn("*** WARNING: API_KEY is not set.                                ***");
-        console.warn("*** AI-powered features (description/image generation) will be  ***");
-        console.warn("*** disabled. Set the API_KEY environment variable to enable them.***");
+        console.warn("*** WARNING: OPENAI_API_KEY is not set.                        ***");
+        console.warn("*** AI description generation will be disabled.                ***");
+        console.warn("*** Image generation will use free Pollinations.ai service.    ***");
+        console.warn("*** Set OPENAI_API_KEY to enable AI descriptions.              ***");
         console.warn("*******************************************************************");
     }
 
@@ -1037,16 +1039,16 @@ async function startServer() {
         }
     });
 
-    // --- GEMINI ENDPOINTS ---
+    // --- AI ENDPOINTS ---
     app.post('/api/generate-description', async (req, res) => {
-      if (!ai) {
-        return res.status(503).json({ error: 'AI features are not configured on the server.' });
+      if (!openai) {
+        return res.status(503).json({ error: 'AI description features are not configured. Set OPENAI_API_KEY environment variable.' });
       }
       const { productName, keywords } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
-      const prompt = `Eres un experto en marketing y copywriting. Crea una descripción de producto elegante y persuasiva para un sistema de punto de venta premium.
+      const prompt = `Eres un experto en marketing y copywriting. Crea una descripción de producto elegante y persuasiva.
 
 Producto: "${productName}"
 Palabras clave adicionales: "${keywords || ''}"
@@ -1059,72 +1061,51 @@ INSTRUCCIONES:
 - Máximo 2-3 frases concisas e impactantes
 - No uses markdown, solo texto plano
 
-Ejemplo de estilo deseado: "El sistema POS que fusiona elegancia con eficiencia, transformando cada venta en una experiencia fluida. Simplifica la gestión de tu negocio y potencia su crecimiento con tecnología intuitiva."
+Ejemplo de estilo: "Café premium seleccionado de las mejores regiones cafetaleras. Sabor intenso y aromático que despierta tus sentidos con cada sorbo."
 
-Descripción:`;
+Responde SOLO con la descripción, sin comillas ni formato adicional.`;
+
       try {
         console.log(`Generating description for product: ${productName} with keywords: ${keywords || 'none'}`);
-        const response = await ai.models.generateContent({
-          model: 'gemini-2.0-flash-exp',
-          contents: prompt
+        const completion = await openai.chat.completions.create({
+          model: 'gpt-4o-mini',
+          messages: [{ role: 'user', content: prompt }],
+          temperature: 0.7,
+          max_tokens: 150
         });
-        const description = response.text;
+        const description = completion.choices[0].message.content.trim();
         console.log(`Description generated successfully: ${description.substring(0, 100)}...`);
-        res.json({ description: description.trim() });
+        res.json({ description });
       } catch (error) {
-        console.error("Error generating description with Gemini:", error);
+        console.error("Error generating description with OpenAI:", error);
         console.error("Error details:", error.message);
         res.status(500).json({ error: `Failed to generate description: ${error.message}` });
       }
     });
     
     app.post('/api/generate-image', async (req, res) => {
-      if (!ai) {
-        return res.status(503).json({ error: 'AI features are not configured on the server.' });
-      }
       const { productName, description } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
       }
 
-      // Create a detailed context from name and description
-      const productContext = description ? `${productName} - ${description}` : productName;
-
-      const prompt = `CRITICAL: NO TEXT, NO LETTERS, NO WORDS, NO NUMBERS anywhere in the image.
-
-Create a minimalist line art drawing of: ${productContext}
-
-STYLE REQUIREMENTS:
-- Pure line art style with clean, simple lines
-- Minimalist design
-- Product centered on solid light gray background (#f3f4f6)
-- No decorative elements
-- No labels or text of any kind
-
-ABSOLUTE RESTRICTIONS:
-- NEVER include any text, letters, words, or numbers
-- NEVER include brand names or product labels
-- NEVER include written descriptions
-- NEVER include any typography or signage
-- Only the visual representation of the product itself
-
-Draw only the physical object/product with clean line art.`;
       try {
-        const response = await ai.models.generateImages({
-            model: 'imagen-4.0-generate-001',
-            prompt: prompt,
-            config: { numberOfImages: 1, outputMimeType: 'image/jpeg', aspectRatio: '1:1' },
-        });
-        if (response.generatedImages && response.generatedImages.length > 0) {
-            const base64ImageBytes = response.generatedImages[0].image.imageBytes;
-            const imageUrl = `data:image/jpeg;base64,${base64ImageBytes}`;
-            res.json({ imageUrl });
-        } else {
-            console.warn("Gemini API did not return an image.");
-            res.status(500).json({ error: 'Gemini API did not return an image.' });
-        }
+        // Use Pollinations.ai - free AI image generation service
+        // Create a detailed, descriptive prompt for better image quality
+        const productContext = description ? `${productName}, ${description}` : productName;
+
+        const prompt = `professional product photo of ${productContext}, minimalist style, clean background, centered composition, high quality, product photography, studio lighting, no text, no labels`;
+
+        // Pollinations.ai generates images via URL - encode the prompt
+        const encodedPrompt = encodeURIComponent(prompt);
+        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&nologo=true&enhance=true`;
+
+        console.log(`Generated image URL for product: ${productName}`);
+
+        // Return the URL directly - the browser will fetch it
+        res.json({ imageUrl });
       } catch (error) {
-        console.error("Error generating image with Gemini:", error);
+        console.error("Error generating image with Pollinations.ai:", error);
         res.status(500).json({ error: 'Failed to generate image' });
       }
     });

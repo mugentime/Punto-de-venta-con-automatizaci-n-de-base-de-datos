@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import type { Product } from '../types';
 import { SparklesIcon } from './Icons';
-import { generateDescription, generateImage } from '../services/geminiService';
+import { generateDescription, generateImage } from '../services/aiService';
 
 interface ProductModalProps {
   isOpen: boolean;
