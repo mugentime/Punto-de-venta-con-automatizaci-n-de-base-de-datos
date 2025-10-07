@@ -78,7 +78,15 @@ const ReportsScreen: React.FC = () => {
         // Total revenue includes both orders and coworking sessions
         const totalRevenue = ordersRevenue + coworkingRevenue;
 
-        // Calculate COGS (Cost of Goods Sold) - product costs from orders
+        // Operating Expenses (includes COGS + rent, utilities, salaries, etc.)
+        // Los gastos operativos ya incluyen el costo de mercancía
+        const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
+
+        // Net Profit = Revenue - Operating Expenses
+        // Ganancia Neta = Ingresos - Gastos Operativos (que ya incluyen costos)
+        const netProfit = totalRevenue - totalExpensesAmount;
+
+        // COGS calculation for display/informational purposes only
         const totalCOGS = currentFilteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
         const coworkingCOGS = currentFilteredCoworkingSessions.reduce((acc, session) => {
             const extrasCost = (session.consumedExtras || []).reduce((sum, item) => sum + (item.cost * item.quantity), 0);
@@ -86,14 +94,8 @@ const ReportsScreen: React.FC = () => {
         }, 0);
         const totalCOGSWithCoworking = totalCOGS + coworkingCOGS;
 
-        // Gross Profit = Revenue - COGS
+        // Gross Profit for display only (not used in net profit calculation)
         const grossProfit = totalRevenue - totalCOGSWithCoworking;
-
-        // Operating Expenses (rent, utilities, salaries, etc.)
-        const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
-
-        // Net Profit = Gross Profit - Operating Expenses
-        const netProfit = grossProfit - totalExpensesAmount;
         const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
