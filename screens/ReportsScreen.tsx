@@ -78,20 +78,22 @@ const ReportsScreen: React.FC = () => {
         // Total revenue includes both orders and coworking sessions
         const totalRevenue = ordersRevenue + coworkingRevenue;
 
-        // Expenses already include costs, so we don't need separate COGS calculation
-        const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
-
-        // Net profit is simply revenue minus expenses (expenses already include costs)
-        const netProfit = totalRevenue - totalExpensesAmount;
-
-        // For display purposes only (not used in profit calculation)
+        // Calculate COGS (Cost of Goods Sold) - product costs from orders
         const totalCOGS = currentFilteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
         const coworkingCOGS = currentFilteredCoworkingSessions.reduce((acc, session) => {
             const extrasCost = (session.consumedExtras || []).reduce((sum, item) => sum + (item.cost * item.quantity), 0);
             return acc + extrasCost;
         }, 0);
         const totalCOGSWithCoworking = totalCOGS + coworkingCOGS;
+
+        // Gross Profit = Revenue - COGS
         const grossProfit = totalRevenue - totalCOGSWithCoworking;
+
+        // Operating Expenses (rent, utilities, salaries, etc.)
+        const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
+
+        // Net Profit = Gross Profit - Operating Expenses
+        const netProfit = grossProfit - totalExpensesAmount;
         const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
