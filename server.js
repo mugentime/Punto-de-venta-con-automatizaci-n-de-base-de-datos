@@ -423,33 +423,45 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const { clientName, serviceType, paymentMethod, items, subtotal, total, userId, customerId } = req.body;
+
+            console.log('📦 Creating order:', { clientName, serviceType, paymentMethod, subtotal, total, userId, customerId, itemsCount: items?.length });
+
             const id = `order-${Date.now()}`;
             const client = await pool.connect();
 
             try {
                 await client.query('BEGIN');
 
+                // Ensure customerId is properly null if not provided
+                const cleanCustomerId = customerId && customerId !== '' ? customerId : null;
+
+                console.log('💾 Inserting order into database...', { id, cleanCustomerId });
+
                 // Insert order
                 const result = await client.query(
                     'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId, customerId || null]
+                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId, cleanCustomerId]
                 );
                 const newOrder = result.rows[0];
+                console.log('✅ Order inserted successfully:', newOrder.id);
 
                 // If it's a credit payment and customer exists, create credit record
-                if (customerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
+                if (cleanCustomerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
+                    console.log('💳 Creating customer credit record...');
                     await client.query(
                         'INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, status, description) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                        [`credit-${Date.now()}`, customerId, id, total, 'charge', 'pending', `Orden #${id}`]
+                        [`credit-${Date.now()}`, cleanCustomerId, id, total, 'charge', 'pending', `Orden #${id}`]
                     );
                     // Update customer's current credit
                     await client.query(
                         'UPDATE customers SET "currentCredit" = "currentCredit" + $1 WHERE id = $2',
-                        [total, customerId]
+                        [total, cleanCustomerId]
                     );
+                    console.log('✅ Customer credit updated');
                 }
 
                 await client.query('COMMIT');
+                console.log('✅ Transaction committed successfully');
 
                 res.status(201).json({
                     ...newOrder,
@@ -461,13 +473,18 @@ async function startServer() {
                 });
             } catch (error) {
                 await client.query('ROLLBACK');
+                console.error('❌ Database transaction error:', error.message, error.stack);
                 throw error;
             } finally {
                 client.release();
             }
         } catch (error) {
-            console.error("Error creating order:", error);
-            res.status(500).json({ error: 'Failed to create order' });
+            console.error("❌ Error creating order:", error.message);
+            console.error("Stack trace:", error.stack);
+            res.status(500).json({
+                error: 'Failed to create order',
+                details: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
         }
     });
 
