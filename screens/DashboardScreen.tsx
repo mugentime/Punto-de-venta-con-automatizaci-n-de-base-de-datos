@@ -4,7 +4,7 @@ import { useAppContext } from '../contexts/AppContext';
 import { SalesIcon, ProductsIcon, HistoryIcon, DashboardIcon, ExpenseIcon, CashIcon } from '../components/Icons';
 
 const DashboardScreen: React.FC = () => {
-    const { orders, expenses } = useAppContext();
+    const { orders, expenses, coworkingSessions } = useAppContext();
     const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('today');
 
     const TimeframeButton: React.FC<{
@@ -47,7 +47,39 @@ const DashboardScreen: React.FC = () => {
     const filteredOrders = filterByTimeframe(orders);
     const filteredExpenses = filterByTimeframe(expenses);
 
-    const totalRevenue = filteredOrders.reduce((acc, order) => acc + order.total, 0);
+    // Filter finished coworking sessions by timeframe
+    const filteredCoworkingSessions = coworkingSessions.filter(session => {
+        if (session.status !== 'finished' || !session.endTime) return false;
+        const sessionDate = new Date(session.endTime);
+        const now = new Date();
+
+        switch (timeframe) {
+            case 'today':
+                return sessionDate.toDateString() === now.toDateString();
+            case 'week': {
+                const startOfWeek = new Date(now);
+                startOfWeek.setDate(now.getDate() - now.getDay());
+                startOfWeek.setHours(0, 0, 0, 0);
+                return sessionDate >= startOfWeek;
+            }
+            case 'month': {
+                const startOfMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+                return sessionDate >= startOfMonth;
+            }
+            default:
+                return false;
+        }
+    });
+
+    // Calculate revenue from orders
+    const ordersRevenue = filteredOrders.reduce((acc, order) => acc + order.total, 0);
+
+    // Calculate revenue from finished coworking sessions
+    const coworkingRevenue = filteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
+
+    // Total revenue includes both orders and coworking sessions
+    const totalRevenue = ordersRevenue + coworkingRevenue;
+
     const totalCOGS = filteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
     const grossProfit = totalRevenue - totalCOGS;
     const totalExpenses = filteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
