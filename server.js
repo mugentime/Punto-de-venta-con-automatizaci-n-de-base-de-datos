@@ -25,9 +25,14 @@ async function setupAndGetDataStore() {
     const databaseUrl = process.env.DATABASE_URL;
     if (databaseUrl) {
         try {
-            pool = new Pool({ connectionString: databaseUrl });
+            pool = new Pool({
+                connectionString: databaseUrl,
+                max: 20, // Increase max connections for better performance
+                idleTimeoutMillis: 30000,
+                connectionTimeoutMillis: 10000,
+            });
             const client = await pool.connect();
-            console.log("Successfully connected to PostgreSQL.");
+            console.log("Successfully connected to PostgreSQL with optimized pool (max: 20 connections).");
 
             await client.query(`
               CREATE TABLE IF NOT EXISTS products (
@@ -1100,6 +1105,66 @@ async function startServer() {
         } catch (error) {
             console.error('Error fixing coworking totals:', error);
             res.status(500).json({ error: error.message });
+        }
+    });
+
+    // --- DATABASE OPTIMIZATION ENDPOINT ---
+    app.post('/api/admin/optimize-database', async (req, res) => {
+        if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+        try {
+            console.log('🚀 Starting database optimization...');
+            const results = {
+                fixedDates: 0,
+                indexesCreated: 0,
+                indexesExisted: 0
+            };
+
+            // Fix null dates in expenses
+            console.log('📝 Fixing null dates in expenses...');
+            const fixDatesResult = await pool.query(`
+                UPDATE expenses
+                SET created_at = CURRENT_TIMESTAMP
+                WHERE created_at IS NULL
+            `);
+            results.fixedDates = fixDatesResult.rowCount;
+            console.log(`✅ Fixed ${results.fixedDates} expenses with null dates`);
+
+            // Add indexes for better performance
+            console.log('🚀 Adding database indexes...');
+
+            const indexes = [
+                { name: 'idx_orders_created_at', table: 'orders', column: 'created_at DESC' },
+                { name: 'idx_expenses_created_at', table: 'expenses', column: 'created_at DESC' },
+                { name: 'idx_coworking_created_at', table: 'coworking_sessions', column: 'created_at DESC' },
+                { name: 'idx_coworking_status', table: 'coworking_sessions', column: 'status' },
+                { name: 'idx_customer_credits_customer', table: 'customer_credits', column: '"customerId"' }
+            ];
+
+            for (const idx of indexes) {
+                try {
+                    await pool.query(`CREATE INDEX IF NOT EXISTS ${idx.name} ON ${idx.table}(${idx.column})`);
+                    results.indexesCreated++;
+                    console.log(`✅ Created index ${idx.name}`);
+                } catch (e) {
+                    results.indexesExisted++;
+                    console.log(`ℹ️  Index ${idx.name} already exists`);
+                }
+            }
+
+            res.json({
+                success: true,
+                message: 'Database optimization completed successfully',
+                results
+            });
+
+        } catch (error) {
+            console.error('❌ Optimization failed:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error.stack
+            });
         }
     });
 
