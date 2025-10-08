@@ -202,11 +202,10 @@ const CashReportScreen: React.FC = () => {
   const cardSalesHist = totalSalesHist - cashSalesHist;
   const totalOrdersHist = filteredOrders.length + filteredCoworkingHist.length;
 
-  // Get last 20 closed sessions for history
+  // Get all closed sessions for history (sorted by most recent first)
   const closedSessions = cashSessions
     .filter(s => s.status === 'closed')
-    .sort((a, b) => new Date(b.endDate || b.startDate).getTime() - new Date(a.endDate || a.startDate).getTime())
-    .slice(0, 20);
+    .sort((a, b) => new Date(b.endDate || b.startDate).getTime() - new Date(a.endDate || a.startDate).getTime());
 
   return (
     <div>
@@ -244,18 +243,21 @@ const CashReportScreen: React.FC = () => {
 
         {/* Cash Sessions History */}
         <div className="bg-white p-6 rounded-xl shadow-md mt-8">
-            <h2 className="text-xl font-bold text-slate-800 mb-4">Historial de Cortes de Caja</h2>
+            <h2 className="text-xl font-bold text-slate-800 mb-4">
+                Historial de Cortes de Caja
+                <span className="text-sm font-normal text-slate-500 ml-2">({closedSessions.length} registros)</span>
+            </h2>
             {closedSessions.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div className="overflow-x-auto max-h-[600px] overflow-y-auto border border-slate-200 rounded-lg">
                     <table className="min-w-full divide-y divide-slate-200">
-                        <thead className="bg-slate-50">
+                        <thead className="bg-slate-50 sticky top-0 z-10">
                             <tr>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fecha Apertura</th>
-                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Fecha Cierre</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Inicial</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Final</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Esperado</th>
-                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Diferencia</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Fecha Apertura</th>
+                                <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Fecha Cierre</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Inicial</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Final</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Esperado</th>
+                                <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider bg-slate-50">Diferencia</th>
                             </tr>
                         </thead>
                         <tbody className="bg-white divide-y divide-slate-200">
