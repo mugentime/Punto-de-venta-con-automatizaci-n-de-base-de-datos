@@ -146,6 +146,29 @@ async function setupAndGetDataStore() {
               );
             `);
 
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS cash_registry (
+                id VARCHAR(255) PRIMARY KEY,
+                date DATE NOT NULL UNIQUE,
+                "openingBalance" NUMERIC(10, 2) NOT NULL DEFAULT 0,
+                "closingBalance" NUMERIC(10, 2),
+                "expectedBalance" NUMERIC(10, 2),
+                difference NUMERIC(10, 2),
+                "totalSales" NUMERIC(10, 2) DEFAULT 0,
+                "totalExpenses" NUMERIC(10, 2) DEFAULT 0,
+                "totalCashPayments" NUMERIC(10, 2) DEFAULT 0,
+                "totalCardPayments" NUMERIC(10, 2) DEFAULT 0,
+                "sessionCount" INTEGER DEFAULT 0,
+                notes TEXT,
+                status VARCHAR(50) DEFAULT 'open',
+                "openedBy" VARCHAR(255) REFERENCES users(id),
+                "closedBy" VARCHAR(255) REFERENCES users(id),
+                "openedAt" TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                "closedAt" TIMESTAMP WITH TIME ZONE,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+
             const res = await client.query('SELECT COUNT(*) FROM products');
             if (res.rows[0].count === '0') {
                 console.log('Seeding initial products into database...');

@@ -157,6 +157,41 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         fetchAllData();
     }, []);
 
+    // 🔄 CROSS-DEVICE SYNC: Poll for coworking sessions every 5 seconds
+    useEffect(() => {
+        const pollCoworkingSessions = async () => {
+            try {
+                const response = await fetch('/api/coworking-sessions');
+                if (response.ok) {
+                    const sessions: CoworkingSession[] = await response.json();
+                    setCoworkingSessions(sessions);
+                }
+            } catch (error) {
+                console.error('Failed to poll coworking sessions:', error);
+            }
+        };
+
+        // Poll every 5 seconds when document is visible
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                pollCoworkingSessions();
+            }
+        }, 5000);
+
+        // Poll immediately when tab becomes visible
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                pollCoworkingSessions();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
+    }, []);
+
 
     // --- FUNCTIONS ---
 
@@ -202,31 +237,79 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         setCurrentUser(null);
     };
 
-    const register = (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
-        return new Promise((resolve, reject) => {
-            if (users.some(u => u.username.toLowerCase() === userDetails.username.toLowerCase())) {
-                return reject(new Error('El nombre de usuario ya existe.'));
+    const register = async (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
+        // Check for duplicates in local state first (quick validation)
+        if (users.some(u => u.username.toLowerCase() === userDetails.username.toLowerCase())) {
+            throw new Error('El nombre de usuario ya existe.');
+        }
+        if (users.some(u => u.email.toLowerCase() === userDetails.email.toLowerCase())) {
+            throw new Error('El correo electrónico ya está en uso.');
+        }
+
+        try {
+            // Create user via API to persist to database
+            const response = await fetch('/api/users', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...userDetails,
+                    role: 'employee',
+                    status: 'pending'
+                }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to create user');
             }
-            if (users.some(u => u.email.toLowerCase() === userDetails.email.toLowerCase())) {
-                return reject(new Error('El correo electrónico ya está en uso.'));
-            }
-            const newUser: User = {
-                ...userDetails,
-                id: `user-${Date.now()}`,
-                role: 'employee',
-                status: 'pending',
-            };
+
+            const newUser = await response.json();
             setUsers(prev => [...prev, newUser]);
-            resolve();
-        });
+        } catch (error) {
+            console.error("Error registering user:", error);
+            throw error;
+        }
     };
 
-    const approveUser = (userId: string) => {
-        setUsers(prev => prev.map(u => u.id === userId ? { ...u, status: 'approved' } : u));
+    const approveUser = async (userId: string) => {
+        try {
+            const user = users.find(u => u.id === userId);
+            if (!user) throw new Error('User not found');
+
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    username: user.username,
+                    email: user.email,
+                    role: user.role,
+                    status: 'approved'
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to approve user');
+
+            const updatedUser = await response.json();
+            setUsers(prev => prev.map(u => u.id === userId ? updatedUser : u));
+        } catch (error) {
+            console.error("Error approving user:", error);
+            throw error;
+        }
     };
 
-    const deleteUser = (userId: string) => {
-        setUsers(prev => prev.filter(u => u.id !== userId));
+    const deleteUser = async (userId: string) => {
+        try {
+            const response = await fetch(`/api/users/${userId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete user');
+
+            setUsers(prev => prev.filter(u => u.id !== userId));
+        } catch (error) {
+            console.error("Error deleting user:", error);
+            throw error;
+        }
     };
 
     // Product Functions (rewritten to use API)
