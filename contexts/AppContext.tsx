@@ -77,8 +77,22 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [coworkingSessions, setCoworkingSessions] = useState<CoworkingSession[]>([]);
     const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
     const [customers, setCustomers] = useState<Customer[]>([]);
-    
+
     // --- EFFECTS ---
+
+    // Restore user session from localStorage on app load
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error('Failed to restore user session:', error);
+                localStorage.removeItem('currentUser');
+            }
+        }
+    }, []);
 
     // Fetch all data from database on app load
     useEffect(() => {
@@ -208,6 +222,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     status: 'approved' as const
                 };
                 setCurrentUser(adminUser);
+                // Persist to localStorage
+                localStorage.setItem('currentUser', JSON.stringify(adminUser));
                 return;
             }
 
@@ -228,6 +244,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             const { password: _, ...userToStore } = user as any;
             setCurrentUser(userToStore);
+            // Persist to localStorage
+            localStorage.setItem('currentUser', JSON.stringify(userToStore));
         } catch (error) {
             throw error;
         }
@@ -235,6 +253,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     const logout = () => {
         setCurrentUser(null);
+        // Clear from localStorage
+        localStorage.removeItem('currentUser');
     };
 
     const register = async (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
