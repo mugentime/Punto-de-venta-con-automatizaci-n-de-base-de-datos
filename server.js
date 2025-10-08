@@ -603,11 +603,14 @@ async function startServer() {
     app.put('/api/expenses/:id', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { description, amount, category } = req.body;
+            const { description, amount, category, date } = req.body;
+
+            // Update with date if provided, otherwise keep existing date using COALESCE
             const result = await pool.query(
-                'UPDATE expenses SET description = $1, amount = $2, category = $3 WHERE id = $4 RETURNING *',
-                [description, amount, category, req.params.id]
+                'UPDATE expenses SET description = $1, amount = $2, category = $3, created_at = COALESCE($4, created_at) WHERE id = $5 RETURNING *',
+                [description, amount, category, date || null, req.params.id]
             );
+
             if (result.rows.length === 0) {
                 return res.status(404).json({ error: 'Expense not found' });
             }
