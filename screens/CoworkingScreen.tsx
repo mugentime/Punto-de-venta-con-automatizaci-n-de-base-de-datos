@@ -93,7 +93,12 @@ const CoworkingScreen: React.FC = () => {
 
     const handleCancelSession = async (sessionId: string) => {
         if (confirm('¿Estás seguro de que quieres cancelar esta sesión? Esta acción no se puede deshacer.')) {
-            await cancelCoworkingSession(sessionId);
+            try {
+                await cancelCoworkingSession(sessionId);
+            } catch (error) {
+                // Error already handled in cancelCoworkingSession
+                console.error('Failed to cancel session:', error);
+            }
         }
     };
 

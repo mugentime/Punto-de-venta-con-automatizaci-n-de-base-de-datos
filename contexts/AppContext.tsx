@@ -733,16 +733,27 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     const cancelCoworkingSession = async (sessionId: string) => {
         try {
+            console.log('🗑️ Attempting to cancel coworking session:', sessionId);
             const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
                 method: 'DELETE',
             });
 
-            if (!response.ok) throw new Error('Failed to cancel coworking session');
+            console.log('📡 Server response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Failed to cancel session. Status:', response.status, 'Error:', errorText);
+                throw new Error(`Failed to cancel coworking session: ${response.status} - ${errorText}`);
+            }
+
+            console.log('✅ Session cancelled successfully from database');
             setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+            alert('✅ Sesión cancelada exitosamente');
         } catch (error) {
-            console.error("Error canceling coworking session:", error);
-            // Fallback to local state update if API fails
-            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
+            console.error("❌ Error canceling coworking session:", error);
+            alert(`❌ Error al cancelar la sesión: ${error.message || error}`);
+            // DO NOT update local state if API fails - this ensures data consistency
+            throw error;
         }
     };
 
