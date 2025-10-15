@@ -1,10 +1,18 @@
 [
   {
-    "id": "cmd-hive-mind-1759371576439",
-    "type": "hive-mind",
+    "id": "cmd-sparc-1759803062023",
+    "type": "sparc",
     "success": true,
-    "duration": 42.07729999999992,
-    "timestamp": 1759371576482,
+    "duration": 3.1259000000000015,
+    "timestamp": 1759803062026,
+    "metadata": {}
+  },
+  {
+    "id": "cmd-init-1759803108683",
+    "type": "init",
+    "success": true,
+    "duration": 41520.0065,
+    "timestamp": 1759803150203,
     "metadata": {}
   }
 ]

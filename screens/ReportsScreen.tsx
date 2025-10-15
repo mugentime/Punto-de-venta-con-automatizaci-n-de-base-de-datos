@@ -43,11 +43,10 @@ const ReportsScreen: React.FC = () => {
         filteredExpenses,
         filteredCoworkingSessions,
         totalRevenue,
-        totalCOGS,
-        grossProfit,
         totalExpensesAmount,
         netProfit,
-        averageTicket
+        averageTicket,
+        totalOrdersCount
     } = useMemo(() => {
         // Helper to extract date in local timezone as YYYY-MM-DD
         const getLocalDateString = (dateInput: string | Date): string => {
@@ -111,23 +110,14 @@ const ReportsScreen: React.FC = () => {
         const totalRevenue = ordersRevenue + coworkingRevenue;
 
         // Operating Expenses (includes COGS + rent, utilities, salaries, etc.)
-        // Los gastos operativos ya incluyen el costo de mercancía
+        // Los gastos operativos ya incluyen el costo de mercancía, por lo tanto NO se deben sumar los costos por separado
         const totalExpensesAmount = currentFilteredExpenses.reduce((acc, expense) => acc + expense.amount, 0);
 
         // Net Profit = Revenue - Operating Expenses
-        // Ganancia Neta = Ingresos - Gastos Operativos (que ya incluyen costos)
+        // Ganancia Neta = Ingresos - Gastos Operativos (que ya incluyen costos de mercancía)
+        // Los costos NO entran separadamente para evitar duplicación
         const netProfit = totalRevenue - totalExpensesAmount;
 
-        // COGS calculation for display/informational purposes only
-        const totalCOGS = currentFilteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
-        const coworkingCOGS = currentFilteredCoworkingSessions.reduce((acc, session) => {
-            const extrasCost = (session.consumedExtras || []).reduce((sum, item) => sum + (item.cost * item.quantity), 0);
-            return acc + extrasCost;
-        }, 0);
-        const totalCOGSWithCoworking = totalCOGS + coworkingCOGS;
-
-        // Gross Profit for display only (not used in net profit calculation)
-        const grossProfit = totalRevenue - totalCOGSWithCoworking;
         const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
@@ -136,11 +126,10 @@ const ReportsScreen: React.FC = () => {
             filteredExpenses: currentFilteredExpenses,
             filteredCoworkingSessions: currentFilteredCoworkingSessions,
             totalRevenue,
-            totalCOGS: totalCOGSWithCoworking,
-            grossProfit,
             totalExpensesAmount,
             netProfit,
-            averageTicket
+            averageTicket,
+            totalOrdersCount
         };
     }, [startDate, endDate, orders, expenses, coworkingSessions]);
 
@@ -215,13 +204,28 @@ const ReportsScreen: React.FC = () => {
             </div>
 
             {/* Financial Summary */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
                 <StatCard title="Ingresos Totales" value={`$${totalRevenue.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-green-600" />} />
-                <StatCard title="Costo de Mercancía" value={`$${totalCOGS.toFixed(2)}`} icon={<ProductsIcon className="h-6 w-6 text-orange-600" />} />
-                <StatCard title="Ganancia Bruta" value={`$${grossProfit.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-sky-600" />} />
-                <StatCard title="Gastos Operativos" value={`$${totalExpensesAmount.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
+                <StatCard title="Gastos Totales" value={`$${totalExpensesAmount.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
                 <StatCard title="Ganancia Neta" value={`$${netProfit.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-indigo-600" />} />
                 <StatCard title="Ticket Promedio" value={`$${averageTicket.toFixed(2)}`} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
+            </div>
+
+            {/* Clarification Note */}
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-4 mb-6 rounded-lg">
+                <div className="flex">
+                    <div className="flex-shrink-0">
+                        <svg className="h-5 w-5 text-blue-500" viewBox="0 0 20 20" fill="currentColor">
+                            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
+                        </svg>
+                    </div>
+                    <div className="ml-3">
+                        <p className="text-sm text-blue-700">
+                            <strong>Nota:</strong> Los gastos totales incluyen todos los costos operativos (mercancía, renta, servicios, salarios, etc.).
+                            La ganancia neta se calcula como: Ingresos - Gastos Totales. Los costos de mercancía no se suman por separado para evitar duplicación.
+                        </p>
+                    </div>
+                </div>
             </div>
 
             {/* Export Actions */}

@@ -108,7 +108,6 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
                     <option value="Alimentos">Alimentos</option>
                     <option value="Membresías">Membresías de Coworking</option>
                 </select>
-                    <option value="Membresías">Membresías de Coworking</option>
                </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-600 mb-1">Imagen del Producto</label>

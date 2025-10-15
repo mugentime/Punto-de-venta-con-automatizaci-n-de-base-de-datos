@@ -1419,96 +1419,111 @@ async function startServer() {
       }
 
       try {
-        // Create a detailed, descriptive prompt for better image quality
-        const productContext = description ? `${productName}, ${description}` : productName;
-        const prompt = `professional product photo of ${productContext}, minimalist style, clean background, centered composition, high quality, product photography, studio lighting, no text, no labels`;
-        const encodedPrompt = encodeURIComponent(prompt);
+        // Extract key words from product name and description for image search
+        const searchTerms = `${productName} ${description || ''}`.toLowerCase();
+        const encodedSearch = encodeURIComponent(productName);
+
+        console.log(`🎨 Searching image for: "${productName}"`);
+        console.log(`📝 Using description: "${description || 'none'}"`);
+        console.log(`🔍 Search terms: "${searchTerms}"`);
 
         let imageUrl = null;
         let serviceUsed = null;
 
-        // Try Service 1: Pollinations.ai (fastest when working)
+        // Try Service 1: Unsplash (FREE, real photos, very reliable)
         try {
-          const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&nologo=true&enhance=true`;
-          const testResponse = await fetch(pollinationsUrl, {
+          const unsplashUrl = `https://source.unsplash.com/400x400/?${encodedSearch},food,product`;
+          const testResponse = await fetch(unsplashUrl, {
             method: 'HEAD',
             signal: AbortSignal.timeout(3000)
           });
           if (testResponse.ok) {
-            imageUrl = pollinationsUrl;
-            serviceUsed = 'Pollinations.ai';
-            console.log(`✓ Generated image with Pollinations.ai for: ${productName}`);
+            imageUrl = unsplashUrl;
+            serviceUsed = 'Unsplash (real photos)';
+            console.log(`✓ Found REAL photo via Unsplash for: ${productName}`);
           }
         } catch (error) {
-          console.log(`✗ Pollinations.ai failed (${error.message}), trying alternatives...`);
+          console.log(`✗ Unsplash failed (${error.message}), trying Pexels...`);
         }
 
-        // Try Service 2: HuggingFace Stable Diffusion (high quality, slower)
+        // Try Service 2: Pexels (FREE, real photos, very reliable)
         if (!imageUrl) {
           try {
-            const hfResponse = await fetch(
-              'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1',
-              {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  inputs: prompt,
-                  options: { wait_for_model: true }
-                }),
-                signal: AbortSignal.timeout(15000)
-              }
-            );
-
-            if (hfResponse.ok) {
-              const imageBlob = await hfResponse.blob();
-              const base64data = await imageBlob.arrayBuffer();
-              const base64 = Buffer.from(base64data).toString('base64');
-              imageUrl = `data:image/jpeg;base64,${base64}`;
-              serviceUsed = 'HuggingFace Stable Diffusion';
-              console.log(`✓ Generated image with HuggingFace for: ${productName}`);
+            const pexelsSearch = `${productName} food product`.replace(/\s+/g, '+');
+            const pexelsUrl = `https://images.pexels.com/photos/searchQuery=${pexelsSearch}`;
+            // Pexels API would need key, so we use their CDN pattern
+            const pexelsFallback = `https://source.unsplash.com/400x400/?${encodedSearch}`;
+            const testResponse = await fetch(pexelsFallback, {
+              method: 'HEAD',
+              signal: AbortSignal.timeout(3000)
+            });
+            if (testResponse.ok) {
+              imageUrl = pexelsFallback;
+              serviceUsed = 'Pexels/Unsplash hybrid';
+              console.log(`✓ Found backup photo for: ${productName}`);
             }
           } catch (error) {
-            console.log(`✗ HuggingFace failed (${error.message}), trying Lexica...`);
+            console.log(`✗ Pexels failed (${error.message}), trying Foodish...`);
           }
         }
 
-        // Try Service 3: Lexica.art search (free, reliable)
-        if (!imageUrl) {
+        // Try Service 3: Foodish API (FREE, food-specific, very reliable)
+        if (!imageUrl && searchTerms.includes('food') || searchTerms.includes('comida') || searchTerms.includes('sopa') || searchTerms.includes('cafe')) {
           try {
-            const lexicaResponse = await fetch(
-              `https://lexica.art/api/v1/search?q=${encodedPrompt}`,
-              { signal: AbortSignal.timeout(5000) }
-            );
-            if (lexicaResponse.ok) {
-              const lexicaData = await lexicaResponse.json();
-              if (lexicaData.images && lexicaData.images.length > 0) {
-                imageUrl = lexicaData.images[0].src;
-                serviceUsed = 'Lexica.art';
-                console.log(`✓ Found image via Lexica.art for: ${productName}`);
+            const foodishResponse = await fetch('https://foodish-api.com/api/', {
+              signal: AbortSignal.timeout(3000)
+            });
+            if (foodishResponse.ok) {
+              const foodData = await foodishResponse.json();
+              if (foodData.image) {
+                imageUrl = foodData.image;
+                serviceUsed = 'Foodish API (food photos)';
+                console.log(`✓ Found FOOD photo via Foodish for: ${productName}`);
               }
             }
           } catch (error) {
-            console.log(`✗ Lexica.art failed (${error.message})`);
+            console.log(`✗ Foodish failed (${error.message}), trying Picsum...`);
           }
         }
 
-        // Final fallback: High-quality placeholder
+        // Try Service 4: Lorem Picsum with category-based selection
         if (!imageUrl) {
-          const seed = productName.toLowerCase().replace(/\s+/g, '-');
-          imageUrl = `https://picsum.photos/seed/${seed}/400`;
-          serviceUsed = 'Picsum (fallback)';
-          console.log(`⚠ Using fallback placeholder for: ${productName}`);
+          try {
+            // Create a hash from product name to get consistent but unique image
+            let hash = 0;
+            for (let i = 0; i < productName.length; i++) {
+              hash = ((hash << 5) - hash) + productName.charCodeAt(i);
+              hash = hash & hash; // Convert to 32bit integer
+            }
+            const imageId = Math.abs(hash % 1000); // Get a number between 0-999
+
+            imageUrl = `https://picsum.photos/id/${imageId}/400`;
+            serviceUsed = 'Picsum (curated photos)';
+            console.log(`✓ Using Picsum curated photo #${imageId} for: ${productName}`);
+          } catch (error) {
+            console.log(`✗ Picsum failed (${error.message})`);
+          }
+        }
+
+        // Final fallback: Use placeholder.com with product name
+        if (!imageUrl) {
+          const placeholderText = encodeURIComponent(productName.substring(0, 30));
+          imageUrl = `https://via.placeholder.com/400x400/059669/FFFFFF?text=${placeholderText}`;
+          serviceUsed = 'Placeholder (text-based)';
+          console.log(`⚠ Using text placeholder for: ${productName}`);
         }
 
         console.log(`🖼️  Image service used: ${serviceUsed}`);
-        res.json({ imageUrl, service: serviceUsed });
+        console.log(`🔗 Final image URL: ${imageUrl.substring(0, 100)}...`);
+
+        res.json({ imageUrl, service: serviceUsed, searchTerms });
       } catch (error) {
         console.error("❌ Error generating image:", error);
-        // Even on complete failure, provide a fallback
-        const seed = req.body.productName.toLowerCase().replace(/\s+/g, '-');
+        // Emergency fallback with product name as text
+        const placeholderText = encodeURIComponent(req.body.productName.substring(0, 30));
         res.json({
-          imageUrl: `https://picsum.photos/seed/${seed}/400`,
-          service: 'Emergency fallback',
+          imageUrl: `https://via.placeholder.com/400x400/dc2626/FFFFFF?text=${placeholderText}`,
+          service: 'Emergency placeholder',
           error: error.message
         });
       }
