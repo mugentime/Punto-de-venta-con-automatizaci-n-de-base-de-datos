@@ -735,6 +735,27 @@ async function startServer() {
         }
     });
 
+    app.delete('/api/coworking-sessions/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+            console.log('🗑️ Deleting coworking session:', req.params.id);
+
+            const result = await pool.query('DELETE FROM coworking_sessions WHERE id = $1 RETURNING *', [req.params.id]);
+
+            if (result.rows.length === 0) {
+                console.log('❌ Coworking session not found:', req.params.id);
+                return res.status(404).json({ error: 'Coworking session not found' });
+            }
+
+            console.log('✅ Coworking session deleted successfully:', req.params.id);
+            res.status(204).send();
+        } catch (error) {
+            console.error('❌ Error deleting coworking session:', error);
+            res.status(500).json({ error: 'Failed to delete coworking session' });
+        }
+    });
+
     // --- CASH SESSIONS API ---
     app.get('/api/cash-sessions', async (req, res) => {
         try {
