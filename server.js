@@ -931,6 +931,48 @@ async function startServer() {
         }
     });
 
+    // --- LOGIN ENDPOINT ---
+    app.post('/api/login', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { username, password } = req.body;
+
+            // Query database for user with password
+            const result = await pool.query(
+                'SELECT id, username, email, password, role, status FROM users WHERE LOWER(username) = LOWER($1)',
+                [username]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(401).json({ error: 'Usuario no encontrado.' });
+            }
+
+            const user = result.rows[0];
+
+            // Check password (in production, use bcrypt)
+            if (user.password !== password) {
+                return res.status(401).json({ error: 'Contraseña incorrecta.' });
+            }
+
+            // Check if user is approved
+            if (user.status !== 'approved') {
+                return res.status(403).json({ error: 'Tu cuenta está pendiente de aprobación.' });
+            }
+
+            // Return user data without password
+            res.json({
+                id: user.id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                status: user.status
+            });
+        } catch (error) {
+            console.error("Error during login:", error);
+            res.status(500).json({ error: 'Failed to login' });
+        }
+    });
+
     app.post('/api/users', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });

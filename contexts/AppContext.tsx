@@ -223,40 +223,23 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     // Auth Functions (updated for API)
     const login = async (username: string, password?: string): Promise<void> => {
         try {
-            // For now, check against the known admin credentials
-            if (username === 'Admin1' && password === '1357') {
-                const adminUser = {
-                    id: 'admin-001',
-                    username: 'Admin1',
-                    email: 'je2alvarela@gmail.com',
-                    role: 'admin' as const,
-                    status: 'approved' as const
-                };
-                setCurrentUser(adminUser);
-                // Persist to localStorage
-                localStorage.setItem('currentUser', JSON.stringify(adminUser));
-                return;
+            // Call the login API endpoint which validates credentials server-side
+            const response = await fetch('/api/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username, password }),
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Error al iniciar sesión');
             }
 
-            // Check against database users
-            const user = users.find(u => u.username.toLowerCase() === username.toLowerCase());
-            if (!user) {
-                throw new Error('Usuario no encontrado.');
-            }
+            const user = await response.json();
 
-            // Simple password check (in production, use proper hashing)
-            if ((user as any).password !== password) {
-                throw new Error('Contraseña incorrecta.');
-            }
-
-            if (user.status === 'pending') {
-                throw new Error('Su cuenta está pendiente de aprobación por un administrador.');
-            }
-
-            const { password: _, ...userToStore } = user as any;
-            setCurrentUser(userToStore);
-            // Persist to localStorage
-            localStorage.setItem('currentUser', JSON.stringify(userToStore));
+            // Set current user and persist to localStorage
+            setCurrentUser(user);
+            localStorage.setItem('currentUser', JSON.stringify(user));
         } catch (error) {
             throw error;
         }
