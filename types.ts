@@ -89,3 +89,13 @@ export interface CustomerCredit {
   description?: string;
   createdAt: string;
 }
+
+export interface CashWithdrawal {
+  id: string;
+  cash_session_id: string;
+  amount: number;
+  description: string;
+  withdrawn_by?: string;
+  withdrawn_at: string;
+  created_at: string;
+}

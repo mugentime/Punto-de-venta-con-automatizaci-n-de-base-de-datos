@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
-import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit } from '../types';
+import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 
 const initialAdmin: User = {
     id: 'admin-001',
@@ -52,8 +52,11 @@ interface AppContextType {
     deleteCoworkingSession: (sessionId: string) => Promise<void>;
     // Cash
     cashSessions: CashSession[];
+    cashWithdrawals: CashWithdrawal[];
     startCashSession: (startAmount: number) => void;
     closeCashSession: (endAmount: number) => void;
+    addCashWithdrawal: (cashSessionId: string, amount: number, description: string) => Promise<void>;
+    deleteCashWithdrawal: (withdrawalId: string) => Promise<void>;
     // Customers
     customers: Customer[];
     addCustomer: (customer: Omit<Customer, 'id' | 'createdAt' | 'currentCredit'>) => Promise<void>;
@@ -76,6 +79,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [expenses, setExpenses] = useState<Expense[]>([]);
     const [coworkingSessions, setCoworkingSessions] = useState<CoworkingSession[]>([]);
     const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
+    const [cashWithdrawals, setCashWithdrawals] = useState<CashWithdrawal[]>([]);
     const [customers, setCustomers] = useState<Customer[]>([]);
 
     // --- EFFECTS ---
@@ -161,6 +165,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 if (customersResponse.ok) {
                     const customersData: Customer[] = await customersResponse.json();
                     setCustomers(customersData);
+                }
+
+                // Fetch cash withdrawals
+                const withdrawalsResponse = await fetch('/api/cash-withdrawals');
+                if (withdrawalsResponse.ok) {
+                    const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
+                    setCashWithdrawals(withdrawalsData);
                 }
             } catch (error) {
                 console.error("Failed to fetch data:", error);
@@ -831,17 +842,19 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const sessionCoworking = coworkingSessions.filter(s =>
                 s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
             );
+            const sessionWithdrawals = cashWithdrawals.filter(w => w.cash_session_id === currentSession.id);
 
             const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
             const coworkingSales = sessionCoworking.reduce((sum, session) => sum + ((session as any).total || 0), 0);
             const totalSales = ordersSales + coworkingSales;
             const totalExpenses = sessionExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+            const totalWithdrawals = sessionWithdrawals.reduce((sum, w) => sum + w.amount, 0);
 
             const ordersCashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
             const coworkingCashSales = sessionCoworking.filter(s => (s as any).paymentMethod === 'Efectivo').reduce((sum, s) => sum + ((s as any).total || 0), 0);
             const cashSales = ordersCashSales + coworkingCashSales;
 
-            const expectedCash = currentSession.startAmount + cashSales - totalExpenses;
+            const expectedCash = currentSession.startAmount + cashSales - totalExpenses - totalWithdrawals;
             const difference = endAmount - expectedCash;
 
             const updateData = {
@@ -955,6 +968,49 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     };
 
+    // Cash Withdrawal Functions
+    const addCashWithdrawal = async (cashSessionId: string, amount: number, description: string) => {
+        try {
+            const response = await fetch('/api/cash-withdrawals', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    cashSessionId,
+                    amount,
+                    description,
+                    userId: currentUser?.id
+                }),
+            });
+
+            if (!response.ok) throw new Error('Failed to create cash withdrawal');
+
+            const newWithdrawal = await response.json();
+            setCashWithdrawals(prev => [newWithdrawal, ...prev]);
+
+            alert(`✅ Retiro registrado: $${amount.toFixed(2)}`);
+        } catch (error) {
+            console.error("Error adding cash withdrawal:", error);
+            alert("Error al registrar el retiro de efectivo");
+            throw error;
+        }
+    };
+
+    const deleteCashWithdrawal = async (withdrawalId: string) => {
+        try {
+            const response = await fetch(`/api/cash-withdrawals/${withdrawalId}`, {
+                method: 'DELETE',
+            });
+
+            if (!response.ok) throw new Error('Failed to delete cash withdrawal');
+
+            setCashWithdrawals(prev => prev.filter(w => w.id !== withdrawalId));
+        } catch (error) {
+            console.error("Error deleting cash withdrawal:", error);
+            alert("Error al eliminar el retiro");
+            throw error;
+        }
+    };
+
     return (
         <AppContext.Provider value={{
             users, currentUser, login, logout, register, approveUser, deleteUser,
@@ -964,7 +1020,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             orders, createOrder, deleteOrder,
             expenses, addExpense, updateExpense, deleteExpense,
             coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
-            cashSessions, startCashSession, closeCashSession,
+            cashSessions, cashWithdrawals, startCashSession, closeCashSession, addCashWithdrawal, deleteCashWithdrawal,
             customers, addCustomer, updateCustomer, deleteCustomer, addCustomerCredit
         }}>
             {children}

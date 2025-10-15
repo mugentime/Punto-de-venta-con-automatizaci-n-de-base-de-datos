@@ -169,6 +169,27 @@ async function setupAndGetDataStore() {
               );
             `);
 
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS cash_withdrawals (
+                id VARCHAR(255) PRIMARY KEY,
+                cash_session_id VARCHAR(255) NOT NULL,
+                amount NUMERIC(10, 2) NOT NULL,
+                description TEXT NOT NULL,
+                withdrawn_by VARCHAR(255),
+                withdrawn_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+                CONSTRAINT fk_cash_session
+                    FOREIGN KEY (cash_session_id)
+                    REFERENCES cash_sessions(id)
+                    ON DELETE CASCADE,
+                CONSTRAINT fk_withdrawn_by
+                    FOREIGN KEY (withdrawn_by)
+                    REFERENCES users(id)
+                    ON DELETE SET NULL,
+                CONSTRAINT check_positive_amount CHECK (amount > 0)
+              );
+            `);
+
             const res = await client.query('SELECT COUNT(*) FROM products');
             if (res.rows[0].count === '0') {
                 console.log('Seeding initial products into database...');
@@ -825,6 +846,69 @@ async function startServer() {
         } catch (error) {
             console.error("Error updating cash session:", error);
             res.status(500).json({ error: 'Failed to update cash session' });
+        }
+    });
+
+    // --- CASH WITHDRAWALS API ---
+    app.get('/api/cash-withdrawals', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query('SELECT * FROM cash_withdrawals ORDER BY withdrawn_at DESC');
+            res.json(result.rows.map(withdrawal => ({
+                ...withdrawal,
+                amount: parseFloat(withdrawal.amount)
+            })));
+        } catch (error) {
+            console.error("Error fetching cash withdrawals:", error);
+            res.status(500).json({ error: 'Failed to fetch cash withdrawals' });
+        }
+    });
+
+    app.get('/api/cash-withdrawals/session/:sessionId', async (req, res) => {
+        try {
+            if (!useDb) return res.json([]);
+            const result = await pool.query(
+                'SELECT * FROM cash_withdrawals WHERE cash_session_id = $1 ORDER BY withdrawn_at DESC',
+                [req.params.sessionId]
+            );
+            res.json(result.rows.map(withdrawal => ({
+                ...withdrawal,
+                amount: parseFloat(withdrawal.amount)
+            })));
+        } catch (error) {
+            console.error("Error fetching session withdrawals:", error);
+            res.status(500).json({ error: 'Failed to fetch session withdrawals' });
+        }
+    });
+
+    app.post('/api/cash-withdrawals', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { cashSessionId, amount, description, userId } = req.body;
+            const id = `withdrawal-${Date.now()}`;
+            const result = await pool.query(
+                'INSERT INTO cash_withdrawals (id, cash_session_id, amount, description, withdrawn_by) VALUES ($1, $2, $3, $4, $5) RETURNING *',
+                [id, cashSessionId, amount, description, userId]
+            );
+            const newWithdrawal = result.rows[0];
+            res.status(201).json({
+                ...newWithdrawal,
+                amount: parseFloat(newWithdrawal.amount)
+            });
+        } catch (error) {
+            console.error("Error creating cash withdrawal:", error);
+            res.status(500).json({ error: 'Failed to create cash withdrawal' });
+        }
+    });
+
+    app.delete('/api/cash-withdrawals/:id', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            await pool.query('DELETE FROM cash_withdrawals WHERE id = $1', [req.params.id]);
+            res.status(204).send();
+        } catch (error) {
+            console.error("Error deleting cash withdrawal:", error);
+            res.status(500).json({ error: 'Failed to delete cash withdrawal' });
         }
     });
 

@@ -45,6 +45,64 @@ const StartDayModal: React.FC<{
   );
 };
 
+// Cash Withdrawal Modal Component
+const CashWithdrawalModal: React.FC<{
+  isOpen: boolean;
+  onClose: () => void;
+  onWithdraw: (amount: number, description: string) => void;
+}> = ({ isOpen, onClose, onWithdraw }) => {
+  const [amount, setAmount] = useState('');
+  const [description, setDescription] = useState('');
+
+  const handleWithdraw = () => {
+    const withdrawAmount = parseFloat(amount);
+    if (!isNaN(withdrawAmount) && withdrawAmount > 0 && description.trim()) {
+      onWithdraw(withdrawAmount, description);
+      setAmount('');
+      setDescription('');
+      onClose();
+    } else {
+      alert('Por favor, ingrese un monto válido y una descripción.');
+    }
+  };
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center p-4">
+      <div className="bg-white rounded-3xl shadow-xl w-full max-w-sm p-6">
+        <h2 className="text-2xl font-bold text-slate-800 mb-4">Retiro de Efectivo</h2>
+        <p className="text-slate-600 mb-4">Registre el retiro de efectivo de la caja.</p>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-slate-600 mb-1">Monto a Retirar</label>
+          <input
+            type="number"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+            placeholder="Ej: 500.00"
+            className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 sm:text-sm"
+            autoFocus
+          />
+        </div>
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-slate-600 mb-1">Motivo del Retiro</label>
+          <textarea
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            placeholder="Ej: Pago a proveedor, cambio de billetes, etc."
+            className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-zinc-500 focus:border-zinc-500 sm:text-sm"
+            rows={3}
+          />
+        </div>
+        <div className="flex justify-end space-x-3">
+          <button onClick={onClose} className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700">Cancelar</button>
+          <button onClick={handleWithdraw} className="px-4 py-2 bg-blue-600 rounded-xl text-sm font-medium text-white">Confirmar Retiro</button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 // Close Day Modal Component
 const CloseDayModal: React.FC<{
   isOpen: boolean;
@@ -54,10 +112,11 @@ const CloseDayModal: React.FC<{
     startAmount: number;
     cashSales: number;
     cashExpenses: number;
+    cashWithdrawals: number;
   };
 }> = ({ isOpen, onClose, onConfirm, sessionData }) => {
   const [countedAmount, setCountedAmount] = useState('');
-  const expectedAmount = sessionData.startAmount + sessionData.cashSales - sessionData.cashExpenses;
+  const expectedAmount = sessionData.startAmount + sessionData.cashSales - sessionData.cashExpenses - sessionData.cashWithdrawals;
   const difference = parseFloat(countedAmount) - expectedAmount;
 
   const handleConfirm = () => {
@@ -80,6 +139,7 @@ const CloseDayModal: React.FC<{
           <div className="flex justify-between"><span className="text-slate-500">Efectivo Inicial:</span> <span className="font-medium">${sessionData.startAmount.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(+) Ventas en Efectivo:</span> <span className="font-medium text-green-600">${sessionData.cashSales.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(-) Gastos:</span> <span className="font-medium text-red-600">${sessionData.cashExpenses.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">(-) Retiros de Efectivo:</span> <span className="font-medium text-orange-600">${sessionData.cashWithdrawals.toFixed(2)}</span></div>
           <div className="flex justify-between font-bold mt-2 pt-2 border-t"><span className="text-slate-800">Efectivo Esperado:</span> <span>${expectedAmount.toFixed(2)}</span></div>
         </div>
         <div>
@@ -109,11 +169,12 @@ const CloseDayModal: React.FC<{
 
 
 const CashReportScreen: React.FC = () => {
-  const { orders, expenses, cashSessions, coworkingSessions, startCashSession, closeCashSession } = useAppContext();
+  const { orders, expenses, cashSessions, cashWithdrawals, coworkingSessions, startCashSession, closeCashSession, addCashWithdrawal } = useAppContext();
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
+  const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
-  
+
   const currentSession = cashSessions.find(s => s.status === 'open');
 
   // Logic for the active session view
@@ -133,9 +194,23 @@ const CashReportScreen: React.FC = () => {
   const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
   const cashSales = ordersCashSales + coworkingCashSales;
 
+  // Calculate withdrawals for current session
+  const sessionWithdrawals = currentSession ? cashWithdrawals.filter(w => w.cash_session_id === currentSession.id) : [];
+  const totalWithdrawals = sessionWithdrawals.reduce((sum, w) => sum + w.amount, 0);
+
   const cardSales = totalSales - cashSales;
   const totalOrders = sessionOrders.length + sessionCoworking.length;
-  const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalExpenses : 0;
+  const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalExpenses - totalWithdrawals : 0;
+
+  const handleWithdraw = async (amount: number, description: string) => {
+    if (currentSession) {
+      try {
+        await addCashWithdrawal(currentSession.id, amount, description);
+      } catch (error) {
+        console.error('Error adding withdrawal:', error);
+      }
+    }
+  };
   
   if (currentSession) {
     return (
@@ -145,31 +220,78 @@ const CashReportScreen: React.FC = () => {
             <h1 className="text-3xl font-bold text-slate-800">Caja Activa</h1>
             <p className="text-sm text-slate-500">Día iniciado a las {new Date(currentSession.startDate).toLocaleTimeString()}</p>
           </div>
-          <button 
-            onClick={() => setIsCloseModalOpen(true)}
-            className="px-4 py-2 bg-red-600 text-white rounded-xl shadow-sm hover:bg-red-700 transition-colors font-semibold"
-          >
-            Cerrar Caja
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => setIsWithdrawModalOpen(true)}
+              className="px-4 py-2 bg-blue-600 text-white rounded-xl shadow-sm hover:bg-blue-700 transition-colors font-semibold"
+            >
+              Retirar Efectivo
+            </button>
+            <button
+              onClick={() => setIsCloseModalOpen(true)}
+              className="px-4 py-2 bg-red-600 text-white rounded-xl shadow-sm hover:bg-red-700 transition-colors font-semibold"
+            >
+              Cerrar Caja
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <StatCard title="Efectivo Inicial" value={`$${currentSession.startAmount.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-gray-500" />} />
           <StatCard title="Ventas en Efectivo" value={`$${cashSales.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-green-600" />} />
           <StatCard title="Ventas con Tarjeta" value={`$${cardSales.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
           <StatCard title="Gastos" value={`$${totalExpenses.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
+          <StatCard title="Retiros de Efectivo" value={`$${totalWithdrawals.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-orange-600" />} />
           <StatCard title="Total de Órdenes" value={totalOrders.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
           <StatCard title="Efectivo Esperado" value={`$${expectedCash.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-blue-600" />} />
         </div>
+
+        {/* Withdrawals List */}
+        {sessionWithdrawals.length > 0 && (
+          <div className="bg-white p-6 rounded-xl shadow-md mb-8">
+            <h2 className="text-xl font-bold text-slate-800 mb-4">Retiros de Efectivo</h2>
+            <div className="overflow-x-auto">
+              <table className="min-w-full divide-y divide-slate-200">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Hora</th>
+                    <th className="px-4 py-3 text-left text-xs font-medium text-slate-500 uppercase">Descripción</th>
+                    <th className="px-4 py-3 text-right text-xs font-medium text-slate-500 uppercase">Monto</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-slate-200">
+                  {sessionWithdrawals.map((withdrawal) => (
+                    <tr key={withdrawal.id} className="hover:bg-slate-50">
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-slate-700">
+                        {new Date(withdrawal.withdrawn_at).toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })}
+                      </td>
+                      <td className="px-4 py-3 text-sm text-slate-700">{withdrawal.description}</td>
+                      <td className="px-4 py-3 whitespace-nowrap text-sm text-right font-medium text-orange-600">
+                        ${withdrawal.amount.toFixed(2)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
         
-        <CloseDayModal 
+        <CashWithdrawalModal
+          isOpen={isWithdrawModalOpen}
+          onClose={() => setIsWithdrawModalOpen(false)}
+          onWithdraw={handleWithdraw}
+        />
+
+        <CloseDayModal
           isOpen={isCloseModalOpen}
           onClose={() => setIsCloseModalOpen(false)}
           onConfirm={closeCashSession}
           sessionData={{
             startAmount: currentSession.startAmount,
             cashSales: cashSales,
-            cashExpenses: totalExpenses
+            cashExpenses: totalExpenses,
+            cashWithdrawals: totalWithdrawals
           }}
         />
       </div>
