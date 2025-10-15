@@ -17,6 +17,9 @@ const initialProducts = [
     { id: '4', name: 'Jugo Prensado en Frío', price: 60, cost: 35, stock: 60, description: 'Mezcla de naranja, zanahoria y jengibre.', imageUrl: 'https://picsum.photos/seed/juice/400', category: 'Refrigerador' },
     { id: '5', name: 'Baguette de Pavo y Pesto', price: 95, cost: 55, stock: 30, description: 'Pavo, queso manchego, arúgula y pesto de la casa.', imageUrl: 'https://picsum.photos/seed/sandwich/400', category: 'Alimentos' },
     { id: '6', name: 'Matcha Latte', price: 65, cost: 25, stock: 80, description: 'Té verde matcha ceremonial con leche a elección.', imageUrl: 'https://picsum.photos/seed/matcha/400', category: 'Cafetería' },
+    { id: '8', name: 'Membresía Básica', price: 500, cost: 0, stock: 100, description: 'Acceso mensual al espacio de coworking. Incluye escritorio compartido y conexión WiFi de alta velocidad.', imageUrl: 'https://picsum.photos/seed/coworking-basic/400', category: 'Membresías' },
+    { id: '9', name: 'Membresía Premium', price: 800, cost: 0, stock: 100, description: 'Acceso ilimitado con escritorio fijo, sala de juntas y locker personal. Incluye todos los beneficios básicos.', imageUrl: 'https://picsum.photos/seed/coworking-premium/400', category: 'Membresías' },
+    { id: '10', name: 'Día de Coworking', price: 180, cost: 0, stock: 100, description: 'Acceso por un día completo al espacio de coworking con todas las facilidades.', imageUrl: 'https://picsum.photos/seed/coworking-day/400', category: 'Membresías' },
     { id: '7', name: 'Pan de Elote', price: 50, cost: 22, stock: 45, description: 'Receta casera, dulce y esponjoso.', imageUrl: 'https://picsum.photos/seed/cornbread/400', category: 'Alimentos' },
 ];
 
