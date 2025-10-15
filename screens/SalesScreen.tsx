@@ -226,6 +226,7 @@ const Cart: React.FC = () => {
 const SalesScreen: React.FC = () => {
     const { products, addToCart } = useAppContext();
     const [toastMessage, setToastMessage] = useState<{ message: string; productName: string } | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
 
     const handleAddToCart = (product: Product) => {
         addToCart(product);
@@ -235,7 +236,14 @@ const SalesScreen: React.FC = () => {
         });
     };
 
-    const groupedProducts = products.reduce((acc, product) => {
+    // Filter products based on search query
+    const filteredProducts = products.filter(product =>
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category?.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+
+    const groupedProducts = filteredProducts.reduce((acc, product) => {
         const category = product.category || 'Sin categoría';
         if (!acc[category]) {
             acc[category] = [];
@@ -254,17 +262,64 @@ const SalesScreen: React.FC = () => {
                 />
             )}
             <div className="flex-1 lg:col-span-2 lg:overflow-y-auto lg:pr-2 min-h-0">
-                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-4 sm:mb-6">Punto de Venta</h1>
-                {Object.entries(groupedProducts).map(([category, productsInCategory]) => (
-                    <div key={category} className="mb-8">
-                        <h2 className="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">{category}</h2>
-                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
-                            {productsInCategory.map(product => (
-                                <ProductCard key={product.id} product={product} onClick={() => handleAddToCart(product)} />
-                            ))}
+                <div className="mb-4 sm:mb-6">
+                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4">Punto de Venta</h1>
+
+                    {/* Search Bar */}
+                    <div className="relative">
+                        <div className="absolute inset-y-0 left-0 pl-3 sm:pl-4 flex items-center pointer-events-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
                         </div>
+                        <input
+                            type="text"
+                            placeholder="Buscar productos por nombre, categoría o descripción..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-slate-300 rounded-xl sm:rounded-2xl shadow-sm focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 text-sm sm:text-base transition-all"
+                            autoFocus
+                        />
+                        {searchQuery && (
+                            <button
+                                onClick={() => setSearchQuery('')}
+                                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                            >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                                </svg>
+                            </button>
+                        )}
                     </div>
-                ))}
+
+                    {/* Results counter */}
+                    {searchQuery && (
+                        <p className="mt-2 text-xs sm:text-sm text-slate-500">
+                            {filteredProducts.length} {filteredProducts.length === 1 ? 'producto encontrado' : 'productos encontrados'}
+                        </p>
+                    )}
+                </div>
+
+                {filteredProducts.length === 0 ? (
+                    <div className="text-center py-12">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 mx-auto text-slate-300 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        <p className="text-slate-500 text-lg font-medium">No se encontraron productos</p>
+                        <p className="text-slate-400 text-sm mt-2">Intenta con otro término de búsqueda</p>
+                    </div>
+                ) : (
+                    Object.entries(groupedProducts).map(([category, productsInCategory]) => (
+                        <div key={category} className="mb-8">
+                            <h2 className="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">{category}</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                                {productsInCategory.map(product => (
+                                    <ProductCard key={product.id} product={product} onClick={() => handleAddToCart(product)} />
+                                ))}
+                            </div>
+                        </div>
+                    ))
+                )}
             </div>
             <div className="flex-shrink-0 mt-4 lg:mt-0 lg:col-span-1 lg:h-full">
                 <Cart />
