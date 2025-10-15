@@ -6,7 +6,7 @@ export interface Product {
   stock: number;
   description: string;
   imageUrl: string;
-  category: 'Cafetería' | 'Refrigerador' | 'Alimentos';
+  category: 'Cafetería' | 'Refrigerador' | 'Alimentos' | 'Membresías';
 }
 
 export interface CartItem extends Product {

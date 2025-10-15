@@ -13,7 +13,7 @@ interface ProductModalProps {
 
 const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, productToEdit }) => {
   const [product, setProduct] = useState({
-    name: '', price: 0, cost: 0, stock: 0, description: '', imageUrl: '', category: 'Cafetería' as 'Cafetería' | 'Refrigerador' | 'Alimentos'
+    name: '', price: 0, cost: 0, stock: 0, description: '', imageUrl: '', category: 'Cafetería' as 'Cafetería' | 'Refrigerador' | 'Alimentos' | 'Membresías'
   });
   const [isGeneratingDesc, setIsGeneratingDesc] = useState(false);
   const [isGeneratingImg, setIsGeneratingImg] = useState(false);
@@ -106,7 +106,9 @@ const ProductModal: React.FC<ProductModalProps> = ({ isOpen, onClose, onSave, pr
                     <option value="Cafetería">Cafetería</option>
                     <option value="Refrigerador">Refrigerador</option>
                     <option value="Alimentos">Alimentos</option>
+                    <option value="Membresías">Membresías de Coworking</option>
                 </select>
+                    <option value="Membresías">Membresías de Coworking</option>
                </div>
                 <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-slate-600 mb-1">Imagen del Producto</label>
