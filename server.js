@@ -381,9 +381,13 @@ async function startServer() {
 
     // --- AI SETUP ---
     console.log("*******************************************************************");
-    console.log("*** AI Configuration:                                           ***");
-    console.log("*** - Image generation: Pollinations.ai (FREE, no API key)      ***");
-    console.log("*** - Text generation: HuggingFace Inference API (FREE)         ***");
+    console.log("*** AI Configuration (100% FREE):                               ***");
+    console.log("*** - Image generation: Multi-service fallback system          ***");
+    console.log("***   1. Pollinations.ai (primary)                             ***");
+    console.log("***   2. HuggingFace Stable Diffusion (backup)                 ***");
+    console.log("***   3. Lexica.art search (backup)                            ***");
+    console.log("***   4. Picsum placeholder (emergency fallback)               ***");
+    console.log("*** - Text generation: HuggingFace Mistral-7B (FREE)           ***");
     console.log("*******************************************************************");
 
     // --- API ENDPOINTS ---
@@ -1412,23 +1416,98 @@ async function startServer() {
       }
 
       try {
-        // Use Pollinations.ai - free AI image generation service
         // Create a detailed, descriptive prompt for better image quality
         const productContext = description ? `${productName}, ${description}` : productName;
-
         const prompt = `professional product photo of ${productContext}, minimalist style, clean background, centered composition, high quality, product photography, studio lighting, no text, no labels`;
-
-        // Pollinations.ai generates images via URL - encode the prompt
         const encodedPrompt = encodeURIComponent(prompt);
-        const imageUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&nologo=true&enhance=true`;
 
-        console.log(`Generated image URL for product: ${productName}`);
+        let imageUrl = null;
+        let serviceUsed = null;
 
-        // Return the URL directly - the browser will fetch it
-        res.json({ imageUrl });
+        // Try Service 1: Pollinations.ai (fastest when working)
+        try {
+          const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&nologo=true&enhance=true`;
+          const testResponse = await fetch(pollinationsUrl, {
+            method: 'HEAD',
+            signal: AbortSignal.timeout(3000)
+          });
+          if (testResponse.ok) {
+            imageUrl = pollinationsUrl;
+            serviceUsed = 'Pollinations.ai';
+            console.log(`✓ Generated image with Pollinations.ai for: ${productName}`);
+          }
+        } catch (error) {
+          console.log(`✗ Pollinations.ai failed (${error.message}), trying alternatives...`);
+        }
+
+        // Try Service 2: HuggingFace Stable Diffusion (high quality, slower)
+        if (!imageUrl) {
+          try {
+            const hfResponse = await fetch(
+              'https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1',
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  inputs: prompt,
+                  options: { wait_for_model: true }
+                }),
+                signal: AbortSignal.timeout(15000)
+              }
+            );
+
+            if (hfResponse.ok) {
+              const imageBlob = await hfResponse.blob();
+              const base64data = await imageBlob.arrayBuffer();
+              const base64 = Buffer.from(base64data).toString('base64');
+              imageUrl = `data:image/jpeg;base64,${base64}`;
+              serviceUsed = 'HuggingFace Stable Diffusion';
+              console.log(`✓ Generated image with HuggingFace for: ${productName}`);
+            }
+          } catch (error) {
+            console.log(`✗ HuggingFace failed (${error.message}), trying Lexica...`);
+          }
+        }
+
+        // Try Service 3: Lexica.art search (free, reliable)
+        if (!imageUrl) {
+          try {
+            const lexicaResponse = await fetch(
+              `https://lexica.art/api/v1/search?q=${encodedPrompt}`,
+              { signal: AbortSignal.timeout(5000) }
+            );
+            if (lexicaResponse.ok) {
+              const lexicaData = await lexicaResponse.json();
+              if (lexicaData.images && lexicaData.images.length > 0) {
+                imageUrl = lexicaData.images[0].src;
+                serviceUsed = 'Lexica.art';
+                console.log(`✓ Found image via Lexica.art for: ${productName}`);
+              }
+            }
+          } catch (error) {
+            console.log(`✗ Lexica.art failed (${error.message})`);
+          }
+        }
+
+        // Final fallback: High-quality placeholder
+        if (!imageUrl) {
+          const seed = productName.toLowerCase().replace(/\s+/g, '-');
+          imageUrl = `https://picsum.photos/seed/${seed}/400`;
+          serviceUsed = 'Picsum (fallback)';
+          console.log(`⚠ Using fallback placeholder for: ${productName}`);
+        }
+
+        console.log(`🖼️  Image service used: ${serviceUsed}`);
+        res.json({ imageUrl, service: serviceUsed });
       } catch (error) {
-        console.error("Error generating image with Pollinations.ai:", error);
-        res.status(500).json({ error: 'Failed to generate image' });
+        console.error("❌ Error generating image:", error);
+        // Even on complete failure, provide a fallback
+        const seed = req.body.productName.toLowerCase().replace(/\s+/g, '-');
+        res.json({
+          imageUrl: `https://picsum.photos/seed/${seed}/400`,
+          service: 'Emergency fallback',
+          error: error.message
+        });
       }
     });
 
