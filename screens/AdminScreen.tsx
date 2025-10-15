@@ -7,6 +7,27 @@ const AdminScreen: React.FC = () => {
 
   const otherUsers = users.filter(u => u.id !== currentUser?.id);
 
+  const handleApproveUser = async (userId: string) => {
+    try {
+      await approveUser(userId);
+    } catch (error) {
+      console.error('Failed to approve user:', error);
+    }
+  };
+
+  const handleDeleteUser = async (userId: string) => {
+    if (!window.confirm('¿Está seguro de que desea eliminar este usuario?')) {
+      return;
+    }
+    try {
+      await deleteUser(userId);
+      alert('✅ Usuario eliminado exitosamente');
+    } catch (error) {
+      console.error('Failed to delete user:', error);
+      alert('Error al eliminar el usuario');
+    }
+  };
+
   const statusBadge = (status: 'approved' | 'pending') => {
     switch (status) {
       case 'approved':
@@ -45,14 +66,14 @@ const AdminScreen: React.FC = () => {
                     <div className="flex justify-center items-center space-x-2">
                       {user.status === 'pending' && (
                         <button
-                          onClick={() => approveUser(user.id)}
+                          onClick={() => handleApproveUser(user.id)}
                           className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg hover:bg-green-600"
                         >
                           Aprobar
                         </button>
                       )}
-                      <button 
-                        onClick={() => deleteUser(user.id)} 
+                      <button
+                        onClick={() => handleDeleteUser(user.id)}
                         className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors"
                         aria-label={`Eliminar ${user.username}`}
                       >
@@ -81,11 +102,11 @@ const AdminScreen: React.FC = () => {
                          <p className="text-sm text-slate-500 capitalize">Rol: {user.role}</p>
                          <div className="flex items-center space-x-2">
                             {user.status === 'pending' && (
-                                <button onClick={() => approveUser(user.id)} className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg hover:bg-green-600">
+                                <button onClick={() => handleApproveUser(user.id)} className="px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-lg hover:bg-green-600">
                                     Aprobar
                                 </button>
                             )}
-                            <button onClick={() => deleteUser(user.id)} className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors" aria-label={`Eliminar ${user.username}`}>
+                            <button onClick={() => handleDeleteUser(user.id)} className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors" aria-label={`Eliminar ${user.username}`}>
                                 <TrashIcon className="h-5 w-5" />
                             </button>
                         </div>

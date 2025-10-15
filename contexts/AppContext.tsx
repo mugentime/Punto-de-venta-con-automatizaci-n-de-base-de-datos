@@ -305,7 +305,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const approveUser = async (userId: string) => {
         try {
             const user = users.find(u => u.id === userId);
-            if (!user) throw new Error('User not found');
+            if (!user) {
+                alert('Usuario no encontrado');
+                throw new Error('User not found');
+            }
 
             const response = await fetch(`/api/users/${userId}`, {
                 method: 'PUT',
@@ -318,10 +321,14 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 }),
             });
 
-            if (!response.ok) throw new Error('Failed to approve user');
+            if (!response.ok) {
+                alert('Error al aprobar el usuario. Por favor intente de nuevo.');
+                throw new Error('Failed to approve user');
+            }
 
             const updatedUser = await response.json();
             setUsers(prev => prev.map(u => u.id === userId ? updatedUser : u));
+            alert(`✅ Usuario ${user.username} aprobado exitosamente`);
         } catch (error) {
             console.error("Error approving user:", error);
             throw error;
