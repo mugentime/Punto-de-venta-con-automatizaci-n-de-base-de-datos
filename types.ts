@@ -23,6 +23,7 @@ export interface Order {
   clientName: string;
   serviceType: 'Mesa' | 'Para llevar';
   paymentMethod: 'Efectivo' | 'Tarjeta';
+  tip?: number;
 }
 
 export type ExpenseCategory = 'Luz' | 'Internet' | 'Sueldos' | 'Inventario' | 'Otro';

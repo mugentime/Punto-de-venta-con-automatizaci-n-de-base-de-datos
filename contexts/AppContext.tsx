@@ -36,7 +36,7 @@ interface AppContextType {
     cartTotal: number;
     // Orders
     orders: Order[];
-    createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; }) => Promise<void>;
+    createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; tip?: number; }) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
     // Expenses
     expenses: Expense[];
@@ -447,10 +447,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     }
 
     // Order Function (updated for API)
-    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; }) => {
+    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; tip?: number; }) => {
         if(cart.length === 0) return;
 
-        console.log('💾 Creating order...', { clientName: orderDetails.clientName, total: cartTotal, items: cart.length, customerId: orderDetails.customerId });
+        console.log('💾 Creating order...', { clientName: orderDetails.clientName, total: cartTotal, items: cart.length, customerId: orderDetails.customerId, tip: orderDetails.tip });
 
         try {
             const orderData = {
@@ -460,6 +460,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 total: cartTotal,
                 userId: currentUser?.id || 'guest',
                 customerId: orderDetails.customerId || null,
+                tip: orderDetails.tip || 0,
             };
 
             console.log('📡 Sending order to API...', orderData);
