@@ -77,6 +77,7 @@ const Cart: React.FC = () => {
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
     // Note: 'Crédito' is handled specially and converted to appropriate payment method in createOrder
     const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Crédito'>('Efectivo');
+    const [tip, setTip] = useState<number>(0);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
 
@@ -85,7 +86,7 @@ const Cart: React.FC = () => {
 
     // Calculate discount
     const discount = selectedCustomer ? (cartTotal * selectedCustomer.discountPercentage / 100) : 0;
-    const finalTotal = cartTotal - discount;
+    const finalTotal = cartTotal - discount + tip;
 
     const handleCheckout = async () => {
         if (cart.length === 0) return;
@@ -102,13 +103,14 @@ const Cart: React.FC = () => {
         try {
             // Convert 'Crédito' to 'Efectivo' for API (credit is tracked separately via customerId)
             const apiPaymentMethod: 'Efectivo' | 'Tarjeta' = paymentMethod === 'Crédito' ? 'Efectivo' : paymentMethod;
-            await createOrder({ clientName, serviceType, paymentMethod: apiPaymentMethod, customerId });
+            await createOrder({ clientName, serviceType, paymentMethod: apiPaymentMethod, customerId, tip });
             // Cart is already cleared by createOrder on success
             setIsCheckingOut(false);
             setSelectedCustomerId('');
             setCustomClientName('');
             setServiceType('Mesa');
             setPaymentMethod('Efectivo');
+            setTip(0);
         } catch (error) {
             // Error already alerted by createOrder, just reset checkout state
             console.error('Checkout failed:', error);
@@ -218,6 +220,21 @@ const Cart: React.FC = () => {
                             </select>
                         </div>
 
+                        <div>
+                            <label htmlFor="tipAmount" className="block text-xs font-medium text-slate-600">Propina (opcional)</label>
+                            <input
+                                type="number"
+                                name="tipAmount"
+                                id="tipAmount"
+                                value={tip}
+                                onChange={(e) => setTip(parseFloat(e.target.value) || 0)}
+                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"
+                                placeholder="0.00"
+                                min="0"
+                                step="0.01"
+                            />
+                        </div>
+
                         {paymentMethod === 'Crédito' && selectedCustomer && (
                             <div className={`border rounded-lg p-2 ${selectedCustomer.currentCredit + finalTotal > selectedCustomer.creditLimit ? 'bg-red-50 border-red-200' : 'bg-blue-50 border-blue-200'}`}>
                                 <p className="text-xs">
@@ -251,6 +268,12 @@ const Cart: React.FC = () => {
                                 <span>-${discount.toFixed(2)}</span>
                             </div>
                          </>
+                     )}
+                     {tip > 0 && (
+                         <div className="flex justify-between text-sm text-slate-600">
+                            <span>Propina:</span>
+                            <span>+${tip.toFixed(2)}</span>
+                        </div>
                      )}
                      <div className="flex justify-between text-lg font-bold">
                         <span className="text-slate-900">Total:</span>
