@@ -94,5 +94,26 @@
   <body class="bg-gray-100">
     <div id="root"></div>
     <script type="module" src="/index.tsx"></script>
+
+    <!-- Service Worker Registration for PWA -->
+    <script>
+      // Register service worker for PWA functionality
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js')
+            .then((registration) => {
+              console.log('✅ Service Worker registrado:', registration.scope);
+
+              // Check for updates periodically
+              setInterval(() => {
+                registration.update();
+              }, 1000 * 60 * 60); // Check every hour
+            })
+            .catch((error) => {
+              console.log('❌ Error al registrar Service Worker:', error);
+            });
+        });
+      }
+    </script>
   </body>
 </html>
