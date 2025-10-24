@@ -5,38 +5,66 @@ import Toast from '../components/Toast';
 import type { Product, CartItem } from '../types';
 
 const ProductCard: React.FC<{ product: Product; onClick: () => void; }> = ({ product, onClick }) => (
-    <div
+    <button
         onClick={onClick}
-        className="bg-white rounded-xl sm:rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg transition-shadow duration-200 group flex flex-col h-full"
+        className="bg-white rounded-xl sm:rounded-2xl shadow-md overflow-hidden cursor-pointer hover:shadow-lg active:shadow-xl transition-shadow duration-200 group flex flex-col h-full text-left w-full min-h-[44px] touch-manipulation"
+        aria-label={`Agregar ${product.name} al carrito`}
     >
-        <img src={product.imageUrl} alt={product.name} className="h-24 sm:h-32 md:h-40 w-full object-cover" />
+        <img src={product.imageUrl} alt={product.name} className="h-28 sm:h-32 md:h-40 w-full object-cover" />
         <div className="p-2 sm:p-3 flex-1 flex flex-col justify-between">
-            <h3 className="text-xs sm:text-sm font-semibold text-slate-800 line-clamp-2 group-hover:text-zinc-700">{product.name}</h3>
-            <p className="text-sm sm:text-lg font-bold text-slate-900 mt-1">${product.price.toFixed(2)}</p>
+            <h3 className="text-sm sm:text-sm font-semibold text-slate-800 line-clamp-2 group-hover:text-zinc-700">{product.name}</h3>
+            <p className="text-base sm:text-lg font-bold text-slate-900 mt-1">${product.price.toFixed(2)}</p>
         </div>
-    </div>
+    </button>
 );
 
 const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
     const { updateCartQuantity, removeFromCart } = useAppContext();
     return (
-        <div className="flex items-center justify-between py-3">
-            <div className="flex-1">
-                <p className="font-medium text-sm text-slate-800">{item.name}</p>
+        <div className="flex items-center justify-between py-3 gap-2">
+            <div className="flex-1 min-w-0">
+                <p className="font-medium text-sm text-slate-800 truncate">{item.name}</p>
                 <p className="text-xs text-slate-500">${item.price.toFixed(2)}</p>
             </div>
-            <div className="flex items-center">
-                <input 
-                    type="number" 
-                    value={item.quantity} 
-                    onChange={(e) => updateCartQuantity(item.id, parseInt(e.target.value))}
-                    className="w-14 text-center border-slate-300 rounded-lg shadow-sm py-1 text-sm mx-2"
+            {/* Large touch-friendly quantity controls */}
+            <div className="flex items-center gap-1 sm:gap-2">
+                <button
+                    onClick={() => updateCartQuantity(item.id, Math.max(1, item.quantity - 1))}
+                    className="min-w-[44px] min-h-[44px] w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-700 transition-colors touch-manipulation"
+                    aria-label="Disminuir cantidad"
+                >
+                    −
+                </button>
+                <input
+                    type="number"
+                    inputMode="numeric"
+                    pattern="[0-9]*"
+                    value={item.quantity}
+                    onChange={(e) => {
+                        const val = parseInt(e.target.value);
+                        if (!isNaN(val) && val >= 1) {
+                            updateCartQuantity(item.id, val);
+                        }
+                    }}
+                    className="w-12 sm:w-14 text-center border-slate-300 rounded-lg shadow-sm py-2 sm:py-1 text-base sm:text-sm focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
+                    style={{ fontSize: '16px' }}
                     min="1"
                 />
+                <button
+                    onClick={() => updateCartQuantity(item.id, item.quantity + 1)}
+                    className="min-w-[44px] min-h-[44px] w-10 h-10 sm:w-8 sm:h-8 flex items-center justify-center bg-slate-100 hover:bg-slate-200 active:bg-slate-300 rounded-lg font-bold text-slate-700 transition-colors touch-manipulation"
+                    aria-label="Aumentar cantidad"
+                >
+                    +
+                </button>
             </div>
-            <p className="w-16 text-right font-medium text-sm text-slate-900">${(item.price * item.quantity).toFixed(2)}</p>
-            <button onClick={() => removeFromCart(item.id)} className="ml-2 p-1 text-slate-500 hover:text-red-600 rounded-full">
-                <TrashIcon className="h-4 w-4" />
+            <p className="w-16 sm:w-20 text-right font-medium text-sm text-slate-900">${(item.price * item.quantity).toFixed(2)}</p>
+            <button
+                onClick={() => removeFromCart(item.id)}
+                className="min-w-[44px] min-h-[44px] p-2 sm:p-1 text-slate-500 hover:text-red-600 active:text-red-700 rounded-full transition-colors touch-manipulation"
+                aria-label="Eliminar del carrito"
+            >
+                <TrashIcon className="h-5 w-5 sm:h-4 sm:w-4" />
             </button>
         </div>
     );
@@ -47,6 +75,7 @@ const Cart: React.FC = () => {
     const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
     const [customClientName, setCustomClientName] = useState('');
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
+    // Note: 'Crédito' is handled specially and converted to appropriate payment method in createOrder
     const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Crédito'>('Efectivo');
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
@@ -71,7 +100,9 @@ const Cart: React.FC = () => {
 
         setIsProcessing(true);
         try {
-            await createOrder({ clientName, serviceType, paymentMethod, customerId });
+            // Convert 'Crédito' to 'Efectivo' for API (credit is tracked separately via customerId)
+            const apiPaymentMethod: 'Efectivo' | 'Tarjeta' = paymentMethod === 'Crédito' ? 'Efectivo' : paymentMethod;
+            await createOrder({ clientName, serviceType, paymentMethod: apiPaymentMethod, customerId });
             // Cart is already cleared by createOrder on success
             setIsCheckingOut(false);
             setSelectedCustomerId('');
@@ -96,20 +127,20 @@ const Cart: React.FC = () => {
             <div className="p-3 sm:p-4 border-b">
                 <h2 className="text-lg sm:text-xl font-bold text-slate-800">Orden Actual</h2>
             </div>
-            <div className="flex-1 overflow-y-auto p-3 sm:p-4">
+            <div className="flex-1 overflow-y-auto p-2 sm:p-4 overscroll-contain">
                 {cart.length > 0 ? (
                     cart.map(item => <CartItemRow key={item.id} item={item} />)
                 ) : (
                     <p className="text-center text-slate-500 mt-8">El carrito está vacío.</p>
                 )}
             </div>
-            
+
             {isCheckingOut && (
-                <div className="p-4 border-t">
-                    <h3 className="text-md font-semibold text-slate-700 mb-3">Detalles de la Orden</h3>
+                <div className="p-3 sm:p-4 border-t max-h-[50vh] overflow-y-auto overscroll-contain">
+                    <h3 className="text-base sm:text-md font-semibold text-slate-700 mb-3">Detalles de la Orden</h3>
                     <div className="space-y-3">
                         <div>
-                            <label htmlFor="customerSelect" className="block text-xs font-medium text-slate-600">Cliente</label>
+                            <label htmlFor="customerSelect" className="block text-sm font-medium text-slate-600 mb-1">Cliente</label>
                             <select
                                 name="customerSelect"
                                 id="customerSelect"
@@ -120,7 +151,8 @@ const Cart: React.FC = () => {
                                         setCustomClientName('');
                                     }
                                 }}
-                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"
+                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-3 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
+                                style={{ fontSize: '16px' }}
                             >
                                 <option value="">Seleccionar cliente...</option>
                                 {customers.map(customer => (
@@ -134,14 +166,15 @@ const Cart: React.FC = () => {
 
                         {selectedCustomerId === 'other' && (
                             <div>
-                                <label htmlFor="customClientName" className="block text-xs font-medium text-slate-600">Nombre del Cliente</label>
+                                <label htmlFor="customClientName" className="block text-sm font-medium text-slate-600 mb-1">Nombre del Cliente</label>
                                 <input
                                     type="text"
                                     name="customClientName"
                                     id="customClientName"
                                     value={customClientName}
                                     onChange={(e) => setCustomClientName(e.target.value)}
-                                    className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm"
+                                    className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-3 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
+                                    style={{ fontSize: '16px' }}
                                     placeholder="Escribe el nombre..."
                                 />
                             </div>
@@ -156,15 +189,29 @@ const Cart: React.FC = () => {
                         )}
 
                         <div>
-                            <label htmlFor="serviceType" className="block text-xs font-medium text-slate-600">Tipo de Servicio</label>
-                            <select name="serviceType" id="serviceType" value={serviceType} onChange={(e) => setServiceType(e.target.value as any)} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm">
+                            <label htmlFor="serviceType" className="block text-sm font-medium text-slate-600 mb-1">Tipo de Servicio</label>
+                            <select
+                                name="serviceType"
+                                id="serviceType"
+                                value={serviceType}
+                                onChange={(e) => setServiceType(e.target.value as any)}
+                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-3 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
+                                style={{ fontSize: '16px' }}
+                            >
                                 <option>Mesa</option>
                                 <option>Para llevar</option>
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="paymentMethod" className="block text-xs font-medium text-slate-600">Método de Pago</label>
-                             <select name="paymentMethod" id="paymentMethod" value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value as any)} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-1.5 px-2 sm:text-sm">
+                            <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-600 mb-1">Método de Pago</label>
+                            <select
+                                name="paymentMethod"
+                                id="paymentMethod"
+                                value={paymentMethod}
+                                onChange={(e) => setPaymentMethod(e.target.value as any)}
+                                className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-3 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500"
+                                style={{ fontSize: '16px' }}
+                            >
                                 <option>Efectivo</option>
                                 <option>Tarjeta</option>
                                 {selectedCustomer && <option>Crédito</option>}
@@ -191,7 +238,7 @@ const Cart: React.FC = () => {
                 </div>
             )}
 
-            <div className="p-4 pb-6 lg:pb-4 border-t bg-slate-50 rounded-b-3xl">
+            <div className="p-3 sm:p-4 pb-6 lg:pb-4 border-t bg-slate-50 rounded-b-3xl">
                  <div className="space-y-2 text-sm mb-4">
                      {discount > 0 && (
                          <>
@@ -210,11 +257,21 @@ const Cart: React.FC = () => {
                         <span>${finalTotal.toFixed(2)}</span>
                     </div>
                 </div>
-                <div className="flex space-x-2">
-                     <button onClick={isCheckingOut ? handleCancelCheckout : clearCart} disabled={isProcessing} className="w-full py-3 px-4 bg-white border border-slate-300 rounded-xl text-sm font-semibold text-slate-700 hover:bg-slate-100 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                <div className="flex gap-2 sm:gap-3">
+                     <button
+                        onClick={isCheckingOut ? handleCancelCheckout : clearCart}
+                        disabled={isProcessing}
+                        className="min-h-[44px] flex-1 py-3 px-3 sm:px-4 bg-white border border-slate-300 rounded-xl text-base sm:text-sm font-semibold text-slate-700 hover:bg-slate-100 active:bg-slate-200 transition-colors disabled:opacity-50 disabled:cursor-not-allowed touch-manipulation"
+                        style={{ fontSize: '16px' }}
+                    >
                         {isCheckingOut ? 'Cancelar' : 'Limpiar'}
                     </button>
-                    <button onClick={handleCheckout} disabled={cart.length === 0 || isProcessing} className="w-full py-3 px-4 bg-zinc-900 rounded-xl text-sm font-semibold text-white hover:bg-zinc-800 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed">
+                    <button
+                        onClick={handleCheckout}
+                        disabled={cart.length === 0 || isProcessing}
+                        className="min-h-[44px] flex-1 py-3 px-3 sm:px-4 bg-zinc-900 rounded-xl text-base sm:text-sm font-semibold text-white hover:bg-zinc-800 active:bg-zinc-700 transition-colors disabled:bg-zinc-400 disabled:cursor-not-allowed touch-manipulation"
+                        style={{ fontSize: '16px' }}
+                    >
                         {isProcessing ? '⏳ Procesando...' : (isCheckingOut ? `Pagar $${finalTotal.toFixed(2)}` : 'Cobrar')}
                     </button>
                 </div>
@@ -227,6 +284,17 @@ const SalesScreen: React.FC = () => {
     const { products, addToCart } = useAppContext();
     const [toastMessage, setToastMessage] = useState<{ message: string; productName: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
+    const [isMobile, setIsMobile] = useState(false);
+
+    // Detect mobile device on mount
+    React.useEffect(() => {
+        const checkMobile = () => {
+            setIsMobile(window.innerWidth < 1024);
+        };
+        checkMobile();
+        window.addEventListener('resize', checkMobile);
+        return () => window.removeEventListener('resize', checkMobile);
+    }, []);
 
     const handleAddToCart = (product: Product) => {
         addToCart(product);
@@ -274,16 +342,19 @@ const SalesScreen: React.FC = () => {
                         </div>
                         <input
                             type="text"
-                            placeholder="Buscar productos por nombre, categoría o descripción..."
+                            inputMode="search"
+                            placeholder="Buscar productos..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
-                            className="w-full pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3 border border-slate-300 rounded-xl sm:rounded-2xl shadow-sm focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 text-sm sm:text-base transition-all"
-                            autoFocus
+                            className="w-full pl-10 sm:pl-12 pr-12 py-3 sm:py-3 border border-slate-300 rounded-xl sm:rounded-2xl shadow-sm focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 text-base transition-all"
+                            style={{ fontSize: '16px' }}
+                            autoFocus={!isMobile}
                         />
                         {searchQuery && (
                             <button
                                 onClick={() => setSearchQuery('')}
-                                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-slate-400 hover:text-slate-600"
+                                className="absolute inset-y-0 right-0 pr-3 sm:pr-4 flex items-center text-slate-400 hover:text-slate-600 active:text-slate-800 min-w-[44px] min-h-[44px] touch-manipulation"
+                                aria-label="Limpiar búsqueda"
                             >
                                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -310,9 +381,9 @@ const SalesScreen: React.FC = () => {
                     </div>
                 ) : (
                     Object.entries(groupedProducts).map(([category, productsInCategory]) => (
-                        <div key={category} className="mb-8">
-                            <h2 className="text-xl font-semibold text-slate-700 mb-4 border-b pb-2">{category}</h2>
-                            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-4">
+                        <div key={category} className="mb-6 sm:mb-8">
+                            <h2 className="text-lg sm:text-xl font-semibold text-slate-700 mb-3 sm:mb-4 border-b pb-2">{category}</h2>
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-2 sm:gap-3 md:gap-4">
                                 {productsInCategory.map(product => (
                                     <ProductCard key={product.id} product={product} onClick={() => handleAddToCart(product)} />
                                 ))}

@@ -1,3 +1,41 @@
+/* ================================================
+   CONEJO NEGRO POS - MOBILE-RESPONSIVE CSS
+   ================================================ */
+
+/* ================================================
+   CUSTOM PROPERTIES (CSS VARIABLES)
+   ================================================ */
+:root {
+  /* Safe areas for notched devices */
+  --safe-area-inset-top: env(safe-area-inset-top, 0px);
+  --safe-area-inset-right: env(safe-area-inset-right, 0px);
+  --safe-area-inset-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-area-inset-left: env(safe-area-inset-left, 0px);
+
+  /* Touch target sizes */
+  --touch-target-min: 44px;
+  --touch-target-comfortable: 48px;
+
+  /* Animation durations */
+  --duration-fast: 150ms;
+  --duration-normal: 300ms;
+  --duration-slow: 500ms;
+
+  /* Z-index layers */
+  --z-base: 1;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-fixed: 30;
+  --z-modal-backdrop: 40;
+  --z-modal: 50;
+  --z-toast: 60;
+}
+
+/* ================================================
+   ANIMATIONS & KEYFRAMES
+   ================================================ */
+
+/* Existing animation - preserved */
 @keyframes slide-in-right {
   from {
     transform: translateX(100%);
@@ -11,4 +49,727 @@
 
 .animate-slide-in-right {
   animation: slide-in-right 0.3s ease-out;
+}
+
+/* New mobile-optimized animations */
+@keyframes slide-in-left {
+  from {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-up {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slide-in-down {
+  from {
+    transform: translateY(-100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes scale-out {
+  from {
+    transform: scale(1);
+    opacity: 1;
+  }
+  to {
+    transform: scale(0.95);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce-in {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-10px); }
+  75% { transform: translateX(10px); }
+}
+
+@keyframes pulse-subtle {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+/* Animation utility classes */
+.animate-slide-in-left {
+  animation: slide-in-left var(--duration-normal) ease-out;
+}
+
+.animate-slide-in-up {
+  animation: slide-in-up var(--duration-normal) ease-out;
+}
+
+.animate-slide-in-down {
+  animation: slide-in-down var(--duration-normal) ease-out;
+}
+
+.animate-fade-in {
+  animation: fade-in var(--duration-normal) ease-in;
+}
+
+.animate-fade-out {
+  animation: fade-out var(--duration-normal) ease-out;
+}
+
+.animate-scale-in {
+  animation: scale-in var(--duration-fast) ease-out;
+}
+
+.animate-scale-out {
+  animation: scale-out var(--duration-fast) ease-in;
+}
+
+.animate-bounce-in {
+  animation: bounce-in var(--duration-slow) ease-out;
+}
+
+.animate-shake {
+  animation: shake 0.4s ease-in-out;
+}
+
+.animate-pulse-subtle {
+  animation: pulse-subtle 2s ease-in-out infinite;
+}
+
+/* ================================================
+   TOUCH-FRIENDLY STYLES
+   ================================================ */
+
+/* Minimum touch target size */
+.touch-target {
+  min-height: var(--touch-target-min);
+  min-width: var(--touch-target-min);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.touch-target-lg {
+  min-height: var(--touch-target-comfortable);
+  min-width: var(--touch-target-comfortable);
+}
+
+/* Remove tap highlight on mobile */
+button,
+a,
+[role="button"],
+[type="button"],
+[type="submit"],
+[type="reset"] {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+/* Better touch feedback */
+.touch-feedback {
+  transition: transform var(--duration-fast) ease-out,
+              background-color var(--duration-fast) ease-out;
+}
+
+.touch-feedback:active {
+  transform: scale(0.97);
+}
+
+/* Prevent text selection on buttons and controls */
+.no-select {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+/* ================================================
+   MOBILE-SPECIFIC UTILITIES
+   ================================================ */
+
+/* Smooth scrolling with momentum */
+.scroll-smooth-mobile {
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+
+/* Hide scrollbars on mobile while keeping functionality */
+.scrollbar-hidden {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.scrollbar-hidden::-webkit-scrollbar {
+  display: none; /* Chrome, Safari, Opera */
+}
+
+/* Thin scrollbars for small screens */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(156, 163, 175, 0.5) transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: rgba(156, 163, 175, 0.5);
+  border-radius: 2px;
+}
+
+/* Safe area padding for notched devices */
+.safe-top {
+  padding-top: var(--safe-area-inset-top);
+}
+
+.safe-bottom {
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.safe-left {
+  padding-left: var(--safe-area-inset-left);
+}
+
+.safe-right {
+  padding-right: var(--safe-area-inset-right);
+}
+
+.safe-x {
+  padding-left: var(--safe-area-inset-left);
+  padding-right: var(--safe-area-inset-right);
+}
+
+.safe-y {
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
+}
+
+.safe-all {
+  padding-top: var(--safe-area-inset-top);
+  padding-right: var(--safe-area-inset-right);
+  padding-bottom: var(--safe-area-inset-bottom);
+  padding-left: var(--safe-area-inset-left);
+}
+
+/* Prevent zoom on input focus (iOS) */
+.no-zoom {
+  font-size: 16px !important;
+}
+
+/* Full viewport height accounting for mobile browsers */
+.vh-mobile {
+  height: 100vh;
+  height: -webkit-fill-available;
+  min-height: -webkit-fill-available;
+}
+
+/* ================================================
+   PERFORMANCE OPTIMIZATIONS
+   ================================================ */
+
+/* Hardware acceleration for smoother animations */
+.gpu-accelerated {
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  will-change: transform;
+}
+
+.gpu-accelerated-opacity {
+  will-change: opacity;
+}
+
+/* Optimize rendering for mobile */
+.optimize-rendering {
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  -webkit-perspective: 1000px;
+  perspective: 1000px;
+}
+
+/* ================================================
+   DARK MODE SUPPORT
+   ================================================ */
+
+@media (prefers-color-scheme: dark) {
+  .scrollbar-thin {
+    scrollbar-color: rgba(75, 85, 99, 0.5) transparent;
+  }
+
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background-color: rgba(75, 85, 99, 0.5);
+  }
+}
+
+/* ================================================
+   ACCESSIBILITY FEATURES
+   ================================================ */
+
+/* Enhanced focus indicators for keyboard navigation */
+.focus-visible-enhanced:focus-visible {
+  outline: 3px solid #3b82f6;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Skip focus on mouse/touch, show on keyboard */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* Reduced motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-slide-in-right,
+  .animate-slide-in-left,
+  .animate-slide-in-up,
+  .animate-slide-in-down,
+  .animate-fade-in,
+  .animate-fade-out,
+  .animate-scale-in,
+  .animate-scale-out,
+  .animate-bounce-in,
+  .animate-shake,
+  .animate-pulse-subtle {
+    animation: none !important;
+  }
+}
+
+/* Screen reader only content */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* ================================================
+   RESPONSIVE MEDIA QUERIES
+   ================================================ */
+
+/* ===== PHONES (320px - 767px) ===== */
+@media (max-width: 767px) {
+  /* Spacing adjustments for small screens */
+  .mobile\:p-compact {
+    padding: 0.75rem !important;
+  }
+
+  .mobile\:px-compact {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+
+  .mobile\:py-compact {
+    padding-top: 0.75rem !important;
+    padding-bottom: 0.75rem !important;
+  }
+
+  /* Full width buttons on mobile */
+  .mobile\:btn-full {
+    width: 100% !important;
+    display: block !important;
+  }
+
+  /* Stack items vertically on mobile */
+  .mobile\:stack {
+    flex-direction: column !important;
+  }
+
+  /* Hide on mobile */
+  .mobile\:hidden {
+    display: none !important;
+  }
+
+  /* Text size adjustments */
+  .mobile\:text-sm {
+    font-size: 0.875rem !important;
+    line-height: 1.25rem !important;
+  }
+
+  .mobile\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+
+  /* Bottom navigation spacing */
+  .mobile\:pb-nav {
+    padding-bottom: calc(4rem + var(--safe-area-inset-bottom)) !important;
+  }
+
+  /* Fixed bottom bar */
+  .mobile\:fixed-bottom {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: var(--z-fixed);
+    padding-bottom: var(--safe-area-inset-bottom);
+  }
+
+  /* Modal adjustments for mobile */
+  .mobile\:modal-fullscreen {
+    position: fixed !important;
+    inset: 0 !important;
+    border-radius: 0 !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+}
+
+/* Extra small phones (320px - 374px) */
+@media (max-width: 374px) {
+  .xs\:text-xs {
+    font-size: 0.75rem !important;
+    line-height: 1rem !important;
+  }
+
+  .xs\:p-xs {
+    padding: 0.5rem !important;
+  }
+
+  .xs\:gap-xs {
+    gap: 0.5rem !important;
+  }
+}
+
+/* ===== TABLETS PORTRAIT (768px - 1023px) ===== */
+@media (min-width: 768px) and (max-width: 1023px) {
+  /* Better use of tablet space */
+  .tablet\:grid-2 {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+
+  .tablet\:grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+  }
+
+  /* Sidebar width for tablets */
+  .tablet\:sidebar {
+    width: 20rem;
+  }
+
+  /* Card layouts for tablets */
+  .tablet\:card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1.5rem;
+  }
+
+  /* Show on tablet */
+  .tablet\:block {
+    display: block !important;
+  }
+
+  .tablet\:flex {
+    display: flex !important;
+  }
+
+  /* Tablet-specific spacing */
+  .tablet\:p-6 {
+    padding: 1.5rem !important;
+  }
+
+  /* Two-column layout for tablets */
+  .tablet\:two-col {
+    column-count: 2;
+    column-gap: 2rem;
+  }
+}
+
+/* ===== TABLETS LANDSCAPE & DESKTOP (1024px+) ===== */
+@media (min-width: 1024px) {
+  /* Desktop-specific layouts */
+  .desktop\:grid-4 {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1.5rem;
+  }
+
+  .desktop\:sidebar-wide {
+    width: 24rem;
+  }
+
+  /* Hover effects only on desktop (no touch) */
+  @media (hover: hover) and (pointer: fine) {
+    .hover\:scale {
+      transition: transform var(--duration-fast) ease-out;
+    }
+
+    .hover\:scale:hover {
+      transform: scale(1.05);
+    }
+
+    .hover\:lift {
+      transition: transform var(--duration-fast) ease-out,
+                  box-shadow var(--duration-fast) ease-out;
+    }
+
+    .hover\:lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+                  0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    }
+  }
+
+  /* Desktop spacing */
+  .desktop\:p-8 {
+    padding: 2rem !important;
+  }
+
+  /* Show on desktop */
+  .desktop\:block {
+    display: block !important;
+  }
+
+  /* Hide on desktop */
+  .desktop\:hidden {
+    display: none !important;
+  }
+}
+
+/* ================================================
+   ORIENTATION-SPECIFIC STYLES
+   ================================================ */
+
+@media (orientation: portrait) {
+  .portrait\:stack {
+    flex-direction: column !important;
+  }
+
+  .portrait\:full-width {
+    width: 100% !important;
+  }
+}
+
+@media (orientation: landscape) {
+  .landscape\:row {
+    flex-direction: row !important;
+  }
+
+  .landscape\:split {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+  }
+}
+
+/* ================================================
+   UTILITY CLASSES
+   ================================================ */
+
+/* Backdrop blur for modals */
+.backdrop-blur-mobile {
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+/* Sticky positioning with safe areas */
+.sticky-top-safe {
+  position: sticky;
+  top: var(--safe-area-inset-top);
+  z-index: var(--z-sticky);
+}
+
+/* Gradient overlays for better readability */
+.gradient-overlay-bottom {
+  position: relative;
+}
+
+.gradient-overlay-bottom::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 4rem;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent);
+  pointer-events: none;
+}
+
+/* Card shadows optimized for mobile */
+.shadow-mobile {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1),
+              0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-mobile-lg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1),
+              0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+/* Dividers */
+.divider-mobile {
+  height: 1px;
+  background: linear-gradient(to right, transparent, rgba(156, 163, 175, 0.3), transparent);
+  margin: 1rem 0;
+}
+
+/* Loading states */
+.loading-spinner {
+  border: 2px solid rgba(0, 0, 0, 0.1);
+  border-left-color: currentColor;
+  border-radius: 50%;
+  width: 1.5rem;
+  height: 1.5rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton loading */
+.skeleton {
+  background: linear-gradient(90deg,
+    #f0f0f0 25%,
+    #e0e0e0 50%,
+    #f0f0f0 75%);
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s ease-in-out infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-color-scheme: dark) {
+  .skeleton {
+    background: linear-gradient(90deg,
+      #2d2d2d 25%,
+      #3d3d3d 50%,
+      #2d2d2d 75%);
+    background-size: 200% 100%;
+  }
+}
+
+/* Toast notifications positioning */
+.toast-container {
+  position: fixed;
+  top: calc(1rem + var(--safe-area-inset-top));
+  right: 1rem;
+  left: 1rem;
+  z-index: var(--z-toast);
+  pointer-events: none;
+}
+
+.toast-container > * {
+  pointer-events: auto;
+}
+
+@media (min-width: 768px) {
+  .toast-container {
+    left: auto;
+    width: 24rem;
+  }
+}
+
+/* ================================================
+   PERFORMANCE HINTS FOR LOW-END DEVICES
+   ================================================ */
+
+@media (prefers-reduced-data: reduce) {
+  /* Reduce visual effects on data-saving mode */
+  .backdrop-blur-mobile {
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+    background-color: rgba(0, 0, 0, 0.7);
+  }
+
+  .shadow-mobile,
+  .shadow-mobile-lg {
+    box-shadow: none;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+}
+
+/* ================================================
+   PRINT STYLES
+   ================================================ */
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+
+  .print-full-width {
+    width: 100% !important;
+  }
+
+  /* Remove animations and transitions for printing */
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
