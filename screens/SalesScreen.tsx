@@ -130,11 +130,11 @@ const Cart: React.FC = () => {
     }
 
     return (
-        <div className="bg-white rounded-xl sm:rounded-3xl shadow-md flex flex-col h-64 sm:h-80 lg:h-full">
-            <div className="p-3 sm:p-4 border-b">
+        <div className={`bg-white rounded-xl sm:rounded-3xl shadow-md flex flex-col ${isCheckingOut ? 'h-[calc(100vh-8rem)]' : 'h-64'} sm:h-80 lg:h-full transition-all duration-300`}>
+            <div className="p-3 sm:p-4 border-b flex-shrink-0">
                 <h2 className="text-lg sm:text-xl font-bold text-slate-800">Orden Actual</h2>
             </div>
-            <div className="flex-1 overflow-y-auto p-2 sm:p-4 overscroll-contain">
+            <div className={`flex-1 overflow-y-auto p-2 sm:p-4 overscroll-contain ${isCheckingOut ? 'hidden sm:block' : ''}`}>
                 {cart.length > 0 ? (
                     cart.map(item => <CartItemRow key={item.id} item={item} />)
                 ) : (
@@ -143,11 +143,11 @@ const Cart: React.FC = () => {
             </div>
 
             {isCheckingOut && (
-                <div className="p-3 sm:p-4 border-t max-h-[70vh] sm:max-h-[50vh] overflow-y-auto overscroll-contain">
-                    <h3 className="text-base sm:text-md font-semibold text-slate-700 mb-2 sm:mb-3">Detalles de la Orden</h3>
-                    <div className="space-y-2 sm:space-y-3">
+                <div className="flex-1 p-3 sm:p-4 border-t overflow-y-auto overscroll-contain">
+                    <h3 className="text-base sm:text-lg font-semibold text-slate-700 mb-3 sm:mb-3">Detalles de la Orden</h3>
+                    <div className="space-y-3 sm:space-y-3">
                         <div>
-                            <label htmlFor="customerSelect" className="block text-xs sm:text-sm font-medium text-slate-600 mb-1">Cliente</label>
+                            <label htmlFor="customerSelect" className="block text-sm font-medium text-slate-700 mb-2">Cliente</label>
                             <select
                                 name="customerSelect"
                                 id="customerSelect"
@@ -158,7 +158,7 @@ const Cart: React.FC = () => {
                                         setCustomClientName('');
                                     }
                                 }}
-                                className="min-h-[44px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-2.5 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation"
+                                className="min-h-[52px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-3 px-4 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation bg-white"
                                 style={{ fontSize: '16px' }}
                             >
                                 <option value="">Seleccionar cliente...</option>
@@ -173,14 +173,14 @@ const Cart: React.FC = () => {
 
                         {selectedCustomerId === 'other' && (
                             <div>
-                                <label htmlFor="customClientName" className="block text-xs sm:text-sm font-medium text-slate-600 mb-1">Nombre del Cliente</label>
+                                <label htmlFor="customClientName" className="block text-sm font-medium text-slate-700 mb-2">Nombre del Cliente</label>
                                 <input
                                     type="text"
                                     name="customClientName"
                                     id="customClientName"
                                     value={customClientName}
                                     onChange={(e) => setCustomClientName(e.target.value)}
-                                    className="min-h-[44px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-2.5 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation"
+                                    className="min-h-[52px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-3 px-4 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation bg-white"
                                     style={{ fontSize: '16px' }}
                                     placeholder="Escribe el nombre..."
                                 />
@@ -196,13 +196,13 @@ const Cart: React.FC = () => {
                         )}
 
                         <div>
-                            <label htmlFor="serviceType" className="block text-xs sm:text-sm font-medium text-slate-600 mb-1">Tipo de Servicio</label>
+                            <label htmlFor="serviceType" className="block text-sm font-medium text-slate-700 mb-2">Tipo de Servicio</label>
                             <select
                                 name="serviceType"
                                 id="serviceType"
                                 value={serviceType}
                                 onChange={(e) => setServiceType(e.target.value as any)}
-                                className="min-h-[44px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-2.5 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation"
+                                className="min-h-[52px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-3 px-4 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation bg-white"
                                 style={{ fontSize: '16px' }}
                             >
                                 <option>Mesa</option>
@@ -210,13 +210,13 @@ const Cart: React.FC = () => {
                             </select>
                         </div>
                         <div>
-                            <label htmlFor="paymentMethod" className="block text-xs sm:text-sm font-medium text-slate-600 mb-1">Método de Pago</label>
+                            <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-700 mb-2">Método de Pago</label>
                             <select
                                 name="paymentMethod"
                                 id="paymentMethod"
                                 value={paymentMethod}
                                 onChange={(e) => setPaymentMethod(e.target.value as any)}
-                                className="min-h-[44px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-2.5 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation"
+                                className="min-h-[52px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-3 px-4 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation bg-white"
                                 style={{ fontSize: '16px' }}
                             >
                                 <option>Efectivo</option>
@@ -226,7 +226,7 @@ const Cart: React.FC = () => {
                         </div>
 
                         <div>
-                            <label htmlFor="tipAmount" className="block text-xs sm:text-sm font-medium text-slate-600 mb-1">Propina (opcional)</label>
+                            <label htmlFor="tipAmount" className="block text-sm font-medium text-slate-700 mb-2">Propina (opcional)</label>
                             <input
                                 type="number"
                                 inputMode="decimal"
@@ -234,7 +234,7 @@ const Cart: React.FC = () => {
                                 id="tipAmount"
                                 value={tip}
                                 onChange={(e) => setTip(parseFloat(e.target.value) || 0)}
-                                className="min-h-[44px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-2.5 px-3 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation"
+                                className="min-h-[52px] block w-full border-2 border-slate-300 rounded-xl shadow-sm py-3 px-4 text-base focus:ring-2 focus:ring-zinc-500 focus:border-zinc-500 touch-manipulation bg-white"
                                 style={{ fontSize: '16px' }}
                                 placeholder="0.00"
                                 min="0"
