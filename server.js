@@ -215,6 +215,20 @@ async function setupAndGetDataStore() {
                     END $$;
                 `);
                 console.log('✅ Auto-migrations completed successfully');
+
+                // Update existing orders with NULL discount/tip to default 0
+                console.log('🔄 Updating existing orders with NULL discount/tip...');
+                const updateResult = await client.query(`
+                    UPDATE orders
+                    SET discount = COALESCE(discount, 0),
+                        tip = COALESCE(tip, 0)
+                    WHERE discount IS NULL OR tip IS NULL
+                `);
+                if (updateResult.rowCount > 0) {
+                    console.log(`✅ Updated ${updateResult.rowCount} order(s) with default discount/tip values`);
+                } else {
+                    console.log('✅ All orders already have discount/tip values');
+                }
             } catch (migrationError) {
                 console.error('⚠️ Auto-migration warning:', migrationError.message);
                 // Don't fail startup if migration has issues
