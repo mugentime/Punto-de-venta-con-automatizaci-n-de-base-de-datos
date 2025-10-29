@@ -2,10 +2,14 @@ import React, { useState } from 'react';
 import StatCard from '../components/StatCard';
 import { useAppContext } from '../contexts/AppContext';
 import { SalesIcon, ProductsIcon, HistoryIcon, DashboardIcon, ExpenseIcon, CashIcon } from '../components/Icons';
+import { deduplicateOrders } from '../utils/deduplication';
 
 const DashboardScreen: React.FC = () => {
     const { orders, expenses, coworkingSessions } = useAppContext();
     const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('today');
+
+    // FIX BUG 4: Deduplicate orders before calculations
+    const deduplicatedOrders = deduplicateOrders(orders);
 
     const TimeframeButton: React.FC<{
       label: string;
@@ -44,7 +48,7 @@ const DashboardScreen: React.FC = () => {
         }
     };
     
-    const filteredOrders = filterByTimeframe(orders);
+    const filteredOrders = filterByTimeframe(deduplicatedOrders);
     const filteredExpenses = filterByTimeframe(expenses);
 
     // Filter finished coworking sessions by timeframe

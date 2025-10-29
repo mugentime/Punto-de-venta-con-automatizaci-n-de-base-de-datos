@@ -37,6 +37,13 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
                 </div>
 
                 <div className="space-y-1 text-sm">
+                    <div className="flex justify-between"><span className="text-slate-600">Subtotal:</span> <span className="text-slate-700">${order.subtotal.toFixed(2)}</span></div>
+                    {order.discount && order.discount > 0 && (
+                        <div className="flex justify-between text-green-600"><span>Descuento:</span> <span>-${order.discount.toFixed(2)}</span></div>
+                    )}
+                    {order.tip && order.tip > 0 && (
+                        <div className="flex justify-between"><span className="text-slate-600">Propina:</span> <span className="text-slate-700">+${order.tip.toFixed(2)}</span></div>
+                    )}
                     <div className="flex justify-between text-base font-bold pt-2 border-t mt-2"><span className="text-slate-800">Total:</span> <span>${order.total.toFixed(2)}</span></div>
                 </div>
             </div>

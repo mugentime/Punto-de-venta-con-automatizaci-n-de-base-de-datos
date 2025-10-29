@@ -447,20 +447,52 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     }
 
     // Order Function (updated for API)
-    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; tip?: number; }) => {
+    const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta' | 'Crédito'; customerId?: string; tip?: number; }) => {
         if(cart.length === 0) return;
 
-        console.log('💾 Creating order...', { clientName: orderDetails.clientName, total: cartTotal, items: cart.length, customerId: orderDetails.customerId, tip: orderDetails.tip });
+        // FIX BUG 3: Clear cart IMMEDIATELY to prevent duplicate orders during async operations
+        const orderCart = [...cart];
+        const orderSubtotal = cartSubtotal;
+
+        // FIX BUG 1: Calculate discount from customer
+        let discount = 0;
+        if (orderDetails.customerId) {
+            const customer = customers.find(c => c.id === orderDetails.customerId);
+            if (customer && customer.discountPercentage > 0) {
+                discount = orderSubtotal * (customer.discountPercentage / 100);
+                console.log(`💰 Applying ${customer.discountPercentage}% discount for ${customer.name}: -$${discount.toFixed(2)}`);
+            }
+        }
+
+        const tipAmount = orderDetails.tip || 0;
+        const orderTotal = orderSubtotal - discount + tipAmount;
+
+        clearCart();
+
+        console.log('💾 Creating order...', {
+            clientName: orderDetails.clientName,
+            subtotal: orderSubtotal,
+            discount,
+            tip: tipAmount,
+            total: orderTotal,
+            items: orderCart.length,
+            customerId: orderDetails.customerId
+        });
 
         try {
+            // FIX BUG 3: Generate idempotency key to prevent duplicate submissions
+            const idempotencyKey = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
             const orderData = {
                 ...orderDetails,
-                items: cart,
-                subtotal: cartSubtotal,
-                total: cartTotal,
+                items: orderCart,
+                subtotal: orderSubtotal,
+                discount, // FIX BUG 1: Include discount in order data
+                total: orderTotal,
                 userId: currentUser?.id || 'guest',
                 customerId: orderDetails.customerId || null,
-                tip: orderDetails.tip || 0,
+                tip: tipAmount,
+                idempotencyKey, // Add idempotency key
             };
 
             console.log('📡 Sending order to API...', orderData);
@@ -468,7 +500,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Create order in database
             const response = await fetch('/api/orders', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Idempotency-Key': idempotencyKey // Send in header too
+                },
                 body: JSON.stringify(orderData),
             });
 
@@ -477,6 +512,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             if (!response.ok) {
                 const errorText = await response.text();
                 console.error('❌ Server error:', response.status, errorText);
+                // Restore cart if order failed
+                orderCart.forEach(item => addToCart(item));
                 alert(`❌ Error al guardar la orden: ${response.status} - ${errorText}`);
                 throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
             }
@@ -488,16 +525,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             setOrders(prev => [newOrder, ...prev]);
 
             // Update stock for all items in the cart
-            const stockUpdates = cart.map(item => ({
+            const stockUpdates = orderCart.map(item => ({
                 id: item.id,
                 quantity: item.quantity
             }));
             await updateStockForSale(stockUpdates);
 
-            // Clear cart after successful order
-            clearCart();
-
-            alert(`✅ Venta guardada: ${orderDetails.clientName} - $${cartTotal.toFixed(2)}`);
+            alert(`✅ Venta guardada: ${orderDetails.clientName} - $${orderTotal.toFixed(2)}`);
         } catch (error) {
             console.error("❌ Error creating order:", error);
             alert(`❌ ERROR: La venta NO se guardó. ${error.message || error}`);

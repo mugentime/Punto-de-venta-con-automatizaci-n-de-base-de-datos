@@ -22,8 +22,10 @@ export interface Order {
   totalCost: number;
   clientName: string;
   serviceType: 'Mesa' | 'Para llevar';
-  paymentMethod: 'Efectivo' | 'Tarjeta';
+  paymentMethod: 'Efectivo' | 'Tarjeta' | 'Crédito'; // FIX BUG 2: Add Crédito
   tip?: number;
+  discount?: number; // FIX BUG 1: Add discount field
+  customerId?: string; // Add customerId for tracking
 }
 
 export type ExpenseCategory = 'Luz' | 'Internet' | 'Sueldos' | 'Inventario' | 'Otro';

@@ -72,6 +72,8 @@ async function setupAndGetDataStore() {
                 "paymentMethod" VARCHAR(50) NOT NULL,
                 items JSONB NOT NULL,
                 subtotal NUMERIC(10, 2) NOT NULL,
+                discount NUMERIC(10, 2) DEFAULT 0,
+                tip NUMERIC(10, 2) DEFAULT 0,
                 total NUMERIC(10, 2) NOT NULL,
                 "userId" VARCHAR(255),
                 "customerId" VARCHAR(255),
@@ -456,6 +458,8 @@ async function startServer() {
             res.json(result.rows.map(order => ({
                 ...order,
                 subtotal: parseFloat(order.subtotal),
+                discount: parseFloat(order.discount || 0),
+                tip: parseFloat(order.tip || 0),
                 total: parseFloat(order.total),
                 date: order.created_at,  // Map created_at to date for frontend compatibility
                 totalCost: order.items ? order.items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
@@ -466,14 +470,44 @@ async function startServer() {
         }
     });
 
+    // FIX BUG 3: Store for idempotency checking (in-memory cache for recent orders)
+    const recentOrderKeys = new Map(); // Map<idempotencyKey, orderId>
+    const ORDER_KEY_TTL = 60000; // 1 minute TTL for idempotency keys
+
     app.post('/api/orders', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { clientName, serviceType, paymentMethod, items, subtotal, total, userId, customerId } = req.body;
+            const { clientName, serviceType, paymentMethod, items, subtotal, discount, tip, total, userId, customerId, idempotencyKey } = req.body;
 
-            console.log('📦 Creating order:', { clientName, serviceType, paymentMethod, subtotal, total, userId, customerId, itemsCount: items?.length });
+            console.log('📦 Creating order:', { clientName, serviceType, paymentMethod, subtotal, discount: discount || 0, tip: tip || 0, total, userId, customerId, itemsCount: items?.length, idempotencyKey });
 
-            const id = `order-${Date.now()}`;
+            // FIX BUG 3: Check idempotency key to prevent duplicate submissions
+            if (idempotencyKey && recentOrderKeys.has(idempotencyKey)) {
+                const existingOrderId = recentOrderKeys.get(idempotencyKey);
+                console.log('⚠️ Duplicate order attempt detected via idempotency key:', idempotencyKey);
+
+                // Return existing order
+                const client = await pool.connect();
+                try {
+                    const result = await client.query('SELECT * FROM orders WHERE id = $1', [existingOrderId]);
+                    if (result.rows.length > 0) {
+                        const existingOrder = result.rows[0];
+                        return res.status(200).json({
+                            ...existingOrder,
+                            subtotal: parseFloat(existingOrder.subtotal),
+                            total: parseFloat(existingOrder.total),
+                            date: existingOrder.created_at,
+                            customerId: existingOrder.customerId,
+                            totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
+                            isDuplicate: true
+                        });
+                    }
+                } finally {
+                    client.release();
+                }
+            }
+
+            const id = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
             const client = await pool.connect();
 
             try {
@@ -484,13 +518,19 @@ async function startServer() {
 
                 console.log('💾 Inserting order into database...', { id, cleanCustomerId });
 
-                // Insert order
+                // Insert order with discount and tip
                 const result = await client.query(
-                    'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *',
-                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, total, userId, cleanCustomerId]
+                    'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, discount, tip, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, discount || 0, tip || 0, total, userId, cleanCustomerId]
                 );
                 const newOrder = result.rows[0];
-                console.log('✅ Order inserted successfully:', newOrder.id);
+                console.log('✅ Order inserted successfully:', newOrder.id, { discount: discount || 0, tip: tip || 0 });
+
+                // FIX BUG 3: Store idempotency key
+                if (idempotencyKey) {
+                    recentOrderKeys.set(idempotencyKey, id);
+                    setTimeout(() => recentOrderKeys.delete(idempotencyKey), ORDER_KEY_TTL);
+                }
 
                 // If it's a credit payment and customer exists, create credit record
                 if (cleanCustomerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
@@ -513,6 +553,8 @@ async function startServer() {
                 res.status(201).json({
                     ...newOrder,
                     subtotal: parseFloat(newOrder.subtotal),
+                    discount: parseFloat(newOrder.discount || 0),
+                    tip: parseFloat(newOrder.tip || 0),
                     total: parseFloat(newOrder.total),
                     date: newOrder.created_at,
                     customerId: newOrder.customerId,

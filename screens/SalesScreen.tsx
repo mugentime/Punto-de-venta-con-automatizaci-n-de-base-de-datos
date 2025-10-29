@@ -95,15 +95,20 @@ const Cart: React.FC = () => {
             return;
         }
 
+        // Prevent duplicate submissions
+        if (isProcessing) {
+            console.log('⚠️ Order already being processed, ignoring duplicate click');
+            return;
+        }
+
         // Determine client name and customer ID
         const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
         const customerId = selectedCustomer ? selectedCustomer.id : undefined;
 
         setIsProcessing(true);
         try {
-            // Convert 'Crédito' to 'Efectivo' for API (credit is tracked separately via customerId)
-            const apiPaymentMethod: 'Efectivo' | 'Tarjeta' = paymentMethod === 'Crédito' ? 'Efectivo' : paymentMethod;
-            await createOrder({ clientName, serviceType, paymentMethod: apiPaymentMethod, customerId, tip });
+            // FIX BUG 2: Send actual payment method (don't convert Crédito to Efectivo)
+            await createOrder({ clientName, serviceType, paymentMethod, customerId, tip });
             // Cart is already cleared by createOrder on success
             setIsCheckingOut(false);
             setSelectedCustomerId('');

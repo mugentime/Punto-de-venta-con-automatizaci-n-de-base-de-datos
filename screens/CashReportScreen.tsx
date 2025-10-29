@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import StatCard from '../components/StatCard';
 import { CashIcon, SalesIcon, HistoryIcon, DashboardIcon, ExpenseIcon, PlusIcon } from '../components/Icons';
+import { deduplicateOrders } from '../utils/deduplication';
 
 // Start Day Modal Component
 const StartDayModal: React.FC<{
@@ -175,10 +176,13 @@ const CashReportScreen: React.FC = () => {
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
+  // FIX BUG 4: Deduplicate orders before calculations
+  const deduplicatedOrders = deduplicateOrders(orders);
+
   const currentSession = cashSessions.find(s => s.status === 'open');
 
   // Logic for the active session view
-  const sessionOrders = currentSession ? orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate)) : [];
+  const sessionOrders = currentSession ? deduplicatedOrders.filter(o => new Date(o.date) >= new Date(currentSession.startDate)) : [];
   const sessionExpenses = currentSession ? expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate)) : [];
   const sessionCoworking = currentSession ? coworkingSessions.filter(s =>
     s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
@@ -303,7 +307,7 @@ const CashReportScreen: React.FC = () => {
     setSelectedDate(e.target.value);
   };
   
-  const filteredOrders = orders.filter(order => order.date && order.date.startsWith(selectedDate));
+  const filteredOrders = deduplicatedOrders.filter(order => order.date && order.date.startsWith(selectedDate));
   const filteredExpenses = expenses.filter(expense => expense.date && expense.date.startsWith(selectedDate));
   const filteredCoworkingHist = coworkingSessions.filter(s =>
     s.status === 'finished' && s.endTime && s.endTime.startsWith(selectedDate)

@@ -2,12 +2,16 @@ import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import StatCard from '../components/StatCard';
 import { SalesIcon, ProductsIcon, DashboardIcon, ExpenseIcon, CashIcon, HistoryIcon } from '../components/Icons';
+import { deduplicateOrders } from '../utils/deduplication';
 
 // Helper to format date to YYYY-MM-DD
 const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
     const { orders, expenses, coworkingSessions } = useAppContext();
+
+    // FIX BUG 4: Deduplicate orders before calculations
+    const deduplicatedOrders = useMemo(() => deduplicateOrders(orders), [orders]);
     
     const today = new Date();
     const startOfMonth = toISODateString(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -59,7 +63,7 @@ const ReportsScreen: React.FC = () => {
 
         // DEBUG: Log date range and sample data
         console.log('📅 Date Range:', { startDate, endDate });
-        console.log('📦 Total orders:', orders.length);
+        console.log('📦 Total orders (deduplicated):', deduplicatedOrders.length);
         console.log('🏢 Total coworking sessions:', coworkingSessions.length);
         if (orders.length > 0) {
             console.log('Sample order dates:', orders.slice(0, 3).map(o => ({
@@ -76,7 +80,7 @@ const ReportsScreen: React.FC = () => {
             })));
         }
 
-        const currentFilteredOrders = orders.filter(o => {
+        const currentFilteredOrders = deduplicatedOrders.filter(o => {
             const orderLocalDate = getLocalDateString(o.date);
             const isInRange = orderLocalDate >= startDate && orderLocalDate <= endDate;
             return isInRange;
