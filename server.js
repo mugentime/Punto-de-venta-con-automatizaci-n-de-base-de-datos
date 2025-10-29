@@ -195,6 +195,31 @@ async function setupAndGetDataStore() {
               );
             `);
 
+            // AUTO-MIGRATION: Add discount and tip columns if they don't exist
+            console.log('🔄 Running auto-migrations...');
+            try {
+                await client.query(`
+                    DO $$
+                    BEGIN
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                                      WHERE table_name = 'orders' AND column_name = 'discount') THEN
+                            ALTER TABLE orders ADD COLUMN discount NUMERIC(10, 2) DEFAULT 0;
+                            RAISE NOTICE 'Added discount column to orders table';
+                        END IF;
+
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                                      WHERE table_name = 'orders' AND column_name = 'tip') THEN
+                            ALTER TABLE orders ADD COLUMN tip NUMERIC(10, 2) DEFAULT 0;
+                            RAISE NOTICE 'Added tip column to orders table';
+                        END IF;
+                    END $$;
+                `);
+                console.log('✅ Auto-migrations completed successfully');
+            } catch (migrationError) {
+                console.error('⚠️ Auto-migration warning:', migrationError.message);
+                // Don't fail startup if migration has issues
+            }
+
             const res = await client.query('SELECT COUNT(*) FROM products');
             if (res.rows[0].count === '0') {
                 console.log('Seeding initial products into database...');
