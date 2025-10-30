@@ -198,11 +198,17 @@ const CashReportScreen: React.FC = () => {
   const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
   const cashSales = ordersCashSales + coworkingCashSales;
 
+  // Calculate credit sales (Crédito or Fiado)
+  const ordersCreditSales = sessionOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
+  const coworkingCreditSales = sessionCoworking.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
+  const creditSales = ordersCreditSales + coworkingCreditSales;
+
   // Calculate withdrawals for current session
   const sessionWithdrawals = currentSession ? cashWithdrawals.filter(w => w.cash_session_id === currentSession.id) : [];
   const totalWithdrawals = sessionWithdrawals.reduce((sum, w) => sum + w.amount, 0);
 
-  const cardSales = totalSales - cashSales;
+  // Card sales = Total - Cash - Credit
+  const cardSales = totalSales - cashSales - creditSales;
   const totalOrders = sessionOrders.length + sessionCoworking.length;
   const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalExpenses - totalWithdrawals : 0;
 
@@ -244,6 +250,7 @@ const CashReportScreen: React.FC = () => {
           <StatCard title="Efectivo Inicial" value={`$${currentSession.startAmount.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-gray-500" />} />
           <StatCard title="Ventas en Efectivo" value={`$${cashSales.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-green-600" />} />
           <StatCard title="Ventas con Tarjeta" value={`$${cardSales.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
+          <StatCard title="Ventas a Crédito" value={`$${creditSales.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-amber-600" />} />
           <StatCard title="Gastos" value={`$${totalExpenses.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
           <StatCard title="Retiros de Efectivo" value={`$${totalWithdrawals.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-orange-600" />} />
           <StatCard title="Total de Órdenes" value={totalOrders.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
@@ -325,7 +332,12 @@ const CashReportScreen: React.FC = () => {
   const coworkingCashHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
   const cashSalesHist = ordersCashHist + coworkingCashHist;
 
-  const cardSalesHist = totalSalesHist - cashSalesHist;
+  // Calculate credit sales (Crédito or Fiado) for historical view
+  const ordersCreditHist = filteredOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
+  const coworkingCreditHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
+  const creditSalesHist = ordersCreditHist + coworkingCreditHist;
+
+  const cardSalesHist = totalSalesHist - cashSalesHist - creditSalesHist;
   const totalOrdersHist = filteredOrders.length + filteredCoworkingHist.length;
 
   // Get all closed sessions for history (sorted by most recent first)
@@ -364,6 +376,7 @@ const CashReportScreen: React.FC = () => {
             <StatCard title="Balance Final" value={`$${finalBalanceHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-blue-600" />} />
             <StatCard title="Ventas en Efectivo" value={`$${cashSalesHist.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-cyan-600" />} />
             <StatCard title="Ventas con Tarjeta" value={`$${cardSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
+            <StatCard title="Ventas a Crédito" value={`$${creditSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-amber-600" />} />
             <StatCard title="Total de Órdenes" value={totalOrdersHist.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
         </div>
 
