@@ -78,7 +78,9 @@ const HistoryScreen: React.FC = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th className="p-4 text-sm font-semibold text-slate-600">ID Orden</th>
+                                <th className="p-4 text-sm font-semibold text-slate-600">Cliente</th>
+                                <th className="p-4 text-sm font-semibold text-slate-600">Tipo de Consumo</th>
+                                <th className="p-4 text-sm font-semibold text-slate-600">Método de Pago</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600">Fecha</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600">Items</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600 text-right">Total</th>
@@ -88,7 +90,27 @@ const HistoryScreen: React.FC = () => {
                         <tbody>
                             {orders.map(order => (
                                 <tr key={order.id} className="border-b hover:bg-slate-50">
-                                    <td className="p-4 text-sm text-slate-800 font-mono">{order.id}</td>
+                                    <td className="p-4 text-sm text-slate-800 font-medium">{order.clientName || 'Cliente general'}</td>
+                                    <td className="p-4 text-sm">
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            order.serviceType === 'Mesa'
+                                                ? 'bg-blue-100 text-blue-800'
+                                                : 'bg-green-100 text-green-800'
+                                        }`}>
+                                            {order.serviceType}
+                                        </span>
+                                    </td>
+                                    <td className="p-4 text-sm">
+                                        <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                                            order.paymentMethod === 'Efectivo'
+                                                ? 'bg-emerald-100 text-emerald-800'
+                                                : order.paymentMethod === 'Tarjeta'
+                                                ? 'bg-purple-100 text-purple-800'
+                                                : 'bg-amber-100 text-amber-800'
+                                        }`}>
+                                            {order.paymentMethod}
+                                        </span>
+                                    </td>
                                     <td className="p-4 text-sm text-slate-500">{new Date(order.date).toLocaleString()}</td>
                                     <td className="p-4 text-sm text-slate-500">{order.items.reduce((acc, item) => acc + item.quantity, 0)}</td>
                                     <td className="p-4 text-sm text-slate-800 font-medium text-right">${order.total.toFixed(2)}</td>
@@ -114,25 +136,41 @@ const HistoryScreen: React.FC = () => {
                 <div className="md:hidden">
                     {orders.map(order => (
                         <div key={order.id} className="border-b p-4">
-                            <div className="flex justify-between items-start">
-                                <div>
-                                    <p className="font-mono text-sm text-slate-700 font-semibold">{order.id}</p>
-                                    <p className="text-xs text-slate-500">{new Date(order.date).toLocaleString()}</p>
+                            <div className="flex justify-between items-start mb-2">
+                                <div className="flex-1">
+                                    <p className="text-sm text-slate-800 font-semibold">{order.clientName || 'Cliente general'}</p>
+                                    <p className="text-xs text-slate-500 mt-0.5">{new Date(order.date).toLocaleString()}</p>
                                 </div>
                                 <p className="text-lg font-bold text-slate-800">${order.total.toFixed(2)}</p>
                             </div>
-                            <div className="mt-2 flex justify-between items-center">
-                                <p className="text-sm text-slate-600">{order.items.reduce((acc, item) => acc + item.quantity, 0)} items</p>
-                                <div className="flex items-center space-x-2">
-                                    <button onClick={() => setSelectedOrder(order)} className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-200">Ver Detalles</button>
-                                    <button
-                                        onClick={() => handleDelete(order.id)}
-                                        className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors"
-                                        title="Eliminar orden"
-                                    >
-                                        <TrashIcon className="h-5 w-5" />
-                                    </button>
-                                </div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    order.serviceType === 'Mesa'
+                                        ? 'bg-blue-100 text-blue-800'
+                                        : 'bg-green-100 text-green-800'
+                                }`}>
+                                    {order.serviceType}
+                                </span>
+                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                    order.paymentMethod === 'Efectivo'
+                                        ? 'bg-emerald-100 text-emerald-800'
+                                        : order.paymentMethod === 'Tarjeta'
+                                        ? 'bg-purple-100 text-purple-800'
+                                        : 'bg-amber-100 text-amber-800'
+                                }`}>
+                                    {order.paymentMethod}
+                                </span>
+                                <span className="text-xs text-slate-500">{order.items.reduce((acc, item) => acc + item.quantity, 0)} items</span>
+                            </div>
+                            <div className="flex justify-end items-center space-x-2">
+                                <button onClick={() => setSelectedOrder(order)} className="px-3 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-lg hover:bg-slate-200">Ver Detalles</button>
+                                <button
+                                    onClick={() => handleDelete(order.id)}
+                                    className="p-2 text-slate-500 hover:text-red-600 rounded-full hover:bg-slate-100 transition-colors"
+                                    title="Eliminar orden"
+                                >
+                                    <TrashIcon className="h-5 w-5" />
+                                </button>
                             </div>
                         </div>
                     ))}
