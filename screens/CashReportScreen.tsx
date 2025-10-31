@@ -112,12 +112,11 @@ const CloseDayModal: React.FC<{
   sessionData: {
     startAmount: number;
     cashSales: number;
-    cashExpenses: number;
     cashWithdrawals: number;
   };
 }> = ({ isOpen, onClose, onConfirm, sessionData }) => {
   const [countedAmount, setCountedAmount] = useState('');
-  const expectedAmount = sessionData.startAmount + sessionData.cashSales - sessionData.cashExpenses - sessionData.cashWithdrawals;
+  const expectedAmount = sessionData.startAmount + sessionData.cashSales - sessionData.cashWithdrawals;
   const difference = parseFloat(countedAmount) - expectedAmount;
 
   const handleConfirm = () => {
@@ -139,7 +138,6 @@ const CloseDayModal: React.FC<{
         <div className="space-y-2 text-sm border-t border-b py-3 my-4">
           <div className="flex justify-between"><span className="text-slate-500">Efectivo Inicial:</span> <span className="font-medium">${sessionData.startAmount.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(+) Ventas en Efectivo:</span> <span className="font-medium text-green-600">${sessionData.cashSales.toFixed(2)}</span></div>
-          <div className="flex justify-between"><span className="text-slate-500">(-) Gastos en Efectivo Caja:</span> <span className="font-medium text-red-600">${sessionData.cashExpenses.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(-) Retiros de Efectivo:</span> <span className="font-medium text-orange-600">${sessionData.cashWithdrawals.toFixed(2)}</span></div>
           <div className="flex justify-between font-bold mt-2 pt-2 border-t"><span className="text-slate-800">Efectivo Esperado:</span> <span>${expectedAmount.toFixed(2)}</span></div>
         </div>
@@ -213,7 +211,7 @@ const CashReportScreen: React.FC = () => {
   // Card sales = Total - Cash - Credit
   const cardSales = totalSales - cashSales - creditSales;
   const totalOrders = sessionOrders.length + sessionCoworking.length;
-  const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalExpenses - totalWithdrawals : 0;
+  const expectedCash = currentSession ? currentSession.startAmount + cashSales - totalWithdrawals : 0;
 
   const handleWithdraw = async (amount: number, description: string) => {
     if (currentSession) {
@@ -304,7 +302,6 @@ const CashReportScreen: React.FC = () => {
           sessionData={{
             startAmount: currentSession.startAmount,
             cashSales: cashSales,
-            cashExpenses: totalExpenses,
             cashWithdrawals: totalWithdrawals
           }}
         />
