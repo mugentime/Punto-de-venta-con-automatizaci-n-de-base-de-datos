@@ -229,6 +229,32 @@ async function setupAndGetDataStore() {
                 } else {
                     console.log('✅ All orders already have discount/tip values');
                 }
+
+                // AUTO-MIGRATION: Add payment_method column to expenses table
+                console.log('🔄 Adding payment_method column to expenses...');
+                await client.query(`
+                    DO $$
+                    BEGIN
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                                      WHERE table_name = 'expenses' AND column_name = 'payment_method') THEN
+                            ALTER TABLE expenses ADD COLUMN payment_method VARCHAR(50) DEFAULT 'Efectivo Caja';
+                            RAISE NOTICE 'Added payment_method column to expenses table';
+                        END IF;
+                    END $$;
+                `);
+
+                // Update existing expenses with NULL payment_method to default 'Efectivo Caja'
+                console.log('🔄 Updating existing expenses with default payment_method...');
+                const expenseUpdateResult = await client.query(`
+                    UPDATE expenses
+                    SET payment_method = COALESCE(payment_method, 'Efectivo Caja')
+                    WHERE payment_method IS NULL
+                `);
+                if (expenseUpdateResult.rowCount > 0) {
+                    console.log(`✅ Updated ${expenseUpdateResult.rowCount} expense(s) with default payment_method`);
+                } else {
+                    console.log('✅ All expenses already have payment_method values');
+                }
             } catch (migrationError) {
                 console.error('⚠️ Auto-migration warning:', migrationError.message);
                 // Don't fail startup if migration has issues
@@ -680,7 +706,8 @@ async function startServer() {
             res.json(result.rows.map(expense => ({
                 ...expense,
                 amount: parseFloat(expense.amount),
-                date: expense.created_at  // Map created_at to date for frontend compatibility
+                date: expense.created_at,  // Map created_at to date for frontend compatibility
+                paymentMethod: expense.payment_method || 'Efectivo Caja'  // Map payment_method to paymentMethod
             })));
         } catch (error) {
             console.error("Error fetching expenses:", error);
@@ -691,17 +718,18 @@ async function startServer() {
     app.post('/api/expenses', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { description, amount, category, userId } = req.body;
+            const { description, amount, category, userId, paymentMethod } = req.body;
             const id = `expense-${Date.now()}`;
             const result = await pool.query(
-                'INSERT INTO expenses (id, description, amount, category, "userId") VALUES ($1, $2, $3, $4, $5) RETURNING *',
-                [id, description, amount, category, userId]
+                'INSERT INTO expenses (id, description, amount, category, "userId", payment_method) VALUES ($1, $2, $3, $4, $5, $6) RETURNING *',
+                [id, description, amount, category, userId, paymentMethod || 'Efectivo Caja']
             );
             const newExpense = result.rows[0];
             res.status(201).json({
                 ...newExpense,
                 amount: parseFloat(newExpense.amount),
-                date: newExpense.created_at  // Map created_at to date for frontend compatibility
+                date: newExpense.created_at,  // Map created_at to date for frontend compatibility
+                paymentMethod: newExpense.payment_method || 'Efectivo Caja'  // Map payment_method to paymentMethod
             });
         } catch (error) {
             console.error("Error creating expense:", error);
@@ -712,12 +740,12 @@ async function startServer() {
     app.put('/api/expenses/:id', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { description, amount, category, date } = req.body;
+            const { description, amount, category, date, paymentMethod } = req.body;
 
             // Update with date if provided, otherwise keep existing date using COALESCE
             const result = await pool.query(
-                'UPDATE expenses SET description = $1, amount = $2, category = $3, created_at = COALESCE($4, created_at) WHERE id = $5 RETURNING *',
-                [description, amount, category, date || null, req.params.id]
+                'UPDATE expenses SET description = $1, amount = $2, category = $3, created_at = COALESCE($4, created_at), payment_method = COALESCE($5, payment_method) WHERE id = $6 RETURNING *',
+                [description, amount, category, date || null, paymentMethod || null, req.params.id]
             );
 
             if (result.rows.length === 0) {
@@ -727,7 +755,8 @@ async function startServer() {
             res.json({
                 ...updatedExpense,
                 amount: parseFloat(updatedExpense.amount),
-                date: updatedExpense.created_at  // Map created_at to date for frontend compatibility
+                date: updatedExpense.created_at,  // Map created_at to date for frontend compatibility
+                paymentMethod: updatedExpense.payment_method || 'Efectivo Caja'  // Map payment_method to paymentMethod
             });
         } catch (error) {
             console.error("Error updating expense:", error);

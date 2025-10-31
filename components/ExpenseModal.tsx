@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import type { Expense, ExpenseCategory, ExpenseType } from '../types';
+import type { Expense, ExpenseCategory, ExpenseType, ExpensePaymentMethod } from '../types';
 
 interface ExpenseModalProps {
   isOpen: boolean;
@@ -14,7 +14,8 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
     description: '',
     amount: 0,
     category: 'Otro' as ExpenseCategory,
-    type: 'Emergente' as ExpenseType
+    type: 'Emergente' as ExpenseType,
+    paymentMethod: 'Efectivo Caja' as ExpensePaymentMethod
   });
 
   const [expense, setExpense] = useState(getInitialState());
@@ -88,6 +89,16 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
                         <option value="Emergente">Emergente</option>
                     </select>
                 </div>
+              </div>
+              <div>
+                <label htmlFor="paymentMethod" className="block text-sm font-medium text-slate-600 mb-1">Método de Pago</label>
+                <select name="paymentMethod" id="paymentMethod" value={expense.paymentMethod} onChange={handleChange} className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm" required>
+                    <option value="Efectivo Caja">Efectivo Caja</option>
+                    <option value="Transferencia">Transferencia</option>
+                    <option value="Tarjeta">Tarjeta</option>
+                    <option value="Otro">Otro</option>
+                </select>
+                <p className="text-xs text-slate-500 mt-1">Solo los gastos pagados con "Efectivo Caja" afectarán el balance de caja</p>
               </div>
             </div>
           </div>

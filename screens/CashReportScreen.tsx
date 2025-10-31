@@ -139,7 +139,7 @@ const CloseDayModal: React.FC<{
         <div className="space-y-2 text-sm border-t border-b py-3 my-4">
           <div className="flex justify-between"><span className="text-slate-500">Efectivo Inicial:</span> <span className="font-medium">${sessionData.startAmount.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(+) Ventas en Efectivo:</span> <span className="font-medium text-green-600">${sessionData.cashSales.toFixed(2)}</span></div>
-          <div className="flex justify-between"><span className="text-slate-500">(-) Gastos:</span> <span className="font-medium text-red-600">${sessionData.cashExpenses.toFixed(2)}</span></div>
+          <div className="flex justify-between"><span className="text-slate-500">(-) Gastos en Efectivo Caja:</span> <span className="font-medium text-red-600">${sessionData.cashExpenses.toFixed(2)}</span></div>
           <div className="flex justify-between"><span className="text-slate-500">(-) Retiros de Efectivo:</span> <span className="font-medium text-orange-600">${sessionData.cashWithdrawals.toFixed(2)}</span></div>
           <div className="flex justify-between font-bold mt-2 pt-2 border-t"><span className="text-slate-800">Efectivo Esperado:</span> <span>${expectedAmount.toFixed(2)}</span></div>
         </div>
@@ -184,6 +184,8 @@ const CashReportScreen: React.FC = () => {
   // Logic for the active session view
   const sessionOrders = currentSession ? deduplicatedOrders.filter(o => new Date(o.date) >= new Date(currentSession.startDate)) : [];
   const sessionExpenses = currentSession ? expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate)) : [];
+  // Filter only cash expenses (paid with cash from the register)
+  const sessionCashExpenses = sessionExpenses.filter(e => e.paymentMethod === 'Efectivo Caja');
   const sessionCoworking = currentSession ? coworkingSessions.filter(s =>
     s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
   ) : [];
@@ -192,7 +194,8 @@ const CashReportScreen: React.FC = () => {
   const coworkingSales = sessionCoworking.reduce((sum, session) => sum + (session.total || 0), 0);
   const totalSales = ordersSales + coworkingSales;
 
-  const totalExpenses = sessionExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  // Only sum expenses paid with cash from register
+  const totalExpenses = sessionCashExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
   const ordersCashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
   const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
@@ -251,7 +254,7 @@ const CashReportScreen: React.FC = () => {
           <StatCard title="Ventas en Efectivo" value={`$${cashSales.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-green-600" />} />
           <StatCard title="Ventas con Tarjeta" value={`$${cardSales.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
           <StatCard title="Ventas a Crédito" value={`$${creditSales.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-amber-600" />} />
-          <StatCard title="Gastos" value={`$${totalExpenses.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
+          <StatCard title="Gastos en Efectivo Caja" value={`$${totalExpenses.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
           <StatCard title="Retiros de Efectivo" value={`$${totalWithdrawals.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-orange-600" />} />
           <StatCard title="Total de Órdenes" value={totalOrders.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
           <StatCard title="Efectivo Esperado" value={`$${expectedCash.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-blue-600" />} />
@@ -316,6 +319,8 @@ const CashReportScreen: React.FC = () => {
   
   const filteredOrders = deduplicatedOrders.filter(order => order.date && order.date.startsWith(selectedDate));
   const filteredExpenses = expenses.filter(expense => expense.date && expense.date.startsWith(selectedDate));
+  // Filter only cash expenses for historical view
+  const filteredCashExpenses = filteredExpenses.filter(e => e.paymentMethod === 'Efectivo Caja');
   const filteredCoworkingHist = coworkingSessions.filter(s =>
     s.status === 'finished' && s.endTime && s.endTime.startsWith(selectedDate)
   );
@@ -324,7 +329,8 @@ const CashReportScreen: React.FC = () => {
   const coworkingRevenueHist = filteredCoworkingHist.reduce((sum, session) => sum + (session.total || 0), 0);
   const totalSalesHist = ordersRevenueHist + coworkingRevenueHist;
 
-  const totalExpensesHist = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
+  // Only sum cash expenses for historical view
+  const totalExpensesHist = filteredCashExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   // Expenses already include costs, so final balance is just sales minus expenses
   const finalBalanceHist = totalSalesHist - totalExpensesHist;
 
@@ -372,7 +378,7 @@ const CashReportScreen: React.FC = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             <StatCard title="Ventas Totales" value={`$${totalSalesHist.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-green-600" />} />
-            <StatCard title="Gastos del Día" value={`$${totalExpensesHist.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
+            <StatCard title="Gastos en Efectivo Caja" value={`$${totalExpensesHist.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
             <StatCard title="Balance Final" value={`$${finalBalanceHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-blue-600" />} />
             <StatCard title="Ventas en Efectivo" value={`$${cashSalesHist.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-cyan-600" />} />
             <StatCard title="Ventas con Tarjeta" value={`$${cardSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
