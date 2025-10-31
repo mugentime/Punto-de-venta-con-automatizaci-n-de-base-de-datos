@@ -879,7 +879,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const coworkingCashSales = sessionCoworking.filter(s => (s as any).paymentMethod === 'Efectivo').reduce((sum, s) => sum + ((s as any).total || 0), 0);
             const cashSales = ordersCashSales + coworkingCashSales;
 
-            const expectedCash = currentSession.startAmount + cashSales - totalExpenses - totalWithdrawals;
+            const expectedCash = currentSession.startAmount + cashSales - totalWithdrawals;
             const difference = endAmount - expectedCash;
 
             const updateData = {
