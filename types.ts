@@ -30,6 +30,7 @@ export interface Order {
 
 export type ExpenseCategory = 'Luz' | 'Internet' | 'Sueldos' | 'Inventario' | 'Otro';
 export type ExpenseType = 'Frecuente' | 'Emergente';
+export type ExpensePaymentMethod = 'Efectivo Caja' | 'Transferencia' | 'Tarjeta' | 'Otro';
 
 export interface Expense {
   id: string;
@@ -38,6 +39,7 @@ export interface Expense {
   amount: number;
   category: ExpenseCategory;
   type: ExpenseType;
+  paymentMethod: ExpensePaymentMethod;
 }
 
 export interface CoworkingSession {

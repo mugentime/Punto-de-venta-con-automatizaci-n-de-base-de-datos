@@ -60,6 +60,7 @@ const ExpensesScreen: React.FC = () => {
                     <th className="p-4 text-sm font-semibold text-slate-600">Descripción</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Categoría</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Tipo</th>
+                    <th className="p-4 text-sm font-semibold text-slate-600">Método de Pago</th>
                     <th className="p-4 text-sm font-semibold text-slate-600 text-right">Monto</th>
                     <th className="p-4 text-sm font-semibold text-slate-600 text-center">Acciones</th>
                 </tr>
@@ -81,6 +82,7 @@ const ExpensesScreen: React.FC = () => {
                             {expense.type}
                         </span>
                     </td>
+                    <td className="p-4 text-sm text-slate-600">{expense.paymentMethod || 'Efectivo Caja'}</td>
                     <td className="p-4 text-sm text-slate-800 font-medium text-right">${expense.amount.toFixed(2)}</td>
                     <td className="p-4 text-center">
                     <div className="flex justify-center items-center space-x-2">
@@ -111,6 +113,9 @@ const ExpensesScreen: React.FC = () => {
                                     month: 'short',
                                     day: 'numeric'
                                 })}
+                            </p>
+                            <p className="text-xs text-slate-600 mt-1">
+                                <span className="font-medium">Método:</span> {expense.paymentMethod || 'Efectivo Caja'}
                             </p>
                         </div>
                         <p className="text-lg font-bold text-slate-800">${expense.amount.toFixed(2)}</p>
