@@ -509,106 +509,86 @@ async function startServer() {
         }
     });
 
-    // FIX BUG 3: Store for idempotency checking (in-memory cache for recent orders)
-    const recentOrderKeys = new Map(); // Map<idempotencyKey, orderId>
-    const ORDER_KEY_TTL = 60000; // 1 minute TTL for idempotency keys
-
+    // Order creation endpoint - using stored procedure for atomic operations
+    // Stored procedure handles: order insertion, stock updates, credit management, and idempotency
     app.post('/api/orders', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { clientName, serviceType, paymentMethod, items, subtotal, discount, tip, total, userId, customerId, idempotencyKey } = req.body;
 
-            console.log('📦 Creating order:', { clientName, serviceType, paymentMethod, subtotal, discount: discount || 0, tip: tip || 0, total, userId, customerId, itemsCount: items?.length, idempotencyKey });
+            const { clientName, serviceType, paymentMethod, items, subtotal, discount, tip, total, userId, customerId } = req.body;
 
-            // FIX BUG 3: Check idempotency key to prevent duplicate submissions
-            if (idempotencyKey && recentOrderKeys.has(idempotencyKey)) {
-                const existingOrderId = recentOrderKeys.get(idempotencyKey);
-                console.log('⚠️ Duplicate order attempt detected via idempotency key:', idempotencyKey);
+            // Get idempotency key from header or body (header takes precedence)
+            const idempotencyKey = req.headers['x-idempotency-key'] || req.body.idempotencyKey || `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const orderId = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
-                // Return existing order
-                const client = await pool.connect();
-                try {
-                    const result = await client.query('SELECT * FROM orders WHERE id = $1', [existingOrderId]);
-                    if (result.rows.length > 0) {
-                        const existingOrder = result.rows[0];
-                        return res.status(200).json({
-                            ...existingOrder,
-                            subtotal: parseFloat(existingOrder.subtotal),
-                            total: parseFloat(existingOrder.total),
-                            date: existingOrder.created_at,
-                            customerId: existingOrder.customerId,
-                            totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
-                            isDuplicate: true
-                        });
-                    }
-                } finally {
-                    client.release();
-                }
+            console.log('📦 Creating order via stored procedure:', {
+                clientName,
+                serviceType,
+                paymentMethod,
+                subtotal,
+                discount: discount || 0,
+                tip: tip || 0,
+                total,
+                userId,
+                customerId,
+                itemsCount: items?.length,
+                idempotencyKey
+            });
+
+            // Ensure customerId is properly null if not provided
+            const cleanCustomerId = customerId && customerId !== '' ? customerId : null;
+
+            // Call stored procedure for atomic order creation
+            const result = await pool.query(
+                'SELECT * FROM create_order_atomic($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
+                [
+                    orderId,
+                    clientName,
+                    serviceType,
+                    paymentMethod,
+                    JSON.stringify(items),
+                    subtotal,
+                    discount || 0,
+                    tip || 0,
+                    total,
+                    userId,
+                    cleanCustomerId,
+                    idempotencyKey
+                ]
+            );
+
+            const { order_id, is_duplicate, error_message } = result.rows[0];
+
+            // Handle errors from stored procedure
+            if (error_message) {
+                console.error('❌ Order creation failed:', error_message);
+                return res.status(400).json({ error: error_message });
             }
 
-            const id = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const client = await pool.connect();
+            // Fetch complete order data
+            const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [order_id]);
+            const newOrder = orderResult.rows[0];
 
-            try {
-                await client.query('BEGIN');
-
-                // Ensure customerId is properly null if not provided
-                const cleanCustomerId = customerId && customerId !== '' ? customerId : null;
-
-                console.log('💾 Inserting order into database...', { id, cleanCustomerId });
-
-                // Insert order with discount and tip
-                const result = await client.query(
-                    'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, discount, tip, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
-                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, discount || 0, tip || 0, total, userId, cleanCustomerId]
-                );
-                const newOrder = result.rows[0];
-                console.log('✅ Order inserted successfully:', newOrder.id, { discount: discount || 0, tip: tip || 0 });
-
-                // FIX BUG 3: Store idempotency key
-                if (idempotencyKey) {
-                    recentOrderKeys.set(idempotencyKey, id);
-                    setTimeout(() => recentOrderKeys.delete(idempotencyKey), ORDER_KEY_TTL);
-                }
-
-                // If it's a credit payment and customer exists, create credit record
-                if (cleanCustomerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
-                    console.log('💳 Creating customer credit record...');
-                    await client.query(
-                        'INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, status, description) VALUES ($1, $2, $3, $4, $5, $6, $7)',
-                        [`credit-${Date.now()}`, cleanCustomerId, id, total, 'charge', 'pending', `Orden #${id}`]
-                    );
-                    // Update customer's current credit
-                    await client.query(
-                        'UPDATE customers SET "currentCredit" = "currentCredit" + $1 WHERE id = $2',
-                        [total, cleanCustomerId]
-                    );
-                    console.log('✅ Customer credit updated');
-                }
-
-                await client.query('COMMIT');
-                console.log('✅ Transaction committed successfully');
-
-                res.status(201).json({
-                    ...newOrder,
-                    subtotal: parseFloat(newOrder.subtotal),
-                    discount: parseFloat(newOrder.discount || 0),
-                    tip: parseFloat(newOrder.tip || 0),
-                    total: parseFloat(newOrder.total),
-                    date: newOrder.created_at,
-                    customerId: newOrder.customerId,
-                    totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
-                });
-            } catch (error) {
-                await client.query('ROLLBACK');
-                console.error('❌ Database transaction error:', error.message, error.stack);
-                throw error;
-            } finally {
-                client.release();
+            if (is_duplicate) {
+                console.log('⚠️ Duplicate order detected via idempotency key:', idempotencyKey);
+            } else {
+                console.log('✅ Order created successfully:', order_id);
             }
+
+            res.status(is_duplicate ? 200 : 201).json({
+                ...newOrder,
+                subtotal: parseFloat(newOrder.subtotal),
+                discount: parseFloat(newOrder.discount || 0),
+                tip: parseFloat(newOrder.tip || 0),
+                total: parseFloat(newOrder.total),
+                date: newOrder.created_at,
+                customerId: newOrder.customerId,
+                totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
+                isDuplicate: is_duplicate
+            });
         } catch (error) {
-            console.error("❌ Error creating order:", error.message);
-            console.error("Stack trace:", error.stack);
+            console.error('❌ Error creating order:', error.message);
+            console.error('Stack trace:', error.stack);
             res.status(500).json({
                 error: 'Failed to create order',
                 details: process.env.NODE_ENV === 'development' ? error.message : undefined

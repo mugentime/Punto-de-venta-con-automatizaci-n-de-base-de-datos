@@ -1,6 +1,8 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
+import { retryFetch } from '../utils/retryWithBackoff';
+import { requestDeduplicator, generateIdempotencyKey } from '../utils/requestDeduplication';
 
 const initialAdmin: User = {
     id: 'admin-001',
@@ -450,11 +452,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta' | 'Crédito'; customerId?: string; tip?: number; }) => {
         if(cart.length === 0) return;
 
-        // FIX BUG 3: Clear cart IMMEDIATELY to prevent duplicate orders during async operations
+        // Capture cart state before async operations
         const orderCart = [...cart];
         const orderSubtotal = cartSubtotal;
 
-        // FIX BUG 1: Calculate discount from customer
+        // Calculate discount from customer
         let discount = 0;
         if (orderDetails.customerId) {
             const customer = customers.find(c => c.id === orderDetails.customerId);
@@ -467,7 +469,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const tipAmount = orderDetails.tip || 0;
         const orderTotal = orderSubtotal - discount + tipAmount;
 
-        clearCart();
+        // CRITICAL FIX: Do NOT clear cart until after server confirms success
+        // This prevents data loss if network request fails
 
         console.log('💾 Creating order...', {
             clientName: orderDetails.clientName,
@@ -480,43 +483,49 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         });
 
         try {
-            // FIX BUG 3: Generate idempotency key to prevent duplicate submissions
-            const idempotencyKey = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            // Generate stable idempotency key based on cart contents
+            const idempotencyKey = generateIdempotencyKey('order', orderCart, orderDetails);
 
             const orderData = {
                 ...orderDetails,
                 items: orderCart,
                 subtotal: orderSubtotal,
-                discount, // FIX BUG 1: Include discount in order data
+                discount,
                 total: orderTotal,
                 userId: currentUser?.id || 'guest',
                 customerId: orderDetails.customerId || null,
                 tip: tipAmount,
-                idempotencyKey, // Add idempotency key
             };
 
-            console.log('📡 Sending order to API...', orderData);
+            console.log('📡 Sending order to API with idempotency key:', idempotencyKey);
 
-            // Create order in database
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-Idempotency-Key': idempotencyKey // Send in header too
-                },
-                body: JSON.stringify(orderData),
-            });
+            // Use request deduplication to prevent multiple simultaneous requests
+            const response = await requestDeduplicator.deduplicate(
+                idempotencyKey,
+                async () => {
+                    // Use retry logic for network resilience
+                    return await retryFetch(
+                        '/api/orders',
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-Idempotency-Key': idempotencyKey
+                            },
+                            body: JSON.stringify(orderData),
+                        },
+                        {
+                            maxAttempts: 3,
+                            onRetry: (attempt) => {
+                                console.log(`⏳ Retrying order creation (attempt ${attempt})...`);
+                            },
+                        },
+                        15000 // 15 second timeout
+                    );
+                }
+            );
 
             console.log('📡 Server response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Server error:', response.status, errorText);
-                // Restore cart if order failed
-                orderCart.forEach(item => addToCart(item));
-                alert(`❌ Error al guardar la orden: ${response.status} - ${errorText}`);
-                throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
-            }
 
             const newOrder = await response.json();
             console.log('✅ Order saved successfully:', newOrder.id);
@@ -524,18 +533,19 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Update local state
             setOrders(prev => [newOrder, ...prev]);
 
-            // Update stock for all items in the cart
-            const stockUpdates = orderCart.map(item => ({
-                id: item.id,
-                quantity: item.quantity
-            }));
-            await updateStockForSale(stockUpdates);
+            // NOW clear cart after successful server response
+            clearCart();
+
+            // Stock update is handled by stored procedure on server
+            // No need for separate updateStockForSale call
+            console.log('✅ Stock updated automatically by stored procedure');
 
             alert(`✅ Venta guardada: ${orderDetails.clientName} - $${orderTotal.toFixed(2)}`);
         } catch (error) {
             console.error("❌ Error creating order:", error);
             alert(`❌ ERROR: La venta NO se guardó. ${error.message || error}`);
-            throw error; // Re-throw so caller knows it failed
+            // Cart remains intact for user to retry
+            throw error;
         }
     };
 
