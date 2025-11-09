@@ -1,6 +1,9 @@
 import React, { useState, lazy, Suspense, memo, useEffect } from 'react';
 import BottomNav from './components/Sidebar';
 import { AppContextProvider, useAppContext } from './contexts/AppContext';
+import { WebSocketProvider } from './contexts/WebSocketContext';
+import { OperationProvider } from './contexts/OperationContext';
+import ConnectionIndicator from './components/ConnectionIndicator';
 
 // Login/Register screens loaded immediately (authentication needed)
 import LoginScreen from './screens/LoginScreen';
@@ -138,9 +141,13 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <AppContextProvider>
-      <AppContent />
-    </AppContextProvider>
+    <OperationProvider>
+      <WebSocketProvider>
+        <AppContextProvider>
+          <AppContent />
+        </AppContextProvider>
+      </WebSocketProvider>
+    </OperationProvider>
   );
 };
 

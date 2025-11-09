@@ -3,6 +3,7 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 import { retryFetch } from '../utils/retryWithBackoff';
 import { requestDeduplicator, generateIdempotencyKey } from '../utils/requestDeduplication';
+import { useWebSocket } from './WebSocketContext';
 
 const initialAdmin: User = {
     id: 'admin-001',
@@ -184,8 +185,62 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         fetchAllData();
     }, []);
 
-    // 🔄 CROSS-DEVICE SYNC: Poll for coworking sessions every 5 seconds
+    // 🔄 REAL-TIME SYNC: WebSocket subscription for coworking sessions
+    const { subscribe, isConnected } = useWebSocket();
+
     useEffect(() => {
+        // Initial load of coworking sessions
+        const loadCoworkingSessions = async () => {
+            try {
+                const response = await fetch('/api/coworking-sessions');
+                if (response.ok) {
+                    const sessions: CoworkingSession[] = await response.json();
+                    setCoworkingSessions(sessions);
+                }
+            } catch (error) {
+                console.error('Failed to load coworking sessions:', error);
+            }
+        };
+
+        loadCoworkingSessions();
+    }, []);
+
+    useEffect(() => {
+        // Subscribe to real-time coworking updates via WebSocket
+        const unsubscribe = subscribe('coworking:update', ({ type, session }: { type: 'create' | 'update' | 'delete'; session: CoworkingSession | { id: string } }) => {
+            console.log(`[AppContext] Received coworking ${type} update:`, session);
+
+            setCoworkingSessions(prev => {
+                switch (type) {
+                    case 'create':
+                        // Add new session if not already present
+                        return prev.some(s => s.id === (session as CoworkingSession).id)
+                            ? prev
+                            : [session as CoworkingSession, ...prev];
+
+                    case 'update':
+                        // Update existing session
+                        return prev.map(s => s.id === (session as CoworkingSession).id ? session as CoworkingSession : s);
+
+                    case 'delete':
+                        // Remove deleted session
+                        return prev.filter(s => s.id !== session.id);
+
+                    default:
+                        return prev;
+                }
+            });
+        });
+
+        return unsubscribe;
+    }, [subscribe]);
+
+    // Fallback: Poll if WebSocket disconnected (graceful degradation)
+    useEffect(() => {
+        if (isConnected) return; // WebSocket is working, no need to poll
+
+        console.log('[AppContext] WebSocket disconnected, falling back to polling');
+
         const pollCoworkingSessions = async () => {
             try {
                 const response = await fetch('/api/coworking-sessions');
@@ -198,26 +253,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             }
         };
 
-        // Poll every 5 seconds when document is visible
-        const interval = setInterval(() => {
-            if (document.visibilityState === 'visible') {
-                pollCoworkingSessions();
-            }
-        }, 5000);
-
-        // Poll immediately when tab becomes visible
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                pollCoworkingSessions();
-            }
-        };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
+        // Poll every 5 seconds when WebSocket is disconnected
+        const interval = setInterval(pollCoworkingSessions, 5000);
 
         return () => {
             clearInterval(interval);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, []);
+    }, [isConnected]);
 
 
     // --- FUNCTIONS ---

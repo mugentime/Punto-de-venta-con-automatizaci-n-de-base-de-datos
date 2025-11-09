@@ -4,6 +4,8 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
 
 const { Pool } = pg;
 
@@ -753,12 +755,19 @@ async function startServer() {
                 [id, clientName, startTime, hourlyRate || 50, JSON.stringify([])]
             );
             const newSession = result.rows[0];
-            res.status(201).json({
+            const responseSession = {
                 ...newSession,
                 hourlyRate: parseFloat(newSession.hourlyRate),
                 total: parseFloat(newSession.total),
                 consumedExtras: newSession.consumedExtras || []
-            });
+            };
+
+            // Broadcast new session to all connected clients
+            if (req.app.locals.broadcastCoworkingUpdate) {
+                req.app.locals.broadcastCoworkingUpdate('create', responseSession);
+            }
+
+            res.status(201).json(responseSession);
         } catch (error) {
             console.error("Error creating coworking session:", error);
             res.status(500).json({ error: 'Failed to create coworking session' });
@@ -812,12 +821,19 @@ async function startServer() {
                 return res.status(404).json({ error: 'Coworking session not found' });
             }
             const updatedSession = result.rows[0];
-            res.json({
+            const responseSession = {
                 ...updatedSession,
                 hourlyRate: parseFloat(updatedSession.hourlyRate),
                 total: parseFloat(updatedSession.total),
                 consumedExtras: updatedSession.consumedExtras || []
-            });
+            };
+
+            // Broadcast updated session to all connected clients
+            if (req.app.locals.broadcastCoworkingUpdate) {
+                req.app.locals.broadcastCoworkingUpdate('update', responseSession);
+            }
+
+            res.json(responseSession);
         } catch (error) {
             console.error("Error updating coworking session:", error);
             res.status(500).json({ error: 'Failed to update coworking session' });
@@ -835,6 +851,13 @@ async function startServer() {
             if (result.rows.length === 0) {
                 console.log('❌ Coworking session not found:', req.params.id);
                 return res.status(404).json({ error: 'Coworking session not found' });
+            }
+
+            const deletedSession = result.rows[0];
+
+            // Broadcast deletion to all connected clients
+            if (req.app.locals.broadcastCoworkingUpdate) {
+                req.app.locals.broadcastCoworkingUpdate('delete', { id: deletedSession.id });
             }
 
             console.log('✅ Coworking session deleted successfully:', req.params.id);
@@ -1640,9 +1663,53 @@ async function startServer() {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 
+    // --- WEBSOCKET SETUP ---
+    const httpServer = createServer(app);
+    const io = new Server(httpServer, {
+        cors: {
+            origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:5173', 'http://localhost:3000'],
+            methods: ['GET', 'POST'],
+        },
+        transports: ['websocket', 'polling'],
+        pingTimeout: 60000,
+        pingInterval: 25000,
+    });
+
+    // WebSocket connection handling
+    io.on('connection', (socket) => {
+        console.log(`[WS] Client connected: ${socket.id} (Total: ${io.sockets.sockets.size})`);
+
+        // Join coworking room for updates
+        socket.join('coworking');
+
+        socket.on('disconnect', (reason) => {
+            console.log(`[WS] Client disconnected: ${socket.id}, reason: ${reason} (Remaining: ${io.sockets.sockets.size})`);
+        });
+
+        socket.on('error', (error) => {
+            console.error(`[WS] Socket error:`, error);
+        });
+    });
+
+    // Broadcast helper function for coworking updates
+    function broadcastCoworkingUpdate(type, session) {
+        const payload = {
+            type,
+            session,
+            timestamp: new Date().toISOString(),
+        };
+
+        io.to('coworking').emit('coworking:update', payload);
+        console.log(`[WS] Broadcast ${type} for session ${session.id} to ${io.sockets.sockets.size} clients`);
+    }
+
+    // Make broadcastCoworkingUpdate available for use in endpoints
+    app.locals.broadcastCoworkingUpdate = broadcastCoworkingUpdate;
+
     // --- START SERVER ---
-    app.listen(port, () => {
-        console.log(`Server listening on port ${port}`);
+    httpServer.listen(port, () => {
+        console.log(`Server listening on port ${port} with WebSocket support`);
+        console.log(`WebSocket endpoint: ws://localhost:${port}`);
     });
 }
 
