@@ -235,26 +235,143 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         return unsubscribe;
     }, [subscribe]);
 
+    // 🔄 REAL-TIME SYNC: WebSocket subscription for cash sessions
+    useEffect(() => {
+        const unsubscribe = subscribe('cash:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
+            console.log(`[AppContext] Received cash ${type} update:`, data);
+
+            setCashSessions(prev => {
+                switch (type) {
+                    case 'create':
+                        return prev.some(s => s.id === data.id) ? prev : [data, ...prev];
+                    case 'update':
+                        return prev.map(s => s.id === data.id ? data : s);
+                    case 'delete':
+                        return prev.filter(s => s.id !== data.id);
+                    default:
+                        return prev;
+                }
+            });
+        });
+
+        return unsubscribe;
+    }, [subscribe]);
+
+    // 🔄 REAL-TIME SYNC: WebSocket subscription for customers
+    useEffect(() => {
+        const unsubscribe = subscribe('customers:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
+            console.log(`[AppContext] Received customers ${type} update:`, data);
+
+            setCustomers(prev => {
+                switch (type) {
+                    case 'create':
+                        return prev.some(c => c.id === data.id) ? prev : [...prev, data].sort((a, b) => a.name.localeCompare(b.name));
+                    case 'update':
+                        return prev.map(c => c.id === data.id ? data : c);
+                    case 'delete':
+                        return prev.filter(c => c.id !== data.id);
+                    default:
+                        return prev;
+                }
+            });
+        });
+
+        return unsubscribe;
+    }, [subscribe]);
+
+    // 🔄 REAL-TIME SYNC: WebSocket subscription for orders
+    useEffect(() => {
+        const unsubscribe = subscribe('orders:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
+            console.log(`[AppContext] Received orders ${type} update:`, data);
+
+            setOrders(prev => {
+                switch (type) {
+                    case 'create':
+                        return prev.some(o => o.id === data.id) ? prev : [data, ...prev];
+                    case 'update':
+                        return prev.map(o => o.id === data.id ? data : o);
+                    case 'delete':
+                        return prev.filter(o => o.id !== data.id);
+                    default:
+                        return prev;
+                }
+            });
+        });
+
+        return unsubscribe;
+    }, [subscribe]);
+
+    // 🔄 REAL-TIME SYNC: WebSocket subscription for products
+    useEffect(() => {
+        const unsubscribe = subscribe('products:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
+            console.log(`[AppContext] Received products ${type} update:`, data);
+
+            setProducts(prev => {
+                switch (type) {
+                    case 'create':
+                        return prev.some(p => p.id === data.id) ? prev : [...prev, data].sort((a, b) => a.name.localeCompare(b.name));
+                    case 'update':
+                        return prev.map(p => p.id === data.id ? data : p);
+                    case 'delete':
+                        return prev.filter(p => p.id !== data.id);
+                    default:
+                        return prev;
+                }
+            });
+        });
+
+        return unsubscribe;
+    }, [subscribe]);
+
     // Fallback: Poll if WebSocket disconnected (graceful degradation)
     useEffect(() => {
         if (isConnected) return; // WebSocket is working, no need to poll
 
-        console.log('[AppContext] WebSocket disconnected, falling back to polling');
+        console.log('[AppContext] WebSocket disconnected, falling back to polling for ALL resources');
 
-        const pollCoworkingSessions = async () => {
+        const pollAllResources = async () => {
             try {
-                const response = await fetch('/api/coworking-sessions');
-                if (response.ok) {
-                    const sessions: CoworkingSession[] = await response.json();
+                // Poll coworking sessions
+                const coworkingRes = await fetch('/api/coworking-sessions');
+                if (coworkingRes.ok) {
+                    const sessions: CoworkingSession[] = await coworkingRes.json();
                     setCoworkingSessions(sessions);
                 }
+
+                // Poll cash sessions
+                const cashRes = await fetch('/api/cash-sessions');
+                if (cashRes.ok) {
+                    const cashData = await cashRes.json();
+                    setCashSessions(cashData);
+                }
+
+                // Poll customers
+                const customersRes = await fetch('/api/customers');
+                if (customersRes.ok) {
+                    const customersData = await customersRes.json();
+                    setCustomers(customersData);
+                }
+
+                // Poll orders (optional: only recent orders to avoid large payloads)
+                const ordersRes = await fetch('/api/orders');
+                if (ordersRes.ok) {
+                    const ordersData = await ordersRes.json();
+                    setOrders(ordersData);
+                }
+
+                // Poll products
+                const productsRes = await fetch('/api/products');
+                if (productsRes.ok) {
+                    const productsData = await productsRes.json();
+                    setProducts(productsData);
+                }
             } catch (error) {
-                console.error('Failed to poll coworking sessions:', error);
+                console.error('Failed to poll resources:', error);
             }
         };
 
         // Poll every 5 seconds when WebSocket is disconnected
-        const interval = setInterval(pollCoworkingSessions, 5000);
+        const interval = setInterval(pollAllResources, 5000);
 
         return () => {
             clearInterval(interval);

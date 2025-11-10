@@ -450,6 +450,12 @@ async function startServer() {
     app.post('/api/products', async (req, res) => {
         try {
             const newProduct = await productStore.create(req.body);
+
+            // Broadcast new product
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('products', 'create', newProduct);
+            }
+
             res.status(201).json(newProduct);
         } catch (error) {
             console.error("Error creating product:", error);
@@ -461,6 +467,10 @@ async function startServer() {
         try {
             const updatedProduct = await productStore.update(req.params.id, req.body);
             if (updatedProduct) {
+                // Broadcast product updated
+                if (req.app.locals.broadcast) {
+                    req.app.locals.broadcast('products', 'update', updatedProduct);
+                }
                 res.json(updatedProduct);
             } else {
                 res.status(404).json({ error: 'Product not found' });
@@ -474,6 +484,12 @@ async function startServer() {
     app.delete('/api/products/:id', async (req, res) => {
         try {
             await productStore.delete(req.params.id);
+
+            // Broadcast product deleted
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('products', 'delete', { id: req.params.id });
+            }
+
             res.status(204).send();
         } catch (error) {
             console.error(`Error deleting product ${req.params.id}:`, error);
@@ -577,7 +593,7 @@ async function startServer() {
                 console.log('✅ Order created successfully:', order_id);
             }
 
-            res.status(is_duplicate ? 200 : 201).json({
+            const responseOrder = {
                 ...newOrder,
                 subtotal: parseFloat(newOrder.subtotal),
                 discount: parseFloat(newOrder.discount || 0),
@@ -587,7 +603,14 @@ async function startServer() {
                 customerId: newOrder.customerId,
                 totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
                 isDuplicate: is_duplicate
-            });
+            };
+
+            // Broadcast new order (only if not duplicate to avoid redundant broadcasts)
+            if (!is_duplicate && req.app.locals.broadcast) {
+                req.app.locals.broadcast('orders', 'create', responseOrder);
+            }
+
+            res.status(is_duplicate ? 200 : 201).json(responseOrder);
         } catch (error) {
             console.error('❌ Error creating order:', error.message);
             console.error('Stack trace:', error.stack);
@@ -898,7 +921,7 @@ async function startServer() {
                 [id, startAmount, startTime, userId]
             );
             const newSession = result.rows[0];
-            res.status(201).json({
+            const responseSession = {
                 ...newSession,
                 startAmount: parseFloat(newSession.startAmount),
                 endAmount: newSession.endAmount ? parseFloat(newSession.endAmount) : null,
@@ -906,7 +929,14 @@ async function startServer() {
                 totalExpenses: parseFloat(newSession.totalExpenses),
                 expectedCash: parseFloat(newSession.expectedCash),
                 difference: parseFloat(newSession.difference)
-            });
+            };
+
+            // Broadcast cash session opened
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'create', responseSession);
+            }
+
+            res.status(201).json(responseSession);
         } catch (error) {
             console.error("Error creating cash session:", error);
             res.status(500).json({ error: 'Failed to create cash session' });
@@ -925,7 +955,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Cash session not found' });
             }
             const updatedSession = result.rows[0];
-            res.json({
+            const responseSession = {
                 ...updatedSession,
                 startAmount: parseFloat(updatedSession.startAmount),
                 endAmount: updatedSession.endAmount ? parseFloat(updatedSession.endAmount) : null,
@@ -933,7 +963,14 @@ async function startServer() {
                 totalExpenses: parseFloat(updatedSession.totalExpenses),
                 expectedCash: parseFloat(updatedSession.expectedCash),
                 difference: parseFloat(updatedSession.difference)
-            });
+            };
+
+            // Broadcast cash session updated/closed
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'update', responseSession);
+            }
+
+            res.json(responseSession);
         } catch (error) {
             console.error("Error updating cash session:", error);
             res.status(500).json({ error: 'Failed to update cash session' });
@@ -1140,13 +1177,20 @@ async function startServer() {
                 [id, name, email || null, phone || null, discountPercentage || 0, creditLimit || 0]
             );
             const customer = result.rows[0];
-            res.status(201).json({
+            const responseCustomer = {
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
                 creditLimit: parseFloat(customer.creditLimit),
                 currentCredit: parseFloat(customer.currentCredit),
                 createdAt: customer.created_at
-            });
+            };
+
+            // Broadcast new customer
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('customers', 'create', responseCustomer);
+            }
+
+            res.status(201).json(responseCustomer);
         } catch (error) {
             console.error("Error creating customer:", error);
             res.status(500).json({ error: 'Failed to create customer' });
@@ -1165,13 +1209,20 @@ async function startServer() {
                 return res.status(404).json({ error: 'Customer not found' });
             }
             const customer = result.rows[0];
-            res.json({
+            const responseCustomer = {
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
                 creditLimit: parseFloat(customer.creditLimit),
                 currentCredit: parseFloat(customer.currentCredit),
                 createdAt: customer.created_at
-            });
+            };
+
+            // Broadcast customer updated
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('customers', 'update', responseCustomer);
+            }
+
+            res.json(responseCustomer);
         } catch (error) {
             console.error("Error updating customer:", error);
             res.status(500).json({ error: 'Failed to update customer' });
@@ -1182,6 +1233,12 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             await pool.query('DELETE FROM customers WHERE id = $1', [req.params.id]);
+
+            // Broadcast customer deleted
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('customers', 'delete', { id: req.params.id });
+            }
+
             res.status(204).send();
         } catch (error) {
             console.error("Error deleting customer:", error);
@@ -1679,8 +1736,12 @@ async function startServer() {
     io.on('connection', (socket) => {
         console.log(`[WS] Client connected: ${socket.id} (Total: ${io.sockets.sockets.size})`);
 
-        // Join coworking room for updates
+        // Join all resource rooms for real-time updates
         socket.join('coworking');
+        socket.join('cash');
+        socket.join('customers');
+        socket.join('orders');
+        socket.join('products');
 
         socket.on('disconnect', (reason) => {
             console.log(`[WS] Client disconnected: ${socket.id}, reason: ${reason} (Remaining: ${io.sockets.sockets.size})`);
@@ -1691,19 +1752,25 @@ async function startServer() {
         });
     });
 
-    // Broadcast helper function for coworking updates
-    function broadcastCoworkingUpdate(type, session) {
+    // Generic broadcast helper for ANY resource type
+    function broadcastUpdate(resource, type, data) {
         const payload = {
-            type,
-            session,
+            type, // 'create', 'update', 'delete'
+            data,
             timestamp: new Date().toISOString(),
         };
 
-        io.to('coworking').emit('coworking:update', payload);
-        console.log(`[WS] Broadcast ${type} for session ${session.id} to ${io.sockets.sockets.size} clients`);
+        io.to(resource).emit(`${resource}:update`, payload);
+        console.log(`[WS] Broadcast ${resource}:${type} to ${io.sockets.sockets.size} clients`);
     }
 
-    // Make broadcastCoworkingUpdate available for use in endpoints
+    // Legacy coworking broadcast for backward compatibility
+    function broadcastCoworkingUpdate(type, session) {
+        broadcastUpdate('coworking', type, session);
+    }
+
+    // Make broadcast functions available for use in endpoints
+    app.locals.broadcast = broadcastUpdate;
     app.locals.broadcastCoworkingUpdate = broadcastCoworkingUpdate;
 
     // --- START SERVER ---
