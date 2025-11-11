@@ -217,6 +217,11 @@ router.post('/historical', auth, canRegisterClients, async (req, res) => {
 
     const record = await databaseManager.createRecord(recordData);
 
+    // Broadcast record creation for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('orders', 'create', record);
+    }
+
     res.status(201).json({
       message: 'Historical record created successfully',
       record
@@ -367,6 +372,11 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       createdBy: req.user.userId
     });
 
+    // Broadcast record creation for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('orders', 'create', record);
+    }
+
     res.status(201).json({
       message: 'Record created successfully',
       record
@@ -445,6 +455,11 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     const fs = require('fs').promises;
     await fs.writeFile(databaseManager.recordsFile, JSON.stringify(records, null, 2));
 
+    // Broadcast record update for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('orders', 'update', records[recordIndex]);
+    }
+
     res.json({
       message: 'Record updated successfully',
       record: records[recordIndex]
@@ -462,6 +477,11 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
 router.delete('/:id', auth, canDeleteRecords, async (req, res) => {
   try {
     await databaseManager.deleteRecord(req.params.id, req.user.userId);
+
+    // Broadcast record deletion for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('orders', 'delete', { id: req.params.id });
+    }
 
     res.json({
       message: 'Record deleted successfully'

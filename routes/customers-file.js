@@ -278,6 +278,11 @@ router.post('/', auth, canManageCustomers, async (req, res) => {
     // Save to database
     const createdCustomer = await databaseManager.createCustomer(customer.toJSON());
 
+    // Broadcast customer creation for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('customers', 'create', createdCustomer);
+    }
+
     res.status(201).json({
       message: 'Customer created successfully',
       customer: createdCustomer,
@@ -342,6 +347,11 @@ router.put('/:id', auth, canManageCustomers, async (req, res) => {
     const updatedCustomer = await databaseManager.updateCustomer(customerId, updateData);
     const customer = new Customer(updatedCustomer);
 
+    // Broadcast customer update for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('customers', 'update', updatedCustomer);
+    }
+
     res.json({
       message: 'Customer updated successfully',
       customer: updatedCustomer,
@@ -371,6 +381,11 @@ router.delete('/:id', auth, canManageCustomers, async (req, res) => {
 
     // Soft delete
     await databaseManager.deleteCustomer(customerId);
+
+    // Broadcast customer deletion for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('customers', 'delete', { id: customerId });
+    }
 
     res.json({
       message: 'Customer deleted successfully'

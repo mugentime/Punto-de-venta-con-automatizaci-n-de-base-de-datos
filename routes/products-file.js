@@ -121,6 +121,11 @@ router.post('/', auth, canManageInventory, async (req, res) => {
       createdBy: req.user.userId
     });
 
+    // Broadcast product creation for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('products', 'create', product);
+    }
+
     res.status(201).json({
       message: 'Product created successfully',
       product
@@ -182,6 +187,11 @@ router.put('/:id', auth, canManageInventory, async (req, res) => {
 
     const product = await databaseManager.updateProduct(req.params.id, updateData);
 
+    // Broadcast product update for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('products', 'update', product);
+    }
+
     res.json({
       message: 'Product updated successfully',
       product
@@ -221,6 +231,11 @@ router.patch('/:id/stock', auth, canManageInventory, async (req, res) => {
 
     const product = await databaseManager.updateProductStock(req.params.id, Number(quantity), operation);
 
+    // Broadcast stock update for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('products', 'update', product);
+    }
+
     res.json({
       message: 'Stock updated successfully',
       product
@@ -244,7 +259,12 @@ router.patch('/:id/stock', auth, canManageInventory, async (req, res) => {
 // Delete product (soft delete by deactivating)
 router.delete('/:id', auth, canManageInventory, async (req, res) => {
   try {
-    await databaseManager.deleteProduct(req.params.id);
+    const deletedProduct = await databaseManager.deleteProduct(req.params.id);
+
+    // Broadcast product deletion for real-time sync
+    if (req.app.locals.broadcast) {
+      req.app.locals.broadcast('products', 'delete', { id: req.params.id });
+    }
 
     res.json({
       message: 'Product deactivated successfully'

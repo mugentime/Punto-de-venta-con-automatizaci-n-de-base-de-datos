@@ -83,6 +83,11 @@ class CashCutController {
                 notes: notes || ''
             });
 
+            // Broadcast cash cut creation for real-time sync
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'create', cashCut);
+            }
+
             res.status(201).json(cashCut);
         } catch (error) {
             console.error('Error creating cash cut:', error);
@@ -125,6 +130,11 @@ class CashCutController {
                 closedBy,
                 notes: notes || ''
             });
+
+            // Broadcast cash cut closure for real-time sync
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'update', cashCut);
+            }
 
             res.json(cashCut);
         } catch (error) {
@@ -173,6 +183,11 @@ class CashCutController {
                 referenceId,
                 note
             });
+
+            // Broadcast cash cut entry addition for real-time sync
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'update', updatedCashCut);
+            }
 
             res.json(updatedCashCut);
         } catch (error) {
@@ -228,6 +243,11 @@ class CashCutController {
             console.log(`🔄 Manual cash cut requested by user: ${userId}`);
             
             const cashCut = await cashCutService.triggerManualCut(userId, notes);
+
+            // Broadcast manual cash cut for real-time sync
+            if (req.app.locals.broadcast) {
+                req.app.locals.broadcast('cash', 'create', cashCut);
+            }
 
             res.json({
                 success: true,
