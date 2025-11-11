@@ -11,6 +11,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const path = require('path');
+const http = require('http');
+const { Server } = require('socket.io');
 require('dotenv').config();
 
 // Import application constants for better maintainability
@@ -1302,10 +1304,67 @@ process.on('SIGINT', async () => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+
+// Create HTTP server and attach Socket.IO
+const server = http.createServer(app);
+const io = new Server(server, {
+  cors: {
+    origin: process.env.NODE_ENV === 'production'
+      ? [process.env.FRONTEND_URL || 'https://posclaude-production.up.railway.app']
+      : ['http://localhost:5173', 'http://localhost:3000', 'http://127.0.0.1:5173'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE']
+  },
+  transports: ['websocket', 'polling'],
+  pingTimeout: 60000,
+  pingInterval: 25000
+});
+
+// WebSocket connection handling
+io.on('connection', (socket) => {
+  console.log(`[WS] Client connected: ${socket.id} (Total: ${io.sockets.sockets.size})`);
+
+  // Join all resource rooms for real-time updates
+  socket.join('coworking');
+  socket.join('cash');
+  socket.join('customers');
+  socket.join('orders');
+  socket.join('products');
+
+  console.log(`[WS] 5 rooms created: cash, customers, orders, products, coworking`);
+
+  socket.on('disconnect', (reason) => {
+    console.log(`[WS] Client disconnected: ${socket.id} - Reason: ${reason}`);
+  });
+
+  socket.on('error', (error) => {
+    console.error(`[WS] Socket error for ${socket.id}:`, error);
+  });
+});
+
+// Generic broadcast helper for ANY resource type
+function broadcastUpdate(resource, type, data) {
+  const payload = {
+    type, // 'create', 'update', 'delete'
+    data,
+    timestamp: new Date().toISOString(),
+  };
+
+  io.to(resource).emit(`${resource}:update`, payload);
+  console.log(`[WS] Broadcast ${resource}:${type} to ${io.sockets.sockets.size} clients`);
+}
+
+// Make broadcast function available for use in endpoints
+app.locals.broadcast = broadcastUpdate;
+app.locals.io = io;
+
+// Start server
+server.listen(PORT, () => {
   console.log(`🚀 Server running on http://localhost:${PORT}`);
   console.log(`📱 POS System: http://localhost:${PORT}`);
   console.log(`🌐 Online Version: http://localhost:${PORT}/online`);
+  console.log(`[WS] WebSocket server initialized`);
+  console.log(`[WS] 5 rooms created: cash, customers, orders, products, coworking`);
 });
 
 module.exports = app;
