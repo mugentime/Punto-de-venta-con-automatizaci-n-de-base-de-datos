@@ -6047,15 +6047,15 @@
         async function showCashCutDetails(cutId) {
             try {
                 showNotification('Cargando detalles del corte...', 'info');
-                
-                // Fetch cash cut details
-                const response = await apiRequest(`/cashcuts/${cutId}`);
-                
-                if (!response || !response._id) {
+
+                // Fetch detailed cash cut with cash transactions
+                const response = await apiRequest(`/cashcuts/${cutId}/details`);
+
+                if (!response || !response.cashCut) {
                     showNotification('Error al cargar detalles del corte', 'error');
                     return;
                 }
-                
+
                 // Create modal on the fly
                 let modal = document.getElementById('cashcut-details-modal');
                 if (!modal) {
@@ -6063,9 +6063,9 @@
                     modal.id = 'cashcut-details-modal';
                     modal.className = 'modal';
                     modal.innerHTML = `
-                        <div class="modal-content" style="max-width: 600px;">
+                        <div class="modal-content" style="max-width: 900px;">
                             <div class="modal-header">
-                                <h2>Detalles del Corte de Caja</h2>
+                                <h2>📊 Detalles del Corte de Caja</h2>
                                 <span class="close">&times;</span>
                             </div>
                             <div class="modal-body" id="cashcut-details-content">
@@ -6074,12 +6074,12 @@
                         </div>
                     `;
                     document.body.appendChild(modal);
-                    
+
                     // Close button functionality
                     modal.querySelector('.close').addEventListener('click', function() {
                         modal.style.display = 'none';
                     });
-                    
+
                     // Click outside to close
                     window.addEventListener('click', function(event) {
                         if (event.target === modal) {
@@ -6087,108 +6087,192 @@
                         }
                     });
                 }
-                
-                // Format data for display
-                const cut = response;
+
+                // Extract data
+                const cut = response.cashCut;
+                const cashIncome = response.cashIncome;
+                const cashExpenses = response.cashExpenses;
+                const summary = response.summary;
+
                 const isOpen = cut.status === 'open';
                 const statusColor = isOpen ? 'var(--warning)' : 'var(--success)';
                 const statusText = isOpen ? 'ABIERTO' : 'CERRADO';
-                const openDate = new Date(cut.openedAt || cut.createdAt).toLocaleString('es-MX');
+                const openDate = new Date(cut.openedAt).toLocaleString('es-MX');
                 const closeDate = cut.closedAt ? new Date(cut.closedAt).toLocaleString('es-MX') : 'No cerrado';
-                
+
                 // Create content
                 const detailsContent = document.getElementById('cashcut-details-content');
                 detailsContent.innerHTML = `
                     <div style="padding: 15px; border-radius: 8px; background: rgba(0, 217, 255, 0.05); margin-bottom: 20px;">
                         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                            <h3 style="margin: 0; color: var(--text-primary);">Corte #${cut._id}</h3>
+                            <h3 style="margin: 0; color: var(--text-primary);">Corte #${cut.id}</h3>
                             <span style="background: ${statusColor}; color: white; padding: 5px 10px; border-radius: 4px; font-weight: bold;">
                                 ${statusText}
                             </span>
                         </div>
-                        
+
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px;">
                             <div>
-                                <strong>Apertura:</strong> ${openDate}
+                                <strong>📅 Apertura:</strong> ${openDate}
                             </div>
                             <div>
-                                <strong>Cierre:</strong> ${closeDate}
-                            </div>
-                            <div>
-                                <strong>Monto Inicial:</strong> $${parseFloat(cut.openingAmount || 0).toFixed(2)}
-                            </div>
-                            <div>
-                                <strong>Monto Final:</strong> $${parseFloat(cut.closingAmount || 0).toFixed(2)}
-                            </div>
-                            <div>
-                                <strong>Monto Esperado:</strong> $${parseFloat(cut.expectedAmount || 0).toFixed(2)}
-                            </div>
-                            <div>
-                                <strong>Diferencia:</strong> $${parseFloat(cut.difference || 0).toFixed(2)}
+                                <strong>📅 Cierre:</strong> ${closeDate}
                             </div>
                         </div>
-                        
+
                         ${cut.notes ? `
-                            <div style="margin-bottom: 15px;">
-                                <strong>Notas:</strong>
-                                <p>${cut.notes}</p>
+                            <div style="margin-bottom: 15px; padding: 10px; background: rgba(255, 255, 255, 0.05); border-radius: 4px;">
+                                <strong>📝 Notas:</strong>
+                                <p style="margin: 5px 0 0 0;">${cut.notes}</p>
                             </div>
                         ` : ''}
-                        
-                        <h4>Movimientos</h4>
-                        ${cut.entries && cut.entries.length > 0 ? `
+                    </div>
+
+                    <!-- Summary Section -->
+                    <div style="padding: 15px; border-radius: 8px; background: rgba(0, 255, 136, 0.05); border: 1px solid rgba(0, 255, 136, 0.2); margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 15px 0; color: var(--success);">💰 Resumen Financiero</h3>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Monto Inicial</div>
+                                <div style="font-size: 18px; font-weight: bold;">$${summary.openingAmount.toFixed(2)}</div>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Total Ingresos (Efectivo)</div>
+                                <div style="font-size: 18px; font-weight: bold; color: var(--success);">+$${summary.totalIncome.toFixed(2)}</div>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Total Egresos (Efectivo)</div>
+                                <div style="font-size: 18px; font-weight: bold; color: var(--danger);">-$${summary.totalExpenses.toFixed(2)}</div>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Efectivo Esperado</div>
+                                <div style="font-size: 18px; font-weight: bold;">$${summary.expectedCash.toFixed(2)}</div>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Efectivo Real</div>
+                                <div style="font-size: 18px; font-weight: bold;">$${summary.actualCash.toFixed(2)}</div>
+                            </div>
+                            <div style="padding: 10px; background: rgba(0, 0, 0, 0.2); border-radius: 4px;">
+                                <div style="color: var(--text-secondary); font-size: 12px;">Diferencia</div>
+                                <div style="font-size: 18px; font-weight: bold; color: ${summary.difference >= 0 ? 'var(--success)' : 'var(--danger)'};">
+                                    ${summary.difference >= 0 ? '+' : ''}$${summary.difference.toFixed(2)}
+                                    (${summary.differencePercentage}%)
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cash Income Section -->
+                    <div style="padding: 15px; border-radius: 8px; background: rgba(0, 217, 255, 0.05); border: 1px solid rgba(0, 217, 255, 0.2); margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 10px 0; color: var(--accent-cyan);">
+                            💵 Ingresos en Efectivo
+                            <span style="font-size: 14px; color: var(--text-secondary);">(${cashIncome.count} transacciones)</span>
+                        </h3>
+                        ${cashIncome.transactions && cashIncome.transactions.length > 0 ? `
                             <div style="max-height: 300px; overflow-y: auto;">
                                 <table style="width: 100%; border-collapse: collapse;">
                                     <thead>
-                                        <tr>
-                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Tipo</th>
-                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Monto</th>
-                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Referencia</th>
-                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Nota</th>
-                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid #ddd;">Fecha</th>
+                                        <tr style="background: rgba(0, 217, 255, 0.1);">
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(0, 217, 255, 0.3);">Fecha</th>
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(0, 217, 255, 0.3);">Cliente</th>
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(0, 217, 255, 0.3);">Servicio</th>
+                                            <th style="text-align: right; padding: 8px; border-bottom: 1px solid rgba(0, 217, 255, 0.3);">Monto</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        ${cut.entries.map(entry => {
-                                            const entryDate = new Date(entry.createdAt).toLocaleString('es-MX');
-                                            const typeColor = entry.type === 'sale' ? 'var(--success)' : entry.type === 'expense' ? 'var(--danger)' : 'var(--warning)';
-                                            const typeText = entry.type === 'sale' ? 'Venta' : entry.type === 'expense' ? 'Gasto' : 'Ajuste';
+                                        ${cashIncome.transactions.map(transaction => {
+                                            const txDate = new Date(transaction.date).toLocaleString('es-MX', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            });
                                             return `
-                                                <tr>
-                                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                                                        <span style="color: ${typeColor}; font-weight: bold;">${typeText}</span>
-                                                    </td>
-                                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                                                        $${parseFloat(entry.amount).toFixed(2)}
-                                                    </td>
-                                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                                                        ${entry.referenceId || '-'}
-                                                    </td>
-                                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                                                        ${entry.note || '-'}
-                                                    </td>
-                                                    <td style="padding: 8px; border-bottom: 1px solid #ddd;">
-                                                        ${entryDate}
+                                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                                    <td style="padding: 8px;">${txDate}</td>
+                                                    <td style="padding: 8px;">${transaction.client || 'N/A'}</td>
+                                                    <td style="padding: 8px;">${transaction.service || 'N/A'}</td>
+                                                    <td style="padding: 8px; text-align: right; color: var(--success); font-weight: bold;">
+                                                        $${transaction.amount.toFixed(2)}
                                                     </td>
                                                 </tr>
                                             `;
                                         }).join('')}
                                     </tbody>
+                                    <tfoot>
+                                        <tr style="background: rgba(0, 217, 255, 0.1); font-weight: bold;">
+                                            <td colspan="3" style="padding: 8px; text-align: right;">TOTAL INGRESOS:</td>
+                                            <td style="padding: 8px; text-align: right; color: var(--success); font-size: 16px;">
+                                                $${cashIncome.total.toFixed(2)}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
                                 </table>
                             </div>
-                        ` : '<p>No hay movimientos registrados</p>'}
+                        ` : '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No hay ingresos en efectivo registrados</p>'}
                     </div>
-                    
+
+                    <!-- Cash Expenses Section -->
+                    <div style="padding: 15px; border-radius: 8px; background: rgba(255, 77, 77, 0.05); border: 1px solid rgba(255, 77, 77, 0.2); margin-bottom: 20px;">
+                        <h3 style="margin: 0 0 10px 0; color: var(--danger);">
+                            💸 Egresos en Efectivo
+                            <span style="font-size: 14px; color: var(--text-secondary);">(${cashExpenses.count} transacciones)</span>
+                        </h3>
+                        ${cashExpenses.transactions && cashExpenses.transactions.length > 0 ? `
+                            <div style="max-height: 300px; overflow-y: auto;">
+                                <table style="width: 100%; border-collapse: collapse;">
+                                    <thead>
+                                        <tr style="background: rgba(255, 77, 77, 0.1);">
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 77, 77, 0.3);">Fecha</th>
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 77, 77, 0.3);">Categoría</th>
+                                            <th style="text-align: left; padding: 8px; border-bottom: 1px solid rgba(255, 77, 77, 0.3);">Descripción</th>
+                                            <th style="text-align: right; padding: 8px; border-bottom: 1px solid rgba(255, 77, 77, 0.3);">Monto</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        ${cashExpenses.transactions.map(expense => {
+                                            const expDate = new Date(expense.date).toLocaleString('es-MX', {
+                                                month: 'short',
+                                                day: 'numeric',
+                                                hour: '2-digit',
+                                                minute: '2-digit'
+                                            });
+                                            return `
+                                                <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                                                    <td style="padding: 8px;">${expDate}</td>
+                                                    <td style="padding: 8px;">${expense.category || 'N/A'}</td>
+                                                    <td style="padding: 8px;">${expense.description || 'N/A'}</td>
+                                                    <td style="padding: 8px; text-align: right; color: var(--danger); font-weight: bold;">
+                                                        $${expense.amount.toFixed(2)}
+                                                    </td>
+                                                </tr>
+                                            `;
+                                        }).join('')}
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="background: rgba(255, 77, 77, 0.1); font-weight: bold;">
+                                            <td colspan="3" style="padding: 8px; text-align: right;">TOTAL EGRESOS:</td>
+                                            <td style="padding: 8px; text-align: right; color: var(--danger); font-size: 16px;">
+                                                $${cashExpenses.total.toFixed(2)}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        ` : '<p style="text-align: center; color: var(--text-secondary); padding: 20px;">No hay egresos en efectivo registrados</p>'}
+                    </div>
+
                     ${isOpen ? `
                         <div class="actions" style="text-align: center;">
-                            <button class="btn btn-primary" onclick="closeCashCut('${cut._id}')">Cerrar Corte</button>
+                            <button class="btn btn-primary" onclick="closeCashCut('${cut.id}')">Cerrar Corte</button>
                         </div>
                     ` : ''}
                 `;
-                
+
                 // Show the modal
                 modal.style.display = 'block';
-                
+                showNotification('Detalles cargados correctamente', 'success');
+
             } catch (error) {
                 console.error('Error showing cash cut details:', error);
                 showNotification('Error al cargar los detalles del corte', 'error');

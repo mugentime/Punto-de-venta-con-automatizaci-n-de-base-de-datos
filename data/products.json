@@ -3,7 +3,7 @@
     "_id": "da56c66d52b8e46b70f40b6f",
     "name": "Fig Bar",
     "category": "cafeteria",
-    "quantity": 18,
+    "quantity": 17,
     "cost": 8,
     "price": 18,
     "lowStockAlert": 5,
@@ -12,7 +12,7 @@
     "isActive": true,
     "createdAt": "2025-09-03T17:21:49.111Z",
     "createdBy": "e0cbd27429eaa20acf48cc23",
-    "updatedAt": "2025-09-03T18:13:59.208Z"
+    "updatedAt": "2025-11-11T18:43:47.842Z"
   },
   {
     "_id": "98073dd887c7bd3441dafdb3",

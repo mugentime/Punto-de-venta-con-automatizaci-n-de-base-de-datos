@@ -74,6 +74,12 @@ router.post('/automatic', auth, cashCutController.triggerAutomaticCut);
 router.get('/:id', auth, cashCutController.getCashCutById);
 
 /**
+ * 📊 GET /api/cashcuts/:id/details - Get detailed cash cut with all cash transactions
+ * Returns all cash income (sales) and expenses within the cut period
+ */
+router.get('/:id/details', auth, cashCutController.getCashCutDetails);
+
+/**
  * 📊 GET /api/cashcuts/:id/report - Get cash cut report
  * This is an alias for getting a cash cut by ID with the same data
  */

@@ -15,7 +15,9 @@ const SECURITY = {
   MAX_LOGIN_ATTEMPTS: parseInt(process.env.MAX_LOGIN_ATTEMPTS) || 5,
   LOCKOUT_TIME: parseInt(process.env.LOCKOUT_TIME) || 900000, // 15 minutes in milliseconds
   PASSWORD_MIN_LENGTH: 8,
-  REQUIRE_STRONG_PASSWORDS: process.env.NODE_ENV === 'production'
+  REQUIRE_STRONG_PASSWORDS: process.env.NODE_ENV === 'production',
+  CIRCUIT_BREAKER_WINDOW: 60000, // 1 minute
+  CIRCUIT_BREAKER_LIMIT: 1000 // Max auth requests per window
 };
 
 // Rate Limiting Configuration
@@ -147,22 +149,26 @@ const CSP = {
 // Error Messages (Spanish)
 const ERROR_MESSAGES = {
   // Authentication
-  UNAUTHORIZED: 'No autorizado',
-  INVALID_CREDENTIALS: 'Credenciales inválidas',
-  USER_NOT_FOUND: 'Usuario no encontrado',
-  TOKEN_EXPIRED: 'Sesión expirada',
-  TOKEN_INVALID: 'Token inválido',
-  
+  AUTH: {
+    NO_TOKEN: 'No se proporcionó token de autenticación',
+    INVALID_TOKEN: 'Token inválido',
+    EXPIRED_TOKEN: 'Sesión expirada',
+    USER_NOT_FOUND: 'Usuario no encontrado',
+    INVALID_CREDENTIALS: 'Credenciales inválidas',
+    UNAUTHORIZED: 'No autorizado',
+    CIRCUIT_BREAKER: 'Demasiadas solicitudes de autenticación'
+  },
+
   // Validation
   INVALID_DATA: 'Datos inválidos',
   REQUIRED_FIELDS: 'Campos requeridos faltantes',
   INVALID_FORMAT: 'Formato inválido',
-  
+
   // Products
   PRODUCT_NOT_FOUND: 'Producto no encontrado',
   INSUFFICIENT_STOCK: 'Stock insuficiente',
   PRODUCT_ALREADY_EXISTS: 'El producto ya existe',
-  
+
   // Database
   DATABASE: {
     CONNECTION_FAILED: 'Error de conexión a la base de datos',
@@ -172,13 +178,15 @@ const ERROR_MESSAGES = {
     QUERY_ERROR: 'Error en la consulta',
     INITIALIZED: 'Base de datos inicializada exitosamente'
   },
-  
-  // Server
-  INTERNAL_ERROR: 'Error interno del servidor',
-  SERVICE_UNAVAILABLE: 'Servicio no disponible',
-  BAD_REQUEST: 'Solicitud incorrecta',
-  NOT_FOUND: 'Recurso no encontrado',
-  RATE_LIMITED: 'Demasiadas solicitudes'
+
+  // General Server Errors
+  GENERAL: {
+    INTERNAL_ERROR: 'Error interno del servidor',
+    SERVICE_UNAVAILABLE: 'Servicio no disponible',
+    BAD_REQUEST: 'Solicitud incorrecta',
+    NOT_FOUND: 'Recurso no encontrado',
+    RATE_LIMITED: 'Demasiadas solicitudes'
+  }
 };
 
 // Success Messages (Spanish)

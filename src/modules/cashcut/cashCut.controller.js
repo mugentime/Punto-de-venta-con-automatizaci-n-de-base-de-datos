@@ -215,7 +215,7 @@ class CashCutController {
     async getCashCutById(req, res) {
         try {
             const cashCut = await databaseManager.getCashCutById(req.params.id);
-            
+
             if (!cashCut) {
                 return res.status(404).json({
                     error: 'Cash cut not found'
@@ -227,6 +227,117 @@ class CashCutController {
             console.error('Error getting cash cut:', error);
             res.status(500).json({
                 error: 'Failed to retrieve cash cut',
+                message: error.message
+            });
+        }
+    }
+
+    /**
+     * 🔍 Get detailed cash cut report with all cash transactions
+     * Returns all cash income (sales) and expenses within the cut period
+     */
+    async getCashCutDetails(req, res) {
+        try {
+            const { id } = req.params;
+
+            // Get the cash cut
+            const cashCut = await databaseManager.getCashCutById(id);
+
+            if (!cashCut) {
+                return res.status(404).json({
+                    error: 'Corte de caja no encontrado'
+                });
+            }
+
+            // Determine the date range for this cash cut
+            const startDate = new Date(cashCut.openedAt || cashCut.createdAt);
+            const endDate = cashCut.closedAt ? new Date(cashCut.closedAt) : new Date();
+
+            // Get all cash sales (ingresos en efectivo) within the period
+            const allSales = await databaseManager.listRecords({
+                limit: 10000,
+                from: startDate.toISOString(),
+                to: endDate.toISOString()
+            });
+
+            const cashSales = allSales.filter(sale =>
+                (sale.payment || sale.paymentMethod || '').toLowerCase() === 'efectivo'
+            );
+
+            // Get all cash expenses (egresos en efectivo) within the period
+            const allExpenses = await databaseManager.listExpenses({
+                limit: 10000,
+                from: startDate.toISOString(),
+                to: endDate.toISOString()
+            });
+
+            const cashExpenses = allExpenses.filter(expense =>
+                (expense.payment_method || expense.paymentMethod || '').toLowerCase() === 'efectivo'
+            );
+
+            // Calculate totals
+            const totalCashIncome = cashSales.reduce((sum, sale) => sum + parseFloat(sale.total || 0), 0);
+            const totalCashExpenses = cashExpenses.reduce((sum, expense) => sum + parseFloat(expense.amount || 0), 0);
+
+            const openingAmount = parseFloat(cashCut.openingAmount || 0);
+            const expectedCash = openingAmount + totalCashIncome - totalCashExpenses;
+            const actualCash = parseFloat(cashCut.closingAmount || 0);
+            const difference = actualCash - expectedCash;
+
+            // Format response
+            const details = {
+                cashCut: {
+                    id: cashCut.id,
+                    status: cashCut.status,
+                    openedAt: cashCut.openedAt || cashCut.createdAt,
+                    closedAt: cashCut.closedAt,
+                    openedBy: cashCut.openedBy,
+                    closedBy: cashCut.closedBy,
+                    notes: cashCut.notes || '',
+                    openingAmount,
+                    closingAmount: actualCash,
+                    expectedAmount: expectedCash,
+                    difference
+                },
+                cashIncome: {
+                    transactions: cashSales.map(sale => ({
+                        id: sale.id || sale._id,
+                        date: sale.createdAt || sale.date,
+                        client: sale.client || sale.clientName || 'Cliente',
+                        service: sale.service || sale.serviceType,
+                        amount: parseFloat(sale.total || 0),
+                        products: sale.products || sale.items || []
+                    })),
+                    total: totalCashIncome,
+                    count: cashSales.length
+                },
+                cashExpenses: {
+                    transactions: cashExpenses.map(expense => ({
+                        id: expense.id || expense._id,
+                        date: expense.createdAt || expense.date,
+                        category: expense.category,
+                        description: expense.description,
+                        amount: parseFloat(expense.amount || 0)
+                    })),
+                    total: totalCashExpenses,
+                    count: cashExpenses.length
+                },
+                summary: {
+                    openingAmount,
+                    totalIncome: totalCashIncome,
+                    totalExpenses: totalCashExpenses,
+                    expectedCash,
+                    actualCash,
+                    difference,
+                    differencePercentage: expectedCash > 0 ? ((difference / expectedCash) * 100).toFixed(2) : 0
+                }
+            };
+
+            res.json(details);
+        } catch (error) {
+            console.error('Error getting cash cut details:', error);
+            res.status(500).json({
+                error: 'Error al obtener detalles del corte de caja',
                 message: error.message
             });
         }

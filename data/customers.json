@@ -48,5 +48,61 @@
     "createdAt": "2025-09-03T18:13:59.181Z",
     "updatedAt": "2025-09-03T18:13:59.211Z",
     "id": "customer_udaljtw9m2gmf4aqfik"
+  },
+  {
+    "_id": "customer_d2pn2ijegzmmhux6jnq",
+    "name": "Cliente Test",
+    "email": null,
+    "phone": null,
+    "birthDate": null,
+    "notes": "",
+    "status": "active",
+    "tags": [],
+    "preferredServices": [
+      "cafeteria"
+    ],
+    "totalVisits": 1,
+    "firstVisit": "2025-11-11T18:43:47.846Z",
+    "lastVisit": "2025-11-11T18:43:47.840Z",
+    "totalSpent": 18,
+    "averageSpent": 18,
+    "totalSessions": 0,
+    "totalHours": 0,
+    "favoriteProducts": [],
+    "productStatistics": {
+      "da56c66d52b8e46b70f40b6f": {
+        "name": "Fig Bar",
+        "quantity": 1,
+        "totalSpent": 18,
+        "category": "cafeteria"
+      }
+    },
+    "preferredPaymentMethod": null,
+    "paymentStatistics": {
+      "efectivo": 1,
+      "tarjeta": 0,
+      "transferencia": 0
+    },
+    "averageSessionDuration": 0,
+    "preferredTimeSlots": [
+      "afternoon"
+    ],
+    "weekdayPreferences": {
+      "Tuesday": 1
+    },
+    "loyaltyPoints": 18,
+    "loyaltyTier": "bronze",
+    "isActive": true,
+    "createdBy": null,
+    "createdAt": "2025-11-11T18:43:47.847Z",
+    "updatedAt": "2025-11-11T18:43:47.849Z",
+    "id": "customer_d2pn2ijegzmmhux6jnq",
+    "membershipStatus": "none",
+    "membershipType": null,
+    "membershipStartDate": null,
+    "membershipEndDate": null,
+    "membershipPrice": 0,
+    "membershipBenefitsUsed": 0,
+    "hasPaidMembership": false
   }
 ]

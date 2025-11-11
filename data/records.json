@@ -383,5 +383,36 @@
     "createdAt": "2025-09-03T18:13:59.207Z",
     "drink": "Fig Bar",
     "drinkProduct": "da56c66d52b8e46b70f40b6f"
+  },
+  {
+    "_id": "2a40a736d5bb14ce89569073",
+    "client": "Cliente Test",
+    "service": "cafeteria",
+    "products": [
+      {
+        "productId": "da56c66d52b8e46b70f40b6f",
+        "name": "Fig Bar",
+        "quantity": 1,
+        "price": 18,
+        "cost": 8,
+        "category": "cafeteria"
+      }
+    ],
+    "hours": 1,
+    "subtotal": 18,
+    "serviceCharge": 0,
+    "total": 18,
+    "payment": "efectivo",
+    "cost": 8,
+    "profit": 10,
+    "drinksCost": 0,
+    "tip": 0,
+    "date": "2025-11-11T18:43:47.840Z",
+    "time": "12:43:47",
+    "createdBy": "e0cbd27429eaa20acf48cc23",
+    "isDeleted": false,
+    "createdAt": "2025-11-11T18:43:47.841Z",
+    "drink": "Fig Bar",
+    "drinkProduct": "da56c66d52b8e46b70f40b6f"
   }
 ]
