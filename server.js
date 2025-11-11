@@ -1190,6 +1190,91 @@ app.get('/api/sync', requireDatabase, auth, async (req, res) => {
 // Sample data initialization endpoint disabled to prevent data loss
 // Use proper database management tools instead
 
+// ============================================================================
+// AI GENERATION ENDPOINTS
+// ============================================================================
+
+/**
+ * Generate product description using AI
+ * POST /api/generate-description
+ * Body: { productName: string, keywords: string }
+ */
+app.post('/api/generate-description', async (req, res) => {
+  try {
+    const { productName, keywords = '' } = req.body;
+
+    if (!productName) {
+      return res.status(400).json({
+        error: 'El nombre del producto es requerido'
+      });
+    }
+
+    // Generate AI-powered description using Pollinations.ai text generation
+    const prompt = `Genera una descripción atractiva y profesional de máximo 2 líneas para un producto llamado "${productName}". ${keywords ? `Considera que es: ${keywords}.` : ''} La descripción debe ser clara, concisa y enfocada en beneficios. Responde SOLO con la descripción, sin formato adicional.`;
+
+    const pollinationsTextUrl = `https://text.pollinations.ai/${encodeURIComponent(prompt)}`;
+
+    const response = await fetch(pollinationsTextUrl);
+    let description = await response.text();
+
+    // Clean up the response - remove quotes and extra whitespace
+    description = description.trim().replace(/^["']|["']$/g, '');
+
+    // Fallback to a template description if AI fails
+    if (!description || description.length < 10) {
+      description = `${productName} - Producto de calidad premium. ${keywords || 'Excelente opción para tu negocio.'}`
+    }
+
+    res.json({ description });
+
+  } catch (error) {
+    console.error('Error generating description:', error);
+
+    // Fallback description
+    const { productName, keywords = '' } = req.body;
+    const fallbackDescription = `${productName} - Producto de calidad premium. ${keywords || 'Excelente opción para tu negocio.'}`;
+
+    res.json({ description: fallbackDescription });
+  }
+});
+
+/**
+ * Generate product image using AI
+ * POST /api/generate-image
+ * Body: { productName: string, description: string }
+ */
+app.post('/api/generate-image', async (req, res) => {
+  try {
+    const { productName, description = '' } = req.body;
+
+    if (!productName) {
+      return res.status(400).json({
+        error: 'El nombre del producto es requerido'
+      });
+    }
+
+    // Create detailed prompt for Pollinations.ai image generation
+    // The key is to be VERY specific about what we want to see
+    const imagePrompt = `Professional high-quality product photography of ${productName}${description ? `, ${description}` : ''}. Studio lighting, white background, centered composition, commercial product shot, 4k resolution, sharp focus, professional photography`;
+
+    // Pollinations.ai image URL with enhanced parameters for better quality
+    const imageUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(imagePrompt)}?width=800&height=800&seed=${Date.now()}&enhance=true&nologo=true`;
+
+    console.log(`[AI Image] Generated for "${productName}": ${imageUrl}`);
+
+    res.json({ imageUrl });
+
+  } catch (error) {
+    console.error('Error generating image:', error);
+
+    // Fallback to a seed-based image if AI fails
+    const { productName } = req.body;
+    const fallbackUrl = `https://picsum.photos/seed/${encodeURIComponent(productName)}/800/800`;
+
+    res.json({ imageUrl: fallbackUrl });
+  }
+});
+
 // Database setup endpoint
 app.post('/api/setup', requireDatabase, async (req, res) => {
   try {
