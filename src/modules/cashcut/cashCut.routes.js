@@ -10,13 +10,14 @@ const cashCutController = require('./cashCut.controller');
 const router = express.Router();
 
 /**
- * 📋 GET /api/cashcuts - Get all cash cuts
+ * 📋 GET /api/cashcuts - Get all cash cuts (PUBLIC)
  * Query params:
  * - limit: number (default: 50)
  * - startDate: ISO date string
  * - endDate: ISO date string
+ * This endpoint is public to allow the PWA to display cash cut history
  */
-router.get('/', auth, cashCutController.getCashCuts);
+router.get('/', cashCutController.getCashCuts);
 
 /**
  * 📊 GET /api/cashcuts/stats - Get cash cut statistics

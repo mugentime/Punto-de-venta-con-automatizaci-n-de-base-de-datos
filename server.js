@@ -937,15 +937,17 @@ app.use('/api/auth', requireDatabase, authRoutes);
 // Add direct /api/login endpoint for React PWA compatibility
 app.post('/api/login', requireDatabase, async (req, res) => {
   try {
-    const { email, password } = req.body;
+    // Accept both 'email' and 'username' for compatibility
+    const { email, username, password } = req.body;
+    const loginEmail = email || username;
 
-    if (!email || !password) {
+    if (!loginEmail || !password) {
       return res.status(400).json({
-        error: 'Email and password are required'
+        error: 'Email/username and password are required'
       });
     }
 
-    const user = await databaseManager.validateUserPassword(email, password);
+    const user = await databaseManager.validateUserPassword(loginEmail, password);
 
     if (!user) {
       return res.status(401).json({
@@ -975,6 +977,19 @@ app.use('/api/records', requireDatabase, recordRoutes); // Includes /historical 
 app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
 app.use('/api/memberships', requireDatabase, membershipRoutes);
 app.use('/api/sessions', requireDatabase, sessionRoutes);
+
+// Add /api/cash-sessions endpoint for React PWA
+app.get('/api/cash-sessions', requireDatabase, async (req, res) => {
+  try {
+    const cashCuts = await databaseManager.listCashCuts({ limit: 1000 });
+    // Filter only entries that have status field (cash sessions)
+    const cashSessions = cashCuts.filter(cut => cut.status);
+    res.json(cashSessions);
+  } catch (error) {
+    console.error('Error fetching cash sessions:', error);
+    res.status(500).json({ error: 'Failed to fetch cash sessions' });
+  }
+});
 app.use('/api/customers', requireDatabase, customerRoutes);
 app.use('/api/expenses', requireDatabase, expenseRoutes);
 app.use('/api/backup', backupRoutes); // Backup can work without DB for file operations
