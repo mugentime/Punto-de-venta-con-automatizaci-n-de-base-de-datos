@@ -54,7 +54,7 @@ Thumbs.db
 *.temp
 
 # Build output
-dist/
+# dist/ - Removed to deploy React PWA frontend
 build/
 out/
 
