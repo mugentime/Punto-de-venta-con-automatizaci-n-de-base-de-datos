@@ -212,6 +212,8 @@ app.use((req, res, next) => {
 
 // Serve static files
 app.use('/static', express.static(__dirname));
+// Serve dist folder for React PWA frontend
+app.use(express.static(path.join(__dirname, 'dist')));
 
 /**
  * Manual Database Initialization Endpoint
@@ -1297,12 +1299,12 @@ app.post('/api/setup', requireDatabase, async (req, res) => {
   }
 });
 
-// Serve HTML files
+// Serve HTML files - React PWA with light theme
 app.get('/', (req, res) => {
   try {
-    res.sendFile(path.join(__dirname, 'index.html'));
+    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
   } catch (error) {
-    console.error('Error serving index.html:', error);
+    console.error('Error serving dist/index.html:', error);
     res.status(500).send('Error loading homepage');
   }
 });
