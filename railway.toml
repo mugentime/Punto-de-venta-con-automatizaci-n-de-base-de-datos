@@ -4,17 +4,5 @@ builder = "nixpacks"
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/api/health"
-healthcheckTimeout = 60
+healthcheckTimeout = 100
 restartPolicyType = "always"
-
-[[services]]
-name = "web"
-port = 8080
-
-[services.web]
-healthcheckPath = "/api/health"
-
-[environments.production.variables]
-NODE_ENV = "production"
-PORT = "8080"
-DATABASE_URL = "postgresql://postgres:aezVREfCHRpQHBfwweXHEaANsbeIMeno@postgres.railway.internal:5432/railway"
