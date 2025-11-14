@@ -933,6 +933,43 @@ app.post('/api/records/historical', requireDatabase, async (req, res) => {
 
 // Routes (with database requirement)
 app.use('/api/auth', requireDatabase, authRoutes);
+
+// Add direct /api/login endpoint for React PWA compatibility
+app.post('/api/login', requireDatabase, async (req, res) => {
+  try {
+    const { email, password } = req.body;
+
+    if (!email || !password) {
+      return res.status(400).json({
+        error: 'Email and password are required'
+      });
+    }
+
+    const user = await databaseManager.validateUserPassword(email, password);
+
+    if (!user) {
+      return res.status(401).json({
+        error: 'Usuario no encontrado.'
+      });
+    }
+
+    const token = databaseManager.generateToken(user);
+
+    res.json({
+      message: 'Login successful',
+      token,
+      user
+    });
+
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({
+      error: 'Login failed',
+      details: error.message
+    });
+  }
+});
+
 app.use('/api/products', requireDatabase, productRoutes);
 app.use('/api/records', requireDatabase, recordRoutes); // Includes /historical endpoint
 app.use('/api/cashcuts', requireDatabase, cashCutRoutes);
