@@ -491,7 +491,7 @@ class CashCutService {
      */
     async saveCashCutToFile(cashCutData) {
         const dataDir = path.join(__dirname, '..', '..', '..', 'data');
-        const cashCutsPath = path.join(dataDir, 'cashcuts.json');
+        const cashCutsPath = path.join(dataDir, 'cash_cuts.json');
         
         try {
             await fs.mkdir(dataDir, { recursive: true });
@@ -534,7 +534,7 @@ class CashCutService {
      * 📖 Get cash cuts from file (fallback)
      */
     async getCashCutsFromFile(limit = 50) {
-        const cashCutsPath = path.join(__dirname, '..', '..', '..', 'data', 'cashcuts.json');
+        const cashCutsPath = path.join(__dirname, '..', '..', '..', 'data', 'cash_cuts.json');
         
         try {
             const data = await fs.readFile(cashCutsPath, 'utf8');

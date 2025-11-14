@@ -415,7 +415,7 @@ class DatabaseManager {
                 const fs = require('fs').promises;
                 const path = require('path');
                 const dataDir = path.join(__dirname, '..', 'data');
-                const cashCutsPath = path.join(dataDir, 'cashcuts.json');
+                const cashCutsPath = path.join(dataDir, 'cash_cuts.json');
                 
                 try {
                     await fs.access(cashCutsPath);
@@ -537,8 +537,8 @@ class DatabaseManager {
             } else {
                 const fs = require('fs').promises;
                 const path = require('path');
-                const cashCutsPath = path.join(__dirname, '..', 'data', 'cashcuts.json');
-                
+                const cashCutsPath = path.join(__dirname, '..', 'data', 'cash_cuts.json');
+
                 const cashCuts = await this.getCashCuts(1000);
                 const index = cashCuts.findIndex(c => c.id === cashCutId || c._id === cashCutId);
                 if (index !== -1) {
@@ -611,8 +611,8 @@ class DatabaseManager {
             } else {
                 const fs = require('fs').promises;
                 const path = require('path');
-                const cashCutsPath = path.join(__dirname, '..', 'data', 'cashcuts.json');
-                
+                const cashCutsPath = path.join(__dirname, '..', 'data', 'cash_cuts.json');
+
                 const cashCuts = await this.getCashCuts(1000);
                 const index = cashCuts.findIndex(c => c.id === id || c._id === id);
                 if (index !== -1) {
