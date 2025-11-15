@@ -1351,12 +1351,12 @@ app.post('/api/setup', requireDatabase, async (req, res) => {
   }
 });
 
-// Serve HTML files - React PWA with light theme
+// Serve HTML files - React PWA with light theme (from Oct 29, 2025 deployment)
 app.get('/', (req, res) => {
   try {
-    res.sendFile(path.join(__dirname, 'dist', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
   } catch (error) {
-    console.error('Error serving dist/index.html:', error);
+    console.error('Error serving index.html:', error);
     res.status(500).send('Error loading homepage');
   }
 });
