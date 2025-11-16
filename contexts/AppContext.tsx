@@ -101,42 +101,71 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     }, []);
 
-    // Fetch all data from database on app load
+    // Fetch all data from database on app load - OPTIMIZED with parallel fetches
     useEffect(() => {
         const fetchAllData = async () => {
             try {
-                // Fetch products
-                const productsResponse = await fetch('/api/products');
+                const startTime = Date.now();
+                console.log('🚀 Starting parallel data fetch...');
+
+                // ⚡ OPTIMIZATION: Fetch ALL resources in PARALLEL using Promise.all
+                const [
+                    productsResponse,
+                    ordersResponse,
+                    expensesResponse,
+                    coworkingResponse,
+                    cashResponse,
+                    usersResponse,
+                    customersResponse,
+                    withdrawalsResponse
+                ] = await Promise.all([
+                    fetch('/api/products'),
+                    fetch('/api/orders?limit=500'),  // Fetch more initial records
+                    fetch('/api/expenses?limit=200'),
+                    fetch('/api/coworking-sessions?limit=200'),
+                    fetch('/api/cash-sessions?limit=100'),
+                    fetch('/api/users'),
+                    fetch('/api/customers?limit=500'),
+                    fetch('/api/cash-withdrawals')
+                ]);
+
+                const fetchDuration = Date.now() - startTime;
+                console.log(`✓ All fetches completed in ${fetchDuration}ms`);
+
+                // Process products
                 if (productsResponse.ok) {
                     const productsData: Product[] = await productsResponse.json();
                     setProducts(productsData);
                 }
 
-                // Fetch orders
-                const ordersResponse = await fetch('/api/orders');
+                // Process orders (paginated response)
                 if (ordersResponse.ok) {
-                    const ordersData: Order[] = await ordersResponse.json();
+                    const ordersResult = await ordersResponse.json();
+                    const ordersData: Order[] = ordersResult.data || ordersResult;
                     setOrders(ordersData);
+                    console.log(`✓ Loaded ${ordersData.length}/${ordersResult.pagination?.total || ordersData.length} orders`);
                 }
 
-                // Fetch expenses
-                const expensesResponse = await fetch('/api/expenses');
+                // Process expenses (paginated response)
                 if (expensesResponse.ok) {
-                    const expensesData: Expense[] = await expensesResponse.json();
+                    const expensesResult = await expensesResponse.json();
+                    const expensesData: Expense[] = expensesResult.data || expensesResult;
                     setExpenses(expensesData);
+                    console.log(`✓ Loaded ${expensesData.length}/${expensesResult.pagination?.total || expensesData.length} expenses`);
                 }
 
-                // Fetch coworking sessions
-                const coworkingResponse = await fetch('/api/coworking-sessions');
+                // Process coworking sessions (paginated response)
                 if (coworkingResponse.ok) {
-                    const coworkingData: CoworkingSession[] = await coworkingResponse.json();
+                    const coworkingResult = await coworkingResponse.json();
+                    const coworkingData: CoworkingSession[] = coworkingResult.data || coworkingResult;
                     setCoworkingSessions(coworkingData);
+                    console.log(`✓ Loaded ${coworkingData.length}/${coworkingResult.pagination?.total || coworkingData.length} coworking sessions`);
                 }
 
-                // Fetch cash sessions
-                const cashResponse = await fetch('/api/cash-sessions');
+                // Process cash sessions (paginated response)
                 if (cashResponse.ok) {
-                    const cashData: any[] = await cashResponse.json();
+                    const cashResult = await cashResponse.json();
+                    const cashData: any[] = cashResult.data || cashResult;
                     // Map API response to frontend CashSession type
                     const mappedSessions: CashSession[] = cashData.map(session => ({
                         id: session.id,
@@ -151,10 +180,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         difference: session.difference
                     }));
                     setCashSessions(mappedSessions);
+                    console.log(`✓ Loaded ${mappedSessions.length}/${cashResult.pagination?.total || mappedSessions.length} cash sessions`);
                 }
 
-                // Fetch users
-                const usersResponse = await fetch('/api/users');
+                // Process users
                 if (usersResponse.ok) {
                     const usersData: User[] = await usersResponse.json();
                     setUsers(usersData);
@@ -163,21 +192,24 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     setUsers([initialAdmin]);
                 }
 
-                // Fetch customers
-                const customersResponse = await fetch('/api/customers');
+                // Process customers (paginated response)
                 if (customersResponse.ok) {
-                    const customersData: Customer[] = await customersResponse.json();
+                    const customersResult = await customersResponse.json();
+                    const customersData: Customer[] = customersResult.data || customersResult;
                     setCustomers(customersData);
+                    console.log(`✓ Loaded ${customersData.length}/${customersResult.pagination?.total || customersData.length} customers`);
                 }
 
-                // Fetch cash withdrawals
-                const withdrawalsResponse = await fetch('/api/cash-withdrawals');
+                // Process cash withdrawals
                 if (withdrawalsResponse.ok) {
                     const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
                     setCashWithdrawals(withdrawalsData);
                 }
+
+                const totalDuration = Date.now() - startTime;
+                console.log(`✅ All data loaded and processed in ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
             } catch (error) {
-                console.error("Failed to fetch data:", error);
+                console.error("❌ Failed to fetch data:", error);
                 // Fallback to initial admin if everything fails
                 setUsers([initialAdmin]);
             }

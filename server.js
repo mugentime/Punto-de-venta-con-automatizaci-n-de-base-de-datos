@@ -1264,15 +1264,43 @@ async function startServer() {
     // --- CUSTOMERS ENDPOINTS ---
     app.get('/api/customers', async (req, res) => {
         try {
+            const startTime = Date.now();
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const result = await pool.query('SELECT * FROM customers ORDER BY name ASC');
-            res.json(result.rows.map(c => ({
+
+            // Pagination parameters
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            // Get total count for pagination metadata
+            const countResult = await pool.query('SELECT COUNT(*) FROM customers');
+            const total = parseInt(countResult.rows[0].count);
+
+            // Fetch paginated customers with LIMIT
+            const result = await pool.query(
+                'SELECT * FROM customers ORDER BY name ASC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
+            const customers = result.rows.map(c => ({
                 ...c,
                 discountPercentage: parseFloat(c.discountPercentage),
                 creditLimit: parseFloat(c.creditLimit),
                 currentCredit: parseFloat(c.currentCredit),
                 createdAt: c.created_at
-            })));
+            }));
+
+            const duration = Date.now() - startTime;
+            console.log(`✓ Customers query completed in ${duration}ms (${customers.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+
+            res.json({
+                data: customers,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + limit < total
+                }
+            });
         } catch (error) {
             console.error("Error fetching customers:", error);
             res.status(500).json({ error: 'Failed to fetch customers' });
