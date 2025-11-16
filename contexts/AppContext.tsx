@@ -221,12 +221,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const { subscribe, isConnected } = useWebSocket();
 
     useEffect(() => {
-        // Initial load of coworking sessions
+        // Initial load of coworking sessions (handle paginated response)
         const loadCoworkingSessions = async () => {
             try {
-                const response = await fetch('/api/coworking-sessions');
+                const response = await fetch('/api/coworking-sessions?limit=200');
                 if (response.ok) {
-                    const sessions: CoworkingSession[] = await response.json();
+                    const result = await response.json();
+                    const sessions: CoworkingSession[] = result.data || result;
                     setCoworkingSessions(sessions);
                 }
             } catch (error) {
@@ -1199,10 +1200,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to add customer credit');
 
-            // Refresh customer data to get updated currentCredit
-            const customerResponse = await fetch('/api/customers');
+            // Refresh customer data to get updated currentCredit (handle paginated response)
+            const customerResponse = await fetch('/api/customers?limit=500');
             if (customerResponse.ok) {
-                const customersData: Customer[] = await customerResponse.json();
+                const result = await customerResponse.json();
+                const customersData: Customer[] = result.data || result;
                 setCustomers(customersData);
             }
         } catch (error) {
