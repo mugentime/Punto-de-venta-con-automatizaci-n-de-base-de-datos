@@ -510,9 +510,24 @@ async function startServer() {
     // --- ORDERS API ---
     app.get('/api/orders', async (req, res) => {
         try {
+            const startTime = Date.now();
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
-            res.json(result.rows.map(order => ({
+
+            // Pagination parameters
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            // Get total count for pagination metadata
+            const countResult = await pool.query('SELECT COUNT(*) FROM orders');
+            const total = parseInt(countResult.rows[0].count);
+
+            // Fetch paginated orders with LIMIT
+            const result = await pool.query(
+                'SELECT * FROM orders ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
+            const orders = result.rows.map(order => ({
                 ...order,
                 subtotal: parseFloat(order.subtotal),
                 discount: parseFloat(order.discount || 0),
@@ -520,7 +535,20 @@ async function startServer() {
                 total: parseFloat(order.total),
                 date: order.created_at,  // Map created_at to date for frontend compatibility
                 totalCost: order.items ? order.items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
-            })));
+            }));
+
+            const duration = Date.now() - startTime;
+            console.log(`✓ Orders query completed in ${duration}ms (${orders.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+
+            res.json({
+                data: orders,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + limit < total
+                }
+            });
         } catch (error) {
             console.error("Error fetching orders:", error);
             res.status(500).json({ error: 'Failed to fetch orders' });
@@ -680,13 +708,41 @@ async function startServer() {
     // --- EXPENSES API ---
     app.get('/api/expenses', async (req, res) => {
         try {
+            const startTime = Date.now();
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM expenses ORDER BY created_at DESC');
-            res.json(result.rows.map(expense => ({
+
+            // Pagination parameters
+            const limit = parseInt(req.query.limit) || 50;
+            const offset = parseInt(req.query.offset) || 0;
+
+            // Get total count for pagination metadata
+            const countResult = await pool.query('SELECT COUNT(*) FROM expenses');
+            const total = parseInt(countResult.rows[0].count);
+
+            // Fetch paginated expenses with LIMIT
+            const result = await pool.query(
+                'SELECT * FROM expenses ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
+            const expenses = result.rows.map(expense => ({
                 ...expense,
                 amount: parseFloat(expense.amount),
                 date: expense.created_at  // Map created_at to date for frontend compatibility
-            })));
+            }));
+
+            const duration = Date.now() - startTime;
+            console.log(`✓ Expenses query completed in ${duration}ms (${expenses.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+
+            res.json({
+                data: expenses,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + limit < total
+                }
+            });
         } catch (error) {
             console.error("Error fetching expenses:", error);
             res.status(500).json({ error: 'Failed to fetch expenses' });
@@ -754,14 +810,42 @@ async function startServer() {
     // --- COWORKING SESSIONS API ---
     app.get('/api/coworking-sessions', async (req, res) => {
         try {
+            const startTime = Date.now();
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM coworking_sessions ORDER BY created_at DESC');
-            res.json(result.rows.map(session => ({
+
+            // Pagination parameters
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            // Get total count for pagination metadata
+            const countResult = await pool.query('SELECT COUNT(*) FROM coworking_sessions');
+            const total = parseInt(countResult.rows[0].count);
+
+            // Fetch paginated sessions with LIMIT
+            const result = await pool.query(
+                'SELECT * FROM coworking_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
+            const sessions = result.rows.map(session => ({
                 ...session,
                 hourlyRate: parseFloat(session.hourlyRate),
                 total: parseFloat(session.total),
                 consumedExtras: session.consumedExtras || []
-            })));
+            }));
+
+            const duration = Date.now() - startTime;
+            console.log(`✓ Coworking sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+
+            res.json({
+                data: sessions,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + limit < total
+                }
+            });
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
             res.status(500).json({ error: 'Failed to fetch coworking sessions' });
@@ -894,9 +978,24 @@ async function startServer() {
     // --- CASH SESSIONS API ---
     app.get('/api/cash-sessions', async (req, res) => {
         try {
+            const startTime = Date.now();
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM cash_sessions ORDER BY created_at DESC');
-            res.json(result.rows.map(session => ({
+
+            // Pagination parameters
+            const limit = parseInt(req.query.limit) || 50;
+            const offset = parseInt(req.query.offset) || 0;
+
+            // Get total count for pagination metadata
+            const countResult = await pool.query('SELECT COUNT(*) FROM cash_sessions');
+            const total = parseInt(countResult.rows[0].count);
+
+            // Fetch paginated sessions with LIMIT
+            const result = await pool.query(
+                'SELECT * FROM cash_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
+            const sessions = result.rows.map(session => ({
                 ...session,
                 startAmount: parseFloat(session.startAmount),
                 endAmount: session.endAmount ? parseFloat(session.endAmount) : null,
@@ -904,7 +1003,20 @@ async function startServer() {
                 totalExpenses: parseFloat(session.totalExpenses),
                 expectedCash: parseFloat(session.expectedCash),
                 difference: parseFloat(session.difference)
-            })));
+            }));
+
+            const duration = Date.now() - startTime;
+            console.log(`✓ Cash sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+
+            res.json({
+                data: sessions,
+                pagination: {
+                    total,
+                    limit,
+                    offset,
+                    hasMore: offset + limit < total
+                }
+            });
         } catch (error) {
             console.error("Error fetching cash sessions:", error);
             res.status(500).json({ error: 'Failed to fetch cash sessions' });
@@ -1456,9 +1568,13 @@ async function startServer() {
 
             const indexes = [
                 { name: 'idx_orders_created_at', table: 'orders', column: 'created_at DESC' },
+                { name: 'idx_orders_status', table: 'orders', column: '"paymentMethod"' },
                 { name: 'idx_expenses_created_at', table: 'expenses', column: 'created_at DESC' },
+                { name: 'idx_expenses_category', table: 'expenses', column: 'category' },
                 { name: 'idx_coworking_created_at', table: 'coworking_sessions', column: 'created_at DESC' },
                 { name: 'idx_coworking_status', table: 'coworking_sessions', column: 'status' },
+                { name: 'idx_cash_sessions_created_at', table: 'cash_sessions', column: 'created_at DESC' },
+                { name: 'idx_cash_sessions_status', table: 'cash_sessions', column: 'status' },
                 { name: 'idx_customer_credits_customer', table: 'customer_credits', column: '"customerId"' }
             ];
 
