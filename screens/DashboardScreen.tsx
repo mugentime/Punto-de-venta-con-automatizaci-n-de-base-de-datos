@@ -78,11 +78,13 @@ const DashboardScreen: React.FC = () => {
     // Calculate revenue from orders
     const ordersRevenue = filteredOrders.reduce((acc, order) => acc + order.total, 0);
 
-    // Calculate revenue from finished coworking sessions
-    const coworkingRevenue = filteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
+    // ⚠️ CRITICAL FIX: Do NOT add coworkingRevenue separately!
+    // Coworking sessions are automatically saved as orders via finishCoworkingSession()
+    // Adding them twice DUPLICATES revenue
+    // const coworkingRevenue = filteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
 
-    // Total revenue includes both orders and coworking sessions
-    const totalRevenue = ordersRevenue + coworkingRevenue;
+    // Total revenue = orders only (already includes coworking sessions as orders)
+    const totalRevenue = ordersRevenue;
 
     const totalCOGS = filteredOrders.reduce((acc, order) => acc + order.totalCost, 0);
     const grossProfit = totalRevenue - totalCOGS;

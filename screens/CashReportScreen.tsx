@@ -189,19 +189,21 @@ const CashReportScreen: React.FC = () => {
   ) : [];
 
   const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
-  const coworkingSales = sessionCoworking.reduce((sum, session) => sum + (session.total || 0), 0);
-  const totalSales = ordersSales + coworkingSales;
+  // ⚠️ CRITICAL FIX: Coworking sessions already included in orders - do NOT add separately
+  // const coworkingSales = sessionCoworking.reduce((sum, session) => sum + (session.total || 0), 0);
+  const totalSales = ordersSales; // Already includes coworking sessions
 
   const totalExpenses = sessionExpenses.reduce((sum, expense) => sum + expense.amount, 0);
 
-  const ordersCashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
-  const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
-  const cashSales = ordersCashSales + coworkingCashSales;
+  // ⚠️ CRITICAL FIX: Coworking sessions already included in sessionOrders - do NOT add separately
+  const cashSales = sessionOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+  // const coworkingCashSales = sessionCoworking.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
+  // const cashSales = ordersCashSales + coworkingCashSales;
 
   // Calculate credit sales (Crédito or Fiado)
-  const ordersCreditSales = sessionOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
-  const coworkingCreditSales = sessionCoworking.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
-  const creditSales = ordersCreditSales + coworkingCreditSales;
+  const creditSales = sessionOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
+  // const coworkingCreditSales = sessionCoworking.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
+  // const creditSales = ordersCreditSales + coworkingCreditSales;
 
   // Calculate withdrawals for current session
   const sessionWithdrawals = currentSession ? cashWithdrawals.filter(w => w.cash_session_id === currentSession.id) : [];
@@ -321,21 +323,23 @@ const CashReportScreen: React.FC = () => {
   );
 
   const ordersRevenueHist = filteredOrders.reduce((sum, order) => sum + order.total, 0);
-  const coworkingRevenueHist = filteredCoworkingHist.reduce((sum, session) => sum + (session.total || 0), 0);
-  const totalSalesHist = ordersRevenueHist + coworkingRevenueHist;
+  // ⚠️ CRITICAL FIX: Coworking sessions already included in orders - do NOT add separately
+  // const coworkingRevenueHist = filteredCoworkingHist.reduce((sum, session) => sum + (session.total || 0), 0);
+  const totalSalesHist = ordersRevenueHist; // Already includes coworking sessions
 
   const totalExpensesHist = filteredExpenses.reduce((sum, expense) => sum + expense.amount, 0);
   // Expenses already include costs, so final balance is just sales minus expenses
   const finalBalanceHist = totalSalesHist - totalExpensesHist;
 
-  const ordersCashHist = filteredOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
-  const coworkingCashHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
-  const cashSalesHist = ordersCashHist + coworkingCashHist;
+  // ⚠️ CRITICAL FIX: Coworking sessions already included in filteredOrders - do NOT add separately
+  const cashSalesHist = filteredOrders.filter(o => o.paymentMethod === 'Efectivo').reduce((sum, o) => sum + o.total, 0);
+  // const coworkingCashHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Efectivo').reduce((sum, s) => sum + (s.total || 0), 0);
+  // const cashSalesHist = ordersCashHist + coworkingCashHist;
 
   // Calculate credit sales (Crédito or Fiado) for historical view
-  const ordersCreditHist = filteredOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
-  const coworkingCreditHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
-  const creditSalesHist = ordersCreditHist + coworkingCreditHist;
+  const creditSalesHist = filteredOrders.filter(o => o.paymentMethod === 'Crédito' || o.paymentMethod === 'Fiado').reduce((sum, o) => sum + o.total, 0);
+  // const coworkingCreditHist = filteredCoworkingHist.filter(s => s.paymentMethod === 'Crédito' || s.paymentMethod === 'Fiado').reduce((sum, s) => sum + (s.total || 0), 0);
+  // const creditSalesHist = ordersCreditHist + coworkingCreditHist;
 
   const cardSalesHist = totalSalesHist - cashSalesHist - creditSalesHist;
   const totalOrdersHist = filteredOrders.length + filteredCoworkingHist.length;

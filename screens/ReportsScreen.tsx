@@ -107,11 +107,13 @@ const ReportsScreen: React.FC = () => {
         // Calculate revenue from orders
         const ordersRevenue = currentFilteredOrders.reduce((acc, order) => acc + order.total, 0);
 
-        // Calculate revenue from finished coworking sessions
-        const coworkingRevenue = currentFilteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
+        // ⚠️ CRITICAL FIX: Do NOT add coworkingRevenue separately!
+        // Coworking sessions are automatically saved as orders via finishCoworkingSession()
+        // in AppContext.tsx (lines 886-927). Adding them twice DUPLICATES revenue by $7,019.70+
+        // const coworkingRevenue = currentFilteredCoworkingSessions.reduce((acc, session) => acc + (session.total || 0), 0);
 
-        // Total revenue includes both orders and coworking sessions
-        const totalRevenue = ordersRevenue + coworkingRevenue;
+        // Total revenue = orders only (already includes coworking sessions as orders)
+        const totalRevenue = ordersRevenue;
 
         // Operating Expenses (includes COGS + rent, utilities, salaries, etc.)
         // Los gastos operativos ya incluyen el costo de mercancía, por lo tanto NO se deben sumar los costos por separado
