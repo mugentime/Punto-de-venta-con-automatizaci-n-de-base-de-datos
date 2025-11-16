@@ -363,31 +363,48 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
         const pollAllResources = async () => {
             try {
-                // Poll coworking sessions
-                const coworkingRes = await fetch('/api/coworking-sessions');
+                // Poll coworking sessions (handle paginated response)
+                const coworkingRes = await fetch('/api/coworking-sessions?limit=100');
                 if (coworkingRes.ok) {
-                    const sessions: CoworkingSession[] = await coworkingRes.json();
+                    const coworkingResult = await coworkingRes.json();
+                    const sessions: CoworkingSession[] = coworkingResult.data || coworkingResult;
                     setCoworkingSessions(sessions);
                 }
 
-                // Poll cash sessions
-                const cashRes = await fetch('/api/cash-sessions');
+                // Poll cash sessions (handle paginated response)
+                const cashRes = await fetch('/api/cash-sessions?limit=50');
                 if (cashRes.ok) {
-                    const cashData = await cashRes.json();
-                    setCashSessions(cashData);
+                    const cashResult = await cashRes.json();
+                    const cashData: any[] = cashResult.data || cashResult;
+                    // Map API response to frontend CashSession type
+                    const mappedSessions: CashSession[] = cashData.map(session => ({
+                        id: session.id,
+                        startDate: session.startTime,
+                        endDate: session.endTime,
+                        startAmount: session.startAmount,
+                        endAmount: session.endAmount,
+                        status: session.status === 'active' ? 'open' : 'closed',
+                        totalSales: session.totalSales,
+                        totalExpenses: session.totalExpenses,
+                        expectedCash: session.expectedCash,
+                        difference: session.difference
+                    }));
+                    setCashSessions(mappedSessions);
                 }
 
-                // Poll customers
-                const customersRes = await fetch('/api/customers');
+                // Poll customers (handle paginated response)
+                const customersRes = await fetch('/api/customers?limit=500');
                 if (customersRes.ok) {
-                    const customersData = await customersRes.json();
+                    const customersResult = await customersRes.json();
+                    const customersData: Customer[] = customersResult.data || customersResult;
                     setCustomers(customersData);
                 }
 
-                // Poll orders (optional: only recent orders to avoid large payloads)
-                const ordersRes = await fetch('/api/orders');
+                // Poll orders (handle paginated response)
+                const ordersRes = await fetch('/api/orders?limit=100');
                 if (ordersRes.ok) {
-                    const ordersData = await ordersRes.json();
+                    const ordersResult = await ordersRes.json();
+                    const ordersData: Order[] = ordersResult.data || ordersResult;
                     setOrders(ordersData);
                 }
 
