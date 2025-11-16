@@ -536,20 +536,28 @@ async function startServer() {
             // 🛡️ FIX: Defensive error handling for each order to prevent one bad order from crashing the entire endpoint
             const orders = result.rows.map((order, index) => {
                 try {
+                    // 🔥 CRITICAL FIX: Remove imageUrl from items to reduce response size from 100+MB to <1MB
+                    // Base64 images in items cause 2.1MB per 10 orders → browser timeout & "Failed to fetch"
+                    const cleanedItems = (order.items && Array.isArray(order.items))
+                        ? order.items.map(item => {
+                            const { imageUrl, ...itemWithoutImage } = item;
+                            return itemWithoutImage;
+                        })
+                        : [];
+
                     return {
                         ...order,
+                        items: cleanedItems, // Use cleaned items without imageUrl
                         subtotal: parseFloat(order.subtotal || 0),
                         discount: parseFloat(order.discount || 0),
                         tip: parseFloat(order.tip || 0),
                         total: parseFloat(order.total || 0),
                         date: order.created_at || new Date().toISOString(),  // Map created_at to date for frontend compatibility
-                        totalCost: (order.items && Array.isArray(order.items))
-                            ? order.items.reduce((acc, item) => {
-                                const cost = parseFloat(item.cost || 0);
-                                const qty = parseInt(item.quantity || 0);
-                                return acc + (cost * qty);
-                            }, 0)
-                            : 0
+                        totalCost: cleanedItems.reduce((acc, item) => {
+                            const cost = parseFloat(item.cost || 0);
+                            const qty = parseInt(item.quantity || 0);
+                            return acc + (cost * qty);
+                        }, 0)
                     };
                 } catch (itemError) {
                     console.error(`❌ Error processing order ${order.id} (index ${index}):`, itemError.message);
@@ -564,6 +572,7 @@ async function startServer() {
                     // Return safe default instead of crashing
                     return {
                         ...order,
+                        items: [], // Empty items on error
                         subtotal: 0,
                         discount: 0,
                         tip: 0,
