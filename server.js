@@ -1031,9 +1031,15 @@ async function startServer() {
             const limit = parseInt(req.query.limit) || 50;
             const offset = parseInt(req.query.offset) || 0;
 
-            // Get total count for pagination metadata
-            const countResult = await pool.query('SELECT COUNT(*) FROM cash_sessions');
-            const total = parseInt(countResult.rows[0].count);
+            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
+            // Only fetch if explicitly requested with ?includeCount=true
+            const includeCount = req.query.includeCount === 'true';
+            let total = null;
+
+            if (includeCount) {
+                const countResult = await pool.query('SELECT COUNT(*) FROM cash_sessions');
+                total = parseInt(countResult.rows[0].count);
+            }
 
             // Fetch paginated sessions with LIMIT
             const result = await pool.query(
@@ -1052,13 +1058,15 @@ async function startServer() {
             }));
 
             const duration = Date.now() - startTime;
-            console.log(`✓ Cash sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+            console.log(`✓ Cash sessions query completed in ${duration}ms (${sessions.length} records, limit: ${limit}, offset: ${offset})`);
 
-            // Return array for backwards compatibility with frontend
-            res.setHeader('X-Total-Count', total);
+            // Only set headers if count was requested
+            if (includeCount && total !== null) {
+                res.setHeader('X-Total-Count', total);
+                res.setHeader('X-Has-More', offset + limit < total);
+            }
             res.setHeader('X-Limit', limit);
             res.setHeader('X-Offset', offset);
-            res.setHeader('X-Has-More', offset + limit < total);
             res.json(sessions);
         } catch (error) {
             console.error("Error fetching cash sessions:", error);
@@ -1314,9 +1322,15 @@ async function startServer() {
             const limit = parseInt(req.query.limit) || 100;
             const offset = parseInt(req.query.offset) || 0;
 
-            // Get total count for pagination metadata
-            const countResult = await pool.query('SELECT COUNT(*) FROM customers');
-            const total = parseInt(countResult.rows[0].count);
+            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
+            // Only fetch if explicitly requested with ?includeCount=true
+            const includeCount = req.query.includeCount === 'true';
+            let total = null;
+
+            if (includeCount) {
+                const countResult = await pool.query('SELECT COUNT(*) FROM customers');
+                total = parseInt(countResult.rows[0].count);
+            }
 
             // Fetch paginated customers with LIMIT
             const result = await pool.query(
@@ -1333,15 +1347,15 @@ async function startServer() {
             }));
 
             const duration = Date.now() - startTime;
-            console.log(`✓ Customers query completed in ${duration}ms (${customers.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+            console.log(`✓ Customers query completed in ${duration}ms (${customers.length} records, limit: ${limit}, offset: ${offset})`);
 
             res.json({
                 data: customers,
                 pagination: {
-                    total,
+                    total: total,
                     limit,
                     offset,
-                    hasMore: offset + limit < total
+                    hasMore: total !== null ? offset + limit < total : null
                 }
             });
         } catch (error) {
