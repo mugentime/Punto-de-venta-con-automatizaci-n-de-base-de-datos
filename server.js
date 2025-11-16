@@ -540,15 +540,13 @@ async function startServer() {
             const duration = Date.now() - startTime;
             console.log(`✓ Orders query completed in ${duration}ms (${orders.length}/${total} records, limit: ${limit}, offset: ${offset})`);
 
-            res.json({
-                data: orders,
-                pagination: {
-                    total,
-                    limit,
-                    offset,
-                    hasMore: offset + limit < total
-                }
-            });
+            // Return array for backwards compatibility with frontend
+            // Pagination info available via headers
+            res.setHeader('X-Total-Count', total);
+            res.setHeader('X-Limit', limit);
+            res.setHeader('X-Offset', offset);
+            res.setHeader('X-Has-More', offset + limit < total);
+            res.json(orders);
         } catch (error) {
             console.error("Error fetching orders:", error);
             res.status(500).json({ error: 'Failed to fetch orders' });
@@ -734,15 +732,12 @@ async function startServer() {
             const duration = Date.now() - startTime;
             console.log(`✓ Expenses query completed in ${duration}ms (${expenses.length}/${total} records, limit: ${limit}, offset: ${offset})`);
 
-            res.json({
-                data: expenses,
-                pagination: {
-                    total,
-                    limit,
-                    offset,
-                    hasMore: offset + limit < total
-                }
-            });
+            // Return array for backwards compatibility with frontend
+            res.setHeader('X-Total-Count', total);
+            res.setHeader('X-Limit', limit);
+            res.setHeader('X-Offset', offset);
+            res.setHeader('X-Has-More', offset + limit < total);
+            res.json(expenses);
         } catch (error) {
             console.error("Error fetching expenses:", error);
             res.status(500).json({ error: 'Failed to fetch expenses' });
@@ -837,15 +832,12 @@ async function startServer() {
             const duration = Date.now() - startTime;
             console.log(`✓ Coworking sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
 
-            res.json({
-                data: sessions,
-                pagination: {
-                    total,
-                    limit,
-                    offset,
-                    hasMore: offset + limit < total
-                }
-            });
+            // Return array for backwards compatibility with frontend
+            res.setHeader('X-Total-Count', total);
+            res.setHeader('X-Limit', limit);
+            res.setHeader('X-Offset', offset);
+            res.setHeader('X-Has-More', offset + limit < total);
+            res.json(sessions);
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
             res.status(500).json({ error: 'Failed to fetch coworking sessions' });
@@ -1008,15 +1000,12 @@ async function startServer() {
             const duration = Date.now() - startTime;
             console.log(`✓ Cash sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
 
-            res.json({
-                data: sessions,
-                pagination: {
-                    total,
-                    limit,
-                    offset,
-                    hasMore: offset + limit < total
-                }
-            });
+            // Return array for backwards compatibility with frontend
+            res.setHeader('X-Total-Count', total);
+            res.setHeader('X-Limit', limit);
+            res.setHeader('X-Offset', offset);
+            res.setHeader('X-Has-More', offset + limit < total);
+            res.json(sessions);
         } catch (error) {
             console.error("Error fetching cash sessions:", error);
             res.status(500).json({ error: 'Failed to fetch cash sessions' });
