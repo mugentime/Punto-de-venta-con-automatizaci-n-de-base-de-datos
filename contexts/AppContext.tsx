@@ -17,6 +17,7 @@ const initialAdmin: User = {
 interface AppContextType {
     // Loading state
     isDataLoaded: boolean;
+    loadAllData: () => Promise<void>;
     // Auth
     users: User[];
     currentUser: User | null;
@@ -106,33 +107,32 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     }, []);
 
-    // Fetch all data from database on app load - OPTIMIZED with parallel fetches
-    useEffect(() => {
-        const fetchAllData = async () => {
-            try {
-                const startTime = Date.now();
-                console.log('🚀 Starting parallel data fetch...');
+    // 🔄 LOAD ALL DATA - Called manually after login
+    const loadAllData = async () => {
+        try {
+            const startTime = Date.now();
+            console.log('🚀 Starting parallel data fetch...');
 
-                // ⚡ OPTIMIZATION: Fetch ALL resources in PARALLEL using Promise.all
-                const [
-                    productsResponse,
-                    ordersResponse,
-                    expensesResponse,
-                    coworkingResponse,
-                    cashResponse,
-                    usersResponse,
-                    customersResponse,
-                    withdrawalsResponse
-                ] = await Promise.all([
-                    fetch('/api/products'),
-                    fetch('/api/orders?limit=500'),  // Fetch more initial records
-                    fetch('/api/expenses?limit=200'),
-                    fetch('/api/coworking-sessions?limit=200'),
-                    fetch('/api/cash-sessions?limit=100'),
-                    fetch('/api/users'),
-                    fetch('/api/customers?limit=500'),
-                    fetch('/api/cash-withdrawals')
-                ]);
+            // ⚡ OPTIMIZATION: Fetch ALL resources in PARALLEL using Promise.all
+            const [
+                productsResponse,
+                ordersResponse,
+                expensesResponse,
+                coworkingResponse,
+                cashResponse,
+                usersResponse,
+                customersResponse,
+                withdrawalsResponse
+            ] = await Promise.all([
+                fetch('/api/products'),
+                fetch('/api/orders?limit=500'),  // Fetch more initial records
+                fetch('/api/expenses?limit=200'),
+                fetch('/api/coworking-sessions?limit=200'),
+                fetch('/api/cash-sessions?limit=100'),
+                fetch('/api/users'),
+                fetch('/api/customers?limit=500'),
+                fetch('/api/cash-withdrawals')
+            ]);
 
                 const fetchDuration = Date.now() - startTime;
                 console.log(`✓ All fetches completed in ${fetchDuration}ms`);
@@ -219,21 +219,19 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     setCashWithdrawals(withdrawalsData);
                 }
 
-                const totalDuration = Date.now() - startTime;
-                console.log(`✅ All data loaded and processed in ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
+            const totalDuration = Date.now() - startTime;
+            console.log(`✅ All data loaded and processed in ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
 
-                // ✅ Set data loaded flag
-                setIsDataLoaded(true);
-            } catch (error) {
-                console.error("❌ Failed to fetch data:", error);
-                // Fallback to initial admin if everything fails
-                setUsers([initialAdmin]);
-                // Even on error, mark as loaded to prevent infinite loading
-                setIsDataLoaded(true);
-            }
-        };
-        fetchAllData();
-    }, []);
+            // ✅ Set data loaded flag
+            setIsDataLoaded(true);
+        } catch (error) {
+            console.error("❌ Failed to fetch data:", error);
+            // Fallback to initial admin if everything fails
+            setUsers([initialAdmin]);
+            // Even on error, mark as loaded to prevent infinite loading
+            setIsDataLoaded(true);
+        }
+    };
 
     // 🔄 REAL-TIME SYNC: WebSocket subscription for coworking sessions
     const { subscribe, isConnected } = useWebSocket();
@@ -469,6 +467,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Set current user and persist to localStorage
             setCurrentUser(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
+
+            // 🔄 Load ALL data after successful login
+            console.log('✅ Login successful, loading all data...');
+            await loadAllData();
         } catch (error) {
             throw error;
         }
@@ -478,6 +480,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         setCurrentUser(null);
         // Clear from localStorage
         localStorage.removeItem('currentUser');
+        // Reset data loaded flag
+        setIsDataLoaded(false);
     };
 
     const register = async (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
@@ -1277,6 +1281,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     return (
         <AppContext.Provider value={{
             isDataLoaded,
+            loadAllData,
             users, currentUser, login, logout, register, approveUser, deleteUser,
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
