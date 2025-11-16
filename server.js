@@ -517,9 +517,15 @@ async function startServer() {
             const limit = parseInt(req.query.limit) || 100;
             const offset = parseInt(req.query.offset) || 0;
 
-            // Get total count for pagination metadata
-            const countResult = await pool.query('SELECT COUNT(*) FROM orders');
-            const total = parseInt(countResult.rows[0].count);
+            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
+            // Only fetch if explicitly requested with ?includeCount=true
+            const includeCount = req.query.includeCount === 'true';
+            let total = null;
+
+            if (includeCount) {
+                const countResult = await pool.query('SELECT COUNT(*) FROM orders');
+                total = parseInt(countResult.rows[0].count);
+            }
 
             // Fetch paginated orders with LIMIT
             const result = await pool.query(
@@ -527,25 +533,57 @@ async function startServer() {
                 [limit, offset]
             );
 
-            const orders = result.rows.map(order => ({
-                ...order,
-                subtotal: parseFloat(order.subtotal),
-                discount: parseFloat(order.discount || 0),
-                tip: parseFloat(order.tip || 0),
-                total: parseFloat(order.total),
-                date: order.created_at,  // Map created_at to date for frontend compatibility
-                totalCost: order.items ? order.items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
-            }));
+            // 🛡️ FIX: Defensive error handling for each order to prevent one bad order from crashing the entire endpoint
+            const orders = result.rows.map((order, index) => {
+                try {
+                    return {
+                        ...order,
+                        subtotal: parseFloat(order.subtotal || 0),
+                        discount: parseFloat(order.discount || 0),
+                        tip: parseFloat(order.tip || 0),
+                        total: parseFloat(order.total || 0),
+                        date: order.created_at || new Date().toISOString(),  // Map created_at to date for frontend compatibility
+                        totalCost: (order.items && Array.isArray(order.items))
+                            ? order.items.reduce((acc, item) => {
+                                const cost = parseFloat(item.cost || 0);
+                                const qty = parseInt(item.quantity || 0);
+                                return acc + (cost * qty);
+                            }, 0)
+                            : 0
+                    };
+                } catch (itemError) {
+                    console.error(`❌ Error processing order ${order.id} (index ${index}):`, itemError.message);
+                    console.error(`Order data snapshot:`, JSON.stringify({
+                        id: order.id,
+                        clientName: order.clientName,
+                        itemsType: typeof order.items,
+                        itemsIsArray: Array.isArray(order.items),
+                        subtotal: order.subtotal,
+                        total: order.total
+                    }));
+                    // Return safe default instead of crashing
+                    return {
+                        ...order,
+                        subtotal: 0,
+                        discount: 0,
+                        tip: 0,
+                        total: 0,
+                        date: order.created_at || new Date().toISOString(),
+                        totalCost: 0
+                    };
+                }
+            }).filter(o => o && o.id); // Filter out any null/undefined orders
 
             const duration = Date.now() - startTime;
-            console.log(`✓ Orders query completed in ${duration}ms (${orders.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+            console.log(`✓ Orders query completed in ${duration}ms (${orders.length} records, limit: ${limit}, offset: ${offset})`);
 
-            // Return array for backwards compatibility with frontend
-            // Pagination info available via headers
-            res.setHeader('X-Total-Count', total);
+            // Only set headers if count was requested
+            if (includeCount && total !== null) {
+                res.setHeader('X-Total-Count', total);
+                res.setHeader('X-Has-More', offset + limit < total);
+            }
             res.setHeader('X-Limit', limit);
             res.setHeader('X-Offset', offset);
-            res.setHeader('X-Has-More', offset + limit < total);
             res.json(orders);
         } catch (error) {
             console.error("Error fetching orders:", error);
@@ -713,9 +751,15 @@ async function startServer() {
             const limit = parseInt(req.query.limit) || 50;
             const offset = parseInt(req.query.offset) || 0;
 
-            // Get total count for pagination metadata
-            const countResult = await pool.query('SELECT COUNT(*) FROM expenses');
-            const total = parseInt(countResult.rows[0].count);
+            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
+            // Only fetch if explicitly requested with ?includeCount=true
+            const includeCount = req.query.includeCount === 'true';
+            let total = null;
+
+            if (includeCount) {
+                const countResult = await pool.query('SELECT COUNT(*) FROM expenses');
+                total = parseInt(countResult.rows[0].count);
+            }
 
             // Fetch paginated expenses with LIMIT
             const result = await pool.query(
@@ -730,13 +774,15 @@ async function startServer() {
             }));
 
             const duration = Date.now() - startTime;
-            console.log(`✓ Expenses query completed in ${duration}ms (${expenses.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+            console.log(`✓ Expenses query completed in ${duration}ms (${expenses.length} records, limit: ${limit}, offset: ${offset})`);
 
-            // Return array for backwards compatibility with frontend
-            res.setHeader('X-Total-Count', total);
+            // Only set headers if count was requested
+            if (includeCount && total !== null) {
+                res.setHeader('X-Total-Count', total);
+                res.setHeader('X-Has-More', offset + limit < total);
+            }
             res.setHeader('X-Limit', limit);
             res.setHeader('X-Offset', offset);
-            res.setHeader('X-Has-More', offset + limit < total);
             res.json(expenses);
         } catch (error) {
             console.error("Error fetching expenses:", error);
@@ -812,9 +858,15 @@ async function startServer() {
             const limit = parseInt(req.query.limit) || 100;
             const offset = parseInt(req.query.offset) || 0;
 
-            // Get total count for pagination metadata
-            const countResult = await pool.query('SELECT COUNT(*) FROM coworking_sessions');
-            const total = parseInt(countResult.rows[0].count);
+            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
+            // Only fetch if explicitly requested with ?includeCount=true
+            const includeCount = req.query.includeCount === 'true';
+            let total = null;
+
+            if (includeCount) {
+                const countResult = await pool.query('SELECT COUNT(*) FROM coworking_sessions');
+                total = parseInt(countResult.rows[0].count);
+            }
 
             // Fetch paginated sessions with LIMIT
             const result = await pool.query(
@@ -830,13 +882,15 @@ async function startServer() {
             }));
 
             const duration = Date.now() - startTime;
-            console.log(`✓ Coworking sessions query completed in ${duration}ms (${sessions.length}/${total} records, limit: ${limit}, offset: ${offset})`);
+            console.log(`✓ Coworking sessions query completed in ${duration}ms (${sessions.length} records, limit: ${limit}, offset: ${offset})`);
 
-            // Return array for backwards compatibility with frontend
-            res.setHeader('X-Total-Count', total);
+            // Only set headers if count was requested
+            if (includeCount && total !== null) {
+                res.setHeader('X-Total-Count', total);
+                res.setHeader('X-Has-More', offset + limit < total);
+            }
             res.setHeader('X-Limit', limit);
             res.setHeader('X-Offset', offset);
-            res.setHeader('X-Has-More', offset + limit < total);
             res.json(sessions);
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);

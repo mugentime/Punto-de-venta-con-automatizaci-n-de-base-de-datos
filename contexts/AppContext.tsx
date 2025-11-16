@@ -149,6 +149,14 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     const ordersData: Order[] = ordersResult.data || ordersResult;
                     setOrders(ordersData);
                     console.log(`✓ Loaded ${ordersData.length}/${ordersResult.pagination?.total || ordersData.length} orders`);
+                } else {
+                    // 🛡️ FIX: Log HTTP errors to diagnose fetch failures
+                    const errorText = await ordersResponse.text();
+                    console.error(`❌ Orders fetch failed with status ${ordersResponse.status}`);
+                    console.error(`Request URL: /api/orders?limit=500`);
+                    console.error(`Response body:`, errorText);
+                    // Set empty array to prevent undefined state
+                    setOrders([]);
                 }
 
                 // Process expenses (paginated response)
