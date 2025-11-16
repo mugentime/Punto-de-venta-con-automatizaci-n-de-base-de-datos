@@ -15,6 +15,8 @@ const initialAdmin: User = {
 };
 
 interface AppContextType {
+    // Loading state
+    isDataLoaded: boolean;
     // Auth
     users: User[];
     currentUser: User | null;
@@ -72,6 +74,9 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // --- STATE MANAGEMENT ---
+
+    // Loading State
+    const [isDataLoaded, setIsDataLoaded] = useState(false);
 
     // All State (now fetched from backend)
     const [users, setUsers] = useState<User[]>([]);
@@ -208,10 +213,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                 const totalDuration = Date.now() - startTime;
                 console.log(`✅ All data loaded and processed in ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
+
+                // ✅ Set data loaded flag
+                setIsDataLoaded(true);
             } catch (error) {
                 console.error("❌ Failed to fetch data:", error);
                 // Fallback to initial admin if everything fails
                 setUsers([initialAdmin]);
+                // Even on error, mark as loaded to prevent infinite loading
+                setIsDataLoaded(true);
             }
         };
         fetchAllData();
@@ -1258,6 +1268,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     return (
         <AppContext.Provider value={{
+            isDataLoaded,
             users, currentUser, login, logout, register, approveUser, deleteUser,
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
