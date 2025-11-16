@@ -8,7 +8,20 @@ import { deduplicateOrders } from '../utils/deduplication';
 const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
-    const { orders, expenses, coworkingSessions } = useAppContext();
+    const { isDataLoaded, orders, expenses, coworkingSessions } = useAppContext();
+
+    // ⏳ LOADING STATE: Prevent premature rendering with $0.00 values
+    if (!isDataLoaded) {
+        return (
+            <div className="flex items-center justify-center min-h-screen bg-gray-50">
+                <div className="text-center">
+                    <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
+                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">Cargando reportes...</h2>
+                    <p className="text-gray-600">Por favor espere mientras se cargan los datos del sistema</p>
+                </div>
+            </div>
+        );
+    }
 
     // FIX BUG 4: Deduplicate orders before calculations
     const deduplicatedOrders = useMemo(() => deduplicateOrders(orders), [orders]);
