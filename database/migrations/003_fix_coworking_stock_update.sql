@@ -1,7 +1,7 @@
--- Stored Procedure: create_order_atomic
--- Atomically creates an order with stock updates and credit management
--- Handles idempotency to prevent duplicate orders
--- All operations succeed or fail together (transaction safety)
+-- Migration: Fix coworking order creation by skipping stock updates for service items
+-- Date: 2025-11-18
+-- Issue: Coworking service items (COWORK_SERVICE) don't exist in products table
+-- Solution: Skip stock updates for service items (IDs with special prefixes)
 
 CREATE OR REPLACE FUNCTION create_order_atomic(
   p_id VARCHAR(255),
