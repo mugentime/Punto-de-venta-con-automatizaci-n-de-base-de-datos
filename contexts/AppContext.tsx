@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 import { retryFetch } from '../utils/retryWithBackoff';
@@ -91,24 +91,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [cashWithdrawals, setCashWithdrawals] = useState<CashWithdrawal[]>([]);
     const [customers, setCustomers] = useState<Customer[]>([]);
 
-    // --- EFFECTS ---
+    // --- FUNCTIONS ---
 
-    // Restore user session from localStorage on app load
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                const user = JSON.parse(storedUser);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error('Failed to restore user session:', error);
-                localStorage.removeItem('currentUser');
-            }
-        }
-    }, []);
-
-    // 🔄 LOAD ALL DATA - Called manually after login
-    const loadAllData = async () => {
+    // 🔄 LOAD ALL DATA - Called manually after login or session restore
+    const loadAllData = useCallback(async () => {
         try {
             const startTime = Date.now();
             console.log('🚀 Starting parallel data fetch...');
@@ -231,7 +217,29 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Even on error, mark as loaded to prevent infinite loading
             setIsDataLoaded(true);
         }
-    };
+    }, []); // Empty deps - loadAllData doesn't depend on any props or state
+
+    // --- EFFECTS ---
+
+    // Restore user session from localStorage on app load
+    useEffect(() => {
+        const restoreSession = async () => {
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                try {
+                    const user = JSON.parse(storedUser);
+                    setCurrentUser(user);
+                    // 🔄 Load all data when restoring session
+                    console.log('✅ Session restored, loading all data...');
+                    await loadAllData();
+                } catch (error) {
+                    console.error('Failed to restore user session:', error);
+                    localStorage.removeItem('currentUser');
+                }
+            }
+        };
+        restoreSession();
+    }, [loadAllData]); // Include loadAllData now that it's memoized with useCallback
 
     // 🔄 REAL-TIME SYNC: WebSocket subscription for coworking sessions
     const { subscribe, isConnected } = useWebSocket();
