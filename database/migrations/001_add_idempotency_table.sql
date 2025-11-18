@@ -1,33 +1,22 @@
--- Migration 001: Add idempotency_keys table
--- Purpose: Prevent duplicate order creation from double-clicks/retry logic
+-- Migration 001: Add idempotency_keys table for preventing duplicate orders
+-- This table stores idempotency keys to ensure order creation is idempotent
+-- Keys expire after 24 hours and can be safely cleaned up
+
+BEGIN;
 
 CREATE TABLE IF NOT EXISTS idempotency_keys (
-    id SERIAL PRIMARY KEY,
-    key VARCHAR(255) UNIQUE NOT NULL,
-    request_data JSONB,
-    response_data JSONB,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
-    expires_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP + INTERVAL '24 hours',
-    status VARCHAR(50) DEFAULT 'pending'
+  key VARCHAR(255) PRIMARY KEY,
+  order_id VARCHAR(255) NOT NULL,
+  resource_type VARCHAR(50) NOT NULL DEFAULT 'order',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  expires_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL '24 hours'),
+  response_data JSONB
 );
 
--- Index for fast key lookups
-CREATE INDEX IF NOT EXISTS idx_idempotency_key ON idempotency_keys(key);
+-- Index for efficient expiration cleanup
+CREATE INDEX idx_idempotency_expires ON idempotency_keys(expires_at);
 
--- Index for cleanup of expired keys
-CREATE INDEX IF NOT EXISTS idx_idempotency_expires ON idempotency_keys(expires_at);
+-- Index for querying by resource type and creation date
+CREATE INDEX idx_idempotency_resource ON idempotency_keys(resource_type, created_at);
 
--- Cleanup function for expired idempotency keys
-CREATE OR REPLACE FUNCTION cleanup_expired_idempotency_keys()
-RETURNS void AS $$
-BEGIN
-    DELETE FROM idempotency_keys WHERE expires_at < CURRENT_TIMESTAMP;
-END;
-$$ LANGUAGE plpgsql;
-
-COMMENT ON TABLE idempotency_keys IS 'Stores idempotency keys for request deduplication';
-COMMENT ON COLUMN idempotency_keys.key IS 'Unique idempotency key (UUID v4)';
-COMMENT ON COLUMN idempotency_keys.request_data IS 'Original request payload';
-COMMENT ON COLUMN idempotency_keys.response_data IS 'Cached response for idempotent requests';
-COMMENT ON COLUMN idempotency_keys.expires_at IS 'Expiration timestamp (24 hours from creation)';
-COMMENT ON COLUMN idempotency_keys.status IS 'Status: pending, completed, failed';
+COMMIT;

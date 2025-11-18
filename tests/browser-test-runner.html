@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Coworking Integration Test Runner</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .test-controls {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .test-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .log-container {
+            background: #1a1a1a;
+            color: #00ff00;
+            padding: 20px;
+            border-radius: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            margin-bottom: 20px;
+        }
+        .button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+        .button:hover {
+            background: #5a6fd8;
+        }
+        .button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .button.danger {
+            background: #e74c3c;
+        }
+        .button.danger:hover {
+            background: #c0392b;
+        }
+        .button.success {
+            background: #27ae60;
+        }
+        .button.success:hover {
+            background: #229954;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .result-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .metric {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .metric:last-child {
+            border-bottom: none;
+        }
+        .metric-label {
+            font-weight: 600;
+            color: #333;
+        }
+        .metric-value {
+            color: #666;
+            font-family: monospace;
+        }
+        .recommendation {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 6px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .recommendation h4 {
+            margin: 0 0 10px 0;
+            color: #856404;
+        }
+        .priority-high {
+            border-left: 4px solid #e74c3c;
+        }
+        .priority-medium {
+            border-left: 4px solid #f39c12;
+        }
+        .priority-low {
+            border-left: 4px solid #3498db;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🔍 Coworking Integration Test Suite</h1>
+        <p>Comprehensive testing tool for diagnosing coworking profit calculation issues</p>
+    </div>
+
+    <div class="test-controls">
+        <h2>Test Controls</h2>
+        <button class="button" onclick="runCoworkingTests()">Run Coworking Integration Tests</button>
+        <button class="button" onclick="runProfitValidation()">Run Profit Validation</button>
+        <button class="button success" onclick="runAllTests()">Run All Tests</button>
+        <button class="button danger" onclick="clearLogs()">Clear Logs</button>
+
+        <div id="testStatus" class="status info" style="margin-top: 15px;">
+            Ready to run tests. Make sure the server is running on localhost:3001
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Logs</h2>
+        <div id="logContainer" class="log-container">
+            Test logs will appear here...\n
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test Results Summary</h2>
+        <div id="resultsContainer">
+            <p>Run tests to see results...</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Recommendations</h2>
+        <div id="recommendationsContainer">
+            <p>Recommendations will appear after running tests...</p>
+        </div>
+    </div>
+
+    <script src="coworking-integration-test.js"></script>
+    <script src="profit-calculation-validator.js"></script>
+
+    <script>
+        let currentCoworkingTest = null;
+        let currentValidator = null;
+
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const logContainer = document.getElementById('logContainer');
+            const colorMap = {
+                info: '#00ff00',
+                error: '#ff4444',
+                warning: '#ffaa00',
+                test: '#00aaff'
+            };
+
+            const color = colorMap[type] || '#00ff00';
+            logContainer.innerHTML += `<span style="color: ${color}">[${timestamp}] ${message}</span>\n`;
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        function updateStatus(message, type = 'info') {
+            const statusDiv = document.getElementById('testStatus');
+            statusDiv.className = `status ${type}`;
+            statusDiv.textContent = message;
+        }
+
+        function clearLogs() {
+            document.getElementById('logContainer').innerHTML = '';
+            log('Logs cleared', 'info');
+        }
+
+        async function runCoworkingTests() {
+            updateStatus('Running coworking integration tests...', 'info');
+
+            try {
+                currentCoworkingTest = new CoworkingTestSuite();
+
+                // Override log function to display in browser
+                currentCoworkingTest.log = log;
+
+                const results = await currentCoworkingTest.runAllTests();
+
+                updateStatus(`Coworking tests completed: ${results.passedTests}/${results.totalTests} passed`,
+                            results.passedTests === results.totalTests ? 'success' : 'warning');
+
+                displayTestResults('Coworking Integration Tests', results);
+
+            } catch (error) {
+                log(`Error running coworking tests: ${error.message}`, 'error');
+                updateStatus('Coworking tests failed', 'error');
+            }
+        }
+
+        async function runProfitValidation() {
+            updateStatus('Running profit calculation validation...', 'info');
+
+            try {
+                currentValidator = new ProfitCalculationValidator();
+
+                // Override log function to display in browser
+                currentValidator.log = log;
+
+                const report = await currentValidator.runAllValidations();
+
+                updateStatus(`Validation completed: ${report.summary.totalIssues} issues, ${report.summary.totalWarnings} warnings`,
+                            report.summary.totalIssues === 0 ? 'success' : 'error');
+
+                displayValidationReport(report);
+
+            } catch (error) {
+                log(`Error running profit validation: ${error.message}`, 'error');
+                updateStatus('Profit validation failed', 'error');
+            }
+        }
+
+        async function runAllTests() {
+            updateStatus('Running comprehensive test suite...', 'info');
+            log('🚀 Starting comprehensive test suite...', 'test');
+
+            await runCoworkingTests();
+            await new Promise(resolve => setTimeout(resolve, 2000)); // Brief pause
+            await runProfitValidation();
+
+            updateStatus('All tests completed', 'success');
+            log('✅ Comprehensive test suite completed', 'test');
+        }
+
+        function displayTestResults(title, results) {
+            const container = document.getElementById('resultsContainer');
+
+            const html = `
+                <div class="result-card">
+                    <h3>${title}</h3>
+                    <div class="metric">
+                        <span class="metric-label">Total Tests:</span>
+                        <span class="metric-value">${results.totalTests}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Passed:</span>
+                        <span class="metric-value">${results.passedTests}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Failed:</span>
+                        <span class="metric-value">${results.failedTests}</span>
+                    </div>
+                    <div class="metric">
+                        <span class="metric-label">Success Rate:</span>
+                        <span class="metric-value">${((results.passedTests / results.totalTests) * 100).toFixed(1)}%</span>
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function displayValidationReport(report) {
+            const container = document.getElementById('resultsContainer');
+            const recommendationsContainer = document.getElementById('recommendationsContainer');
+
+            // Display validation results
+            const validationHtml = `
+                <div class="results-grid">
+                    <div class="result-card">
+                        <h3>Validation Summary</h3>
+                        <div class="metric">
+                            <span class="metric-label">Total Issues:</span>
+                            <span class="metric-value">${report.summary.totalIssues}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Warnings:</span>
+                            <span class="metric-value">${report.summary.totalWarnings}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Validations Run:</span>
+                            <span class="metric-value">${report.summary.validationsPassed}</span>
+                        </div>
+                    </div>
+
+                    ${report.validationResults.profitCalculations ? `
+                    <div class="result-card">
+                        <h3>Profit Analysis</h3>
+                        <div class="metric">
+                            <span class="metric-label">Total Revenue:</span>
+                            <span class="metric-value">$${report.validationResults.profitCalculations.totalRevenue.toFixed(2)}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Total Costs:</span>
+                            <span class="metric-value">$${report.validationResults.profitCalculations.totalCosts.toFixed(2)}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Gross Profit:</span>
+                            <span class="metric-value">$${report.validationResults.profitCalculations.grossProfit.toFixed(2)}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Net Profit:</span>
+                            <span class="metric-value">$${report.validationResults.profitCalculations.netProfit.toFixed(2)}</span>
+                        </div>
+                    </div>
+                    ` : ''}
+
+                    ${report.validationResults.coworkingIntegration ? `
+                    <div class="result-card">
+                        <h3>Coworking Integration</h3>
+                        <div class="metric">
+                            <span class="metric-label">Finished Sessions:</span>
+                            <span class="metric-value">${report.validationResults.coworkingIntegration.finishedSessions}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Coworking Orders:</span>
+                            <span class="metric-value">${report.validationResults.coworkingIntegration.coworkingOrders}</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-label">Integration Status:</span>
+                            <span class="metric-value">${report.validationResults.coworkingIntegration.integrationWorking ? '✅ Working' : '❌ Broken'}</span>
+                        </div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+
+            container.innerHTML = validationHtml;
+
+            // Display recommendations
+            if (report.recommendations && report.recommendations.length > 0) {
+                const recommendationHtml = report.recommendations.map(rec => `
+                    <div class="recommendation priority-${rec.priority.toLowerCase()}">
+                        <h4>🔧 ${rec.priority} Priority: ${rec.issue}</h4>
+                        <p><strong>Recommendation:</strong> ${rec.recommendation}</p>
+                        <p><strong>Code Location:</strong> <code>${rec.codeLocation}</code></p>
+                    </div>
+                `).join('');
+
+                recommendationsContainer.innerHTML = recommendationHtml;
+            } else {
+                recommendationsContainer.innerHTML = '<p class="status success">✅ No issues found! The system appears to be working correctly.</p>';
+            }
+        }
+
+        // Auto-check server connectivity on page load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('http://localhost:3001/api/products');
+                if (response.ok) {
+                    updateStatus('✅ Server connection verified - Ready to run tests', 'success');
+                } else {
+                    updateStatus('⚠️ Server responding but may have issues', 'warning');
+                }
+            } catch (error) {
+                updateStatus('❌ Cannot connect to server - Make sure it\'s running on localhost:3001', 'error');
+            }
+        });
+    </script>
+</body>
+</html>
