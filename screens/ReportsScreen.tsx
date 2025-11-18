@@ -9,6 +9,8 @@ const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
     const { isDataLoaded, orders, expenses, coworkingSessions } = useAppContext();
+    const [showSalesDetail, setShowSalesDetail] = useState(false);
+    const [showExpensesDetail, setShowExpensesDetail] = useState(false);
 
     // ⏳ LOADING STATE: Prevent premature rendering with $0.00 values
     if (!isDataLoaded) {
@@ -277,6 +279,115 @@ const ReportsScreen: React.FC = () => {
                      <button onClick={handleDownloadSales} className="px-4 py-2 bg-green-700 text-white rounded-xl hover:bg-green-600 transition-colors">Descargar Ventas (CSV)</button>
                      <button onClick={handleDownloadExpenses} className="px-4 py-2 bg-red-700 text-white rounded-xl hover:bg-red-600 transition-colors">Descargar Gastos (CSV)</button>
                 </div>
+            </div>
+
+            {/* Detailed Sales Report */}
+            <div className="bg-white rounded-3xl shadow-md mb-6 overflow-hidden">
+                <button
+                    onClick={() => setShowSalesDetail(!showSalesDetail)}
+                    className="w-full p-4 flex justify-between items-center hover:bg-slate-50 transition-colors"
+                >
+                    <h2 className="text-lg font-bold text-slate-800">Detalle de Ventas ({filteredOrders.length} órdenes)</h2>
+                    <svg className={`h-5 w-5 text-slate-600 transition-transform ${showSalesDetail ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {showSalesDetail && (
+                    <div className="border-t overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50">
+                                <tr>
+                                    <th className="p-3 font-semibold text-slate-600">Fecha</th>
+                                    <th className="p-3 font-semibold text-slate-600">Cliente</th>
+                                    <th className="p-3 font-semibold text-slate-600">Producto</th>
+                                    <th className="p-3 font-semibold text-slate-600 text-center">Cantidad</th>
+                                    <th className="p-3 font-semibold text-slate-600 text-right">Precio Unit.</th>
+                                    <th className="p-3 font-semibold text-slate-600 text-right">Total Item</th>
+                                    <th className="p-3 font-semibold text-slate-600">Pago</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredOrders.flatMap(order =>
+                                    order.items.map((item, idx) => (
+                                        <tr key={`${order.id}-${idx}`} className="border-b hover:bg-slate-50">
+                                            <td className="p-3 text-slate-600">{new Date(order.date).toLocaleDateString('es-MX')}</td>
+                                            <td className="p-3 text-slate-800">{order.clientName || 'General'}</td>
+                                            <td className="p-3 text-slate-800">{item.name}</td>
+                                            <td className="p-3 text-center text-slate-600">{item.quantity}</td>
+                                            <td className="p-3 text-right text-slate-600">${item.price.toFixed(2)}</td>
+                                            <td className="p-3 text-right font-semibold text-slate-800">${(item.price * item.quantity).toFixed(2)}</td>
+                                            <td className="p-3">
+                                                <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                                                    order.paymentMethod === 'Efectivo'
+                                                        ? 'bg-emerald-100 text-emerald-800'
+                                                        : order.paymentMethod === 'Tarjeta'
+                                                        ? 'bg-purple-100 text-purple-800'
+                                                        : 'bg-amber-100 text-amber-800'
+                                                }`}>
+                                                    {order.paymentMethod}
+                                                </span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                            <tfoot className="bg-slate-50 font-bold">
+                                <tr>
+                                    <td colSpan={5} className="p-3 text-right text-slate-800">Total Ventas:</td>
+                                    <td className="p-3 text-right text-slate-800">${totalRevenue.toFixed(2)}</td>
+                                    <td></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                )}
+            </div>
+
+            {/* Detailed Expenses Report */}
+            <div className="bg-white rounded-3xl shadow-md mb-6 overflow-hidden">
+                <button
+                    onClick={() => setShowExpensesDetail(!showExpensesDetail)}
+                    className="w-full p-4 flex justify-between items-center hover:bg-slate-50 transition-colors"
+                >
+                    <h2 className="text-lg font-bold text-slate-800">Detalle de Gastos ({filteredExpenses.length} registros)</h2>
+                    <svg className={`h-5 w-5 text-slate-600 transition-transform ${showExpensesDetail ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                {showExpensesDetail && (
+                    <div className="border-t overflow-x-auto">
+                        <table className="w-full text-left text-sm">
+                            <thead className="bg-slate-50">
+                                <tr>
+                                    <th className="p-3 font-semibold text-slate-600">Fecha</th>
+                                    <th className="p-3 font-semibold text-slate-600">Descripción</th>
+                                    <th className="p-3 font-semibold text-slate-600">Categoría</th>
+                                    <th className="p-3 font-semibold text-slate-600 text-right">Monto</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {filteredExpenses.map(expense => (
+                                    <tr key={expense.id} className="border-b hover:bg-slate-50">
+                                        <td className="p-3 text-slate-600">{new Date(expense.date).toLocaleDateString('es-MX')}</td>
+                                        <td className="p-3 text-slate-800">{expense.description}</td>
+                                        <td className="p-3">
+                                            <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                {expense.category}
+                                            </span>
+                                        </td>
+                                        <td className="p-3 text-right font-semibold text-slate-800">${expense.amount.toFixed(2)}</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                            <tfoot className="bg-slate-50 font-bold">
+                                <tr>
+                                    <td colSpan={3} className="p-3 text-right text-slate-800">Total Gastos:</td>
+                                    <td className="p-3 text-right text-slate-800">${totalExpensesAmount.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                )}
             </div>
 
             {/* Styling for print */}
