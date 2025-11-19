@@ -297,7 +297,7 @@ async function setupAndGetDataStore() {
                       v_credit_id VARCHAR(255);
                     BEGIN
                       -- Check idempotency
-                      SELECT order_id INTO v_existing_order_id
+                      SELECT idempotency_keys.order_id INTO v_existing_order_id
                       FROM idempotency_keys
                       WHERE key = p_idempotency_key
                         AND created_at > NOW() - INTERVAL '10 minutes';
