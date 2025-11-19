@@ -1,8 +1,8 @@
 // Service Worker para Conejo Negro POS
-// Versión: 1.0.0
+// Versión: 1.0.1 - Fixed POST request handling
 
-const CACHE_NAME = 'conejo-negro-pos-v1';
-const RUNTIME_CACHE = 'conejo-negro-runtime-v1';
+const CACHE_NAME = 'conejo-negro-pos-v1.0.1';
+const RUNTIME_CACHE = 'conejo-negro-runtime-v1.0.1';
 
 // Archivos esenciales para cachear
 const PRECACHE_URLS = [
@@ -65,8 +65,10 @@ self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // Ignorar requests que no sean GET
+  // Para requests que no sean GET (POST, PUT, DELETE, etc.)
+  // Pasarlos directamente a la red SIN interceptar
   if (request.method !== 'GET') {
+    event.respondWith(fetch(request));
     return;
   }
 
