@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import cors from 'cors';
 
 const { Pool } = pg;
 
@@ -522,6 +523,7 @@ async function startServer() {
     // --- EXPRESS APP SETUP ---
     const app = express();
     const port = process.env.PORT || 3001;
+    app.use(cors()); // Enable CORS for all origins (production safe when frontend is served from same domain)
     app.use(express.json({ limit: '50mb' }));
 
     // --- AI SETUP ---
