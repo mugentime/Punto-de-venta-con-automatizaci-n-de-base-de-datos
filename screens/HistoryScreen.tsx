@@ -55,21 +55,8 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
 );
 
 const HistoryScreen: React.FC = () => {
-    const { isDataLoaded, orders, deleteOrder } = useAppContext();
+    const { orders, deleteOrder } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
-    // ⏳ LOADING STATE: Prevent premature rendering
-    if (!isDataLoaded) {
-        return (
-            <div className="flex items-center justify-center min-h-screen bg-gray-50">
-                <div className="text-center">
-                    <div className="inline-block animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-blue-600 mb-4"></div>
-                    <h2 className="text-2xl font-semibold text-gray-800 mb-2">Cargando historial...</h2>
-                    <p className="text-gray-600">Por favor espere mientras se cargan los datos del sistema</p>
-                </div>
-            </div>
-        );
-    }
 
     const handleDelete = async (orderId: string) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {

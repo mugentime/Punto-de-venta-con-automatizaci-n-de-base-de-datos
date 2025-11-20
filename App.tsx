@@ -1,9 +1,6 @@
 import React, { useState, lazy, Suspense, memo, useEffect } from 'react';
 import BottomNav from './components/Sidebar';
 import { AppContextProvider, useAppContext } from './contexts/AppContext';
-import { WebSocketProvider } from './contexts/WebSocketContext';
-import { OperationProvider } from './contexts/OperationContext';
-import ConnectionIndicator from './components/ConnectionIndicator';
 
 // Login/Register screens loaded immediately (authentication needed)
 import LoginScreen from './screens/LoginScreen';
@@ -87,7 +84,6 @@ const MainLayout: React.FC = memo(() => {
 
   return (
     <div className="flex flex-col h-screen bg-gray-100/80 font-sans">
-      <ConnectionIndicator />
       {/*
         Mobile-first responsive padding strategy:
         - Mobile (default): minimal padding (p-1), large bottom padding for nav (pb-20)
@@ -142,13 +138,9 @@ const AppContent: React.FC = () => {
 
 const App: React.FC = () => {
   return (
-    <OperationProvider>
-      <WebSocketProvider>
-        <AppContextProvider>
-          <AppContent />
-        </AppContextProvider>
-      </WebSocketProvider>
-    </OperationProvider>
+    <AppContextProvider>
+      <AppContent />
+    </AppContextProvider>
   );
 };
 

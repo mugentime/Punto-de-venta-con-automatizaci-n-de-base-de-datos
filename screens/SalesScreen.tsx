@@ -3,7 +3,6 @@ import { useAppContext } from '../contexts/AppContext';
 import { TrashIcon } from '../components/Icons';
 import Toast from '../components/Toast';
 import type { Product, CartItem } from '../types';
-import { useCheckoutStateMachine } from '../hooks/useCheckoutStateMachine';
 
 const ProductCard: React.FC<{ product: Product; onClick: () => void; }> = ({ product, onClick }) => (
     <div
@@ -50,19 +49,8 @@ const Cart: React.FC = () => {
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
     const [paymentMethod, setPaymentMethod] = useState<'Efectivo' | 'Tarjeta' | 'Crédito'>('Efectivo');
     const [tip, setTip] = useState<number>(0);
-
-    // Use checkout state machine for better state management
-    const {
-        state: checkoutState,
-        startCheckout,
-        cancel: cancelCheckout,
-        submitSuccess,
-        submitError,
-        reset: resetCheckout
-    } = useCheckoutStateMachine(cart);
-
-    const isCheckingOut = checkoutState === 'SELECTING_DETAILS' || checkoutState === 'VALIDATING' || checkoutState === 'SUBMITTING';
-    const isProcessing = checkoutState === 'VALIDATING' || checkoutState === 'SUBMITTING';
+    const [isCheckingOut, setIsCheckingOut] = useState(false);
+    const [isProcessing, setIsProcessing] = useState(false);
 
     // Get selected customer
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
@@ -73,48 +61,36 @@ const Cart: React.FC = () => {
 
     const handleCheckout = async () => {
         if (cart.length === 0) return;
-
-        // Start checkout flow if not already started
-        if (checkoutState === 'IDLE') {
-            startCheckout();
+        if (!isCheckingOut) {
+            setIsCheckingOut(true);
             return;
         }
 
-        // If already in checkout, process the order
-        if (checkoutState === 'SELECTING_DETAILS') {
-            // Determine client name and customer ID
-            const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
-            const customerId = selectedCustomer ? selectedCustomer.id : undefined;
+        // Determine client name and customer ID
+        const clientName = selectedCustomerId === 'other' ? customClientName : (selectedCustomer?.name || 'Cliente');
+        const customerId = selectedCustomer ? selectedCustomer.id : undefined;
 
-            try {
-                await createOrder({ clientName, serviceType, paymentMethod, customerId, tip });
-                // Cart is already cleared by createOrder on success
-                submitSuccess();
-
-                // Reset form after successful checkout
-                setTimeout(() => {
-                    setSelectedCustomerId('');
-                    setCustomClientName('');
-                    setServiceType('Mesa');
-                    setPaymentMethod('Efectivo');
-                    setTip(0);
-                    resetCheckout();
-                }, 1000);
-            } catch (error) {
-                // Error already alerted by createOrder
-                console.error('Checkout failed:', error);
-                submitError(error.message || 'Error al procesar la orden');
-
-                // Reset checkout state after error
-                setTimeout(() => {
-                    cancelCheckout();
-                }, 2000);
-            }
+        setIsProcessing(true);
+        try {
+            await createOrder({ clientName, serviceType, paymentMethod, customerId, tip });
+            // Cart is already cleared by createOrder on success
+            setIsCheckingOut(false);
+            setSelectedCustomerId('');
+            setCustomClientName('');
+            setServiceType('Mesa');
+            setPaymentMethod('Efectivo');
+            setTip(0);
+        } catch (error) {
+            // Error already alerted by createOrder, just reset checkout state
+            console.error('Checkout failed:', error);
+            setIsCheckingOut(false);
+        } finally {
+            setIsProcessing(false);
         }
     };
 
     const handleCancelCheckout = () => {
-        cancelCheckout();
+        setIsCheckingOut(false);
     }
 
     return (

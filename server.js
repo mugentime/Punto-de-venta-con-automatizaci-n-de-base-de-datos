@@ -4,8 +4,6 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
-import { createServer } from 'http';
-import { Server } from 'socket.io';
 
 const { Pool } = pg;
 
@@ -264,105 +262,6 @@ async function setupAndGetDataStore() {
             } catch (err) {
                 console.log('consumedExtras column already exists or error:', err.message);
             }
-
-            // AUTO-MIGRATION: Update create_order_atomic to skip service items
-            console.log('🔄 Updating create_order_atomic stored procedure...');
-            try {
-                await client.query(`
-                    CREATE OR REPLACE FUNCTION create_order_atomic(
-                      p_id VARCHAR(255),
-                      p_client_name VARCHAR(255),
-                      p_service_type VARCHAR(50),
-                      p_payment_method VARCHAR(50),
-                      p_items JSONB,
-                      p_subtotal NUMERIC(10, 2),
-                      p_discount NUMERIC(10, 2),
-                      p_tip NUMERIC(10, 2),
-                      p_total NUMERIC(10, 2),
-                      p_user_id VARCHAR(255),
-                      p_customer_id VARCHAR(255),
-                      p_idempotency_key VARCHAR(255)
-                    )
-                    RETURNS TABLE(
-                      order_id VARCHAR(255),
-                      is_duplicate BOOLEAN,
-                      error_message TEXT
-                    ) AS $$
-                    DECLARE
-                      v_existing_order_id VARCHAR(255);
-                      v_customer_credit NUMERIC(10, 2);
-                      v_credit_limit NUMERIC(10, 2);
-                      v_item RECORD;
-                      v_credit_id VARCHAR(255);
-                    BEGIN
-                      -- Check idempotency
-                      SELECT order_id INTO v_existing_order_id
-                      FROM idempotency_keys
-                      WHERE key = p_idempotency_key
-                        AND created_at > NOW() - INTERVAL '10 minutes';
-
-                      IF v_existing_order_id IS NOT NULL THEN
-                        RETURN QUERY SELECT v_existing_order_id, TRUE, NULL::TEXT;
-                        RETURN;
-                      END IF;
-
-                      -- Validate customer credit if applicable
-                      IF p_customer_id IS NOT NULL AND p_payment_method = 'Crédito' THEN
-                        SELECT "currentCredit", "creditLimit" INTO v_customer_credit, v_credit_limit
-                        FROM customers WHERE id = p_customer_id;
-
-                        IF v_customer_credit + p_total > v_credit_limit THEN
-                          RETURN QUERY SELECT NULL::VARCHAR, FALSE, 'Credit limit exceeded';
-                          RETURN;
-                        END IF;
-                      END IF;
-
-                      -- Insert order
-                      INSERT INTO orders (
-                        id, "clientName", "serviceType", "paymentMethod", items,
-                        subtotal, discount, tip, total, "userId", "customerId", created_at
-                      )
-                      VALUES (
-                        p_id, p_client_name, p_service_type, p_payment_method, p_items,
-                        p_subtotal, p_discount, p_tip, p_total, p_user_id, p_customer_id, NOW()
-                      );
-
-                      -- Store idempotency key
-                      INSERT INTO idempotency_keys (key, order_id, resource_type, created_at, expires_at)
-                      VALUES (p_idempotency_key, p_id, 'order', NOW(), NOW() + INTERVAL '24 hours');
-
-                      -- Update stock - SKIP SERVICE ITEMS (fixed for coworking)
-                      FOR v_item IN SELECT * FROM jsonb_to_recordset(p_items) AS x(id VARCHAR, quantity INTEGER)
-                      LOOP
-                        IF v_item.id NOT LIKE 'COWORK_%' AND v_item.id NOT LIKE 'TIP_%' AND v_item.id NOT LIKE 'SERVICE_%' THEN
-                          UPDATE products SET stock = stock - v_item.quantity WHERE id = v_item.id;
-                          IF (SELECT stock FROM products WHERE id = v_item.id) < 0 THEN
-                            RAISE EXCEPTION 'Insufficient stock for product %', v_item.id;
-                          END IF;
-                        END IF;
-                      END LOOP;
-
-                      -- Update customer credit if applicable
-                      IF p_customer_id IS NOT NULL AND p_payment_method = 'Crédito' THEN
-                        v_credit_id := 'credit-' || EXTRACT(EPOCH FROM NOW())::BIGINT || '-' || floor(random() * 1000000)::INT;
-                        INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, status, description, created_at)
-                        VALUES (v_credit_id, p_customer_id, p_id, p_total, 'charge', 'pending', 'Orden #' || p_id, NOW());
-                        UPDATE customers SET "currentCredit" = "currentCredit" + p_total WHERE id = p_customer_id;
-                      END IF;
-
-                      RETURN QUERY SELECT p_id, FALSE, NULL::TEXT;
-
-                    EXCEPTION
-                      WHEN OTHERS THEN
-                        RETURN QUERY SELECT NULL::VARCHAR, FALSE, SQLERRM;
-                    END;
-                    $$ LANGUAGE plpgsql;
-                `);
-                console.log('✅ create_order_atomic stored procedure updated successfully');
-            } catch (procError) {
-                console.error('⚠️ Failed to update create_order_atomic:', procError.message);
-                // Don't fail startup if procedure update has issues
-            }
             client.release();
             useDb = true;
             console.log("Running in Database Mode.");
@@ -549,12 +448,6 @@ async function startServer() {
     app.post('/api/products', async (req, res) => {
         try {
             const newProduct = await productStore.create(req.body);
-
-            // Broadcast new product
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('products', 'create', newProduct);
-            }
-
             res.status(201).json(newProduct);
         } catch (error) {
             console.error("Error creating product:", error);
@@ -566,10 +459,6 @@ async function startServer() {
         try {
             const updatedProduct = await productStore.update(req.params.id, req.body);
             if (updatedProduct) {
-                // Broadcast product updated
-                if (req.app.locals.broadcast) {
-                    req.app.locals.broadcast('products', 'update', updatedProduct);
-                }
                 res.json(updatedProduct);
             } else {
                 res.status(404).json({ error: 'Product not found' });
@@ -583,12 +472,6 @@ async function startServer() {
     app.delete('/api/products/:id', async (req, res) => {
         try {
             await productStore.delete(req.params.id);
-
-            // Broadcast product deleted
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('products', 'delete', { id: req.params.id });
-            }
-
             res.status(204).send();
         } catch (error) {
             console.error(`Error deleting product ${req.params.id}:`, error);
@@ -609,183 +492,123 @@ async function startServer() {
     // --- ORDERS API ---
     app.get('/api/orders', async (req, res) => {
         try {
-            const startTime = Date.now();
             if (!useDb) return res.json([]);
-
-            // Pagination parameters
-            const limit = parseInt(req.query.limit) || 100;
-            const offset = parseInt(req.query.offset) || 0;
-
-            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
-            // Only fetch if explicitly requested with ?includeCount=true
-            const includeCount = req.query.includeCount === 'true';
-            let total = null;
-
-            if (includeCount) {
-                const countResult = await pool.query('SELECT COUNT(*) FROM orders');
-                total = parseInt(countResult.rows[0].count);
-            }
-
-            // Fetch paginated orders with LIMIT
-            const result = await pool.query(
-                'SELECT * FROM orders ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-
-            // 🛡️ FIX: Defensive error handling for each order to prevent one bad order from crashing the entire endpoint
-            const orders = result.rows.map((order, index) => {
-                try {
-                    // 🔥 CRITICAL FIX: Remove imageUrl from items to reduce response size from 100+MB to <1MB
-                    // Base64 images in items cause 2.1MB per 10 orders → browser timeout & "Failed to fetch"
-                    const cleanedItems = (order.items && Array.isArray(order.items))
-                        ? order.items.map(item => {
-                            const { imageUrl, ...itemWithoutImage } = item;
-                            return itemWithoutImage;
-                        })
-                        : [];
-
-                    return {
-                        ...order,
-                        items: cleanedItems, // Use cleaned items without imageUrl
-                        subtotal: parseFloat(order.subtotal || 0),
-                        discount: parseFloat(order.discount || 0),
-                        tip: parseFloat(order.tip || 0),
-                        total: parseFloat(order.total || 0),
-                        date: order.created_at || new Date().toISOString(),  // Map created_at to date for frontend compatibility
-                        totalCost: cleanedItems.reduce((acc, item) => {
-                            const cost = parseFloat(item.cost || 0);
-                            const qty = parseInt(item.quantity || 0);
-                            return acc + (cost * qty);
-                        }, 0)
-                    };
-                } catch (itemError) {
-                    console.error(`❌ Error processing order ${order.id} (index ${index}):`, itemError.message);
-                    console.error(`Order data snapshot:`, JSON.stringify({
-                        id: order.id,
-                        clientName: order.clientName,
-                        itemsType: typeof order.items,
-                        itemsIsArray: Array.isArray(order.items),
-                        subtotal: order.subtotal,
-                        total: order.total
-                    }));
-                    // Return safe default instead of crashing
-                    return {
-                        ...order,
-                        items: [], // Empty items on error
-                        subtotal: 0,
-                        discount: 0,
-                        tip: 0,
-                        total: 0,
-                        date: order.created_at || new Date().toISOString(),
-                        totalCost: 0
-                    };
-                }
-            }).filter(o => o && o.id); // Filter out any null/undefined orders
-
-            const duration = Date.now() - startTime;
-            console.log(`✓ Orders query completed in ${duration}ms (${orders.length} records, limit: ${limit}, offset: ${offset})`);
-
-            // Only set headers if count was requested
-            if (includeCount && total !== null) {
-                res.setHeader('X-Total-Count', total);
-                res.setHeader('X-Has-More', offset + limit < total);
-            }
-            res.setHeader('X-Limit', limit);
-            res.setHeader('X-Offset', offset);
-            res.json(orders);
+            const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+            res.json(result.rows.map(order => ({
+                ...order,
+                subtotal: parseFloat(order.subtotal),
+                discount: parseFloat(order.discount || 0),
+                tip: parseFloat(order.tip || 0),
+                total: parseFloat(order.total),
+                date: order.created_at,  // Map created_at to date for frontend compatibility
+                totalCost: order.items ? order.items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
+            })));
         } catch (error) {
             console.error("Error fetching orders:", error);
             res.status(500).json({ error: 'Failed to fetch orders' });
         }
     });
 
-    // Order creation endpoint - using stored procedure for atomic operations
-    // Stored procedure handles: order insertion, stock updates, credit management, and idempotency
+    // FIX BUG 3: Store for idempotency checking (in-memory cache for recent orders)
+    const recentOrderKeys = new Map(); // Map<idempotencyKey, orderId>
+    const ORDER_KEY_TTL = 60000; // 1 minute TTL for idempotency keys
+
     app.post('/api/orders', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const { clientName, serviceType, paymentMethod, items, subtotal, discount, tip, total, userId, customerId, idempotencyKey } = req.body;
 
-            const { clientName, serviceType, paymentMethod, items, subtotal, discount, tip, total, userId, customerId } = req.body;
+            console.log('📦 Creating order:', { clientName, serviceType, paymentMethod, subtotal, discount: discount || 0, tip: tip || 0, total, userId, customerId, itemsCount: items?.length, idempotencyKey });
 
-            // Get idempotency key from header or body (header takes precedence)
-            const idempotencyKey = req.headers['x-idempotency-key'] || req.body.idempotencyKey || `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-            const orderId = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            // FIX BUG 3: Check idempotency key to prevent duplicate submissions
+            if (idempotencyKey && recentOrderKeys.has(idempotencyKey)) {
+                const existingOrderId = recentOrderKeys.get(idempotencyKey);
+                console.log('⚠️ Duplicate order attempt detected via idempotency key:', idempotencyKey);
 
-            console.log('📦 Creating order via stored procedure:', {
-                clientName,
-                serviceType,
-                paymentMethod,
-                subtotal,
-                discount: discount || 0,
-                tip: tip || 0,
-                total,
-                userId,
-                customerId,
-                itemsCount: items?.length,
-                idempotencyKey
-            });
-
-            // Ensure customerId is properly null if not provided
-            const cleanCustomerId = customerId && customerId !== '' ? customerId : null;
-
-            // Call stored procedure for atomic order creation
-            const result = await pool.query(
-                'SELECT * FROM create_order_atomic($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)',
-                [
-                    orderId,
-                    clientName,
-                    serviceType,
-                    paymentMethod,
-                    JSON.stringify(items),
-                    subtotal,
-                    discount || 0,
-                    tip || 0,
-                    total,
-                    userId,
-                    cleanCustomerId,
-                    idempotencyKey
-                ]
-            );
-
-            const { order_id, is_duplicate, error_message } = result.rows[0];
-
-            // Handle errors from stored procedure
-            if (error_message) {
-                console.error('❌ Order creation failed:', error_message);
-                return res.status(400).json({ error: error_message });
+                // Return existing order
+                const client = await pool.connect();
+                try {
+                    const result = await client.query('SELECT * FROM orders WHERE id = $1', [existingOrderId]);
+                    if (result.rows.length > 0) {
+                        const existingOrder = result.rows[0];
+                        return res.status(200).json({
+                            ...existingOrder,
+                            subtotal: parseFloat(existingOrder.subtotal),
+                            total: parseFloat(existingOrder.total),
+                            date: existingOrder.created_at,
+                            customerId: existingOrder.customerId,
+                            totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
+                            isDuplicate: true
+                        });
+                    }
+                } finally {
+                    client.release();
+                }
             }
 
-            // Fetch complete order data
-            const orderResult = await pool.query('SELECT * FROM orders WHERE id = $1', [order_id]);
-            const newOrder = orderResult.rows[0];
+            const id = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+            const client = await pool.connect();
 
-            if (is_duplicate) {
-                console.log('⚠️ Duplicate order detected via idempotency key:', idempotencyKey);
-            } else {
-                console.log('✅ Order created successfully:', order_id);
+            try {
+                await client.query('BEGIN');
+
+                // Ensure customerId is properly null if not provided
+                const cleanCustomerId = customerId && customerId !== '' ? customerId : null;
+
+                console.log('💾 Inserting order into database...', { id, cleanCustomerId });
+
+                // Insert order with discount and tip
+                const result = await client.query(
+                    'INSERT INTO orders (id, "clientName", "serviceType", "paymentMethod", items, subtotal, discount, tip, total, "userId", "customerId") VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11) RETURNING *',
+                    [id, clientName, serviceType, paymentMethod, JSON.stringify(items), subtotal, discount || 0, tip || 0, total, userId, cleanCustomerId]
+                );
+                const newOrder = result.rows[0];
+                console.log('✅ Order inserted successfully:', newOrder.id, { discount: discount || 0, tip: tip || 0 });
+
+                // FIX BUG 3: Store idempotency key
+                if (idempotencyKey) {
+                    recentOrderKeys.set(idempotencyKey, id);
+                    setTimeout(() => recentOrderKeys.delete(idempotencyKey), ORDER_KEY_TTL);
+                }
+
+                // If it's a credit payment and customer exists, create credit record
+                if (cleanCustomerId && (paymentMethod === 'Crédito' || paymentMethod === 'Fiado')) {
+                    console.log('💳 Creating customer credit record...');
+                    await client.query(
+                        'INSERT INTO customer_credits (id, "customerId", "orderId", amount, type, status, description) VALUES ($1, $2, $3, $4, $5, $6, $7)',
+                        [`credit-${Date.now()}`, cleanCustomerId, id, total, 'charge', 'pending', `Orden #${id}`]
+                    );
+                    // Update customer's current credit
+                    await client.query(
+                        'UPDATE customers SET "currentCredit" = "currentCredit" + $1 WHERE id = $2',
+                        [total, cleanCustomerId]
+                    );
+                    console.log('✅ Customer credit updated');
+                }
+
+                await client.query('COMMIT');
+                console.log('✅ Transaction committed successfully');
+
+                res.status(201).json({
+                    ...newOrder,
+                    subtotal: parseFloat(newOrder.subtotal),
+                    discount: parseFloat(newOrder.discount || 0),
+                    tip: parseFloat(newOrder.tip || 0),
+                    total: parseFloat(newOrder.total),
+                    date: newOrder.created_at,
+                    customerId: newOrder.customerId,
+                    totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0
+                });
+            } catch (error) {
+                await client.query('ROLLBACK');
+                console.error('❌ Database transaction error:', error.message, error.stack);
+                throw error;
+            } finally {
+                client.release();
             }
-
-            const responseOrder = {
-                ...newOrder,
-                subtotal: parseFloat(newOrder.subtotal),
-                discount: parseFloat(newOrder.discount || 0),
-                tip: parseFloat(newOrder.tip || 0),
-                total: parseFloat(newOrder.total),
-                date: newOrder.created_at,
-                customerId: newOrder.customerId,
-                totalCost: items ? items.reduce((acc, item) => acc + (item.cost * item.quantity), 0) : 0,
-                isDuplicate: is_duplicate
-            };
-
-            // Broadcast new order (only if not duplicate to avoid redundant broadcasts)
-            if (!is_duplicate && req.app.locals.broadcast) {
-                req.app.locals.broadcast('orders', 'create', responseOrder);
-            }
-
-            res.status(is_duplicate ? 200 : 201).json(responseOrder);
         } catch (error) {
-            console.error('❌ Error creating order:', error.message);
-            console.error('Stack trace:', error.stack);
+            console.error("❌ Error creating order:", error.message);
+            console.error("Stack trace:", error.stack);
             res.status(500).json({
                 error: 'Failed to create order',
                 details: process.env.NODE_ENV === 'development' ? error.message : undefined
@@ -852,46 +675,13 @@ async function startServer() {
     // --- EXPENSES API ---
     app.get('/api/expenses', async (req, res) => {
         try {
-            const startTime = Date.now();
             if (!useDb) return res.json([]);
-
-            // Pagination parameters
-            const limit = parseInt(req.query.limit) || 50;
-            const offset = parseInt(req.query.offset) || 0;
-
-            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
-            // Only fetch if explicitly requested with ?includeCount=true
-            const includeCount = req.query.includeCount === 'true';
-            let total = null;
-
-            if (includeCount) {
-                const countResult = await pool.query('SELECT COUNT(*) FROM expenses');
-                total = parseInt(countResult.rows[0].count);
-            }
-
-            // Fetch paginated expenses with LIMIT
-            const result = await pool.query(
-                'SELECT * FROM expenses ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-
-            const expenses = result.rows.map(expense => ({
+            const result = await pool.query('SELECT * FROM expenses ORDER BY created_at DESC');
+            res.json(result.rows.map(expense => ({
                 ...expense,
                 amount: parseFloat(expense.amount),
                 date: expense.created_at  // Map created_at to date for frontend compatibility
-            }));
-
-            const duration = Date.now() - startTime;
-            console.log(`✓ Expenses query completed in ${duration}ms (${expenses.length} records, limit: ${limit}, offset: ${offset})`);
-
-            // Only set headers if count was requested
-            if (includeCount && total !== null) {
-                res.setHeader('X-Total-Count', total);
-                res.setHeader('X-Has-More', offset + limit < total);
-            }
-            res.setHeader('X-Limit', limit);
-            res.setHeader('X-Offset', offset);
-            res.json(expenses);
+            })));
         } catch (error) {
             console.error("Error fetching expenses:", error);
             res.status(500).json({ error: 'Failed to fetch expenses' });
@@ -959,47 +749,14 @@ async function startServer() {
     // --- COWORKING SESSIONS API ---
     app.get('/api/coworking-sessions', async (req, res) => {
         try {
-            const startTime = Date.now();
             if (!useDb) return res.json([]);
-
-            // Pagination parameters
-            const limit = parseInt(req.query.limit) || 100;
-            const offset = parseInt(req.query.offset) || 0;
-
-            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
-            // Only fetch if explicitly requested with ?includeCount=true
-            const includeCount = req.query.includeCount === 'true';
-            let total = null;
-
-            if (includeCount) {
-                const countResult = await pool.query('SELECT COUNT(*) FROM coworking_sessions');
-                total = parseInt(countResult.rows[0].count);
-            }
-
-            // Fetch paginated sessions with LIMIT
-            const result = await pool.query(
-                'SELECT * FROM coworking_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-
-            const sessions = result.rows.map(session => ({
+            const result = await pool.query('SELECT * FROM coworking_sessions ORDER BY created_at DESC');
+            res.json(result.rows.map(session => ({
                 ...session,
                 hourlyRate: parseFloat(session.hourlyRate),
                 total: parseFloat(session.total),
                 consumedExtras: session.consumedExtras || []
-            }));
-
-            const duration = Date.now() - startTime;
-            console.log(`✓ Coworking sessions query completed in ${duration}ms (${sessions.length} records, limit: ${limit}, offset: ${offset})`);
-
-            // Only set headers if count was requested
-            if (includeCount && total !== null) {
-                res.setHeader('X-Total-Count', total);
-                res.setHeader('X-Has-More', offset + limit < total);
-            }
-            res.setHeader('X-Limit', limit);
-            res.setHeader('X-Offset', offset);
-            res.json(sessions);
+            })));
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
             res.status(500).json({ error: 'Failed to fetch coworking sessions' });
@@ -1016,19 +773,12 @@ async function startServer() {
                 [id, clientName, startTime, hourlyRate || 50, JSON.stringify([])]
             );
             const newSession = result.rows[0];
-            const responseSession = {
+            res.status(201).json({
                 ...newSession,
                 hourlyRate: parseFloat(newSession.hourlyRate),
                 total: parseFloat(newSession.total),
                 consumedExtras: newSession.consumedExtras || []
-            };
-
-            // Broadcast new session to all connected clients
-            if (req.app.locals.broadcastCoworkingUpdate) {
-                req.app.locals.broadcastCoworkingUpdate('create', responseSession);
-            }
-
-            res.status(201).json(responseSession);
+            });
         } catch (error) {
             console.error("Error creating coworking session:", error);
             res.status(500).json({ error: 'Failed to create coworking session' });
@@ -1082,19 +832,12 @@ async function startServer() {
                 return res.status(404).json({ error: 'Coworking session not found' });
             }
             const updatedSession = result.rows[0];
-            const responseSession = {
+            res.json({
                 ...updatedSession,
                 hourlyRate: parseFloat(updatedSession.hourlyRate),
                 total: parseFloat(updatedSession.total),
                 consumedExtras: updatedSession.consumedExtras || []
-            };
-
-            // Broadcast updated session to all connected clients
-            if (req.app.locals.broadcastCoworkingUpdate) {
-                req.app.locals.broadcastCoworkingUpdate('update', responseSession);
-            }
-
-            res.json(responseSession);
+            });
         } catch (error) {
             console.error("Error updating coworking session:", error);
             res.status(500).json({ error: 'Failed to update coworking session' });
@@ -1114,13 +857,6 @@ async function startServer() {
                 return res.status(404).json({ error: 'Coworking session not found' });
             }
 
-            const deletedSession = result.rows[0];
-
-            // Broadcast deletion to all connected clients
-            if (req.app.locals.broadcastCoworkingUpdate) {
-                req.app.locals.broadcastCoworkingUpdate('delete', { id: deletedSession.id });
-            }
-
             console.log('✅ Coworking session deleted successfully:', req.params.id);
             res.status(204).send();
         } catch (error) {
@@ -1132,30 +868,9 @@ async function startServer() {
     // --- CASH SESSIONS API ---
     app.get('/api/cash-sessions', async (req, res) => {
         try {
-            const startTime = Date.now();
             if (!useDb) return res.json([]);
-
-            // Pagination parameters
-            const limit = parseInt(req.query.limit) || 50;
-            const offset = parseInt(req.query.offset) || 0;
-
-            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
-            // Only fetch if explicitly requested with ?includeCount=true
-            const includeCount = req.query.includeCount === 'true';
-            let total = null;
-
-            if (includeCount) {
-                const countResult = await pool.query('SELECT COUNT(*) FROM cash_sessions');
-                total = parseInt(countResult.rows[0].count);
-            }
-
-            // Fetch paginated sessions with LIMIT
-            const result = await pool.query(
-                'SELECT * FROM cash_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-
-            const sessions = result.rows.map(session => ({
+            const result = await pool.query('SELECT * FROM cash_sessions ORDER BY created_at DESC');
+            res.json(result.rows.map(session => ({
                 ...session,
                 startAmount: parseFloat(session.startAmount),
                 endAmount: session.endAmount ? parseFloat(session.endAmount) : null,
@@ -1163,19 +878,7 @@ async function startServer() {
                 totalExpenses: parseFloat(session.totalExpenses),
                 expectedCash: parseFloat(session.expectedCash),
                 difference: parseFloat(session.difference)
-            }));
-
-            const duration = Date.now() - startTime;
-            console.log(`✓ Cash sessions query completed in ${duration}ms (${sessions.length} records, limit: ${limit}, offset: ${offset})`);
-
-            // Only set headers if count was requested
-            if (includeCount && total !== null) {
-                res.setHeader('X-Total-Count', total);
-                res.setHeader('X-Has-More', offset + limit < total);
-            }
-            res.setHeader('X-Limit', limit);
-            res.setHeader('X-Offset', offset);
-            res.json(sessions);
+            })));
         } catch (error) {
             console.error("Error fetching cash sessions:", error);
             res.status(500).json({ error: 'Failed to fetch cash sessions' });
@@ -1192,7 +895,7 @@ async function startServer() {
                 [id, startAmount, startTime, userId]
             );
             const newSession = result.rows[0];
-            const responseSession = {
+            res.status(201).json({
                 ...newSession,
                 startAmount: parseFloat(newSession.startAmount),
                 endAmount: newSession.endAmount ? parseFloat(newSession.endAmount) : null,
@@ -1200,14 +903,7 @@ async function startServer() {
                 totalExpenses: parseFloat(newSession.totalExpenses),
                 expectedCash: parseFloat(newSession.expectedCash),
                 difference: parseFloat(newSession.difference)
-            };
-
-            // Broadcast cash session opened
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('cash', 'create', responseSession);
-            }
-
-            res.status(201).json(responseSession);
+            });
         } catch (error) {
             console.error("Error creating cash session:", error);
             res.status(500).json({ error: 'Failed to create cash session' });
@@ -1226,7 +922,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Cash session not found' });
             }
             const updatedSession = result.rows[0];
-            const responseSession = {
+            res.json({
                 ...updatedSession,
                 startAmount: parseFloat(updatedSession.startAmount),
                 endAmount: updatedSession.endAmount ? parseFloat(updatedSession.endAmount) : null,
@@ -1234,14 +930,7 @@ async function startServer() {
                 totalExpenses: parseFloat(updatedSession.totalExpenses),
                 expectedCash: parseFloat(updatedSession.expectedCash),
                 difference: parseFloat(updatedSession.difference)
-            };
-
-            // Broadcast cash session updated/closed
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('cash', 'update', responseSession);
-            }
-
-            res.json(responseSession);
+            });
         } catch (error) {
             console.error("Error updating cash session:", error);
             res.status(500).json({ error: 'Failed to update cash session' });
@@ -1423,49 +1112,15 @@ async function startServer() {
     // --- CUSTOMERS ENDPOINTS ---
     app.get('/api/customers', async (req, res) => {
         try {
-            const startTime = Date.now();
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-
-            // Pagination parameters
-            const limit = parseInt(req.query.limit) || 100;
-            const offset = parseInt(req.query.offset) || 0;
-
-            // ⚡ OPTIMIZATION: Skip COUNT(*) for faster response
-            // Only fetch if explicitly requested with ?includeCount=true
-            const includeCount = req.query.includeCount === 'true';
-            let total = null;
-
-            if (includeCount) {
-                const countResult = await pool.query('SELECT COUNT(*) FROM customers');
-                total = parseInt(countResult.rows[0].count);
-            }
-
-            // Fetch paginated customers with LIMIT
-            const result = await pool.query(
-                'SELECT * FROM customers ORDER BY name ASC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-
-            const customers = result.rows.map(c => ({
+            const result = await pool.query('SELECT * FROM customers ORDER BY name ASC');
+            res.json(result.rows.map(c => ({
                 ...c,
                 discountPercentage: parseFloat(c.discountPercentage),
                 creditLimit: parseFloat(c.creditLimit),
                 currentCredit: parseFloat(c.currentCredit),
                 createdAt: c.created_at
-            }));
-
-            const duration = Date.now() - startTime;
-            console.log(`✓ Customers query completed in ${duration}ms (${customers.length} records, limit: ${limit}, offset: ${offset})`);
-
-            res.json({
-                data: customers,
-                pagination: {
-                    total: total,
-                    limit,
-                    offset,
-                    hasMore: total !== null ? offset + limit < total : null
-                }
-            });
+            })));
         } catch (error) {
             console.error("Error fetching customers:", error);
             res.status(500).json({ error: 'Failed to fetch customers' });
@@ -1482,20 +1137,13 @@ async function startServer() {
                 [id, name, email || null, phone || null, discountPercentage || 0, creditLimit || 0]
             );
             const customer = result.rows[0];
-            const responseCustomer = {
+            res.status(201).json({
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
                 creditLimit: parseFloat(customer.creditLimit),
                 currentCredit: parseFloat(customer.currentCredit),
                 createdAt: customer.created_at
-            };
-
-            // Broadcast new customer
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('customers', 'create', responseCustomer);
-            }
-
-            res.status(201).json(responseCustomer);
+            });
         } catch (error) {
             console.error("Error creating customer:", error);
             res.status(500).json({ error: 'Failed to create customer' });
@@ -1514,20 +1162,13 @@ async function startServer() {
                 return res.status(404).json({ error: 'Customer not found' });
             }
             const customer = result.rows[0];
-            const responseCustomer = {
+            res.json({
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
                 creditLimit: parseFloat(customer.creditLimit),
                 currentCredit: parseFloat(customer.currentCredit),
                 createdAt: customer.created_at
-            };
-
-            // Broadcast customer updated
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('customers', 'update', responseCustomer);
-            }
-
-            res.json(responseCustomer);
+            });
         } catch (error) {
             console.error("Error updating customer:", error);
             res.status(500).json({ error: 'Failed to update customer' });
@@ -1538,12 +1179,6 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             await pool.query('DELETE FROM customers WHERE id = $1', [req.params.id]);
-
-            // Broadcast customer deleted
-            if (req.app.locals.broadcast) {
-                req.app.locals.broadcast('customers', 'delete', { id: req.params.id });
-            }
-
             res.status(204).send();
         } catch (error) {
             console.error("Error deleting customer:", error);
@@ -1761,13 +1396,9 @@ async function startServer() {
 
             const indexes = [
                 { name: 'idx_orders_created_at', table: 'orders', column: 'created_at DESC' },
-                { name: 'idx_orders_status', table: 'orders', column: '"paymentMethod"' },
                 { name: 'idx_expenses_created_at', table: 'expenses', column: 'created_at DESC' },
-                { name: 'idx_expenses_category', table: 'expenses', column: 'category' },
                 { name: 'idx_coworking_created_at', table: 'coworking_sessions', column: 'created_at DESC' },
                 { name: 'idx_coworking_status', table: 'coworking_sessions', column: 'status' },
-                { name: 'idx_cash_sessions_created_at', table: 'cash_sessions', column: 'created_at DESC' },
-                { name: 'idx_cash_sessions_status', table: 'cash_sessions', column: 'status' },
                 { name: 'idx_customer_credits_customer', table: 'customer_credits', column: '"customerId"' }
             ];
 
@@ -2029,63 +1660,9 @@ async function startServer() {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });
 
-    // --- WEBSOCKET SETUP ---
-    const httpServer = createServer(app);
-    const io = new Server(httpServer, {
-        cors: {
-            origin: process.env.NODE_ENV === 'production' ? false : ['http://localhost:5173', 'http://localhost:3000'],
-            methods: ['GET', 'POST'],
-        },
-        transports: ['websocket', 'polling'],
-        pingTimeout: 60000,
-        pingInterval: 25000,
-    });
-
-    // WebSocket connection handling
-    io.on('connection', (socket) => {
-        console.log(`[WS] Client connected: ${socket.id} (Total: ${io.sockets.sockets.size})`);
-
-        // Join all resource rooms for real-time updates
-        socket.join('coworking');
-        socket.join('cash');
-        socket.join('customers');
-        socket.join('orders');
-        socket.join('products');
-
-        socket.on('disconnect', (reason) => {
-            console.log(`[WS] Client disconnected: ${socket.id}, reason: ${reason} (Remaining: ${io.sockets.sockets.size})`);
-        });
-
-        socket.on('error', (error) => {
-            console.error(`[WS] Socket error:`, error);
-        });
-    });
-
-    // Generic broadcast helper for ANY resource type
-    function broadcastUpdate(resource, type, data) {
-        const payload = {
-            type, // 'create', 'update', 'delete'
-            data,
-            timestamp: new Date().toISOString(),
-        };
-
-        io.to(resource).emit(`${resource}:update`, payload);
-        console.log(`[WS] Broadcast ${resource}:${type} to ${io.sockets.sockets.size} clients`);
-    }
-
-    // Legacy coworking broadcast for backward compatibility
-    function broadcastCoworkingUpdate(type, session) {
-        broadcastUpdate('coworking', type, session);
-    }
-
-    // Make broadcast functions available for use in endpoints
-    app.locals.broadcast = broadcastUpdate;
-    app.locals.broadcastCoworkingUpdate = broadcastCoworkingUpdate;
-
     // --- START SERVER ---
-    httpServer.listen(port, () => {
-        console.log(`Server listening on port ${port} with WebSocket support`);
-        console.log(`WebSocket endpoint: ws://localhost:${port}`);
+    app.listen(port, () => {
+        console.log(`Server listening on port ${port}`);
     });
 }
 
