@@ -1,8 +1,8 @@
 // Service Worker para Conejo Negro POS
-// Versión: 1.0.0
+// Versión: 2.0.0 - Force cache update after merge
 
-const CACHE_NAME = 'conejo-negro-pos-v1';
-const RUNTIME_CACHE = 'conejo-negro-runtime-v1';
+const CACHE_NAME = 'conejo-negro-pos-v2';
+const RUNTIME_CACHE = 'conejo-negro-runtime-v2';
 
 // Archivos esenciales para cachear
 const PRECACHE_URLS = [
