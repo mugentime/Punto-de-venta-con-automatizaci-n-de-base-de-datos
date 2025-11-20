@@ -103,85 +103,123 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const fetchAllData = async () => {
             console.log('🔄 Starting data fetch...');
             try {
-                // Fetch products
-                const productsResponse = await fetch('/api/products');
-                if (productsResponse.ok) {
-                    const productsData: Product[] = await productsResponse.json();
-                    setProducts(productsData);
+                // Fetch products with individual error handling
+                try {
+                    console.log('📦 Fetching products...');
+                    const productsResponse = await fetch('/api/products');
+                    console.log('📦 Products response:', productsResponse.status);
+                    if (productsResponse.ok) {
+                        const productsData: Product[] = await productsResponse.json();
+                        console.log('📦 Products loaded:', productsData.length, 'items');
+                        setProducts(productsData);
+                    } else {
+                        console.error('❌ Failed to fetch products:', await productsResponse.text());
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching products:', error);
                 }
 
-                // Fetch orders
-                const ordersResponse = await fetch('/api/orders');
-                if (ordersResponse.ok) {
-                    const ordersData: Order[] = await ordersResponse.json();
-                    setOrders(ordersData);
+                // Fetch orders with individual error handling
+                try {
+                    const ordersResponse = await fetch('/api/orders');
+                    if (ordersResponse.ok) {
+                        const ordersData: Order[] = await ordersResponse.json();
+                        setOrders(ordersData);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching orders:', error);
                 }
 
-                // Fetch expenses
-                const expensesResponse = await fetch('/api/expenses');
-                if (expensesResponse.ok) {
-                    const expensesData: Expense[] = await expensesResponse.json();
-                    setExpenses(expensesData);
+                // Fetch expenses with individual error handling
+                try {
+                    const expensesResponse = await fetch('/api/expenses');
+                    if (expensesResponse.ok) {
+                        const expensesData: Expense[] = await expensesResponse.json();
+                        setExpenses(expensesData);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching expenses:', error);
                 }
 
-                // Fetch coworking sessions
-                const coworkingResponse = await fetch('/api/coworking-sessions');
-                if (coworkingResponse.ok) {
-                    const coworkingData: CoworkingSession[] = await coworkingResponse.json();
-                    setCoworkingSessions(coworkingData);
+                // Fetch coworking sessions with individual error handling
+                try {
+                    const coworkingResponse = await fetch('/api/coworking-sessions');
+                    if (coworkingResponse.ok) {
+                        const coworkingData: CoworkingSession[] = await coworkingResponse.json();
+                        setCoworkingSessions(coworkingData);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching coworking sessions:', error);
                 }
 
-                // Fetch cash sessions
-                const cashResponse = await fetch('/api/cash-sessions');
-                console.log('💰 Cash sessions response:', cashResponse.status);
-                if (cashResponse.ok) {
-                    const cashData: any[] = await cashResponse.json();
-                    console.log('💰 Raw cash data:', cashData);
-                    // Map API response to frontend CashSession type
-                    const mappedSessions: CashSession[] = cashData.map(session => ({
-                        id: session.id,
-                        startDate: session.startTime,
-                        endDate: session.endTime,
-                        startAmount: session.startAmount,
-                        endAmount: session.endAmount,
-                        status: session.status === 'active' ? 'open' : 'closed',
-                        totalSales: session.totalSales,
-                        totalExpenses: session.totalExpenses,
-                        expectedCash: session.expectedCash,
-                        difference: session.difference
-                    }));
-                    console.log('💰 Mapped cash sessions:', mappedSessions);
-                    setCashSessions(mappedSessions);
-                } else {
-                    console.error('❌ Failed to fetch cash sessions:', await cashResponse.text());
+                // Fetch cash sessions with individual error handling
+                try {
+                    const cashResponse = await fetch('/api/cash-sessions');
+                    console.log('💰 Cash sessions response:', cashResponse.status);
+                    if (cashResponse.ok) {
+                        const cashData: any[] = await cashResponse.json();
+                        console.log('💰 Raw cash data:', cashData);
+                        // Map API response to frontend CashSession type
+                        const mappedSessions: CashSession[] = cashData.map(session => ({
+                            id: session.id,
+                            startDate: session.startTime,
+                            endDate: session.endTime,
+                            startAmount: session.startAmount,
+                            endAmount: session.endAmount,
+                            status: session.status === 'active' ? 'open' : 'closed',
+                            totalSales: session.totalSales,
+                            totalExpenses: session.totalExpenses,
+                            expectedCash: session.expectedCash,
+                            difference: session.difference
+                        }));
+                        console.log('💰 Mapped cash sessions:', mappedSessions);
+                        setCashSessions(mappedSessions);
+                    } else {
+                        console.error('❌ Failed to fetch cash sessions:', await cashResponse.text());
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching cash sessions:', error);
                 }
 
-                // Fetch users
-                const usersResponse = await fetch('/api/users');
-                if (usersResponse.ok) {
-                    const usersData: User[] = await usersResponse.json();
-                    setUsers(usersData);
-                } else {
-                    // Fallback to initial admin if API fails
+                // Fetch users with individual error handling
+                try {
+                    const usersResponse = await fetch('/api/users');
+                    if (usersResponse.ok) {
+                        const usersData: User[] = await usersResponse.json();
+                        setUsers(usersData);
+                    } else {
+                        // Fallback to initial admin if API fails
+                        setUsers([initialAdmin]);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching users:', error);
                     setUsers([initialAdmin]);
                 }
 
-                // Fetch customers
-                const customersResponse = await fetch('/api/customers');
-                console.log('👥 Customers response:', customersResponse.status);
-                if (customersResponse.ok) {
-                    const customersData: Customer[] = await customersResponse.json();
-                    console.log('👥 Customers data:', customersData);
-                    setCustomers(customersData);
-                } else {
-                    console.error('❌ Failed to fetch customers:', await customersResponse.text());
+                // Fetch customers with individual error handling
+                try {
+                    const customersResponse = await fetch('/api/customers');
+                    console.log('👥 Customers response:', customersResponse.status);
+                    if (customersResponse.ok) {
+                        const customersData: Customer[] = await customersResponse.json();
+                        console.log('👥 Customers data:', customersData);
+                        setCustomers(customersData);
+                    } else {
+                        console.error('❌ Failed to fetch customers:', await customersResponse.text());
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching customers:', error);
                 }
 
-                // Fetch cash withdrawals
-                const withdrawalsResponse = await fetch('/api/cash-withdrawals');
-                if (withdrawalsResponse.ok) {
-                    const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
-                    setCashWithdrawals(withdrawalsData);
+                // Fetch cash withdrawals with individual error handling
+                try {
+                    const withdrawalsResponse = await fetch('/api/cash-withdrawals');
+                    if (withdrawalsResponse.ok) {
+                        const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
+                        setCashWithdrawals(withdrawalsData);
+                    }
+                } catch (error) {
+                    console.error('❌ Error fetching cash withdrawals:', error);
                 }
             } catch (error) {
                 console.error("Failed to fetch data:", error);

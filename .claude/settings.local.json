@@ -8,7 +8,10 @@
       "Bash(railway logs:*)",
       "Bash(npm run typecheck:*)",
       "Bash(npm run:*)",
-      "Bash(npm install)"
+      "Bash(npm install)",
+      "Bash(nul)",
+      "Bash(dir /s /b 'C:\\Users\\je2al\\Desktop\\Punto de venta Branch\\app\\api' 2)",
+      "Bash(findstr:*)"
     ],
     "deny": [],
     "ask": []
