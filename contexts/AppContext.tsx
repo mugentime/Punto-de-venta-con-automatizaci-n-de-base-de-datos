@@ -101,6 +101,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     // Fetch all data from database on app load
     useEffect(() => {
         const fetchAllData = async () => {
+            console.log('🔄 Starting data fetch...');
             try {
                 // Fetch products
                 const productsResponse = await fetch('/api/products');
@@ -132,8 +133,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                 // Fetch cash sessions
                 const cashResponse = await fetch('/api/cash-sessions');
+                console.log('💰 Cash sessions response:', cashResponse.status);
                 if (cashResponse.ok) {
                     const cashData: any[] = await cashResponse.json();
+                    console.log('💰 Raw cash data:', cashData);
                     // Map API response to frontend CashSession type
                     const mappedSessions: CashSession[] = cashData.map(session => ({
                         id: session.id,
@@ -147,7 +150,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         expectedCash: session.expectedCash,
                         difference: session.difference
                     }));
+                    console.log('💰 Mapped cash sessions:', mappedSessions);
                     setCashSessions(mappedSessions);
+                } else {
+                    console.error('❌ Failed to fetch cash sessions:', await cashResponse.text());
                 }
 
                 // Fetch users
@@ -162,9 +168,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                 // Fetch customers
                 const customersResponse = await fetch('/api/customers');
+                console.log('👥 Customers response:', customersResponse.status);
                 if (customersResponse.ok) {
                     const customersData: Customer[] = await customersResponse.json();
+                    console.log('👥 Customers data:', customersData);
                     setCustomers(customersData);
+                } else {
+                    console.error('❌ Failed to fetch customers:', await customersResponse.text());
                 }
 
                 // Fetch cash withdrawals
