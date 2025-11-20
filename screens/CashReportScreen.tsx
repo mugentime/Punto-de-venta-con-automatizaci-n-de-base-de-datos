@@ -170,11 +170,17 @@ const CloseDayModal: React.FC<{
 
 
 const CashReportScreen: React.FC = () => {
-  const { orders, expenses, cashSessions, cashWithdrawals, coworkingSessions, startCashSession, closeCashSession, addCashWithdrawal } = useAppContext();
+  const { orders, expenses, cashSessions, cashWithdrawals, coworkingSessions, startCashSession, closeCashSession, addCashWithdrawal, refetchOrders } = useAppContext();
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
+
+  // 🔄 Refetch orders when component mounts to ensure data is fresh
+  React.useEffect(() => {
+    console.log('💰 CashReportScreen mounted - refetching orders...');
+    refetchOrders();
+  }, []); // Empty dependency - only run on mount
 
   // FIX BUG 4: Deduplicate orders before calculations
   const deduplicatedOrders = deduplicateOrders(orders);

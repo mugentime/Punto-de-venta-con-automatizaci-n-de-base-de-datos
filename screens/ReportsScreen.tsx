@@ -8,9 +8,15 @@ import { deduplicateOrders } from '../utils/deduplication';
 const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
-    const { orders, expenses, coworkingSessions } = useAppContext();
+    const { orders, expenses, coworkingSessions, refetchOrders } = useAppContext();
     const [showSalesDetail, setShowSalesDetail] = useState(false);
     const [showExpensesDetail, setShowExpensesDetail] = useState(false);
+
+    // 🔄 Refetch orders when component mounts to ensure data is fresh
+    React.useEffect(() => {
+        console.log('📊 ReportsScreen mounted - refetching orders...');
+        refetchOrders();
+    }, []); // Empty dependency - only run on mount
 
     // FIX BUG 4: Deduplicate orders before calculations
     const deduplicatedOrders = useMemo(() => deduplicateOrders(orders), [orders]);
