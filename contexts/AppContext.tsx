@@ -121,10 +121,18 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                 // Fetch orders with individual error handling
                 try {
+                    console.log('📋 Fetching orders...');
                     const ordersResponse = await fetch('/api/orders');
+                    console.log('📋 Orders response:', ordersResponse.status);
                     if (ordersResponse.ok) {
                         const ordersData: Order[] = await ordersResponse.json();
+                        console.log('📋 Orders loaded:', ordersData.length, 'orders');
+                        console.log('📋 Date range:', ordersData.length > 0 ?
+                            `${new Date(ordersData[ordersData.length-1].date).toLocaleDateString()} to ${new Date(ordersData[0].date).toLocaleDateString()}` :
+                            'No orders');
                         setOrders(ordersData);
+                    } else {
+                        console.error('❌ Failed to fetch orders:', await ordersResponse.text());
                     }
                 } catch (error) {
                     console.error('❌ Error fetching orders:', error);

@@ -129,11 +129,11 @@
               });
             });
 
-            // When the new service worker takes control, reload the page
-            navigator.serviceWorker.addEventListener('controllerchange', () => {
-              console.log('🔄 Service Worker updated! Reloading page...');
-              window.location.reload();
-            });
+            // When the new service worker takes control, reload the page (DISABLED to prevent refresh loop)
+            // navigator.serviceWorker.addEventListener('controllerchange', () => {
+            //   console.log('🔄 Service Worker updated! Reloading page...');
+            //   window.location.reload();
+            // });
 
             // Check for updates every 5 minutes (more aggressive)
             setInterval(() => {
