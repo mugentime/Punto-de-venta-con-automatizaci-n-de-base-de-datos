@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { TrashIcon } from '../components/Icons';
 import type { Order } from '../types';
@@ -55,8 +55,39 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
 );
 
 const HistoryScreen: React.FC = () => {
-    const { orders, deleteOrder } = useAppContext();
+    const { orders, deleteOrder, refetchOrders } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+
+    // 🔄 OPTION A: Refetch orders when component mounts
+    useEffect(() => {
+        console.log('📊 HistoryScreen mounted - refetching orders...');
+        refetchOrders();
+    }, []); // Empty dependency - only run on mount
+
+    // 🔄 OPTION C: Polling - refetch every 10 seconds while screen is active
+    useEffect(() => {
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                console.log('🔄 Polling: Refetching orders...');
+                refetchOrders();
+            }
+        }, 10000); // 10 seconds
+
+        return () => clearInterval(interval);
+    }, [refetchOrders]);
+
+    // 🔄 OPTION C: Refetch when tab/window regains focus
+    useEffect(() => {
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                console.log('👁️ Tab focused - refetching orders...');
+                refetchOrders();
+            }
+        };
+
+        document.addEventListener('visibilitychange', handleVisibilityChange);
+        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+    }, [refetchOrders]);
 
     const handleDelete = async (orderId: string) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {

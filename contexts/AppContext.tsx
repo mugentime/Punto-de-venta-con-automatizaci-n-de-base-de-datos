@@ -38,6 +38,7 @@ interface AppContextType {
     orders: Order[];
     createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; tip?: number; }) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
+    refetchOrders: () => Promise<void>;
     // Expenses
     expenses: Expense[];
     addExpense: (expense: Omit<Expense, 'id'>) => void;
@@ -580,6 +581,9 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Update local state
             setOrders(prev => [newOrder, ...prev]);
 
+            // 🔄 OPTION B: Invalidate cache - force refetch after successful order creation
+            await refetchOrders();
+
             // Update stock for all items in the cart
             const stockUpdates = orderCart.map(item => ({
                 id: item.id,
@@ -615,6 +619,23 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             console.error("Error deleting order:", error);
             alert("Error al eliminar la orden");
             throw error;
+        }
+    };
+
+    // 🔄 OPTION A: Refetch Orders Function - allows manual refresh
+    const refetchOrders = async () => {
+        try {
+            console.log('🔄 Refetching orders...');
+            const ordersResponse = await fetch('/api/orders');
+            if (ordersResponse.ok) {
+                const ordersData: Order[] = await ordersResponse.json();
+                console.log('✅ Orders refetched:', ordersData.length, 'orders');
+                setOrders(ordersData);
+            } else {
+                console.error('❌ Failed to refetch orders:', await ordersResponse.text());
+            }
+        } catch (error) {
+            console.error('❌ Error refetching orders:', error);
         }
     };
 
@@ -1098,7 +1119,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
             cartSubtotal, cartTotal,
-            orders, createOrder, deleteOrder,
+            orders, createOrder, deleteOrder, refetchOrders,
             expenses, addExpense, updateExpense, deleteExpense,
             coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
             cashSessions, cashWithdrawals, startCashSession, closeCashSession, addCashWithdrawal, deleteCashWithdrawal,
