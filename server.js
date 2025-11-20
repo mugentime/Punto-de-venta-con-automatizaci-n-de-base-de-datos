@@ -1873,6 +1873,79 @@ async function startServer() {
         }
     });
 
+    // --- FIX PRODUCT STOCK ENDPOINT ---
+    app.post('/api/admin/fix-product-stock', async (req, res) => {
+        if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+        try {
+            console.log('🔍 Checking products with low/zero stock...');
+
+            // Query products with low/zero stock
+            const lowStockResult = await pool.query(`
+                SELECT id, name, stock, category, price
+                FROM products
+                WHERE stock <= 0
+                ORDER BY name;
+            `);
+
+            if (lowStockResult.rows.length === 0) {
+                console.log('✅ All products have positive stock!');
+                return res.json({
+                    success: true,
+                    message: 'All products already have positive stock',
+                    productsUpdated: 0,
+                    products: []
+                });
+            }
+
+            console.log(`⚠️  Found ${lowStockResult.rows.length} products with zero/negative stock`);
+
+            // Update stock levels based on category
+            const updateResult = await pool.query(`
+                UPDATE products
+                SET stock = CASE
+                    WHEN category = 'Cafetería' THEN 100
+                    WHEN category = 'Alimentos' THEN 50
+                    WHEN category = 'Refrigerador' THEN 60
+                    WHEN category = 'Membresías' THEN 100
+                    ELSE 75
+                END
+                WHERE stock <= 0
+                RETURNING id, name, stock, category;
+            `);
+
+            console.log(`✅ Updated ${updateResult.rows.length} products`);
+
+            // Get summary statistics
+            const summaryResult = await pool.query(`
+                SELECT
+                    category,
+                    COUNT(*) as product_count,
+                    SUM(stock) as total_units,
+                    AVG(stock) as avg_stock_per_product
+                FROM products
+                GROUP BY category
+                ORDER BY category;
+            `);
+
+            res.json({
+                success: true,
+                message: `Successfully updated ${updateResult.rows.length} products`,
+                productsUpdated: updateResult.rows.length,
+                products: updateResult.rows,
+                summary: summaryResult.rows
+            });
+
+        } catch (error) {
+            console.error('❌ Stock fix failed:', error);
+            res.status(500).json({
+                success: false,
+                error: error.message,
+                details: error.stack
+            });
+        }
+    });
+
     // --- AI ENDPOINTS ---
     app.post('/api/generate-description', async (req, res) => {
       const { productName, keywords } = req.body;
