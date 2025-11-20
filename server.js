@@ -198,6 +198,31 @@ async function setupAndGetDataStore() {
               );
             `);
 
+            // CRITICAL FIX: Create idempotency_keys table for order deduplication
+            console.log('🔄 Ensuring idempotency_keys table exists...');
+            await client.query(`
+              CREATE TABLE IF NOT EXISTS idempotency_keys (
+                key VARCHAR(255) PRIMARY KEY,
+                order_id VARCHAR(255) NOT NULL,
+                resource_type VARCHAR(50) NOT NULL DEFAULT 'order',
+                created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT (CURRENT_TIMESTAMP + INTERVAL '24 hours'),
+                response_data JSONB
+              );
+            `);
+
+            // Create indexes for idempotency_keys table if they don't exist
+            await client.query(`
+              CREATE INDEX IF NOT EXISTS idx_idempotency_expires ON idempotency_keys(expires_at);
+            `);
+            await client.query(`
+              CREATE INDEX IF NOT EXISTS idx_idempotency_resource ON idempotency_keys(resource_type, created_at);
+            `);
+            await client.query(`
+              CREATE INDEX IF NOT EXISTS idx_idempotency_order ON idempotency_keys(order_id);
+            `);
+            console.log('✅ idempotency_keys table verified/created successfully');
+
             // AUTO-MIGRATION: Add discount and tip columns if they don't exist
             console.log('🔄 Running auto-migrations...');
             try {
