@@ -1,9 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
-import { retryFetch } from '../utils/retryWithBackoff';
-import { requestDeduplicator, generateIdempotencyKey } from '../utils/requestDeduplication';
-import { useWebSocket } from './WebSocketContext';
 
 const initialAdmin: User = {
     id: 'admin-001',
@@ -15,9 +12,6 @@ const initialAdmin: User = {
 };
 
 interface AppContextType {
-    // Loading state
-    isDataLoaded: boolean;
-    loadAllData: () => Promise<void>;
     // Auth
     users: User[];
     currentUser: User | null;
@@ -76,9 +70,6 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // --- STATE MANAGEMENT ---
 
-    // Loading State
-    const [isDataLoaded, setIsDataLoaded] = useState(false);
-
     // All State (now fetched from backend)
     const [users, setUsers] = useState<User[]>([]);
     const [currentUser, setCurrentUser] = useState<User | null>(null);
@@ -91,80 +82,58 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [cashWithdrawals, setCashWithdrawals] = useState<CashWithdrawal[]>([]);
     const [customers, setCustomers] = useState<Customer[]>([]);
 
-    // --- FUNCTIONS ---
+    // --- EFFECTS ---
 
-    // 🔄 LOAD ALL DATA - Called manually after login or session restore
-    const loadAllData = useCallback(async () => {
-        try {
-            const startTime = Date.now();
-            console.log('🚀 Starting parallel data fetch...');
+    // Restore user session from localStorage on app load
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                const user = JSON.parse(storedUser);
+                setCurrentUser(user);
+            } catch (error) {
+                console.error('Failed to restore user session:', error);
+                localStorage.removeItem('currentUser');
+            }
+        }
+    }, []);
 
-            // ⚡ OPTIMIZATION: Fetch ALL resources in PARALLEL using Promise.all
-            const [
-                productsResponse,
-                ordersResponse,
-                expensesResponse,
-                coworkingResponse,
-                cashResponse,
-                usersResponse,
-                customersResponse,
-                withdrawalsResponse
-            ] = await Promise.all([
-                fetch('/api/products'),
-                fetch('/api/orders?limit=500'),  // Fetch more initial records
-                fetch('/api/expenses?limit=200'),
-                fetch('/api/coworking-sessions?limit=200'),
-                fetch('/api/cash-sessions?limit=100'),
-                fetch('/api/users'),
-                fetch('/api/customers?limit=500'),
-                fetch('/api/cash-withdrawals')
-            ]);
-
-                const fetchDuration = Date.now() - startTime;
-                console.log(`✓ All fetches completed in ${fetchDuration}ms`);
-
-                // Process products
+    // Fetch all data from database on app load
+    useEffect(() => {
+        const fetchAllData = async () => {
+            try {
+                // Fetch products
+                const productsResponse = await fetch('/api/products');
                 if (productsResponse.ok) {
                     const productsData: Product[] = await productsResponse.json();
                     setProducts(productsData);
                 }
 
-                // Process orders (paginated response)
+                // Fetch orders
+                const ordersResponse = await fetch('/api/orders');
                 if (ordersResponse.ok) {
-                    const ordersResult = await ordersResponse.json();
-                    const ordersData: Order[] = ordersResult.data || ordersResult;
+                    const ordersData: Order[] = await ordersResponse.json();
                     setOrders(ordersData);
-                    console.log(`✓ Loaded ${ordersData.length}/${ordersResult.pagination?.total || ordersData.length} orders`);
-                } else {
-                    // 🛡️ FIX: Log HTTP errors to diagnose fetch failures
-                    const errorText = await ordersResponse.text();
-                    console.error(`❌ Orders fetch failed with status ${ordersResponse.status}`);
-                    console.error(`Request URL: /api/orders?limit=500`);
-                    console.error(`Response body:`, errorText);
-                    // Set empty array to prevent undefined state
-                    setOrders([]);
                 }
 
-                // Process expenses (paginated response)
+                // Fetch expenses
+                const expensesResponse = await fetch('/api/expenses');
                 if (expensesResponse.ok) {
-                    const expensesResult = await expensesResponse.json();
-                    const expensesData: Expense[] = expensesResult.data || expensesResult;
+                    const expensesData: Expense[] = await expensesResponse.json();
                     setExpenses(expensesData);
-                    console.log(`✓ Loaded ${expensesData.length}/${expensesResult.pagination?.total || expensesData.length} expenses`);
                 }
 
-                // Process coworking sessions (paginated response)
+                // Fetch coworking sessions
+                const coworkingResponse = await fetch('/api/coworking-sessions');
                 if (coworkingResponse.ok) {
-                    const coworkingResult = await coworkingResponse.json();
-                    const coworkingData: CoworkingSession[] = coworkingResult.data || coworkingResult;
+                    const coworkingData: CoworkingSession[] = await coworkingResponse.json();
                     setCoworkingSessions(coworkingData);
-                    console.log(`✓ Loaded ${coworkingData.length}/${coworkingResult.pagination?.total || coworkingData.length} coworking sessions`);
                 }
 
-                // Process cash sessions (paginated response)
+                // Fetch cash sessions
+                const cashResponse = await fetch('/api/cash-sessions');
                 if (cashResponse.ok) {
-                    const cashResult = await cashResponse.json();
-                    const cashData: any[] = cashResult.data || cashResult;
+                    const cashData: any[] = await cashResponse.json();
                     // Map API response to frontend CashSession type
                     const mappedSessions: CashSession[] = cashData.map(session => ({
                         id: session.id,
@@ -179,10 +148,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         difference: session.difference
                     }));
                     setCashSessions(mappedSessions);
-                    console.log(`✓ Loaded ${mappedSessions.length}/${cashResult.pagination?.total || mappedSessions.length} cash sessions`);
                 }
 
-                // Process users
+                // Fetch users
+                const usersResponse = await fetch('/api/users');
                 if (usersResponse.ok) {
                     const usersData: User[] = await usersResponse.json();
                     setUsers(usersData);
@@ -191,266 +160,62 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     setUsers([initialAdmin]);
                 }
 
-                // Process customers (paginated response)
+                // Fetch customers
+                const customersResponse = await fetch('/api/customers');
                 if (customersResponse.ok) {
-                    const customersResult = await customersResponse.json();
-                    const customersData: Customer[] = customersResult.data || customersResult;
+                    const customersData: Customer[] = await customersResponse.json();
                     setCustomers(customersData);
-                    console.log(`✓ Loaded ${customersData.length}/${customersResult.pagination?.total || customersData.length} customers`);
                 }
 
-                // Process cash withdrawals
+                // Fetch cash withdrawals
+                const withdrawalsResponse = await fetch('/api/cash-withdrawals');
                 if (withdrawalsResponse.ok) {
                     const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
                     setCashWithdrawals(withdrawalsData);
                 }
-
-            const totalDuration = Date.now() - startTime;
-            console.log(`✅ All data loaded and processed in ${totalDuration}ms (${(totalDuration / 1000).toFixed(2)}s)`);
-
-            // ✅ Set data loaded flag
-            setIsDataLoaded(true);
-        } catch (error) {
-            console.error("❌ Failed to fetch data:", error);
-            // Fallback to initial admin if everything fails
-            setUsers([initialAdmin]);
-            // Even on error, mark as loaded to prevent infinite loading
-            setIsDataLoaded(true);
-        }
-    }, []); // Empty deps - loadAllData doesn't depend on any props or state
-
-    // --- EFFECTS ---
-
-    // Restore user session from localStorage on app load
-    useEffect(() => {
-        const restoreSession = async () => {
-            const storedUser = localStorage.getItem('currentUser');
-            if (storedUser) {
-                try {
-                    const user = JSON.parse(storedUser);
-                    setCurrentUser(user);
-                    // 🔄 Load all data when restoring session
-                    console.log('✅ Session restored, loading all data...');
-                    await loadAllData();
-                } catch (error) {
-                    console.error('Failed to restore user session:', error);
-                    localStorage.removeItem('currentUser');
-                }
-            }
-        };
-        restoreSession();
-    }, [loadAllData]); // Include loadAllData now that it's memoized with useCallback
-
-    // 🔄 REAL-TIME SYNC: WebSocket subscription for coworking sessions
-    const { subscribe, isConnected } = useWebSocket();
-
-    useEffect(() => {
-        // Initial load of coworking sessions (handle paginated response)
-        const loadCoworkingSessions = async () => {
-            try {
-                const response = await fetch('/api/coworking-sessions?limit=200');
-                if (response.ok) {
-                    const result = await response.json();
-                    const sessions: CoworkingSession[] = result.data || result;
-                    setCoworkingSessions(sessions);
-                }
             } catch (error) {
-                console.error('Failed to load coworking sessions:', error);
+                console.error("Failed to fetch data:", error);
+                // Fallback to initial admin if everything fails
+                setUsers([initialAdmin]);
             }
         };
-
-        loadCoworkingSessions();
+        fetchAllData();
     }, []);
 
+    // 🔄 CROSS-DEVICE SYNC: Poll for coworking sessions every 5 seconds
     useEffect(() => {
-        // Subscribe to real-time coworking updates via WebSocket
-        const unsubscribe = subscribe('coworking:update', ({ type, session }: { type: 'create' | 'update' | 'delete'; session: CoworkingSession | { id: string } }) => {
-            console.log(`[AppContext] Received coworking ${type} update:`, session);
-
-            setCoworkingSessions(prev => {
-                switch (type) {
-                    case 'create':
-                        // Add new session if not already present
-                        return prev.some(s => s.id === (session as CoworkingSession).id)
-                            ? prev
-                            : [session as CoworkingSession, ...prev];
-
-                    case 'update':
-                        // Update existing session
-                        return prev.map(s => s.id === (session as CoworkingSession).id ? session as CoworkingSession : s);
-
-                    case 'delete':
-                        // Remove deleted session
-                        return prev.filter(s => s.id !== session.id);
-
-                    default:
-                        return prev;
-                }
-            });
-        });
-
-        return unsubscribe;
-    }, [subscribe]);
-
-    // 🔄 REAL-TIME SYNC: WebSocket subscription for cash sessions
-    useEffect(() => {
-        const unsubscribe = subscribe('cash:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
-            console.log(`[AppContext] Received cash ${type} update:`, data);
-
-            setCashSessions(prev => {
-                switch (type) {
-                    case 'create':
-                        return prev.some(s => s.id === data.id) ? prev : [data, ...prev];
-                    case 'update':
-                        return prev.map(s => s.id === data.id ? data : s);
-                    case 'delete':
-                        return prev.filter(s => s.id !== data.id);
-                    default:
-                        return prev;
-                }
-            });
-        });
-
-        return unsubscribe;
-    }, [subscribe]);
-
-    // 🔄 REAL-TIME SYNC: WebSocket subscription for customers
-    useEffect(() => {
-        const unsubscribe = subscribe('customers:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
-            console.log(`[AppContext] Received customers ${type} update:`, data);
-
-            setCustomers(prev => {
-                switch (type) {
-                    case 'create':
-                        return prev.some(c => c.id === data.id) ? prev : [...prev, data].sort((a, b) => a.name.localeCompare(b.name));
-                    case 'update':
-                        return prev.map(c => c.id === data.id ? data : c);
-                    case 'delete':
-                        return prev.filter(c => c.id !== data.id);
-                    default:
-                        return prev;
-                }
-            });
-        });
-
-        return unsubscribe;
-    }, [subscribe]);
-
-    // 🔄 REAL-TIME SYNC: WebSocket subscription for orders
-    useEffect(() => {
-        const unsubscribe = subscribe('orders:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
-            console.log(`[AppContext] Received orders ${type} update:`, data);
-
-            setOrders(prev => {
-                switch (type) {
-                    case 'create':
-                        return prev.some(o => o.id === data.id) ? prev : [data, ...prev];
-                    case 'update':
-                        return prev.map(o => o.id === data.id ? data : o);
-                    case 'delete':
-                        return prev.filter(o => o.id !== data.id);
-                    default:
-                        return prev;
-                }
-            });
-        });
-
-        return unsubscribe;
-    }, [subscribe]);
-
-    // 🔄 REAL-TIME SYNC: WebSocket subscription for products
-    useEffect(() => {
-        const unsubscribe = subscribe('products:update', ({ type, data }: { type: 'create' | 'update' | 'delete'; data: any }) => {
-            console.log(`[AppContext] Received products ${type} update:`, data);
-
-            setProducts(prev => {
-                switch (type) {
-                    case 'create':
-                        return prev.some(p => p.id === data.id) ? prev : [...prev, data].sort((a, b) => a.name.localeCompare(b.name));
-                    case 'update':
-                        return prev.map(p => p.id === data.id ? data : p);
-                    case 'delete':
-                        return prev.filter(p => p.id !== data.id);
-                    default:
-                        return prev;
-                }
-            });
-        });
-
-        return unsubscribe;
-    }, [subscribe]);
-
-    // Fallback: Poll if WebSocket disconnected (graceful degradation)
-    useEffect(() => {
-        if (isConnected) return; // WebSocket is working, no need to poll
-
-        console.log('[AppContext] WebSocket disconnected, falling back to polling for ALL resources');
-
-        const pollAllResources = async () => {
+        const pollCoworkingSessions = async () => {
             try {
-                // Poll coworking sessions (handle paginated response)
-                const coworkingRes = await fetch('/api/coworking-sessions?limit=100');
-                if (coworkingRes.ok) {
-                    const coworkingResult = await coworkingRes.json();
-                    const sessions: CoworkingSession[] = coworkingResult.data || coworkingResult;
+                const response = await fetch('/api/coworking-sessions');
+                if (response.ok) {
+                    const sessions: CoworkingSession[] = await response.json();
                     setCoworkingSessions(sessions);
                 }
-
-                // Poll cash sessions (handle paginated response)
-                const cashRes = await fetch('/api/cash-sessions?limit=50');
-                if (cashRes.ok) {
-                    const cashResult = await cashRes.json();
-                    const cashData: any[] = cashResult.data || cashResult;
-                    // Map API response to frontend CashSession type
-                    const mappedSessions: CashSession[] = cashData.map(session => ({
-                        id: session.id,
-                        startDate: session.startTime,
-                        endDate: session.endTime,
-                        startAmount: session.startAmount,
-                        endAmount: session.endAmount,
-                        status: session.status === 'active' ? 'open' : 'closed',
-                        totalSales: session.totalSales,
-                        totalExpenses: session.totalExpenses,
-                        expectedCash: session.expectedCash,
-                        difference: session.difference
-                    }));
-                    setCashSessions(mappedSessions);
-                }
-
-                // Poll customers (handle paginated response)
-                const customersRes = await fetch('/api/customers?limit=500');
-                if (customersRes.ok) {
-                    const customersResult = await customersRes.json();
-                    const customersData: Customer[] = customersResult.data || customersResult;
-                    setCustomers(customersData);
-                }
-
-                // Poll orders (handle paginated response)
-                const ordersRes = await fetch('/api/orders?limit=100');
-                if (ordersRes.ok) {
-                    const ordersResult = await ordersRes.json();
-                    const ordersData: Order[] = ordersResult.data || ordersResult;
-                    setOrders(ordersData);
-                }
-
-                // Poll products
-                const productsRes = await fetch('/api/products');
-                if (productsRes.ok) {
-                    const productsData = await productsRes.json();
-                    setProducts(productsData);
-                }
             } catch (error) {
-                console.error('Failed to poll resources:', error);
+                console.error('Failed to poll coworking sessions:', error);
             }
         };
 
-        // Poll every 5 seconds when WebSocket is disconnected
-        const interval = setInterval(pollAllResources, 5000);
+        // Poll every 5 seconds when document is visible
+        const interval = setInterval(() => {
+            if (document.visibilityState === 'visible') {
+                pollCoworkingSessions();
+            }
+        }, 5000);
+
+        // Poll immediately when tab becomes visible
+        const handleVisibilityChange = () => {
+            if (document.visibilityState === 'visible') {
+                pollCoworkingSessions();
+            }
+        };
+        document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
             clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, [isConnected]);
+    }, []);
 
 
     // --- FUNCTIONS ---
@@ -475,10 +240,6 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Set current user and persist to localStorage
             setCurrentUser(user);
             localStorage.setItem('currentUser', JSON.stringify(user));
-
-            // 🔄 Load ALL data after successful login
-            console.log('✅ Login successful, loading all data...');
-            await loadAllData();
         } catch (error) {
             throw error;
         }
@@ -488,8 +249,6 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         setCurrentUser(null);
         // Clear from localStorage
         localStorage.removeItem('currentUser');
-        // Reset data loaded flag
-        setIsDataLoaded(false);
     };
 
     const register = async (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
@@ -691,11 +450,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta' | 'Crédito'; customerId?: string; tip?: number; }) => {
         if(cart.length === 0) return;
 
-        // Capture cart state before async operations
+        // FIX BUG 3: Clear cart IMMEDIATELY to prevent duplicate orders during async operations
         const orderCart = [...cart];
         const orderSubtotal = cartSubtotal;
 
-        // Calculate discount from customer
+        // FIX BUG 1: Calculate discount from customer
         let discount = 0;
         if (orderDetails.customerId) {
             const customer = customers.find(c => c.id === orderDetails.customerId);
@@ -708,8 +467,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const tipAmount = orderDetails.tip || 0;
         const orderTotal = orderSubtotal - discount + tipAmount;
 
-        // CRITICAL FIX: Do NOT clear cart until after server confirms success
-        // This prevents data loss if network request fails
+        clearCart();
 
         console.log('💾 Creating order...', {
             clientName: orderDetails.clientName,
@@ -722,49 +480,43 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         });
 
         try {
-            // Generate stable idempotency key based on cart contents
-            const idempotencyKey = generateIdempotencyKey('order', orderCart, orderDetails);
+            // FIX BUG 3: Generate idempotency key to prevent duplicate submissions
+            const idempotencyKey = `order-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
 
             const orderData = {
                 ...orderDetails,
                 items: orderCart,
                 subtotal: orderSubtotal,
-                discount,
+                discount, // FIX BUG 1: Include discount in order data
                 total: orderTotal,
                 userId: currentUser?.id || 'guest',
                 customerId: orderDetails.customerId || null,
                 tip: tipAmount,
+                idempotencyKey, // Add idempotency key
             };
 
-            console.log('📡 Sending order to API with idempotency key:', idempotencyKey);
+            console.log('📡 Sending order to API...', orderData);
 
-            // Use request deduplication to prevent multiple simultaneous requests
-            const response = await requestDeduplicator.deduplicate(
-                idempotencyKey,
-                async () => {
-                    // Use retry logic for network resilience
-                    return await retryFetch(
-                        '/api/orders',
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                'X-Idempotency-Key': idempotencyKey
-                            },
-                            body: JSON.stringify(orderData),
-                        },
-                        {
-                            maxAttempts: 3,
-                            onRetry: (attempt) => {
-                                console.log(`⏳ Retrying order creation (attempt ${attempt})...`);
-                            },
-                        },
-                        15000 // 15 second timeout
-                    );
-                }
-            );
+            // Create order in database
+            const response = await fetch('/api/orders', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Idempotency-Key': idempotencyKey // Send in header too
+                },
+                body: JSON.stringify(orderData),
+            });
 
             console.log('📡 Server response status:', response.status);
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error('❌ Server error:', response.status, errorText);
+                // Restore cart if order failed
+                orderCart.forEach(item => addToCart(item));
+                alert(`❌ Error al guardar la orden: ${response.status} - ${errorText}`);
+                throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
+            }
 
             const newOrder = await response.json();
             console.log('✅ Order saved successfully:', newOrder.id);
@@ -772,19 +524,18 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             // Update local state
             setOrders(prev => [newOrder, ...prev]);
 
-            // NOW clear cart after successful server response
-            clearCart();
-
-            // Stock update is handled by stored procedure on server
-            // No need for separate updateStockForSale call
-            console.log('✅ Stock updated automatically by stored procedure');
+            // Update stock for all items in the cart
+            const stockUpdates = orderCart.map(item => ({
+                id: item.id,
+                quantity: item.quantity
+            }));
+            await updateStockForSale(stockUpdates);
 
             alert(`✅ Venta guardada: ${orderDetails.clientName} - $${orderTotal.toFixed(2)}`);
         } catch (error) {
             console.error("❌ Error creating order:", error);
             alert(`❌ ERROR: La venta NO se guardó. ${error.message || error}`);
-            // Cart remains intact for user to retry
-            throw error;
+            throw error; // Re-throw so caller knows it failed
         }
     };
 
@@ -1230,11 +981,10 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to add customer credit');
 
-            // Refresh customer data to get updated currentCredit (handle paginated response)
-            const customerResponse = await fetch('/api/customers?limit=500');
+            // Refresh customer data to get updated currentCredit
+            const customerResponse = await fetch('/api/customers');
             if (customerResponse.ok) {
-                const result = await customerResponse.json();
-                const customersData: Customer[] = result.data || result;
+                const customersData: Customer[] = await customerResponse.json();
                 setCustomers(customersData);
             }
         } catch (error) {
@@ -1288,8 +1038,6 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     return (
         <AppContext.Provider value={{
-            isDataLoaded,
-            loadAllData,
             users, currentUser, login, logout, register, approveUser, deleteUser,
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
