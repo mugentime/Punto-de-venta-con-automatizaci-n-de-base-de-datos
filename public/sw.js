@@ -1,8 +1,8 @@
 // Service Worker para Conejo Negro POS
-// Versión: 1.0.2 - Fixed POST request promise rejection
+// Versión: 1.0.3 - Don't intercept POST requests at all
 
-const CACHE_NAME = 'conejo-negro-pos-v1.0.2';
-const RUNTIME_CACHE = 'conejo-negro-runtime-v1.0.2';
+const CACHE_NAME = 'conejo-negro-pos-v1.0.3';
+const RUNTIME_CACHE = 'conejo-negro-runtime-v1.0.3';
 
 // Archivos esenciales para cachear
 const PRECACHE_URLS = [
@@ -66,24 +66,9 @@ self.addEventListener('fetch', (event) => {
   const url = new URL(request.url);
 
   // Para requests que no sean GET (POST, PUT, DELETE, etc.)
-  // Pasarlos directamente a la red SIN interceptar, con manejo de errores
+  // NO interceptar - dejar pasar al navegador naturalmente
   if (request.method !== 'GET') {
-    event.respondWith(
-      fetch(request).catch((error) => {
-        console.error('[SW] POST request failed:', error);
-        return new Response(
-          JSON.stringify({
-            error: 'NetworkError when attempting to fetch resource.',
-            message: error.message
-          }),
-          {
-            status: 503,
-            statusText: 'Service Unavailable',
-            headers: { 'Content-Type': 'application/json' }
-          }
-        );
-      })
-    );
+    // No llamar a event.respondWith() - el navegador manejará la petición directamente
     return;
   }
 
