@@ -1,6 +1,6 @@
 {
   "name": "conejo-negro-pos",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Punto de venta para Conejo Negro Café, gestionando ventas, productos y sesiones de coworking con un diseño inspirado en la marca.",
   "type": "module",
   "scripts": {
