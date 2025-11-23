@@ -1720,15 +1720,25 @@ async function startServer() {
           const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&model=flux&nologo=true`;
           console.log(`🌸 Trying Pollinations.ai...`);
 
+          // Do a partial GET request to verify there's actual content
           const testResponse = await fetch(pollinationsUrl, {
-            method: 'HEAD',
+            method: 'GET',
             signal: AbortSignal.timeout(30000) // 30 seconds for AI generation
           });
 
           if (testResponse.ok) {
-            imageUrl = pollinationsUrl;
-            serviceUsed = 'Pollinations.ai (AI-generated)';
-            console.log(`✅ AI Image generated via Pollinations.ai for: ${productName}`);
+            // Read first few bytes to verify there's content
+            const reader = testResponse.body.getReader();
+            const { value, done } = await reader.read();
+            reader.releaseLock();
+
+            if (value && value.length > 0) {
+              imageUrl = pollinationsUrl;
+              serviceUsed = 'Pollinations.ai (AI-generated)';
+              console.log(`✅ AI Image generated via Pollinations.ai for: ${productName} (verified ${value.length} bytes)`);
+            } else {
+              console.log(`⚠️  Pollinations.ai returned empty response, falling back to next service...`);
+            }
           }
         } catch (error) {
           console.log(`❌ Pollinations.ai failed (${error.message}), trying HuggingFace...`);
