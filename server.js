@@ -715,6 +715,76 @@ async function startServer() {
         }
     });
 
+    // 🧹 Cleanup duplicate orders from database
+    app.post('/api/orders/cleanup-duplicates', async (req, res) => {
+        if (!useDb) {
+            return res.status(500).json({ error: 'Database mode only' });
+        }
+
+        try {
+            const client = await pool.connect();
+
+            // Find duplicates (same clientName, total, timestamp within same second)
+            const findQuery = `
+                WITH duplicates AS (
+                    SELECT
+                        id,
+                        client_name,
+                        total,
+                        created_at,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY client_name, total, FLOOR(EXTRACT(EPOCH FROM created_at))
+                            ORDER BY id ASC
+                        ) as row_num
+                    FROM orders
+                )
+                SELECT id, client_name, total, created_at
+                FROM duplicates
+                WHERE row_num > 1
+                ORDER BY created_at DESC;
+            `;
+
+            const duplicates = await client.query(findQuery);
+            console.log(`📊 Found ${duplicates.rows.length} duplicate orders`);
+
+            if (duplicates.rows.length === 0) {
+                client.release();
+                return res.json({ message: 'No duplicates found', deleted: 0 });
+            }
+
+            // Delete duplicates (keep first occurrence by smallest ID)
+            const deleteQuery = `
+                WITH duplicates AS (
+                    SELECT
+                        id,
+                        ROW_NUMBER() OVER (
+                            PARTITION BY client_name, total, FLOOR(EXTRACT(EPOCH FROM created_at))
+                            ORDER BY id ASC
+                        ) as row_num
+                    FROM orders
+                )
+                DELETE FROM orders
+                WHERE id IN (
+                    SELECT id FROM duplicates WHERE row_num > 1
+                )
+                RETURNING id, client_name, total, created_at;
+            `;
+
+            const deleteResult = await client.query(deleteQuery);
+            console.log(`✅ Deleted ${deleteResult.rows.length} duplicate orders`);
+
+            client.release();
+            res.json({
+                message: `Successfully deleted ${deleteResult.rows.length} duplicate orders`,
+                deleted: deleteResult.rows.length,
+                duplicates: deleteResult.rows
+            });
+        } catch (err) {
+            console.error('❌ Error cleaning up duplicates:', err);
+            res.status(500).json({ error: 'Internal server error' });
+        }
+    });
+
     // --- EXPENSES API ---
     app.get('/api/expenses', async (req, res) => {
         try {
