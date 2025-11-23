@@ -180,7 +180,8 @@ const CashReportScreen: React.FC = () => {
   useEffect(() => {
     console.log('💰 CashReportScreen mounted - refetching orders...');
     refetchOrders();
-  }, [refetchOrders]); // Include refetchOrders in dependencies
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency - only run on mount (NOT refetchOrders to avoid infinite loop)
 
   // 🚀 PERFORMANCE FIX: Memoize deduplication to prevent running on every render
   const deduplicatedOrders = useMemo(() => {

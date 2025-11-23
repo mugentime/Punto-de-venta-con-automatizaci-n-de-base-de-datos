@@ -62,7 +62,8 @@ const HistoryScreen: React.FC = () => {
     useEffect(() => {
         console.log('📊 HistoryScreen mounted - refetching orders...');
         refetchOrders();
-    }, [refetchOrders]); // Include refetchOrders in dependencies
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency - only run on mount (NOT refetchOrders to avoid infinite loop)
 
     // 🔄 PERFORMANCE FIX: Reduced polling frequency from 10s to 30s to prevent excessive re-renders
     useEffect(() => {
@@ -74,7 +75,8 @@ const HistoryScreen: React.FC = () => {
         }, 30000); // 30 seconds (reduced from 10s)
 
         return () => clearInterval(interval);
-    }, [refetchOrders]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency - refetchOrders is stable, no need to recreate interval
 
     // 🔄 Refetch when tab/window regains focus (keep this for immediate updates when user returns)
     useEffect(() => {
@@ -87,7 +89,8 @@ const HistoryScreen: React.FC = () => {
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
         return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
-    }, [refetchOrders]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []); // Empty dependency - refetchOrders is stable, no need to recreate listener
 
     const handleDelete = async (orderId: string) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {
