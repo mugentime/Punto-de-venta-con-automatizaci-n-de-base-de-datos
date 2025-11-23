@@ -1722,7 +1722,7 @@ async function startServer() {
 
           const testResponse = await fetch(pollinationsUrl, {
             method: 'HEAD',
-            signal: AbortSignal.timeout(10000) // 10 seconds for AI generation
+            signal: AbortSignal.timeout(30000) // 30 seconds for AI generation
           });
 
           if (testResponse.ok) {
@@ -1752,7 +1752,7 @@ async function startServer() {
                   num_inference_steps: 30
                 }
               }),
-              signal: AbortSignal.timeout(15000) // 15 seconds for AI generation
+              signal: AbortSignal.timeout(30000) // 30 seconds for AI generation
             });
 
             if (hfResponse.ok) {
