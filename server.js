@@ -1701,104 +1701,127 @@ async function startServer() {
       }
 
       try {
-        // Extract key words from product name and description for image search
-        const searchTerms = `${productName} ${description || ''}`.toLowerCase();
-        const encodedSearch = encodeURIComponent(productName);
+        // Create detailed AI prompt from product name and description
+        const aiPrompt = description
+          ? `professional food photography of ${productName}, ${description}, high quality, detailed, appetizing, restaurant style`
+          : `professional food photography of ${productName}, high quality, detailed, appetizing, restaurant style`;
 
-        console.log(`🎨 Searching image for: "${productName}"`);
+        const encodedPrompt = encodeURIComponent(aiPrompt);
+
+        console.log(`🎨 AI Image Generation for: "${productName}"`);
         console.log(`📝 Using description: "${description || 'none'}"`);
-        console.log(`🔍 Search terms: "${searchTerms}"`);
+        console.log(`🤖 AI Prompt: "${aiPrompt}"`);
 
         let imageUrl = null;
         let serviceUsed = null;
 
-        // Try Service 1: Unsplash (FREE, real photos, very reliable)
+        // 🎨 Service 1: Pollinations.ai (PRIMARY - Real AI image generation)
         try {
-          const unsplashUrl = `https://source.unsplash.com/400x400/?${encodedSearch},food,product`;
-          const testResponse = await fetch(unsplashUrl, {
+          const pollinationsUrl = `https://image.pollinations.ai/prompt/${encodedPrompt}?width=400&height=400&model=flux&nologo=true`;
+          console.log(`🌸 Trying Pollinations.ai...`);
+
+          const testResponse = await fetch(pollinationsUrl, {
             method: 'HEAD',
-            signal: AbortSignal.timeout(3000)
+            signal: AbortSignal.timeout(10000) // 10 seconds for AI generation
           });
+
           if (testResponse.ok) {
-            imageUrl = unsplashUrl;
-            serviceUsed = 'Unsplash (real photos)';
-            console.log(`✓ Found REAL photo via Unsplash for: ${productName}`);
+            imageUrl = pollinationsUrl;
+            serviceUsed = 'Pollinations.ai (AI-generated)';
+            console.log(`✅ AI Image generated via Pollinations.ai for: ${productName}`);
           }
         } catch (error) {
-          console.log(`✗ Unsplash failed (${error.message}), trying Pexels...`);
+          console.log(`❌ Pollinations.ai failed (${error.message}), trying HuggingFace...`);
         }
 
-        // Try Service 2: Pexels (FREE, real photos, very reliable)
+        // 🤗 Service 2: HuggingFace Stable Diffusion (BACKUP - Real AI)
         if (!imageUrl) {
           try {
-            const pexelsSearch = `${productName} food product`.replace(/\s+/g, '+');
-            const pexelsUrl = `https://images.pexels.com/photos/searchQuery=${pexelsSearch}`;
-            // Pexels API would need key, so we use their CDN pattern
-            const pexelsFallback = `https://source.unsplash.com/400x400/?${encodedSearch}`;
-            const testResponse = await fetch(pexelsFallback, {
-              method: 'HEAD',
-              signal: AbortSignal.timeout(3000)
+            console.log(`🤗 Trying HuggingFace Stable Diffusion...`);
+
+            const hfResponse = await fetch('https://api-inference.huggingface.co/models/stabilityai/stable-diffusion-2-1', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                inputs: aiPrompt,
+                parameters: {
+                  width: 400,
+                  height: 400,
+                  num_inference_steps: 30
+                }
+              }),
+              signal: AbortSignal.timeout(15000) // 15 seconds for AI generation
             });
-            if (testResponse.ok) {
-              imageUrl = pexelsFallback;
-              serviceUsed = 'Pexels/Unsplash hybrid';
-              console.log(`✓ Found backup photo for: ${productName}`);
+
+            if (hfResponse.ok) {
+              const blob = await hfResponse.blob();
+              // Convert blob to base64 data URL
+              const reader = new FileReader();
+              const base64Promise = new Promise((resolve, reject) => {
+                reader.onloadend = () => resolve(reader.result);
+                reader.onerror = reject;
+                reader.readAsDataURL(blob);
+              });
+
+              imageUrl = await base64Promise;
+              serviceUsed = 'HuggingFace Stable Diffusion (AI-generated)';
+              console.log(`✅ AI Image generated via HuggingFace for: ${productName}`);
             }
           } catch (error) {
-            console.log(`✗ Pexels failed (${error.message}), trying Foodish...`);
+            console.log(`❌ HuggingFace failed (${error.message}), trying Lexica...`);
           }
         }
 
-        // Try Service 3: Foodish API (FREE, food-specific, very reliable)
-        if (!imageUrl && searchTerms.includes('food') || searchTerms.includes('comida') || searchTerms.includes('sopa') || searchTerms.includes('cafe')) {
+        // 🎭 Service 3: Lexica.art API (AI art search - finds existing AI-generated images)
+        if (!imageUrl) {
           try {
-            const foodishResponse = await fetch('https://foodish-api.com/api/', {
-              signal: AbortSignal.timeout(3000)
+            console.log(`🎭 Trying Lexica.art AI search...`);
+
+            const lexicaResponse = await fetch(`https://lexica.art/api/v1/search?q=${encodeURIComponent(productName)}`, {
+              signal: AbortSignal.timeout(5000)
             });
-            if (foodishResponse.ok) {
-              const foodData = await foodishResponse.json();
-              if (foodData.image) {
-                imageUrl = foodData.image;
-                serviceUsed = 'Foodish API (food photos)';
-                console.log(`✓ Found FOOD photo via Foodish for: ${productName}`);
+
+            if (lexicaResponse.ok) {
+              const lexicaData = await lexicaResponse.json();
+              if (lexicaData.images && lexicaData.images.length > 0) {
+                // Get the first result (most relevant)
+                imageUrl = lexicaData.images[0].src;
+                serviceUsed = 'Lexica.art (AI art search)';
+                console.log(`✅ AI-generated image found via Lexica.art for: ${productName}`);
               }
             }
           } catch (error) {
-            console.log(`✗ Foodish failed (${error.message}), trying Picsum...`);
+            console.log(`❌ Lexica.art failed (${error.message}), using Picsum placeholder...`);
           }
         }
 
-        // Try Service 4: Lorem Picsum with category-based selection
+        // 🖼️ Service 4: Picsum placeholder (EMERGENCY FALLBACK - not AI)
         if (!imageUrl) {
-          try {
-            // Create a hash from product name to get consistent but unique image
-            let hash = 0;
-            for (let i = 0; i < productName.length; i++) {
-              hash = ((hash << 5) - hash) + productName.charCodeAt(i);
-              hash = hash & hash; // Convert to 32bit integer
-            }
-            const imageId = Math.abs(hash % 1000); // Get a number between 0-999
-
-            imageUrl = `https://picsum.photos/id/${imageId}/400`;
-            serviceUsed = 'Picsum (curated photos)';
-            console.log(`✓ Using Picsum curated photo #${imageId} for: ${productName}`);
-          } catch (error) {
-            console.log(`✗ Picsum failed (${error.message})`);
+          console.log(`⚠️  All AI services failed, using Picsum placeholder...`);
+          // Create a hash from product name to get consistent but unique image
+          let hash = 0;
+          for (let i = 0; i < productName.length; i++) {
+            hash = ((hash << 5) - hash) + productName.charCodeAt(i);
+            hash = hash & hash;
           }
-        }
+          const imageId = Math.abs(hash % 1000);
 
-        // Final fallback: Use placeholder.com with product name
-        if (!imageUrl) {
-          const placeholderText = encodeURIComponent(productName.substring(0, 30));
-          imageUrl = `https://via.placeholder.com/400x400/059669/FFFFFF?text=${placeholderText}`;
-          serviceUsed = 'Placeholder (text-based)';
-          console.log(`⚠ Using text placeholder for: ${productName}`);
+          imageUrl = `https://picsum.photos/id/${imageId}/400`;
+          serviceUsed = 'Picsum placeholder (emergency fallback)';
+          console.log(`⚠️  Using Picsum placeholder #${imageId} for: ${productName}`);
         }
 
         console.log(`🖼️  Image service used: ${serviceUsed}`);
         console.log(`🔗 Final image URL: ${imageUrl.substring(0, 100)}...`);
 
-        res.json({ imageUrl, service: serviceUsed, searchTerms });
+        res.json({
+          imageUrl,
+          service: serviceUsed,
+          prompt: aiPrompt,
+          isAiGenerated: serviceUsed.includes('AI') || serviceUsed.includes('Pollinations') || serviceUsed.includes('HuggingFace') || serviceUsed.includes('Lexica')
+        });
       } catch (error) {
         console.error("❌ Error generating image:", error);
         // Emergency fallback with product name as text
