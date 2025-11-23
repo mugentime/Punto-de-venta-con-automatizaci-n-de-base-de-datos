@@ -62,21 +62,21 @@ const HistoryScreen: React.FC = () => {
     useEffect(() => {
         console.log('📊 HistoryScreen mounted - refetching orders...');
         refetchOrders();
-    }, []); // Empty dependency - only run on mount
+    }, [refetchOrders]); // Include refetchOrders in dependencies
 
-    // 🔄 OPTION C: Polling - refetch every 10 seconds while screen is active
+    // 🔄 PERFORMANCE FIX: Reduced polling frequency from 10s to 30s to prevent excessive re-renders
     useEffect(() => {
         const interval = setInterval(() => {
             if (document.visibilityState === 'visible') {
                 console.log('🔄 Polling: Refetching orders...');
                 refetchOrders();
             }
-        }, 10000); // 10 seconds
+        }, 30000); // 30 seconds (reduced from 10s)
 
         return () => clearInterval(interval);
     }, [refetchOrders]);
 
-    // 🔄 OPTION C: Refetch when tab/window regains focus
+    // 🔄 Refetch when tab/window regains focus (keep this for immediate updates when user returns)
     useEffect(() => {
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {

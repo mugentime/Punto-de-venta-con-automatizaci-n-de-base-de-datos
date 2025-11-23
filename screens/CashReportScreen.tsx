@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import StatCard from '../components/StatCard';
 import { CashIcon, SalesIcon, HistoryIcon, DashboardIcon, ExpenseIcon, PlusIcon } from '../components/Icons';
@@ -177,13 +177,16 @@ const CashReportScreen: React.FC = () => {
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
   // 🔄 Refetch orders when component mounts to ensure data is fresh
-  React.useEffect(() => {
+  useEffect(() => {
     console.log('💰 CashReportScreen mounted - refetching orders...');
     refetchOrders();
-  }, []); // Empty dependency - only run on mount
+  }, [refetchOrders]); // Include refetchOrders in dependencies
 
-  // FIX BUG 4: Deduplicate orders before calculations
-  const deduplicatedOrders = deduplicateOrders(orders);
+  // 🚀 PERFORMANCE FIX: Memoize deduplication to prevent running on every render
+  const deduplicatedOrders = useMemo(() => {
+    console.log('🔄 Running deduplication on', orders.length, 'orders...');
+    return deduplicateOrders(orders);
+  }, [orders]); // Only re-run when orders array changes
 
   const currentSession = cashSessions.find(s => s.status === 'open');
 
