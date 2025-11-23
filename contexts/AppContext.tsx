@@ -163,11 +163,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                 // Fetch cash sessions with individual error handling
                 try {
-                    const cashResponse = await fetch('/api/cash-sessions');
+                    // 🚀 PERFORMANCE FIX: Limit initial load to recent sessions only
+                    const cashResponse = await fetch('/api/cash-sessions?limit=100');
                     console.log('💰 Cash sessions response:', cashResponse.status);
                     if (cashResponse.ok) {
                         const cashData: any[] = await cashResponse.json();
-                        console.log('💰 Raw cash data:', cashData);
+                        console.log(`💰 Loaded ${cashData.length} recent cash sessions (limit: 100)`);
                         // Map API response to frontend CashSession type
                         const mappedSessions: CashSession[] = cashData.map(session => ({
                             id: session.id,
@@ -181,7 +182,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                             expectedCash: session.expectedCash,
                             difference: session.difference
                         }));
-                        console.log('💰 Mapped cash sessions:', mappedSessions);
+                        console.log('✅ Cash sessions mapped successfully');
                         setCashSessions(mappedSessions);
                     } else {
                         console.error('❌ Failed to fetch cash sessions:', await cashResponse.text());
