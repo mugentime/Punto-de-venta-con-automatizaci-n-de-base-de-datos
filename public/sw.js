@@ -1,8 +1,8 @@
 // Service Worker para Conejo Negro POS
-// Versión: 2.0.0 - Force cache update after merge
+// Versión: 2.1.0 - Fix API requests not intercepted by SW
 
-const CACHE_NAME = 'conejo-negro-pos-v2';
-const RUNTIME_CACHE = 'conejo-negro-runtime-v2';
+const CACHE_NAME = 'conejo-negro-pos-v2.1';
+const RUNTIME_CACHE = 'conejo-negro-runtime-v2.1';
 
 // Archivos esenciales para cachear
 const PRECACHE_URLS = [
@@ -79,22 +79,9 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Para rutas de API, siempre ir a la red (no cachear datos dinámicos)
+  // Para rutas de API, NO interceptar - dejar que el browser maneje directamente
   if (url.pathname.startsWith('/api/')) {
-    event.respondWith(
-      fetch(request)
-        .catch(() => {
-          return new Response(
-            JSON.stringify({ error: 'Sin conexión. Por favor, intenta de nuevo más tarde.' }),
-            {
-              status: 503,
-              statusText: 'Service Unavailable',
-              headers: { 'Content-Type': 'application/json' }
-            }
-          );
-        })
-    );
-    return;
+    return; // No usar event.respondWith, dejar que pase directo al browser
   }
 
   // Para el resto de archivos estáticos (HTML, CSS, JS, imágenes)
