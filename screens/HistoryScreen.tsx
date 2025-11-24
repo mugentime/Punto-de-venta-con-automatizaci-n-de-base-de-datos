@@ -58,28 +58,22 @@ const HistoryScreen: React.FC = () => {
     const { orders, deleteOrder, refetchOrders } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-    // 🔄 OPTION A: Refetch orders when component mounts
+    // ✅ SINGLE useEffect with combined logic to prevent re-render cycles
     useEffect(() => {
-        console.log('📊 HistoryScreen mounted - refetching orders...');
-        refetchOrders();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency - only run on mount (NOT refetchOrders to avoid infinite loop)
+        console.log('📊 HistoryScreen mounted - initial fetch');
 
-    // 🔄 PERFORMANCE FIX: Reduced polling frequency from 10s to 30s to prevent excessive re-renders
-    useEffect(() => {
+        // Initial fetch on mount
+        refetchOrders();
+
+        // Set up polling interval (only when tab is visible)
         const interval = setInterval(() => {
             if (document.visibilityState === 'visible') {
                 console.log('🔄 Polling: Refetching orders...');
                 refetchOrders();
             }
-        }, 30000); // 30 seconds (reduced from 10s)
+        }, 30000); // 30 seconds
 
-        return () => clearInterval(interval);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency - refetchOrders is stable, no need to recreate interval
-
-    // 🔄 Refetch when tab/window regains focus (keep this for immediate updates when user returns)
-    useEffect(() => {
+        // Set up visibility change handler
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
                 console.log('👁️ Tab focused - refetching orders...');
@@ -88,9 +82,14 @@ const HistoryScreen: React.FC = () => {
         };
 
         document.addEventListener('visibilitychange', handleVisibilityChange);
-        return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+
+        // Cleanup
+        return () => {
+            clearInterval(interval);
+            document.removeEventListener('visibilitychange', handleVisibilityChange);
+        };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency - refetchOrders is stable, no need to recreate listener
+    }, []); // Empty dependency - only run on mount
 
     const handleDelete = async (orderId: string) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {
