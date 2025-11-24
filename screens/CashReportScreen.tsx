@@ -176,12 +176,38 @@ const CashReportScreen: React.FC = () => {
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(new Date().toISOString().split('T')[0]);
 
-  // 🔄 Refetch orders when component mounts to ensure data is fresh
+  // ✅ SINGLE useEffect with combined logic to prevent re-render cycles
   useEffect(() => {
-    console.log('💰 CashReportScreen mounted - refetching orders...');
+    console.log('💰 CashReportScreen mounted - initial fetch');
+
+    // Initial fetch on mount
     refetchOrders();
+
+    // Set up polling interval (only when tab is visible)
+    const interval = setInterval(() => {
+      if (document.visibilityState === 'visible') {
+        console.log('🔄 Polling: Refetching orders...');
+        refetchOrders();
+      }
+    }, 30000); // 30 seconds
+
+    // Set up visibility change handler
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible') {
+        console.log('👁️ Tab focused - refetching orders...');
+        refetchOrders();
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    // Cleanup
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []); // Empty dependency - only run on mount (NOT refetchOrders to avoid infinite loop)
+  }, []); // Empty dependency - only run on mount
 
   // 🚀 PERFORMANCE FIX: Memoize deduplication to prevent running on every render
   const deduplicatedOrders = useMemo(() => {
