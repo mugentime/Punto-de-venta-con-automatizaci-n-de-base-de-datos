@@ -643,6 +643,22 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     // Expense Functions (updated for API)
     const addExpense = async (expense: Omit<Expense, 'id'>) => {
         try {
+            // Si el pago es desde efectivo de caja, verificar que hay sesión abierta
+            if (expense.paymentSource === 'efectivo_caja') {
+                const openSession = cashSessions.find(s => s.status === 'open');
+                if (!openSession) {
+                    alert('No hay una sesión de caja abierta. No se puede usar efectivo de caja.');
+                    throw new Error('No open cash session');
+                }
+
+                // Crear retiro de caja asociado al gasto
+                await addCashWithdrawal(
+                    openSession.id,
+                    expense.amount,
+                    `Gasto: ${expense.description} (${expense.category})`
+                );
+            }
+
             const response = await fetch('/api/expenses', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -651,8 +667,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             if (!response.ok) throw new Error('Failed to create expense');
             const newExpense = await response.json();
             setExpenses(prev => [newExpense, ...prev]);
+
+            const sourceLabel = expense.paymentSource === 'efectivo_caja' ? 'Efectivo de Caja' : 'Transferencia';
+            alert(`Gasto registrado: $${expense.amount.toFixed(2)} (${sourceLabel})`);
         } catch (error) {
             console.error("Error adding expense:", error);
+            throw error;
         }
     };
     const updateExpense = async (updatedExpense: Expense) => {

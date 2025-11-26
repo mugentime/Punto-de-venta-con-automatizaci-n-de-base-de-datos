@@ -1,20 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import type { Expense, ExpenseCategory, ExpenseType } from '../types';
+import type { Expense, ExpenseCategory, ExpenseType, ExpensePaymentSource } from '../types';
 
 interface ExpenseModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (expense: Omit<Expense, 'id'> | Expense) => void;
   expenseToEdit?: Expense | null;
+  hasOpenCashSession?: boolean;
 }
 
-const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, expenseToEdit }) => {
+const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, expenseToEdit, hasOpenCashSession = false }) => {
   const getInitialState = () => ({
     date: new Date().toISOString().split('T')[0],
     description: '',
     amount: 0,
     category: 'Otro' as ExpenseCategory,
-    type: 'Emergente' as ExpenseType
+    type: 'Emergente' as ExpenseType,
+    paymentSource: 'transferencia' as ExpensePaymentSource
   });
 
   const [expense, setExpense] = useState(getInitialState());
@@ -22,7 +24,11 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
   useEffect(() => {
     if (isOpen) {
         if (expenseToEdit) {
-            setExpense({ ...expenseToEdit, date: expenseToEdit.date.split('T')[0] });
+            setExpense({
+              ...expenseToEdit,
+              date: expenseToEdit.date.split('T')[0],
+              paymentSource: expenseToEdit.paymentSource || 'transferencia'
+            });
         } else {
             setExpense(getInitialState());
         }
@@ -88,6 +94,27 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
                         <option value="Emergente">Emergente</option>
                     </select>
                 </div>
+              </div>
+              <div>
+                <label htmlFor="paymentSource" className="block text-sm font-medium text-slate-600 mb-1">Origen del Pago</label>
+                <select
+                  name="paymentSource"
+                  id="paymentSource"
+                  value={expense.paymentSource}
+                  onChange={handleChange}
+                  className="mt-1 block w-full border border-slate-300 rounded-xl shadow-sm py-2 px-3 focus:outline-none focus:ring-slate-500 focus:border-slate-500 sm:text-sm"
+                  required
+                >
+                  <option value="transferencia">Transferencia Bancaria</option>
+                  <option value="efectivo_caja" disabled={!hasOpenCashSession}>
+                    Efectivo de Caja {!hasOpenCashSession && '(Requiere caja abierta)'}
+                  </option>
+                </select>
+                {expense.paymentSource === 'efectivo_caja' && (
+                  <p className="mt-1 text-xs text-amber-600">
+                    Este monto se descontara del efectivo en caja
+                  </p>
+                )}
               </div>
             </div>
           </div>

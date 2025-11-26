@@ -5,7 +5,8 @@ import { PlusIcon, EditIcon, TrashIcon } from '../components/Icons';
 import type { Expense } from '../types';
 
 const ExpensesScreen: React.FC = () => {
-  const { expenses, addExpense, updateExpense, deleteExpense } = useAppContext();
+  const { expenses, addExpense, updateExpense, deleteExpense, cashSessions } = useAppContext();
+  const hasOpenCashSession = cashSessions.some(s => s.status === 'open');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);
 
@@ -35,6 +36,14 @@ const ExpensesScreen: React.FC = () => {
     }
   };
 
+  const paymentSourceBadge = (source: string) => {
+    switch (source) {
+      case 'efectivo_caja': return { class: 'bg-green-100 text-green-800', label: 'Caja' };
+      case 'transferencia': return { class: 'bg-purple-100 text-purple-800', label: 'Transferencia' };
+      default: return { class: 'bg-slate-100 text-slate-800', label: source || 'N/A' };
+    }
+  };
+
   const sortedExpenses = expenses.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
 
   return (
@@ -60,6 +69,7 @@ const ExpensesScreen: React.FC = () => {
                     <th className="p-4 text-sm font-semibold text-slate-600">Descripción</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Categoría</th>
                     <th className="p-4 text-sm font-semibold text-slate-600">Tipo</th>
+                    <th className="p-4 text-sm font-semibold text-slate-600">Origen</th>
                     <th className="p-4 text-sm font-semibold text-slate-600 text-right">Monto</th>
                     <th className="p-4 text-sm font-semibold text-slate-600 text-center">Acciones</th>
                 </tr>
@@ -79,6 +89,11 @@ const ExpensesScreen: React.FC = () => {
                     <td className="p-4 text-sm text-slate-500">
                         <span className={`px-2 py-1 text-xs font-semibold rounded-full ${typeBadgeClass(expense.type)}`}>
                             {expense.type}
+                        </span>
+                    </td>
+                    <td className="p-4 text-sm text-slate-500">
+                        <span className={`px-2 py-1 text-xs font-semibold rounded-full ${paymentSourceBadge(expense.paymentSource).class}`}>
+                            {paymentSourceBadge(expense.paymentSource).label}
                         </span>
                     </td>
                     <td className="p-4 text-sm text-slate-800 font-medium text-right">${expense.amount.toFixed(2)}</td>
@@ -116,10 +131,13 @@ const ExpensesScreen: React.FC = () => {
                         <p className="text-lg font-bold text-slate-800">${expense.amount.toFixed(2)}</p>
                     </div>
                     <div className="mt-2 flex justify-between items-center">
-                        <div>
+                        <div className="flex flex-wrap gap-1">
                             <span className="text-xs text-slate-600">{expense.category}</span>
-                            <span className={`ml-2 px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadgeClass(expense.type)}`}>
+                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${typeBadgeClass(expense.type)}`}>
                                 {expense.type}
+                            </span>
+                            <span className={`px-2 py-0.5 text-xs font-semibold rounded-full ${paymentSourceBadge(expense.paymentSource).class}`}>
+                                {paymentSourceBadge(expense.paymentSource).label}
                             </span>
                         </div>
                         <div className="flex items-center space-x-1">
@@ -146,6 +164,7 @@ const ExpensesScreen: React.FC = () => {
         onClose={closeModal}
         onSave={handleSave}
         expenseToEdit={expenseToEdit}
+        hasOpenCashSession={hasOpenCashSession}
       />
     </div>
   );
