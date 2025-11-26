@@ -38,8 +38,8 @@ const ExpensesScreen: React.FC = () => {
 
   const paymentSourceBadge = (source: string) => {
     switch (source) {
-      case 'efectivo_caja': return { class: 'bg-green-100 text-green-800', label: '💵 Caja' };
-      case 'transferencia': return { class: 'bg-purple-100 text-purple-800', label: '🏦 Transferencia' };
+      case 'efectivo_caja': return { class: 'bg-green-100 text-green-800', label: 'Caja' };
+      case 'transferencia': return { class: 'bg-purple-100 text-purple-800', label: 'Transferencia' };
       default: return { class: 'bg-slate-100 text-slate-800', label: source || 'N/A' };
     }
   };

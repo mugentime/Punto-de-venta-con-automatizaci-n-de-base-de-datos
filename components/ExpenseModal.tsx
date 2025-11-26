@@ -112,7 +112,7 @@ const ExpenseModal: React.FC<ExpenseModalProps> = ({ isOpen, onClose, onSave, ex
                 </select>
                 {expense.paymentSource === 'efectivo_caja' && (
                   <p className="mt-1 text-xs text-amber-600">
-                    ⚠️ Este monto se descontará del efectivo en caja
+                    Este monto se descontara del efectivo en caja
                   </p>
                 )}
               </div>
