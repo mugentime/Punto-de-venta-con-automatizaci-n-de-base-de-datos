@@ -1349,17 +1349,42 @@ async function startServer() {
     app.get('/api/customers/:id/credits', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+            // Get credits with order details if available
             const result = await pool.query(
-                'SELECT * FROM customer_credits WHERE "customerId" = $1 ORDER BY created_at DESC',
+                `SELECT cc.*, o.items as order_items, o.discount as order_discount, c.name as customer_name, c."discountPercentage" as customer_discount
+                 FROM customer_credits cc
+                 LEFT JOIN orders o ON cc."orderId" = o.id
+                 LEFT JOIN customers c ON cc."customerId" = c.id
+                 WHERE cc."customerId" = $1
+                 ORDER BY cc.created_at DESC`,
                 [req.params.id]
             );
-            res.json(result.rows.map(c => ({
-                ...c,
-                amount: parseFloat(c.amount),
-                customerId: c.customerId,
-                orderId: c.orderId,
-                createdAt: c.created_at
-            })));
+
+            res.json(result.rows.map(c => {
+                // Parse order items to create a summary
+                let orderSummary = null;
+                if (c.order_items) {
+                    try {
+                        const items = typeof c.order_items === 'string' ? JSON.parse(c.order_items) : c.order_items;
+                        orderSummary = items.map(item => `${item.quantity}x ${item.name}`).join(', ');
+                    } catch (e) {
+                        orderSummary = null;
+                    }
+                }
+
+                return {
+                    ...c,
+                    amount: parseFloat(c.amount),
+                    customerId: c.customerId,
+                    orderId: c.orderId,
+                    createdAt: c.created_at,
+                    orderSummary: orderSummary,
+                    orderDiscount: c.order_discount ? parseFloat(c.order_discount) : null,
+                    customerName: c.customer_name,
+                    customerDiscount: c.customer_discount ? parseFloat(c.customer_discount) : null
+                };
+            }));
         } catch (error) {
             console.error("Error fetching customer credits:", error);
             res.status(500).json({ error: 'Failed to fetch customer credits' });
