@@ -158,11 +158,11 @@ const CustomersScreen: React.FC = () => {
                                   <th className="p-2 text-left">Tipo</th>
                                   <th className="p-2 text-left">Monto</th>
                                   <th className="p-2 text-left">Estado</th>
-                                  <th className="p-2 text-left">Descripción</th>
+                                  <th className="p-2 text-left">Detalle</th>
                                 </tr>
                               </thead>
                               <tbody>
-                                {customerCredits[customer.id].map((credit) => (
+                                {customerCredits[customer.id].map((credit: any) => (
                                   <tr key={credit.id} className="border-b">
                                     <td className="p-2">{new Date(credit.createdAt).toLocaleDateString()}</td>
                                     <td className="p-2">
@@ -176,7 +176,22 @@ const CustomersScreen: React.FC = () => {
                                         {credit.status === 'paid' ? 'Pagado' : 'Pendiente'}
                                       </span>
                                     </td>
-                                    <td className="p-2">{credit.description || '-'}</td>
+                                    <td className="p-2 max-w-xs">
+                                      {credit.type === 'charge' && credit.orderSummary ? (
+                                        <div>
+                                          <p className="text-xs text-gray-700 truncate" title={credit.orderSummary}>
+                                            {credit.orderSummary}
+                                          </p>
+                                          {credit.orderDiscount > 0 && (
+                                            <p className="text-xs text-green-600">
+                                              Descuento: {credit.customerDiscount || 0}%
+                                            </p>
+                                          )}
+                                        </div>
+                                      ) : (
+                                        <span className="text-gray-500">{credit.description || '-'}</span>
+                                      )}
+                                    </td>
                                   </tr>
                                 ))}
                               </tbody>
