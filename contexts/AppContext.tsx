@@ -1,5 +1,6 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
+import { sessionCache, CACHE_KEYS } from '../utils/sessionCache';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 
 const initialAdmin: User = {
@@ -99,77 +100,122 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     }, []);
 
-    // Fetch all data from database on app load
+    // Track if initial load from cache has been done
+    const initialLoadDone = useRef(false);
+
+    // Fetch all data from database on app load (with session cache)
     useEffect(() => {
-        const fetchAllData = async () => {
-            console.log('🔄 Starting data fetch...');
+        const loadFromCacheOrFetch = async () => {
+            // Check if we have cached data from this session
+            const cachedProducts = sessionCache.get<Product[]>(CACHE_KEYS.PRODUCTS);
+            const cachedOrders = sessionCache.get<Order[]>(CACHE_KEYS.ORDERS);
+            const cachedExpenses = sessionCache.get<Expense[]>(CACHE_KEYS.EXPENSES);
+            const cachedCoworking = sessionCache.get<CoworkingSession[]>(CACHE_KEYS.COWORKING_SESSIONS);
+            const cachedCashSessions = sessionCache.get<CashSession[]>(CACHE_KEYS.CASH_SESSIONS);
+            const cachedUsers = sessionCache.get<User[]>(CACHE_KEYS.USERS);
+            const cachedCustomers = sessionCache.get<Customer[]>(CACHE_KEYS.CUSTOMERS);
+            const cachedWithdrawals = sessionCache.get<CashWithdrawal[]>(CACHE_KEYS.CASH_WITHDRAWALS);
+
+            const hasCache = cachedProducts || cachedOrders || cachedCashSessions;
+
+            if (hasCache && !initialLoadDone.current) {
+                console.log('⚡ Loading from session cache (instant)...');
+
+                // Load cached data instantly
+                if (cachedProducts) {
+                    setProducts(cachedProducts);
+                    console.log(`📦 Products from cache: ${cachedProducts.length} items`);
+                }
+                if (cachedOrders) {
+                    setOrders(cachedOrders);
+                    console.log(`📋 Orders from cache: ${cachedOrders.length} orders`);
+                }
+                if (cachedExpenses) setExpenses(cachedExpenses);
+                if (cachedCoworking) setCoworkingSessions(cachedCoworking);
+                if (cachedCashSessions) {
+                    setCashSessions(cachedCashSessions);
+                    console.log(`💰 Cash sessions from cache: ${cachedCashSessions.length} sessions`);
+                }
+                if (cachedUsers) setUsers(cachedUsers);
+                if (cachedCustomers) setCustomers(cachedCustomers);
+                if (cachedWithdrawals) setCashWithdrawals(cachedWithdrawals);
+
+                initialLoadDone.current = true;
+
+                // Background refresh if cache is stale (older than 5 min)
+                if (sessionCache.isStale(CACHE_KEYS.ORDERS)) {
+                    console.log('🔄 Cache is stale, refreshing in background...');
+                    fetchAllDataFromServer(true);
+                }
+            } else {
+                // No cache, fetch everything from server
+                console.log('🔄 No cache found, fetching from server...');
+                await fetchAllDataFromServer(false);
+                initialLoadDone.current = true;
+            }
+        };
+
+        const fetchAllDataFromServer = async (isBackground: boolean) => {
+            const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
+            console.log(`${logPrefix} Starting data fetch...`);
+
             try {
-                // Fetch products with individual error handling
+                // Fetch products
                 try {
-                    console.log('📦 Fetching products...');
                     const productsResponse = await fetch('/api/products');
-                    console.log('📦 Products response:', productsResponse.status);
                     if (productsResponse.ok) {
                         const productsData: Product[] = await productsResponse.json();
-                        console.log('📦 Products loaded:', productsData.length, 'items');
+                        console.log(`${logPrefix} 📦 Products loaded: ${productsData.length} items`);
                         setProducts(productsData);
-                    } else {
-                        console.error('❌ Failed to fetch products:', await productsResponse.text());
+                        sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching products:', error);
                 }
 
-                // Fetch orders with individual error handling
+                // Fetch orders
                 try {
-                    console.log('📋 Fetching orders...');
                     const ordersResponse = await fetch('/api/orders');
-                    console.log('📋 Orders response:', ordersResponse.status);
                     if (ordersResponse.ok) {
                         const ordersData: Order[] = await ordersResponse.json();
-                        console.log('📋 Orders loaded:', ordersData.length, 'orders');
-                        console.log('📋 Date range:', ordersData.length > 0 ?
-                            `${new Date(ordersData[ordersData.length-1].date).toLocaleDateString()} to ${new Date(ordersData[0].date).toLocaleDateString()}` :
-                            'No orders');
+                        console.log(`${logPrefix} 📋 Orders loaded: ${ordersData.length} orders`);
                         setOrders(ordersData);
-                    } else {
-                        console.error('❌ Failed to fetch orders:', await ordersResponse.text());
+                        sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching orders:', error);
                 }
 
-                // Fetch expenses with individual error handling
+                // Fetch expenses
                 try {
                     const expensesResponse = await fetch('/api/expenses');
                     if (expensesResponse.ok) {
                         const expensesData: Expense[] = await expensesResponse.json();
                         setExpenses(expensesData);
+                        sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching expenses:', error);
                 }
 
-                // Fetch coworking sessions with individual error handling
+                // Fetch coworking sessions
                 try {
                     const coworkingResponse = await fetch('/api/coworking-sessions');
                     if (coworkingResponse.ok) {
                         const coworkingData: CoworkingSession[] = await coworkingResponse.json();
                         setCoworkingSessions(coworkingData);
+                        sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching coworking sessions:', error);
                 }
 
-                // Fetch cash sessions with individual error handling
+                // Fetch cash sessions
                 try {
-                    // 🚀 PERFORMANCE FIX: Limit initial load to recent sessions only
                     const cashResponse = await fetch('/api/cash-sessions?limit=100');
-                    console.log('💰 Cash sessions response:', cashResponse.status);
                     if (cashResponse.ok) {
                         const cashData: any[] = await cashResponse.json();
-                        console.log(`💰 Loaded ${cashData.length} recent cash sessions (limit: 100)`);
-                        // Map API response to frontend CashSession type
+                        console.log(`${logPrefix} 💰 Cash sessions loaded: ${cashData.length} sessions`);
                         const mappedSessions: CashSession[] = cashData.map(session => ({
                             id: session.id,
                             startDate: session.startTime,
@@ -182,23 +228,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                             expectedCash: session.expectedCash,
                             difference: session.difference
                         }));
-                        console.log('✅ Cash sessions mapped successfully');
                         setCashSessions(mappedSessions);
-                    } else {
-                        console.error('❌ Failed to fetch cash sessions:', await cashResponse.text());
+                        sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching cash sessions:', error);
                 }
 
-                // Fetch users with individual error handling
+                // Fetch users
                 try {
                     const usersResponse = await fetch('/api/users');
                     if (usersResponse.ok) {
                         const usersData: User[] = await usersResponse.json();
                         setUsers(usersData);
+                        sessionCache.set(CACHE_KEYS.USERS, usersData);
                     } else {
-                        // Fallback to initial admin if API fails
                         setUsers([initialAdmin]);
                     }
                 } catch (error) {
@@ -206,38 +250,38 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     setUsers([initialAdmin]);
                 }
 
-                // Fetch customers with individual error handling
+                // Fetch customers
                 try {
                     const customersResponse = await fetch('/api/customers');
-                    console.log('👥 Customers response:', customersResponse.status);
                     if (customersResponse.ok) {
                         const customersData: Customer[] = await customersResponse.json();
-                        console.log('👥 Customers data:', customersData);
                         setCustomers(customersData);
-                    } else {
-                        console.error('❌ Failed to fetch customers:', await customersResponse.text());
+                        sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching customers:', error);
                 }
 
-                // Fetch cash withdrawals with individual error handling
+                // Fetch cash withdrawals
                 try {
                     const withdrawalsResponse = await fetch('/api/cash-withdrawals');
                     if (withdrawalsResponse.ok) {
                         const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
                         setCashWithdrawals(withdrawalsData);
+                        sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
                     }
                 } catch (error) {
                     console.error('❌ Error fetching cash withdrawals:', error);
                 }
+
+                console.log(`${logPrefix} ✅ Data fetch complete`);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
-                // Fallback to initial admin if everything fails
                 setUsers([initialAdmin]);
             }
         };
-        fetchAllData();
+
+        loadFromCacheOrFetch();
     }, []);
 
     // 🔄 CROSS-DEVICE SYNC: Poll for coworking sessions every 5 seconds
@@ -401,7 +445,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
             if (!response.ok) throw new Error('Failed to create product');
             const newProduct = await response.json();
-            setProducts(prev => [...prev, newProduct]);
+            setProducts(prev => {
+                const updated = [...prev, newProduct];
+                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error adding product:", error);
         }
@@ -416,7 +464,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
             if (!response.ok) throw new Error('Failed to update product');
             const returnedProduct = await response.json();
-            setProducts(prev => prev.map(p => p.id === returnedProduct.id ? returnedProduct : p));
+            setProducts(prev => {
+                const updated = prev.map(p => p.id === returnedProduct.id ? returnedProduct : p);
+                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error updating product:", error);
         }
@@ -428,7 +480,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error('Failed to delete product');
-            setProducts(prev => prev.filter(p => p.id !== productId));
+            setProducts(prev => {
+                const updated = prev.filter(p => p.id !== productId);
+                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error deleting product:", error);
         }
@@ -444,6 +500,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             if (!response.ok) throw new Error('Failed to import products');
             const fullProductList = await response.json();
             setProducts(fullProductList);
+            sessionCache.set(CACHE_KEYS.PRODUCTS, fullProductList);
         } catch (error) {
             console.error("Error importing products:", error);
         }
@@ -612,8 +669,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to delete order');
 
-            // Update local state
-            setOrders(prev => prev.filter(o => o.id !== orderId));
+            // Update local state and cache
+            setOrders(prev => {
+                const updated = prev.filter(o => o.id !== orderId);
+                sessionCache.set(CACHE_KEYS.ORDERS, updated);
+                return updated;
+            });
 
             console.log('✅ Order deleted successfully:', orderId);
         } catch (error) {
@@ -632,6 +693,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 const ordersData: Order[] = await ordersResponse.json();
                 console.log('✅ Orders refetched:', ordersData.length, 'orders');
                 setOrders(ordersData);
+                sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
             } else {
                 console.error('❌ Failed to refetch orders:', await ordersResponse.text());
             }
@@ -666,7 +728,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
             if (!response.ok) throw new Error('Failed to create expense');
             const newExpense = await response.json();
-            setExpenses(prev => [newExpense, ...prev]);
+            setExpenses(prev => {
+                const updated = [newExpense, ...prev];
+                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
+                return updated;
+            });
 
             const sourceLabel = expense.paymentSource === 'efectivo_caja' ? 'Efectivo de Caja' : 'Transferencia';
             alert(`Gasto registrado: $${expense.amount.toFixed(2)} (${sourceLabel})`);
@@ -684,7 +750,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
             if (!response.ok) throw new Error('Failed to update expense');
             const returnedExpense = await response.json();
-            setExpenses(prev => prev.map(e => e.id === returnedExpense.id ? returnedExpense : e));
+            setExpenses(prev => {
+                const updated = prev.map(e => e.id === returnedExpense.id ? returnedExpense : e);
+                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error updating expense:", error);
         }
@@ -695,7 +765,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 method: 'DELETE',
             });
             if (!response.ok) throw new Error('Failed to delete expense');
-            setExpenses(prev => prev.filter(e => e.id !== expenseId));
+            setExpenses(prev => {
+                const updated = prev.filter(e => e.id !== expenseId);
+                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error deleting expense:", error);
         }
@@ -944,7 +1018,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 difference: newSession.difference || 0
             };
 
-            setCashSessions(prev => [mappedSession, ...prev]);
+            setCashSessions(prev => {
+                const updated = [mappedSession, ...prev];
+                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error starting cash session:", error);
             alert("Error al iniciar la sesión de caja");
@@ -1013,7 +1091,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 difference: updatedSession.difference
             };
 
-            setCashSessions(prev => prev.map(s => s.id === currentSession.id ? mappedSession : s));
+            setCashSessions(prev => {
+                const updated = prev.map(s => s.id === currentSession.id ? mappedSession : s);
+                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error closing cash session:", error);
             alert("Error al cerrar la sesión de caja");
