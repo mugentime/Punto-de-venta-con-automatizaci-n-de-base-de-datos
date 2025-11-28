@@ -283,6 +283,30 @@ async function setupAndGetDataStore() {
             } catch (err) {
                 console.log('consumedExtras column already exists or error:', err.message);
             }
+
+            // AUTO-MIGRATION: Add paymentSource and type columns to expenses table
+            console.log('🔄 Running expenses table migrations...');
+            try {
+                await client.query(`
+                    DO $$
+                    BEGIN
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                                      WHERE table_name = 'expenses' AND column_name = 'paymentSource') THEN
+                            ALTER TABLE expenses ADD COLUMN "paymentSource" VARCHAR(50) DEFAULT 'transferencia';
+                            RAISE NOTICE 'Added paymentSource column to expenses table';
+                        END IF;
+
+                        IF NOT EXISTS (SELECT 1 FROM information_schema.columns
+                                      WHERE table_name = 'expenses' AND column_name = 'type') THEN
+                            ALTER TABLE expenses ADD COLUMN type VARCHAR(50) DEFAULT 'Emergente';
+                            RAISE NOTICE 'Added type column to expenses table';
+                        END IF;
+                    END $$;
+                `);
+                console.log('✅ Expenses table migrations completed successfully');
+            } catch (expenseMigrationError) {
+                console.error('⚠️ Expenses migration warning:', expenseMigrationError.message);
+            }
             client.release();
             useDb = true;
             console.log("Running in Database Mode.");
@@ -793,7 +817,9 @@ async function startServer() {
             res.json(result.rows.map(expense => ({
                 ...expense,
                 amount: parseFloat(expense.amount),
-                date: expense.created_at  // Map created_at to date for frontend compatibility
+                date: expense.created_at,  // Map created_at to date for frontend compatibility
+                paymentSource: expense.paymentSource || 'transferencia',
+                type: expense.type || 'Emergente'
             })));
         } catch (error) {
             console.error("Error fetching expenses:", error);
@@ -804,17 +830,19 @@ async function startServer() {
     app.post('/api/expenses', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { description, amount, category, userId } = req.body;
+            const { description, amount, category, userId, paymentSource, type } = req.body;
             const id = `expense-${Date.now()}`;
             const result = await pool.query(
-                'INSERT INTO expenses (id, description, amount, category, "userId") VALUES ($1, $2, $3, $4, $5) RETURNING *',
-                [id, description, amount, category, userId]
+                'INSERT INTO expenses (id, description, amount, category, "userId", "paymentSource", type) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *',
+                [id, description, amount, category, userId, paymentSource || 'transferencia', type || 'Emergente']
             );
             const newExpense = result.rows[0];
             res.status(201).json({
                 ...newExpense,
                 amount: parseFloat(newExpense.amount),
-                date: newExpense.created_at  // Map created_at to date for frontend compatibility
+                date: newExpense.created_at,  // Map created_at to date for frontend compatibility
+                paymentSource: newExpense.paymentSource,
+                type: newExpense.type
             });
         } catch (error) {
             console.error("Error creating expense:", error);
@@ -825,12 +853,12 @@ async function startServer() {
     app.put('/api/expenses/:id', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const { description, amount, category, date } = req.body;
+            const { description, amount, category, date, paymentSource, type } = req.body;
 
-            // Update with date if provided, otherwise keep existing date using COALESCE
+            // Update with all fields including paymentSource and type
             const result = await pool.query(
-                'UPDATE expenses SET description = $1, amount = $2, category = $3, created_at = COALESCE($4, created_at) WHERE id = $5 RETURNING *',
-                [description, amount, category, date || null, req.params.id]
+                'UPDATE expenses SET description = $1, amount = $2, category = $3, created_at = COALESCE($4, created_at), "paymentSource" = COALESCE($5, "paymentSource"), type = COALESCE($6, type) WHERE id = $7 RETURNING *',
+                [description, amount, category, date || null, paymentSource, type, req.params.id]
             );
 
             if (result.rows.length === 0) {
@@ -840,7 +868,9 @@ async function startServer() {
             res.json({
                 ...updatedExpense,
                 amount: parseFloat(updatedExpense.amount),
-                date: updatedExpense.created_at  // Map created_at to date for frontend compatibility
+                date: updatedExpense.created_at,  // Map created_at to date for frontend compatibility
+                paymentSource: updatedExpense.paymentSource,
+                type: updatedExpense.type
             });
         } catch (error) {
             console.error("Error updating expense:", error);
