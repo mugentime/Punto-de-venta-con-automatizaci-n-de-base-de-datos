@@ -636,11 +636,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const newOrder = await response.json();
             console.log('✅ Order saved successfully:', newOrder.id);
 
-            // Update local state
-            setOrders(prev => [newOrder, ...prev]);
-
-            // 🔄 OPTION B: Invalidate cache - force refetch after successful order creation
-            await refetchOrders();
+            // Update local state and cache (no refetch needed - we have the new order)
+            setOrders(prev => {
+                const updated = [newOrder, ...prev];
+                sessionCache.set(CACHE_KEYS.ORDERS, updated);
+                return updated;
+            });
 
             // Update stock for all items in the cart
             const stockUpdates = orderCart.map(item => ({
@@ -792,7 +793,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to create coworking session');
             const newSession = await response.json();
-            setCoworkingSessions(prev => [newSession, ...prev]);
+            setCoworkingSessions(prev => {
+                const updated = [newSession, ...prev];
+                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error starting coworking session:", error);
         }
@@ -808,7 +813,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to update coworking session');
             const updatedSession = await response.json();
-            setCoworkingSessions(prev => prev.map(s => s.id === sessionId ? updatedSession : s));
+            setCoworkingSessions(prev => {
+                const updated = prev.map(s => s.id === sessionId ? updatedSession : s);
+                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
+                return updated;
+            });
         } catch (error) {
             console.error("Error updating coworking session:", error);
         }
@@ -912,7 +921,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (response.ok) {
                 const createdOrder = await response.json();
-                setOrders(prev => [createdOrder, ...prev]);
+                setOrders(prev => {
+                    const updated = [createdOrder, ...prev];
+                    sessionCache.set(CACHE_KEYS.ORDERS, updated);
+                    return updated;
+                });
                 console.log('✅ Coworking order successfully saved to database:', createdOrder.id);
                 alert(`✅ Sesión de coworking guardada: ${session.clientName} - $${total.toFixed(2)}`);
             } else {
@@ -920,13 +933,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 console.error('❌ Failed to save coworking order. Status:', response.status, 'Error:', errorText);
                 alert(`⚠️ Error al guardar la orden de coworking: ${response.status} - ${errorText}`);
                 // Fallback to local state only
-                setOrders(prev => [newOrder, ...prev]);
+                setOrders(prev => {
+                    const updated = [newOrder, ...prev];
+                    sessionCache.set(CACHE_KEYS.ORDERS, updated);
+                    return updated;
+                });
             }
         } catch (error) {
             console.error('❌ Error saving coworking order:', error);
             alert(`⚠️ Error al guardar la orden de coworking: ${error.message}`);
             // Fallback to local state only
-            setOrders(prev => [newOrder, ...prev]);
+            setOrders(prev => {
+                const updated = [newOrder, ...prev];
+                sessionCache.set(CACHE_KEYS.ORDERS, updated);
+                return updated;
+            });
         }
 
         // Update session with calculated total, duration, and payment method for reporting
