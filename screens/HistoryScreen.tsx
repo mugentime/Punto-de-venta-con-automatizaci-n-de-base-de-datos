@@ -55,41 +55,11 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
 );
 
 const HistoryScreen: React.FC = () => {
-    const { orders, deleteOrder, refetchOrders } = useAppContext();
+    const { orders, deleteOrder } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-    // ✅ SINGLE useEffect with combined logic to prevent re-render cycles
-    useEffect(() => {
-        console.log('📊 HistoryScreen mounted - initial fetch');
-
-        // Initial fetch on mount
-        refetchOrders();
-
-        // Set up polling interval (only when tab is visible)
-        const interval = setInterval(() => {
-            if (document.visibilityState === 'visible') {
-                console.log('🔄 Polling: Refetching orders...');
-                refetchOrders();
-            }
-        }, 30000); // 30 seconds
-
-        // Set up visibility change handler
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                console.log('👁️ Tab focused - refetching orders...');
-                refetchOrders();
-            }
-        };
-
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        // Cleanup
-        return () => {
-            clearInterval(interval);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []); // Empty dependency - only run on mount
+    // ✅ OPTIMIZED: No redundant polling - AppContext handles data fetching
+    // Service Worker caches API responses with TTL-based invalidation
 
     const handleDelete = async (orderId: string) => {
         if (confirm('¿Estás seguro de que deseas eliminar esta orden? Esta acción no se puede deshacer.')) {

@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { sessionCache, CACHE_KEYS } from '../utils/sessionCache';
+import { dedupedFetch, invalidateCache, shouldRefreshOnVisibility, getCachedData } from '../utils/apiCache';
+import offlineStorage, { STORES } from '../utils/offlineStorage';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 
 const initialAdmin: User = {
@@ -102,179 +104,166 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     // Track if initial load from cache has been done
     const initialLoadDone = useRef(false);
+    const isFetching = useRef(false); // Prevent concurrent fetches
 
-    // Fetch all data from database on app load (with session cache)
+    // Fetch all data from database on app load (with multi-tier cache)
     useEffect(() => {
         const loadFromCacheOrFetch = async () => {
-            // Check if we have cached data from this session
-            const cachedProducts = sessionCache.get<Product[]>(CACHE_KEYS.PRODUCTS);
-            const cachedOrders = sessionCache.get<Order[]>(CACHE_KEYS.ORDERS);
-            const cachedExpenses = sessionCache.get<Expense[]>(CACHE_KEYS.EXPENSES);
-            const cachedCoworking = sessionCache.get<CoworkingSession[]>(CACHE_KEYS.COWORKING_SESSIONS);
-            const cachedCashSessions = sessionCache.get<CashSession[]>(CACHE_KEYS.CASH_SESSIONS);
-            const cachedUsers = sessionCache.get<User[]>(CACHE_KEYS.USERS);
-            const cachedCustomers = sessionCache.get<Customer[]>(CACHE_KEYS.CUSTOMERS);
-            const cachedWithdrawals = sessionCache.get<CashWithdrawal[]>(CACHE_KEYS.CASH_WITHDRAWALS);
+            // Prevent concurrent initial loads
+            if (isFetching.current) return;
+            isFetching.current = true;
 
-            const hasCache = cachedProducts || cachedOrders || cachedCashSessions;
+            try {
+                // TIER 1: Try IndexedDB first (persistent across sessions)
+                console.log('⚡ Checking IndexedDB for cached data...');
+                const [idbProducts, idbOrders, idbExpenses, idbCashSessions] = await Promise.all([
+                    offlineStorage.getAll<Product>(STORES.PRODUCTS).catch(() => []),
+                    offlineStorage.getAll<Order>(STORES.ORDERS).catch(() => []),
+                    offlineStorage.getAll<Expense>(STORES.EXPENSES).catch(() => []),
+                    offlineStorage.getAll<CashSession>(STORES.CASH_SESSIONS).catch(() => [])
+                ]);
 
-            if (hasCache && !initialLoadDone.current) {
-                console.log('⚡ Loading from session cache (instant)...');
+                const hasIdbData = idbProducts.length > 0 || idbOrders.length > 0;
 
-                // Load cached data instantly
-                if (cachedProducts) {
-                    setProducts(cachedProducts);
-                    console.log(`📦 Products from cache: ${cachedProducts.length} items`);
+                // TIER 2: Fall back to sessionCache if no IndexedDB data
+                const cachedProducts = hasIdbData ? idbProducts : sessionCache.get<Product[]>(CACHE_KEYS.PRODUCTS);
+                const cachedOrders = hasIdbData ? idbOrders : sessionCache.get<Order[]>(CACHE_KEYS.ORDERS);
+                const cachedExpenses = hasIdbData ? idbExpenses : sessionCache.get<Expense[]>(CACHE_KEYS.EXPENSES);
+                const cachedCoworking = sessionCache.get<CoworkingSession[]>(CACHE_KEYS.COWORKING_SESSIONS);
+                const cachedCashSessions = hasIdbData && idbCashSessions.length > 0 ? idbCashSessions : sessionCache.get<CashSession[]>(CACHE_KEYS.CASH_SESSIONS);
+                const cachedUsers = sessionCache.get<User[]>(CACHE_KEYS.USERS);
+                const cachedCustomers = sessionCache.get<Customer[]>(CACHE_KEYS.CUSTOMERS);
+                const cachedWithdrawals = sessionCache.get<CashWithdrawal[]>(CACHE_KEYS.CASH_WITHDRAWALS);
+
+                const hasCache = (cachedProducts && cachedProducts.length > 0) || (cachedOrders && cachedOrders.length > 0) || (cachedCashSessions && cachedCashSessions.length > 0);
+
+                if (hasCache && !initialLoadDone.current) {
+                    console.log(`⚡ Loading from ${hasIdbData ? 'IndexedDB' : 'session'} cache (instant)...`);
+
+                    // Load cached data instantly for fast first paint
+                    if (cachedProducts && cachedProducts.length > 0) {
+                        setProducts(cachedProducts);
+                        console.log(`📦 Products from cache: ${cachedProducts.length} items`);
+                    }
+                    if (cachedOrders && cachedOrders.length > 0) {
+                        setOrders(cachedOrders);
+                        console.log(`📋 Orders from cache: ${cachedOrders.length} orders`);
+                    }
+                    if (cachedExpenses && cachedExpenses.length > 0) setExpenses(cachedExpenses);
+                    if (cachedCoworking && cachedCoworking.length > 0) setCoworkingSessions(cachedCoworking);
+                    if (cachedCashSessions && cachedCashSessions.length > 0) {
+                        setCashSessions(cachedCashSessions);
+                        console.log(`💰 Cash sessions from cache: ${cachedCashSessions.length} sessions`);
+                    }
+                    if (cachedUsers && cachedUsers.length > 0) setUsers(cachedUsers);
+                    if (cachedCustomers && cachedCustomers.length > 0) setCustomers(cachedCustomers);
+                    if (cachedWithdrawals && cachedWithdrawals.length > 0) setCashWithdrawals(cachedWithdrawals);
+
+                    initialLoadDone.current = true;
+
+                    // Background refresh - but only if we have network
+                    if (navigator.onLine) {
+                        console.log('🔄 Background refresh starting...');
+                        fetchAllDataFromServer(true);
+                    }
+                } else {
+                    // No cache, fetch everything from server
+                    console.log('🔄 No cache found, fetching from server...');
+                    await fetchAllDataFromServer(false);
+                    initialLoadDone.current = true;
                 }
-                if (cachedOrders) {
-                    setOrders(cachedOrders);
-                    console.log(`📋 Orders from cache: ${cachedOrders.length} orders`);
-                }
-                if (cachedExpenses) setExpenses(cachedExpenses);
-                if (cachedCoworking) setCoworkingSessions(cachedCoworking);
-                if (cachedCashSessions) {
-                    setCashSessions(cachedCashSessions);
-                    console.log(`💰 Cash sessions from cache: ${cachedCashSessions.length} sessions`);
-                }
-                if (cachedUsers) setUsers(cachedUsers);
-                if (cachedCustomers) setCustomers(cachedCustomers);
-                if (cachedWithdrawals) setCashWithdrawals(cachedWithdrawals);
-
-                initialLoadDone.current = true;
-
-                // Background refresh if cache is stale (older than 5 min)
-                if (sessionCache.isStale(CACHE_KEYS.ORDERS)) {
-                    console.log('🔄 Cache is stale, refreshing in background...');
-                    fetchAllDataFromServer(true);
-                }
-            } else {
-                // No cache, fetch everything from server
-                console.log('🔄 No cache found, fetching from server...');
-                await fetchAllDataFromServer(false);
-                initialLoadDone.current = true;
+            } finally {
+                isFetching.current = false;
             }
         };
 
         const fetchAllDataFromServer = async (isBackground: boolean) => {
             const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
-            console.log(`${logPrefix} Starting data fetch...`);
+            console.log(`${logPrefix} Starting optimized parallel data fetch...`);
 
             try {
-                // Fetch products
-                try {
-                    const productsResponse = await fetch('/api/products');
-                    if (productsResponse.ok) {
-                        const productsData: Product[] = await productsResponse.json();
-                        console.log(`${logPrefix} 📦 Products loaded: ${productsData.length} items`);
-                        setProducts(productsData);
-                        sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching products:', error);
+                // OPTIMIZED: Parallel fetch with deduplication
+                const [
+                    productsData,
+                    ordersData,
+                    expensesData,
+                    coworkingData,
+                    cashData,
+                    usersData,
+                    customersData,
+                    withdrawalsData
+                ] = await Promise.all([
+                    dedupedFetch<Product[]>('/api/products').catch(() => null),
+                    dedupedFetch<Order[]>('/api/orders').catch(() => null),
+                    dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
+                    dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
+                    dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
+                    dedupedFetch<User[]>('/api/users').catch(() => [initialAdmin]),
+                    dedupedFetch<Customer[]>('/api/customers').catch(() => null),
+                    dedupedFetch<CashWithdrawal[]>('/api/cash-withdrawals').catch(() => null)
+                ]);
+
+                // Update state and caches in parallel
+                if (productsData) {
+                    console.log(`${logPrefix} 📦 Products loaded: ${productsData.length} items`);
+                    setProducts(productsData);
+                    sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
+                    offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(console.error);
                 }
 
-                // Fetch orders
-                try {
-                    const ordersResponse = await fetch('/api/orders');
-                    if (ordersResponse.ok) {
-                        const ordersData: Order[] = await ordersResponse.json();
-                        console.log(`${logPrefix} 📋 Orders loaded: ${ordersData.length} orders`);
-                        setOrders(ordersData);
-                        sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching orders:', error);
+                if (ordersData) {
+                    console.log(`${logPrefix} 📋 Orders loaded: ${ordersData.length} orders`);
+                    setOrders(ordersData);
+                    sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
+                    offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(console.error);
                 }
 
-                // Fetch expenses
-                try {
-                    const expensesResponse = await fetch('/api/expenses');
-                    if (expensesResponse.ok) {
-                        const expensesData: Expense[] = await expensesResponse.json();
-                        setExpenses(expensesData);
-                        sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching expenses:', error);
+                if (expensesData) {
+                    setExpenses(expensesData);
+                    sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
+                    offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(console.error);
                 }
 
-                // Fetch coworking sessions
-                try {
-                    const coworkingResponse = await fetch('/api/coworking-sessions');
-                    if (coworkingResponse.ok) {
-                        const coworkingData: CoworkingSession[] = await coworkingResponse.json();
-                        setCoworkingSessions(coworkingData);
-                        sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching coworking sessions:', error);
+                if (coworkingData) {
+                    setCoworkingSessions(coworkingData);
+                    sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
                 }
 
-                // Fetch cash sessions
-                try {
-                    const cashResponse = await fetch('/api/cash-sessions?limit=100');
-                    if (cashResponse.ok) {
-                        const cashData: any[] = await cashResponse.json();
-                        console.log(`${logPrefix} 💰 Cash sessions loaded: ${cashData.length} sessions`);
-                        const mappedSessions: CashSession[] = cashData.map(session => ({
-                            id: session.id,
-                            startDate: session.startTime,
-                            endDate: session.endTime,
-                            startAmount: session.startAmount,
-                            endAmount: session.endAmount,
-                            status: session.status === 'active' ? 'open' : 'closed',
-                            totalSales: session.totalSales,
-                            totalExpenses: session.totalExpenses,
-                            expectedCash: session.expectedCash,
-                            difference: session.difference
-                        }));
-                        setCashSessions(mappedSessions);
-                        sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching cash sessions:', error);
+                if (cashData) {
+                    console.log(`${logPrefix} 💰 Cash sessions loaded: ${cashData.length} sessions`);
+                    const mappedSessions: CashSession[] = cashData.map(session => ({
+                        id: session.id,
+                        startDate: session.startTime,
+                        endDate: session.endTime,
+                        startAmount: session.startAmount,
+                        endAmount: session.endAmount,
+                        status: session.status === 'active' ? 'open' : 'closed',
+                        totalSales: session.totalSales,
+                        totalExpenses: session.totalExpenses,
+                        expectedCash: session.expectedCash,
+                        difference: session.difference
+                    }));
+                    setCashSessions(mappedSessions);
+                    sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
+                    offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(console.error);
                 }
 
-                // Fetch users
-                try {
-                    const usersResponse = await fetch('/api/users');
-                    if (usersResponse.ok) {
-                        const usersData: User[] = await usersResponse.json();
-                        setUsers(usersData);
-                        sessionCache.set(CACHE_KEYS.USERS, usersData);
-                    } else {
-                        setUsers([initialAdmin]);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching users:', error);
-                    setUsers([initialAdmin]);
+                if (usersData) {
+                    setUsers(usersData);
+                    sessionCache.set(CACHE_KEYS.USERS, usersData);
                 }
 
-                // Fetch customers
-                try {
-                    const customersResponse = await fetch('/api/customers');
-                    if (customersResponse.ok) {
-                        const customersData: Customer[] = await customersResponse.json();
-                        setCustomers(customersData);
-                        sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching customers:', error);
+                if (customersData) {
+                    setCustomers(customersData);
+                    sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
                 }
 
-                // Fetch cash withdrawals
-                try {
-                    const withdrawalsResponse = await fetch('/api/cash-withdrawals');
-                    if (withdrawalsResponse.ok) {
-                        const withdrawalsData: CashWithdrawal[] = await withdrawalsResponse.json();
-                        setCashWithdrawals(withdrawalsData);
-                        sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
-                    }
-                } catch (error) {
-                    console.error('❌ Error fetching cash withdrawals:', error);
+                if (withdrawalsData) {
+                    setCashWithdrawals(withdrawalsData);
+                    sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
                 }
 
-                console.log(`${logPrefix} ✅ Data fetch complete`);
+                console.log(`${logPrefix} ✅ Data fetch complete (parallel)`);
             } catch (error) {
                 console.error("Failed to fetch data:", error);
                 setUsers([initialAdmin]);
@@ -284,40 +273,68 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         loadFromCacheOrFetch();
     }, []);
 
-    // 🔄 CROSS-DEVICE SYNC: Poll for coworking sessions every 5 seconds
+    // 🔄 SMART POLLING: Only poll coworking when there are active sessions
+    const hasActiveSessions = useRef(false);
+
+    useEffect(() => {
+        // Update active sessions flag
+        hasActiveSessions.current = coworkingSessions.some(s => s.status === 'active');
+    }, [coworkingSessions]);
+
     useEffect(() => {
         const pollCoworkingSessions = async () => {
             try {
-                const response = await fetch('/api/coworking-sessions');
-                if (response.ok) {
-                    const sessions: CoworkingSession[] = await response.json();
-                    setCoworkingSessions(sessions);
-                }
+                // Use dedupedFetch to prevent duplicate requests
+                const sessions = await dedupedFetch<CoworkingSession[]>('/api/coworking-sessions', {}, true);
+                setCoworkingSessions(sessions);
+                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, sessions);
             } catch (error) {
                 console.error('Failed to poll coworking sessions:', error);
             }
         };
 
-        // Poll every 5 seconds when document is visible
-        const interval = setInterval(() => {
-            if (document.visibilityState === 'visible') {
-                pollCoworkingSessions();
-            }
-        }, 5000);
+        // SMART POLLING: 5 seconds if active sessions, 30 seconds otherwise
+        let interval: NodeJS.Timeout | null = null;
 
-        // Poll immediately when tab becomes visible
+        const startPolling = () => {
+            if (interval) clearInterval(interval);
+            const pollInterval = hasActiveSessions.current ? 5000 : 30000;
+            console.log(`⏱️ Coworking poll interval: ${pollInterval / 1000}s (active: ${hasActiveSessions.current})`);
+
+            interval = setInterval(() => {
+                if (document.visibilityState === 'visible' && navigator.onLine) {
+                    pollCoworkingSessions();
+                }
+            }, pollInterval);
+        };
+
+        startPolling();
+
+        // Restart polling when active sessions change
+        const checkActiveChange = setInterval(() => {
+            const currentActive = coworkingSessions.some(s => s.status === 'active');
+            if (currentActive !== hasActiveSessions.current) {
+                hasActiveSessions.current = currentActive;
+                startPolling();
+            }
+        }, 10000);
+
+        // Smart visibility change - only refetch if cache is stale
         const handleVisibilityChange = () => {
             if (document.visibilityState === 'visible') {
-                pollCoworkingSessions();
+                if (shouldRefreshOnVisibility('/api/coworking-sessions')) {
+                    pollCoworkingSessions();
+                }
             }
         };
         document.addEventListener('visibilitychange', handleVisibilityChange);
 
         return () => {
-            clearInterval(interval);
+            if (interval) clearInterval(interval);
+            clearInterval(checkActiveChange);
             document.removeEventListener('visibilitychange', handleVisibilityChange);
         };
-    }, []);
+    }, [coworkingSessions]);
 
 
     // --- FUNCTIONS ---

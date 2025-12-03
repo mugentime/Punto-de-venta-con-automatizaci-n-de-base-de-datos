@@ -1,21 +1,23 @@
-// Service Worker Optimizado para Conejo Negro POS
-// Versión: 3.0.0 - Multi-tier caching strategy with intelligent resource management
-// Performance target: >80% cache hit rate, <1MB transfer on repeat visits
+// Service Worker Optimizado para Conejo Negro POS - PWA Performance Edition
+// Versión: 4.0.0 - API caching + stale-while-revalidate + offline support
+// Performance target: >90% cache hit rate, instant page loads
 
-const VERSION = '3.0.0';
+const VERSION = '4.0.0';
 const CACHE_PREFIX = 'conejo-negro-pos';
 const CACHES = {
   static: `${CACHE_PREFIX}-static-v${VERSION}`,      // JS, CSS con hash - Cache First
   images: `${CACHE_PREFIX}-images-v${VERSION}`,      // Imágenes - Stale-While-Revalidate
   runtime: `${CACHE_PREFIX}-runtime-v${VERSION}`,    // HTML, otros - Network First
-  cdn: `${CACHE_PREFIX}-cdn-v${VERSION}`             // CDNs externos - Cache First
+  cdn: `${CACHE_PREFIX}-cdn-v${VERSION}`,            // CDNs externos - Cache First
+  api: `${CACHE_PREFIX}-api-v${VERSION}`             // API responses - Network First w/ Cache Fallback
 };
 
 // Límites de cache para prevenir crecimiento excesivo
 const CACHE_LIMITS = {
   images: 50,  // Máximo 50 imágenes
   runtime: 30, // Máximo 30 recursos runtime
-  cdn: 20      // Máximo 20 recursos CDN
+  cdn: 20,     // Máximo 20 recursos CDN
+  api: 100     // Máximo 100 API responses
 };
 
 // TTL (Time To Live) en milisegundos
@@ -23,14 +25,26 @@ const CACHE_TTL = {
   static: 7 * 24 * 60 * 60 * 1000,   // 7 días para assets estáticos
   images: 3 * 24 * 60 * 60 * 1000,   // 3 días para imágenes
   cdn: 30 * 24 * 60 * 60 * 1000,     // 30 días para CDNs
-  runtime: 24 * 60 * 60 * 1000       // 1 día para runtime
+  runtime: 24 * 60 * 60 * 1000,      // 1 día para runtime
+  api: {
+    products: 10 * 60 * 1000,        // 10 minutos - productos cambian poco
+    orders: 30 * 1000,               // 30 segundos - órdenes cambian mucho
+    expenses: 2 * 60 * 1000,         // 2 minutos
+    'coworking-sessions': 5 * 1000,  // 5 segundos - real-time
+    'cash-sessions': 60 * 1000,      // 1 minuto
+    users: 5 * 60 * 1000,            // 5 minutos
+    customers: 5 * 60 * 1000,        // 5 minutos
+    'cash-withdrawals': 60 * 1000,   // 1 minuto
+    default: 30 * 1000               // 30 segundos default
+  }
 };
 
 // Assets críticos para precache
 const PRECACHE_URLS = [
   '/',
   '/index.html',
-  '/manifest.json'
+  '/manifest.json',
+  '/app.css'
 ];
 
 // Regex patterns para clasificación de recursos
@@ -45,10 +59,13 @@ const PATTERNS = {
   fonts: /\.(woff|woff2|ttf|eot|otf)$/i,
 
   // CDNs conocidos
-  cdn: /(cdn\.|unpkg\.|jsdelivr\.|cdnjs\.|fonts\.googleapis\.com|fonts\.gstatic\.com)/i,
+  cdn: /(cdn\.|unpkg\.|jsdelivr\.|cdnjs\.|fonts\.googleapis\.com|fonts\.gstatic\.com|aistudiocdn\.com)/i,
 
   // API routes
-  api: /\/api\//i
+  api: /\/api\//i,
+
+  // API routes que pueden ser cacheadas
+  cacheableApi: /\/api\/(products|orders|expenses|coworking-sessions|cash-sessions|users|customers|cash-withdrawals)/i
 };
 
 // ============================================================================
@@ -62,7 +79,7 @@ self.addEventListener('install', (event) => {
     (async () => {
       const cache = await caches.open(CACHES.static);
 
-      // Precache solo recursos críticos
+      // Precache recursos críticos
       await cache.addAll(PRECACHE_URLS);
 
       console.log(`[SW ${VERSION}] Precache complete`);
@@ -125,43 +142,132 @@ self.addEventListener('fetch', (event) => {
  * Clasifica el request y devuelve la estrategia apropiada
  */
 function classifyRequest(url, request) {
-  // 1. API requests - NO cachear, pasar directo
-  if (PATTERNS.api.test(url.pathname)) {
-    return null; // Dejar pasar al browser
+  // 1. API requests cacheables - Stale-While-Revalidate
+  if (PATTERNS.cacheableApi.test(url.pathname)) {
+    return apiStaleWhileRevalidate(request, url);
   }
 
-  // 2. Assets de Vite con hash - Cache First (immutable)
+  // 2. Otros API requests - Network only (mutaciones)
+  if (PATTERNS.api.test(url.pathname)) {
+    return null; // Dejar pasar al browser para mutaciones
+  }
+
+  // 3. Assets de Vite con hash - Cache First (immutable)
   if (PATTERNS.viteAssets.test(url.pathname)) {
     return cacheFirst(request, CACHES.static);
   }
 
-  // 3. Fonts - Cache First (immutable)
+  // 4. Fonts - Cache First (immutable)
   if (PATTERNS.fonts.test(url.pathname)) {
     return cacheFirst(request, CACHES.static);
   }
 
-  // 4. CDNs externos - Cache First con TTL
+  // 5. CDNs externos - Cache First con TTL largo
   if (url.origin !== location.origin && PATTERNS.cdn.test(url.hostname)) {
     return cacheFirst(request, CACHES.cdn, CACHE_TTL.cdn);
   }
 
-  // 5. Imágenes - Stale-While-Revalidate
+  // 6. Imágenes - Stale-While-Revalidate
   if (PATTERNS.images.test(url.pathname)) {
     return staleWhileRevalidate(request, CACHES.images, CACHE_TTL.images);
   }
 
-  // 6. Navegación y otros - Network First
+  // 7. Navegación y otros - Network First
   if (request.mode === 'navigate' || url.pathname.endsWith('.html')) {
     return networkFirst(request, CACHES.runtime);
   }
 
-  // 7. Recursos del mismo origen - Network First
+  // 8. Recursos del mismo origen - Network First
   if (url.origin === location.origin) {
     return networkFirst(request, CACHES.runtime);
   }
 
   // Default: dejar pasar
   return null;
+}
+
+/**
+ * API Stale-While-Revalidate - Optimizado para datos PWA
+ * Retorna cache inmediatamente y actualiza en background
+ */
+async function apiStaleWhileRevalidate(request, url) {
+  const cache = await caches.open(CACHES.api);
+  const cachedResponse = await cache.match(request);
+
+  // Determinar TTL para este endpoint
+  const endpoint = url.pathname.split('/api/')[1]?.split('/')[0]?.split('?')[0] || 'default';
+  const ttl = CACHE_TTL.api[endpoint] || CACHE_TTL.api.default;
+
+  // Verificar si cache es válido
+  let cacheIsValid = false;
+  if (cachedResponse) {
+    const cachedDate = cachedResponse.headers.get('sw-cached-date');
+    if (cachedDate) {
+      const age = Date.now() - new Date(cachedDate).getTime();
+      cacheIsValid = age < ttl;
+
+      if (cacheIsValid) {
+        console.log(`[SW API] Cache HIT (${endpoint}): age ${Math.round(age/1000)}s < ${Math.round(ttl/1000)}s TTL`);
+      } else {
+        console.log(`[SW API] Cache STALE (${endpoint}): age ${Math.round(age/1000)}s > ${Math.round(ttl/1000)}s TTL`);
+      }
+    }
+  }
+
+  // Función para hacer fetch y actualizar cache
+  const fetchAndUpdate = async () => {
+    try {
+      const networkResponse = await fetch(request);
+
+      if (networkResponse && networkResponse.ok) {
+        await saveToCache(cache, request, networkResponse.clone(), CACHES.api);
+        console.log(`[SW API] Cache UPDATED: ${endpoint}`);
+      }
+
+      return networkResponse;
+    } catch (error) {
+      console.error(`[SW API] Network failed for ${endpoint}:`, error);
+      throw error;
+    }
+  };
+
+  // Si tenemos cache válido, retornarlo inmediatamente
+  if (cachedResponse && cacheIsValid) {
+    // Actualizar en background si estamos más del 50% del TTL
+    const cachedDate = new Date(cachedResponse.headers.get('sw-cached-date'));
+    const age = Date.now() - cachedDate.getTime();
+
+    if (age > ttl * 0.5) {
+      console.log(`[SW API] Background refresh for ${endpoint}`);
+      fetchAndUpdate().catch(() => {});
+    }
+
+    return cachedResponse;
+  }
+
+  // Si cache es stale, intentar red primero
+  if (cachedResponse) {
+    // Intentar red, pero con timeout
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // 3s timeout
+
+    try {
+      const networkResponse = await fetch(request, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      if (networkResponse.ok) {
+        await saveToCache(cache, request, networkResponse.clone(), CACHES.api);
+        return networkResponse;
+      }
+    } catch (error) {
+      clearTimeout(timeoutId);
+      console.log(`[SW API] Network slow/failed, using stale cache for ${endpoint}`);
+      return cachedResponse;
+    }
+  }
+
+  // Sin cache, necesitamos la red
+  return fetchAndUpdate();
 }
 
 /**
@@ -305,6 +411,8 @@ async function enforceQuota(cache, cacheName) {
     limit = CACHE_LIMITS.images;
   } else if (cacheName.includes('cdn')) {
     limit = CACHE_LIMITS.cdn;
+  } else if (cacheName.includes('api')) {
+    limit = CACHE_LIMITS.api;
   }
 
   const keys = await cache.keys();
@@ -317,6 +425,31 @@ async function enforceQuota(cache, cacheName) {
     }
     console.log(`[SW] Quota enforced: deleted ${toDelete} old entries from ${cacheName}`);
   }
+}
+
+// ============================================================================
+// BACKGROUND SYNC para operaciones offline
+// ============================================================================
+
+self.addEventListener('sync', (event) => {
+  console.log(`[SW] Background sync triggered: ${event.tag}`);
+
+  if (event.tag === 'sync-pending-operations') {
+    event.waitUntil(processPendingOperations());
+  }
+});
+
+async function processPendingOperations() {
+  // Este se integra con IndexedDB pendingSync store
+  console.log('[SW] Processing pending operations...');
+  // La lógica real está en offlineStorage.ts
+  // El SW solo dispara la sincronización
+
+  // Notificar a los clientes que la sincronización comenzó
+  const clients = await self.clients.matchAll();
+  clients.forEach(client => {
+    client.postMessage({ type: 'SYNC_STARTED' });
+  });
 }
 
 // ============================================================================
@@ -338,9 +471,46 @@ self.addEventListener('message', (event) => {
     );
   }
 
+  if (event.data && event.data.type === 'CLEAR_API_CACHE') {
+    console.log('[SW] CLEAR_API_CACHE requested');
+    event.waitUntil(caches.delete(CACHES.api));
+  }
+
   if (event.data && event.data.type === 'GET_VERSION') {
     event.ports[0].postMessage({ version: VERSION });
   }
+
+  if (event.data && event.data.type === 'GET_CACHE_STATS') {
+    event.waitUntil(
+      (async () => {
+        const stats = {};
+        for (const [name, cacheName] of Object.entries(CACHES)) {
+          const cache = await caches.open(cacheName);
+          const keys = await cache.keys();
+          stats[name] = keys.length;
+        }
+        event.ports[0].postMessage({ stats });
+      })()
+    );
+  }
+
+  // Invalidar cache de API específico
+  if (event.data && event.data.type === 'INVALIDATE_API') {
+    const endpoint = event.data.endpoint;
+    console.log(`[SW] Invalidating API cache for: ${endpoint}`);
+    event.waitUntil(
+      (async () => {
+        const cache = await caches.open(CACHES.api);
+        const keys = await cache.keys();
+        for (const request of keys) {
+          if (request.url.includes(endpoint)) {
+            await cache.delete(request);
+            console.log(`[SW] Deleted cache: ${request.url}`);
+          }
+        }
+      })()
+    );
+  }
 });
 
-console.log(`[SW ${VERSION}] Service Worker loaded with multi-tier caching`);
+console.log(`[SW ${VERSION}] Service Worker loaded with API caching and offline support`);
