@@ -51,6 +51,7 @@ const Cart: React.FC = () => {
     const [tip, setTip] = useState<number>(0);
     const [isCheckingOut, setIsCheckingOut] = useState(false);
     const [isProcessing, setIsProcessing] = useState(false);
+    const [checkoutToast, setCheckoutToast] = useState<{ message: string; productName: string } | null>(null);
 
     // Get selected customer
     const selectedCustomer = customers.find(c => c.id === selectedCustomerId);
@@ -74,6 +75,13 @@ const Cart: React.FC = () => {
         try {
             await createOrder({ clientName, serviceType, paymentMethod, customerId, tip });
             // Cart is already cleared by createOrder on success
+
+            // 🚀 PERF FIX: Show non-blocking toast instead of alert
+            setCheckoutToast({
+                message: `✅ Venta guardada`,
+                productName: `${clientName} - $${finalTotal.toFixed(2)}`
+            });
+
             setIsCheckingOut(false);
             setSelectedCustomerId('');
             setCustomClientName('');
@@ -81,8 +89,12 @@ const Cart: React.FC = () => {
             setPaymentMethod('Efectivo');
             setTip(0);
         } catch (error) {
-            // Error already alerted by createOrder, just reset checkout state
+            // Show error toast instead of alert
             console.error('Checkout failed:', error);
+            setCheckoutToast({
+                message: '❌ Error al guardar',
+                productName: 'Intente de nuevo'
+            });
             setIsCheckingOut(false);
         } finally {
             setIsProcessing(false);
@@ -95,6 +107,13 @@ const Cart: React.FC = () => {
 
     return (
         <div className={`bg-white rounded-xl sm:rounded-3xl shadow-md flex flex-col ${isCheckingOut ? 'h-[calc(100vh-8rem)]' : 'h-64'} sm:h-80 lg:h-full`}>
+            {checkoutToast && (
+                <Toast
+                    message={checkoutToast.message}
+                    productName={checkoutToast.productName}
+                    onClose={() => setCheckoutToast(null)}
+                />
+            )}
             <div className="p-2 sm:p-4 border-b flex-shrink-0">
                 <h2 className="text-base sm:text-xl font-bold text-slate-800">Orden Actual</h2>
             </div>
