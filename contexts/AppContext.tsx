@@ -189,7 +189,35 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
         const fetchAllDataFromServer = async (isBackground: boolean) => {
             const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
-            console.log(`${logPrefix} Starting optimized parallel data fetch...`);
+
+            // BACKGROUND: Only fetch critical data (products + orders) - saves 6 API calls!
+            if (isBackground) {
+                console.log(`${logPrefix} Background refresh - critical data only (2 calls)`);
+                try {
+                    const [productsData, ordersData] = await Promise.all([
+                        dedupedFetch<Product[]>('/api/products').catch(() => null),
+                        dedupedFetch<Order[]>('/api/orders').catch(() => null)
+                    ]);
+
+                    if (productsData) {
+                        setProducts(productsData);
+                        sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
+                        offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(() => {});
+                    }
+                    if (ordersData) {
+                        setOrders(ordersData);
+                        sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
+                        offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
+                    }
+                    console.log(`${logPrefix} ✅ Background refresh complete`);
+                } catch (error) {
+                    console.error(`${logPrefix} Background refresh failed:`, error);
+                }
+                return;
+            }
+
+            // INITIAL LOAD: Fetch everything
+            console.log(`${logPrefix} Starting initial data fetch (8 calls)...`);
 
             try {
                 // OPTIMIZED: Parallel fetch with deduplication
@@ -283,18 +311,23 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         loadFromCacheOrFetch();
     }, []);
 
-    // 🔄 SMART POLLING: Only poll coworking when there are active sessions
-    const hasActiveSessions = useRef(false);
-
+    // 🔄 MINIMAL POLLING: Only poll when there are ACTIVE coworking sessions
+    // No polling = no API calls = cheap & fast
     useEffect(() => {
-        // Update active sessions flag
-        hasActiveSessions.current = coworkingSessions.some(s => s.status === 'active');
-    }, [coworkingSessions]);
+        const hasActive = coworkingSessions.some(s => s.status === 'active');
 
-    useEffect(() => {
+        // NO POLLING if no active sessions - saves API calls
+        if (!hasActive) {
+            console.log('⏱️ No active coworking sessions - polling disabled');
+            return;
+        }
+
+        console.log('⏱️ Active coworking session detected - polling every 10s');
+
         const pollCoworkingSessions = async () => {
+            if (document.visibilityState !== 'visible' || !navigator.onLine) return;
+
             try {
-                // Use dedupedFetch to prevent duplicate requests
                 const sessions = await dedupedFetch<CoworkingSession[]>('/api/coworking-sessions', {}, true);
                 setCoworkingSessions(sessions);
                 sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, sessions);
@@ -303,48 +336,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             }
         };
 
-        // SMART POLLING: 5 seconds if active sessions, 30 seconds otherwise
-        let interval: NodeJS.Timeout | null = null;
+        // Poll every 10 seconds ONLY when active sessions exist
+        const interval = setInterval(pollCoworkingSessions, 10000);
 
-        const startPolling = () => {
-            if (interval) clearInterval(interval);
-            const pollInterval = hasActiveSessions.current ? 5000 : 30000;
-            console.log(`⏱️ Coworking poll interval: ${pollInterval / 1000}s (active: ${hasActiveSessions.current})`);
-
-            interval = setInterval(() => {
-                if (document.visibilityState === 'visible' && navigator.onLine) {
-                    pollCoworkingSessions();
-                }
-            }, pollInterval);
-        };
-
-        startPolling();
-
-        // Restart polling when active sessions change
-        const checkActiveChange = setInterval(() => {
-            const currentActive = coworkingSessions.some(s => s.status === 'active');
-            if (currentActive !== hasActiveSessions.current) {
-                hasActiveSessions.current = currentActive;
-                startPolling();
-            }
-        }, 10000);
-
-        // Smart visibility change - only refetch if cache is stale
-        const handleVisibilityChange = () => {
-            if (document.visibilityState === 'visible') {
-                if (shouldRefreshOnVisibility('/api/coworking-sessions')) {
-                    pollCoworkingSessions();
-                }
-            }
-        };
-        document.addEventListener('visibilitychange', handleVisibilityChange);
-
-        return () => {
-            if (interval) clearInterval(interval);
-            clearInterval(checkActiveChange);
-            document.removeEventListener('visibilitychange', handleVisibilityChange);
-        };
-    }, [coworkingSessions]);
+        return () => clearInterval(interval);
+    }, [coworkingSessions.filter(s => s.status === 'active').length]); // Only re-run when active count changes
 
 
     // --- FUNCTIONS ---
