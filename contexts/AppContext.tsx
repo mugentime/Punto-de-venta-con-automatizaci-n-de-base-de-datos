@@ -161,10 +161,20 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                     initialLoadDone.current = true;
 
-                    // Background refresh - but only if we have network
+                    // Background refresh - DEFERRED to not block UI render
                     if (navigator.onLine) {
-                        console.log('🔄 Background refresh starting...');
-                        fetchAllDataFromServer(true);
+                        // Use requestIdleCallback for true non-blocking refresh
+                        // Falls back to setTimeout for browsers without support
+                        const deferRefresh = () => {
+                            console.log('🔄 Background refresh starting (deferred)...');
+                            fetchAllDataFromServer(true);
+                        };
+
+                        if ('requestIdleCallback' in window) {
+                            (window as any).requestIdleCallback(deferRefresh, { timeout: 2000 });
+                        } else {
+                            setTimeout(deferRefresh, 100);
+                        }
                     }
                 } else {
                     // No cache, fetch everything from server
