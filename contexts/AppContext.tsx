@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback, useMemo } from 'react';
 import useLocalStorage from '../hooks/useLocalStorage';
 import { sessionCache, CACHE_KEYS } from '../utils/sessionCache';
 import { dedupedFetch, invalidateCache, shouldRefreshOnVisibility, getCachedData } from '../utils/apiCache';
@@ -313,11 +313,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     // 🔄 MINIMAL POLLING: Only poll when there are ACTIVE coworking sessions
     // No polling = no API calls = cheap & fast
-    useEffect(() => {
-        const hasActive = coworkingSessions.some(s => s.status === 'active');
+    // FIX: Memoize active count to prevent infinite loop from .filter() creating new array each render
+    const activeSessionCount = useMemo(
+        () => coworkingSessions.filter(s => s.status === 'active').length,
+        [coworkingSessions]
+    );
 
+    useEffect(() => {
         // NO POLLING if no active sessions - saves API calls
-        if (!hasActive) {
+        if (activeSessionCount === 0) {
             console.log('⏱️ No active coworking sessions - polling disabled');
             return;
         }
@@ -340,7 +344,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const interval = setInterval(pollCoworkingSessions, 10000);
 
         return () => clearInterval(interval);
-    }, [coworkingSessions.filter(s => s.status === 'active').length]); // Only re-run when active count changes
+    }, [activeSessionCount]); // Stable memoized value - no infinite loop
 
 
     // --- FUNCTIONS ---
