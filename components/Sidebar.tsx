@@ -156,6 +156,10 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
           paddingBottom: 'env(safe-area-inset-bottom)',
         }}
       >
+        {/* HOTFIX Version Badge */}
+        <div className="absolute -top-6 left-1/2 -translate-x-1/2 bg-orange-500 text-white text-xs font-bold px-3 py-1 rounded-full shadow-lg animate-pulse">
+          🔧 HOTFIX v1.0.1
+        </div>
         <div
           ref={scrollContainerRef}
           className={`flex items-center h-16 sm:h-20 mx-auto ${
