@@ -161,20 +161,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                     initialLoadDone.current = true;
 
-                    // Background refresh - DEFERRED to not block UI render
+                    // Background refresh - Start IMMEDIATELY (not deferred)
+                    // FIX: Deferred refresh caused cash/expenses/coworking to load too late
                     if (navigator.onLine) {
-                        // Use requestIdleCallback for true non-blocking refresh
-                        // Falls back to setTimeout for browsers without support
-                        const deferRefresh = () => {
-                            console.log('🔄 Background refresh starting (deferred)...');
-                            fetchAllDataFromServer(true);
-                        };
-
-                        if ('requestIdleCallback' in window) {
-                            (window as any).requestIdleCallback(deferRefresh, { timeout: 2000 });
-                        } else {
-                            setTimeout(deferRefresh, 100);
-                        }
+                        console.log('🔄 Background refresh starting immediately...');
+                        fetchAllDataFromServer(true);
                     }
                 } else {
                     // No cache, fetch everything from server

@@ -1,6 +1,10 @@
 [build]
 builder = "nixpacks"
 
+[build.env]
+# Install devDependencies for vite build
+NIXPACKS_NPM_INSTALL_CMD = "npm ci --include=dev"
+
 [deploy]
 startCommand = "npm start"
 healthcheckPath = "/api/health"
