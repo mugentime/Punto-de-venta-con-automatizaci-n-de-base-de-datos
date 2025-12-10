@@ -116,11 +116,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             try {
                 // TIER 1: Try IndexedDB first (persistent across sessions)
                 console.log('⚡ Checking IndexedDB for cached data...');
-                const [idbProducts, idbOrders, idbExpenses, idbCashSessions] = await Promise.all([
+                const [idbProducts, idbOrders, idbExpenses, idbCashSessions, idbCustomers] = await Promise.all([
                     offlineStorage.getAll<Product>(STORES.PRODUCTS).catch(() => []),
                     offlineStorage.getAll<Order>(STORES.ORDERS).catch(() => []),
                     offlineStorage.getAll<Expense>(STORES.EXPENSES).catch(() => []),
-                    offlineStorage.getAll<CashSession>(STORES.CASH_SESSIONS).catch(() => [])
+                    offlineStorage.getAll<CashSession>(STORES.CASH_SESSIONS).catch(() => []),
+                    offlineStorage.getAll<Customer>(STORES.CUSTOMERS).catch(() => [])
                 ]);
 
                 const hasIdbData = idbProducts.length > 0 || idbOrders.length > 0;
@@ -132,7 +133,8 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 const cachedCoworking = sessionCache.get<CoworkingSession[]>(CACHE_KEYS.COWORKING_SESSIONS);
                 const cachedCashSessions = hasIdbData && idbCashSessions.length > 0 ? idbCashSessions : sessionCache.get<CashSession[]>(CACHE_KEYS.CASH_SESSIONS);
                 const cachedUsers = sessionCache.get<User[]>(CACHE_KEYS.USERS);
-                const cachedCustomers = sessionCache.get<Customer[]>(CACHE_KEYS.CUSTOMERS);
+                // FIX: Customers now loaded from IndexedDB for instant PWA load
+                const cachedCustomers = idbCustomers.length > 0 ? idbCustomers : sessionCache.get<Customer[]>(CACHE_KEYS.CUSTOMERS);
                 const cachedWithdrawals = sessionCache.get<CashWithdrawal[]>(CACHE_KEYS.CASH_WITHDRAWALS);
 
                 const hasCache = (cachedProducts && cachedProducts.length > 0) || (cachedOrders && cachedOrders.length > 0) || (cachedCashSessions && cachedCashSessions.length > 0);
@@ -182,16 +184,17 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
 
             // BACKGROUND: Fetch ALL data to ensure fresh data on PWA reload
-            // FIX: Previously only fetched products + orders, leaving expenses/coworking/history stale
+            // FIX: Now includes customers for instant PWA loading
             if (isBackground) {
-                console.log(`${logPrefix} Background refresh - fetching all data`);
+                console.log(`${logPrefix} Background refresh - fetching all data including customers`);
                 try {
-                    const [productsData, ordersData, expensesData, coworkingData, cashData] = await Promise.all([
+                    const [productsData, ordersData, expensesData, coworkingData, cashData, customersData] = await Promise.all([
                         dedupedFetch<Product[]>('/api/products').catch(() => null),
                         dedupedFetch<Order[]>('/api/orders').catch(() => null),
                         dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
                         dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
-                        dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null)
+                        dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
+                        dedupedFetch<Customer[]>('/api/customers').catch(() => null)
                     ]);
 
                     if (productsData) {
@@ -229,6 +232,13 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         setCashSessions(mappedSessions);
                         sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
                         offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
+                    }
+                    // FIX: Customers now included in background refresh for instant PWA load
+                    if (customersData) {
+                        setCustomers(customersData);
+                        sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
+                        offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
+                        console.log(`${logPrefix} 👥 Customers refreshed: ${customersData.length} customers`);
                     }
                     console.log(`${logPrefix} ✅ Background refresh complete`);
                 } catch (error) {
@@ -313,8 +323,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 }
 
                 if (customersData) {
+                    console.log(`${logPrefix} 👥 Customers loaded: ${customersData.length} customers`);
                     setCustomers(customersData);
                     sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
+                    // FIX: Persist customers to IndexedDB for instant PWA reload
+                    offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(console.error);
                 }
 
                 if (withdrawalsData) {
