@@ -2,7 +2,7 @@
 // Versión: 4.0.0 - API caching + stale-while-revalidate + offline support
 // Performance target: >90% cache hit rate, instant page loads
 
-const VERSION = '4.0.0';
+const VERSION = '4.1.0';
 const CACHE_PREFIX = 'conejo-negro-pos';
 const CACHES = {
   static: `${CACHE_PREFIX}-static-v${VERSION}`,      // JS, CSS con hash - Cache First

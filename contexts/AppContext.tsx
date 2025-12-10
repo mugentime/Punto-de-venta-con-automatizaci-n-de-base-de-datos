@@ -190,13 +190,17 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const fetchAllDataFromServer = async (isBackground: boolean) => {
             const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
 
-            // BACKGROUND: Only fetch critical data (products + orders) - saves 6 API calls!
+            // BACKGROUND: Fetch ALL data to ensure fresh data on PWA reload
+            // FIX: Previously only fetched products + orders, leaving expenses/coworking/history stale
             if (isBackground) {
-                console.log(`${logPrefix} Background refresh - critical data only (2 calls)`);
+                console.log(`${logPrefix} Background refresh - fetching all data`);
                 try {
-                    const [productsData, ordersData] = await Promise.all([
+                    const [productsData, ordersData, expensesData, coworkingData, cashData] = await Promise.all([
                         dedupedFetch<Product[]>('/api/products').catch(() => null),
-                        dedupedFetch<Order[]>('/api/orders').catch(() => null)
+                        dedupedFetch<Order[]>('/api/orders').catch(() => null),
+                        dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
+                        dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
+                        dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null)
                     ]);
 
                     if (productsData) {
@@ -208,6 +212,32 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         setOrders(ordersData);
                         sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
                         offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
+                    }
+                    if (expensesData) {
+                        setExpenses(expensesData);
+                        sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
+                        offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
+                    }
+                    if (coworkingData) {
+                        setCoworkingSessions(coworkingData);
+                        sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
+                    }
+                    if (cashData) {
+                        const mappedSessions: CashSession[] = cashData.map(session => ({
+                            id: session.id,
+                            startDate: session.startTime,
+                            endDate: session.endTime,
+                            startAmount: session.startAmount,
+                            endAmount: session.endAmount,
+                            status: session.status === 'active' ? 'open' : 'closed',
+                            totalSales: session.totalSales,
+                            totalExpenses: session.totalExpenses,
+                            expectedCash: session.expectedCash,
+                            difference: session.difference
+                        }));
+                        setCashSessions(mappedSessions);
+                        sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
+                        offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
                     }
                     console.log(`${logPrefix} ✅ Background refresh complete`);
                 } catch (error) {
