@@ -216,9 +216,10 @@ const CustomersScreen: React.FC = () => {
           <div key={customer.id} className="bg-white rounded-2xl shadow-md overflow-hidden">
             <div className="p-4">
               <div className="flex justify-between items-start mb-3">
-                <div>
+                <div onClick={() => toggleCustomerDetails(customer.id)} className="cursor-pointer flex-1">
                   <p className="font-bold text-slate-800">{customer.name}</p>
                   <p className="text-xs text-slate-500">{customer.email || customer.phone || 'Sin contacto'}</p>
+                  <p className="text-xs text-blue-500 mt-1">Toca para ver historial de créditos</p>
                 </div>
                 <div className="flex space-x-1">
                   <button
@@ -258,6 +259,45 @@ const CustomersScreen: React.FC = () => {
                   </div>
                 </div>
               </div>
+
+              {/* Mobile Credit History - Expandable */}
+              {expandedCustomerId === customer.id && (
+                <div className="mt-3 pt-3 border-t border-slate-200">
+                  <h4 className="font-semibold text-sm mb-2 text-slate-700">Historial de Créditos</h4>
+                  {customerCredits[customer.id] && customerCredits[customer.id].length > 0 ? (
+                    <div className="space-y-2 max-h-60 overflow-y-auto">
+                      {customerCredits[customer.id].map((credit: any) => (
+                        <div key={credit.id} className="bg-slate-50 p-3 rounded-lg text-xs">
+                          <div className="flex justify-between items-start mb-1">
+                            <span className={`px-2 py-0.5 rounded text-xs font-medium ${credit.type === 'charge' ? 'bg-red-100 text-red-700' : 'bg-green-100 text-green-700'}`}>
+                              {credit.type === 'charge' ? 'Cargo' : 'Pago'}
+                            </span>
+                            <span className="font-bold text-slate-800">${credit.amount.toFixed(2)}</span>
+                          </div>
+                          <div className="flex justify-between items-center text-slate-500 mb-1">
+                            <span>{new Date(credit.createdAt).toLocaleDateString()}</span>
+                            <span className={`px-2 py-0.5 rounded ${credit.status === 'paid' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                              {credit.status === 'paid' ? 'Pagado' : 'Pendiente'}
+                            </span>
+                          </div>
+                          {credit.type === 'charge' && credit.orderSummary ? (
+                            <div className="mt-1 p-2 bg-white rounded border">
+                              <p className="text-slate-700 text-xs">{credit.orderSummary}</p>
+                              {credit.orderDiscount > 0 && (
+                                <p className="text-green-600 text-xs mt-1">Descuento aplicado: {credit.customerDiscount || 0}%</p>
+                              )}
+                            </div>
+                          ) : credit.description ? (
+                            <p className="text-slate-600 mt-1">{credit.description}</p>
+                          ) : null}
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-slate-500 text-sm text-center py-4">No hay historial de créditos</p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         ))}
