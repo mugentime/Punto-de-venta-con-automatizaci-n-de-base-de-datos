@@ -1265,11 +1265,26 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to add customer credit');
 
-            // Refresh customer data to get updated currentCredit
-            const customerResponse = await fetch('/api/customers');
+            // Optimistic UI update - immediately reflect the change
+            setCustomers(prev => prev.map(c => {
+                if (c.id === customerId) {
+                    const newCredit = type === 'charge'
+                        ? c.currentCredit + amount
+                        : c.currentCredit - amount;
+                    return { ...c, currentCredit: Math.max(0, newCredit) };
+                }
+                return c;
+            }));
+
+            // Also refresh from server with cache bypass to ensure sync
+            const customerResponse = await fetch(`/api/customers?_t=${Date.now()}`, {
+                cache: 'no-store'
+            });
             if (customerResponse.ok) {
                 const customersData: Customer[] = await customerResponse.json();
                 setCustomers(customersData);
+                // Update IndexedDB cache
+                offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
             }
         } catch (error) {
             console.error("Error adding customer credit:", error);
