@@ -121,9 +121,27 @@ const MainLayout: React.FC = memo(() => {
   );
 });
 
+// PWA initialization loader - prevents showing stale/empty data
+const InitializationLoader: React.FC = () => (
+  <div className="flex flex-col items-center justify-center h-screen bg-gradient-to-br from-zinc-900 to-zinc-800">
+    <div className="relative">
+      <div className="animate-spin rounded-full h-16 w-16 border-4 border-zinc-600 border-t-white"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-white text-xl font-bold">CN</span>
+      </div>
+    </div>
+    <p className="mt-4 text-zinc-400 text-sm animate-pulse">Cargando datos...</p>
+  </div>
+);
+
 const AppContent: React.FC = () => {
-  const { currentUser } = useAppContext();
+  const { currentUser, isInitializing } = useAppContext();
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login');
+
+  // Show loader while PWA is initializing to prevent stale/empty data flash
+  if (isInitializing) {
+    return <InitializationLoader />;
+  }
 
   if (!currentUser) {
     if (authMode === 'login') {

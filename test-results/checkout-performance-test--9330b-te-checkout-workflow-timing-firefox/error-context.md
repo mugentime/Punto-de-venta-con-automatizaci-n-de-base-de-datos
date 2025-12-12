@@ -1,0 +1,54 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e3]:
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - generic [ref=e7]:
+        - generic [ref=e8]:
+          - heading "Punto de Venta" [level=1] [ref=e9]
+          - generic [ref=e10]:
+            - generic:
+              - img
+            - textbox "Buscar productos por nombre, categoría o descripción..." [active] [ref=e11]
+        - generic [ref=e12]:
+          - img [ref=e13]
+          - paragraph [ref=e15]: No se encontraron productos
+          - paragraph [ref=e16]: Intenta con otro término de búsqueda
+      - generic [ref=e18]:
+        - heading "Orden Actual" [level=2] [ref=e20]
+        - paragraph [ref=e22]: El carrito está vacío.
+        - generic [ref=e23]:
+          - generic [ref=e25]:
+            - generic [ref=e26]: "Total:"
+            - generic [ref=e27]: $0.00
+          - generic [ref=e28]:
+            - button "Limpiar" [ref=e29] [cursor=pointer]
+            - button "Cobrar" [disabled] [ref=e30]
+  - navigation [ref=e31]:
+    - generic [ref=e32]:
+      - button "Ventas" [ref=e33] [cursor=pointer]:
+        - img [ref=e34] [cursor=pointer]
+        - generic [ref=e36] [cursor=pointer]: Ventas
+      - button "Productos" [ref=e37] [cursor=pointer]:
+        - img [ref=e38] [cursor=pointer]
+        - generic [ref=e40] [cursor=pointer]: Productos
+      - button "Caja" [ref=e41] [cursor=pointer]:
+        - img [ref=e42] [cursor=pointer]
+        - generic [ref=e44] [cursor=pointer]: Caja
+      - button "Cowork" [ref=e45] [cursor=pointer]:
+        - img [ref=e46] [cursor=pointer]
+        - generic [ref=e48] [cursor=pointer]: Cowork
+      - button "Clientes" [ref=e49] [cursor=pointer]:
+        - img [ref=e50] [cursor=pointer]
+        - generic [ref=e52] [cursor=pointer]: Clientes
+      - button "Historial" [ref=e53] [cursor=pointer]:
+        - img [ref=e54] [cursor=pointer]
+        - generic [ref=e56] [cursor=pointer]: Historial
+      - button "Más opciones" [ref=e57] [cursor=pointer]:
+        - img [ref=e58] [cursor=pointer]
+        - generic [ref=e60] [cursor=pointer]: Más
+      - button "Salir" [ref=e61] [cursor=pointer]:
+        - img [ref=e62] [cursor=pointer]
+        - generic [ref=e64] [cursor=pointer]: Salir
+```

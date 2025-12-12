@@ -15,6 +15,8 @@ const initialAdmin: User = {
 };
 
 interface AppContextType {
+    // Initialization state
+    isInitializing: boolean;
     // Auth
     users: User[];
     currentUser: User | null;
@@ -73,6 +75,9 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
     // --- STATE MANAGEMENT ---
+
+    // PWA initialization state - prevents showing stale/empty data
+    const [isInitializing, setIsInitializing] = useState(true);
 
     // All State (now fetched from backend)
     const [users, setUsers] = useState<User[]>([]);
@@ -162,18 +167,31 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     if (cachedWithdrawals && cachedWithdrawals.length > 0) setCashWithdrawals(cachedWithdrawals);
 
                     initialLoadDone.current = true;
+                    // PWA FIX: Only mark as initialized if we have valid data
+                    if (cachedProducts && cachedProducts.length > 0) {
+                        setIsInitializing(false);
+                        console.log('✅ PWA initialized with cached data');
+                    }
 
                     // Background refresh - Start IMMEDIATELY (not deferred)
                     // FIX: Deferred refresh caused cash/expenses/coworking to load too late
                     if (navigator.onLine) {
                         console.log('🔄 Background refresh starting immediately...');
-                        fetchAllDataFromServer(true);
+                        fetchAllDataFromServer(true).then(() => {
+                            // If we didn't have cache, mark initialized after server fetch
+                            setIsInitializing(false);
+                        });
+                    } else {
+                        // Offline with no valid cache - still need to show something
+                        setIsInitializing(false);
                     }
                 } else {
                     // No cache, fetch everything from server
                     console.log('🔄 No cache found, fetching from server...');
                     await fetchAllDataFromServer(false);
                     initialLoadDone.current = true;
+                    setIsInitializing(false);
+                    console.log('✅ PWA initialized with server data');
                 }
             } finally {
                 isFetching.current = false;
@@ -1304,6 +1322,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
     return (
         <AppContext.Provider value={{
+            isInitializing,
             users, currentUser, login, logout, register, approveUser, deleteUser,
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
