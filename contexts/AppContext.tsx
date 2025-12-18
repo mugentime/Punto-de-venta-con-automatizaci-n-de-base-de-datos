@@ -44,6 +44,7 @@ interface AppContextType {
     createOrder: (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta'; customerId?: string; tip?: number; }) => Promise<void>;
     deleteOrder: (orderId: string) => Promise<void>;
     refetchOrders: () => Promise<void>;
+    refetchAll: () => Promise<void>;
     // Expenses
     expenses: Expense[];
     addExpense: (expense: Omit<Expense, 'id'>) => Promise<void>;
@@ -786,6 +787,78 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     };
 
+    // 🔄 Refetch All Data - complete refresh of all app data
+    const refetchAll = async () => {
+        try {
+            console.log('🔄 Refetching all data...');
+
+            const [productsData, ordersData, expensesData, coworkingData, cashData, usersData, customersData, withdrawalsData] = await Promise.all([
+                fetch('/api/products').then(r => r.ok ? r.json() : null),
+                fetch('/api/orders').then(r => r.ok ? r.json() : null),
+                fetch('/api/expenses').then(r => r.ok ? r.json() : null),
+                fetch('/api/coworking-sessions').then(r => r.ok ? r.json() : null),
+                fetch('/api/cash-sessions?limit=100').then(r => r.ok ? r.json() : null),
+                fetch('/api/users').then(r => r.ok ? r.json() : null),
+                fetch('/api/customers').then(r => r.ok ? r.json() : null),
+                fetch('/api/cash-withdrawals').then(r => r.ok ? r.json() : null)
+            ]);
+
+            if (productsData) {
+                setProducts(productsData);
+                sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
+                offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(() => {});
+            }
+            if (ordersData) {
+                setOrders(ordersData);
+                sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
+                offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
+            }
+            if (expensesData) {
+                setExpenses(expensesData);
+                sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
+                offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
+            }
+            if (coworkingData) {
+                setCoworkingSessions(coworkingData);
+                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
+            }
+            if (cashData) {
+                const mappedSessions: CashSession[] = cashData.map((session: any) => ({
+                    id: session.id,
+                    startDate: session.startTime,
+                    endDate: session.endTime,
+                    startAmount: session.startAmount,
+                    endAmount: session.endAmount,
+                    status: session.status === 'active' ? 'open' : 'closed',
+                    totalSales: session.totalSales,
+                    totalExpenses: session.totalExpenses,
+                    expectedCash: session.expectedCash,
+                    difference: session.difference
+                }));
+                setCashSessions(mappedSessions);
+                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
+                offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
+            }
+            if (usersData) {
+                setUsers(usersData);
+                sessionCache.set(CACHE_KEYS.USERS, usersData);
+            }
+            if (customersData) {
+                setCustomers(customersData);
+                sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
+                offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
+            }
+            if (withdrawalsData) {
+                setCashWithdrawals(withdrawalsData);
+                sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
+            }
+
+            console.log('✅ All data refetched successfully');
+        } catch (error) {
+            console.error('❌ Error refetching data:', error);
+        }
+    };
+
     // Expense Functions (updated for API)
     const addExpense = async (expense: Omit<Expense, 'id'>) => {
         try {
@@ -1342,7 +1415,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             products, addProduct, updateProduct, deleteProduct, importProducts,
             cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
             cartSubtotal, cartTotal,
-            orders, createOrder, deleteOrder, refetchOrders,
+            orders, createOrder, deleteOrder, refetchOrders, refetchAll,
             expenses, addExpense, updateExpense, deleteExpense,
             coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
             cashSessions, cashWithdrawals, startCashSession, closeCashSession, addCashWithdrawal, deleteCashWithdrawal,
