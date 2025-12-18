@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import { useAppContext } from '../contexts/AppContext';
 import { SalesIcon, ProductsIcon, HistoryIcon, DashboardIcon, ExpenseIcon, CashIcon } from '../components/Icons';
 import { deduplicateOrders } from '../utils/deduplication';
 
 const DashboardScreen: React.FC = () => {
-    const { orders, expenses, coworkingSessions } = useAppContext();
+    const { orders, expenses, coworkingSessions, refetchAll } = useAppContext();
     const [timeframe, setTimeframe] = useState<'today' | 'week' | 'month'>('today');
 
     // FIX BUG 4: Deduplicate orders before calculations
@@ -112,10 +113,13 @@ const DashboardScreen: React.FC = () => {
         <div>
             <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-6 gap-4">
                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Dashboard</h1>
-                <div className="flex space-x-1 bg-slate-200 p-1 rounded-lg self-start sm:self-center">
-                    <TimeframeButton label="Hoy" value="today" />
-                    <TimeframeButton label="Semana" value="week" />
-                    <TimeframeButton label="Mes" value="month" />
+                <div className="flex items-center gap-3">
+                    <div className="flex space-x-1 bg-slate-200 p-1 rounded-lg">
+                        <TimeframeButton label="Hoy" value="today" />
+                        <TimeframeButton label="Semana" value="week" />
+                        <TimeframeButton label="Mes" value="month" />
+                    </div>
+                    <RefreshButton onRefresh={refetchAll} size="md" />
                 </div>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

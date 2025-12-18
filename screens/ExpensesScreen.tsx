@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import ExpenseModal from '../components/ExpenseModal';
+import RefreshButton from '../components/RefreshButton';
 import { PlusIcon, EditIcon, TrashIcon } from '../components/Icons';
 import type { Expense } from '../types';
 
 const ExpensesScreen: React.FC = () => {
-  const { expenses, addExpense, updateExpense, deleteExpense, cashSessions } = useAppContext();
+  const { expenses, addExpense, updateExpense, deleteExpense, cashSessions, refetchAll } = useAppContext();
   const hasOpenCashSession = cashSessions.some(s => s.status === 'open');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expenseToEdit, setExpenseToEdit] = useState<Expense | null>(null);

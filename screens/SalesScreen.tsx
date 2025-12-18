@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import { TrashIcon } from '../components/Icons';
 import Toast from '../components/Toast';
+import RefreshButton from '../components/RefreshButton';
 import type { Product, CartItem } from '../types';
 
 const ProductCard: React.FC<{ product: Product; onClick: () => void; }> = ({ product, onClick }) => (
@@ -43,7 +44,7 @@ const CartItemRow: React.FC<{ item: CartItem }> = ({ item }) => {
 };
 
 const Cart: React.FC = () => {
-    const { cart, cartTotal, createOrder, clearCart, customers } = useAppContext();
+    const { cart, cartTotal, createOrder, clearCart, customers, refetchAll } = useAppContext();
     const [selectedCustomerId, setSelectedCustomerId] = useState<string>('');
     const [customClientName, setCustomClientName] = useState('');
     const [serviceType, setServiceType] = useState<'Mesa' | 'Para llevar'>('Mesa');
@@ -266,7 +267,7 @@ const Cart: React.FC = () => {
 }
 
 const SalesScreen: React.FC = () => {
-    const { products, addToCart } = useAppContext();
+    const { products, addToCart, refetchAll } = useAppContext();
     const [toastMessage, setToastMessage] = useState<{ message: string; productName: string } | null>(null);
     const [searchQuery, setSearchQuery] = useState('');
 
@@ -305,7 +306,10 @@ const SalesScreen: React.FC = () => {
             )}
             <div className="flex-1 lg:col-span-2 lg:overflow-y-auto lg:pr-2 min-h-0">
                 <div className="mb-4 sm:mb-6">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-3 sm:mb-4">Punto de Venta</h1>
+                    <div className="flex justify-between items-center mb-3 sm:mb-4">
+                        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Punto de Venta</h1>
+                        <RefreshButton onRefresh={refetchAll} size="md" />
+                    </div>
 
                     {/* Search Bar */}
                     <div className="relative">

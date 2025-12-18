@@ -1,9 +1,10 @@
 import React from 'react';
 import { useAppContext } from '../contexts/AppContext';
+import RefreshButton from '../components/RefreshButton';
 import { TrashIcon } from '../components/Icons';
 
 const AdminScreen: React.FC = () => {
-  const { users, approveUser, deleteUser, currentUser } = useAppContext();
+  const { users, approveUser, deleteUser, currentUser, refetchAll } = useAppContext();
 
   const otherUsers = users.filter(u => u.id !== currentUser?.id);
 
@@ -41,7 +42,10 @@ const AdminScreen: React.FC = () => {
 
   return (
     <div>
-      <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">Administrar Usuarios</h1>
+      <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+        <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Administrar Usuarios</h1>
+        <RefreshButton onRefresh={refetchAll} size="md" />
+      </div>
       <div className="bg-white shadow-md rounded-3xl overflow-hidden">
         {/* Desktop Table View */}
         <div className="overflow-x-auto hidden md:block">

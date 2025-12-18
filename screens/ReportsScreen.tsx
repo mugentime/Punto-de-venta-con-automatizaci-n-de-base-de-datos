@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import { SalesIcon, ProductsIcon, DashboardIcon, ExpenseIcon, CashIcon, HistoryIcon } from '../components/Icons';
 import { deduplicateOrders } from '../utils/deduplication';
 
@@ -8,7 +9,7 @@ import { deduplicateOrders } from '../utils/deduplication';
 const toISODateString = (date: Date) => date.toISOString().split('T')[0];
 
 const ReportsScreen: React.FC = () => {
-    const { orders, expenses, coworkingSessions } = useAppContext();
+    const { orders, expenses, coworkingSessions, refetchAll } = useAppContext();
     const [showSalesDetail, setShowSalesDetail] = useState(false);
     const [showExpensesDetail, setShowExpensesDetail] = useState(false);
 

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
+import RefreshButton from '../components/RefreshButton';
 import { PlusIcon, TrashIcon } from '../components/Icons';
 import type { CoworkingSession, Product, CartItem } from '../types';
 
@@ -45,7 +46,7 @@ const calculateCoworkingCost = (startTime: string, endTime: string): { cost: num
 };
 
 const CoworkingScreen: React.FC = () => {
-    const { coworkingSessions, startCoworkingSession, products, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession } = useAppContext();
+    const { coworkingSessions, startCoworkingSession, products, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession, refetchAll } = useAppContext();
     const [now, setNow] = useState(new Date());
     const [isStartModalOpen, setIsStartModalOpen] = useState(false);
     const [clientName, setClientName] = useState('');

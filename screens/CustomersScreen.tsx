@@ -2,11 +2,12 @@ import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import CustomerModal from '../components/CustomerModal';
 import CreditModal from '../components/CreditModal';
+import RefreshButton from '../components/RefreshButton';
 import { PlusIcon, EditIcon, TrashIcon } from '../components/Icons';
 import type { Customer, CustomerCredit } from '../types';
 
 const CustomersScreen: React.FC = () => {
-  const { customers, addCustomer, updateCustomer, deleteCustomer, addCustomerCredit } = useAppContext();
+  const { customers, addCustomer, updateCustomer, deleteCustomer, addCustomerCredit, refetchAll } = useAppContext();
   const [isCustomerModalOpen, setIsCustomerModalOpen] = useState(false);
   const [isCreditModalOpen, setIsCreditModalOpen] = useState(false);
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
@@ -73,13 +74,16 @@ const CustomersScreen: React.FC = () => {
     <div>
       <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Clientes Frecuentes</h1>
-        <button
-          onClick={() => openCustomerModal()}
-          className="flex items-center px-4 py-2 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800 transition-colors"
-        >
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Nuevo Cliente
-        </button>
+        <div className="flex gap-2">
+          <RefreshButton onRefresh={refetchAll} size="md" />
+          <button
+            onClick={() => openCustomerModal()}
+            className="flex items-center px-4 py-2 bg-zinc-900 text-white rounded-xl shadow-sm hover:bg-zinc-800 transition-colors"
+          >
+            <PlusIcon className="h-5 w-5 mr-2" />
+            Nuevo Cliente
+          </button>
+        </div>
       </div>
 
       {/* Desktop Table View */}

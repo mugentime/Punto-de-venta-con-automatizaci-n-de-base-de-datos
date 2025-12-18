@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import StatCard from '../components/StatCard';
+import RefreshButton from '../components/RefreshButton';
 import { CashIcon, SalesIcon, HistoryIcon, DashboardIcon, ExpenseIcon, PlusIcon } from '../components/Icons';
 import { deduplicateOrders } from '../utils/deduplication';
 

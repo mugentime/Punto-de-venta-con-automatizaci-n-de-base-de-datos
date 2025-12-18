@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAppContext } from '../contexts/AppContext';
+import RefreshButton from '../components/RefreshButton';
 import { TrashIcon } from '../components/Icons';
 import type { Order } from '../types';
 
@@ -55,7 +56,7 @@ const OrderDetailsModal: React.FC<{ order: Order, onClose: () => void }> = ({ or
 );
 
 const HistoryScreen: React.FC = () => {
-    const { orders, deleteOrder } = useAppContext();
+    const { orders, deleteOrder, refetchAll } = useAppContext();
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     // ✅ OPTIMIZED: No redundant polling - AppContext handles data fetching
@@ -74,7 +75,10 @@ const HistoryScreen: React.FC = () => {
 
     return (
         <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">Historial de Órdenes</h1>
+            <div className="flex justify-between items-center mb-6 flex-wrap gap-4">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Historial de Órdenes</h1>
+                <RefreshButton onRefresh={refetchAll} size="md" />
+            </div>
             <div className="bg-white shadow-md rounded-3xl overflow-hidden">
                 {/* Desktop Table View */}
                 <div className="overflow-x-auto hidden md:block">

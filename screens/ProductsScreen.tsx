@@ -3,10 +3,11 @@ import { useAppContext } from '../contexts/AppContext';
 import ProductModal from '../components/ProductModal';
 import ImportProductsModal from '../components/ImportProductsModal';
 import { PlusIcon, EditIcon, TrashIcon, UploadIcon } from '../components/Icons';
+import RefreshButton from '../components/RefreshButton';
 import type { Product } from '../types';
 
 const ProductsScreen: React.FC = () => {
-  const { products, addProduct, updateProduct, deleteProduct } = useAppContext();
+  const { products, addProduct, updateProduct, deleteProduct, refetchAll } = useAppContext();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [productToEdit, setProductToEdit] = useState<Product | null>(null);
@@ -115,6 +116,7 @@ const ProductsScreen: React.FC = () => {
 
         {/* Action Buttons - Mobile: Full width, Desktop: Inline */}
         <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:space-x-2">
+          <RefreshButton onRefresh={refetchAll} size="md" />
           {/* Mobile: Search Toggle */}
           <button
             onClick={() => setIsSearchVisible(!isSearchVisible)}
