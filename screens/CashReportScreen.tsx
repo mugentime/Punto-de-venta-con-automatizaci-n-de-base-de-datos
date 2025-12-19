@@ -381,15 +381,35 @@ const CashReportScreen: React.FC = () => {
             />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-            <StatCard title="Ventas Totales" value={`$${totalSalesHist.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-green-600" />} />
-            <StatCard title="Gastos del Día" value={`$${totalExpensesHist.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
-            <StatCard title="Balance Final" value={`$${finalBalanceHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-blue-600" />} />
-            <StatCard title="Ventas en Efectivo" value={`$${cashSalesHist.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-cyan-600" />} />
-            <StatCard title="Ventas con Tarjeta" value={`$${cardSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
-            <StatCard title="Ventas a Crédito" value={`$${creditSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-amber-600" />} />
-            <StatCard title="Total de Órdenes" value={totalOrdersHist.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
-        </div>
+        {/* Only show metrics if there's data for the selected date */}
+        {(totalOrdersHist > 0 || totalExpensesHist > 0) ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <StatCard title="Ventas Totales" value={`$${totalSalesHist.toFixed(2)}`} icon={<DashboardIcon className="h-6 w-6 text-green-600" />} />
+                <StatCard title="Gastos del Día" value={`$${totalExpensesHist.toFixed(2)}`} icon={<ExpenseIcon className="h-6 w-6 text-red-600" />} />
+                <StatCard title="Balance Final" value={`$${finalBalanceHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-blue-600" />} />
+                <StatCard title="Ventas en Efectivo" value={`$${cashSalesHist.toFixed(2)}`} icon={<CashIcon className="h-6 w-6 text-cyan-600" />} />
+                <StatCard title="Ventas con Tarjeta" value={`$${cardSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-purple-600" />} />
+                <StatCard title="Ventas a Crédito" value={`$${creditSalesHist.toFixed(2)}`} icon={<SalesIcon className="h-6 w-6 text-amber-600" />} />
+                <StatCard title="Total de Órdenes" value={totalOrdersHist.toString()} icon={<HistoryIcon className="h-6 w-6 text-yellow-600" />} />
+            </div>
+        ) : (
+            <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-xl mb-8">
+                <div className="flex items-start">
+                    <svg className="h-6 w-6 text-blue-500 mt-0.5 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <div>
+                        <h3 className="text-lg font-semibold text-blue-900 mb-1">No hay datos para la fecha seleccionada</h3>
+                        <p className="text-blue-800">
+                            No se registraron ventas ni gastos el día <strong>{new Date(selectedDate).toLocaleDateString('es-MX', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</strong>.
+                        </p>
+                        <p className="text-blue-700 mt-2 text-sm">
+                            Selecciona otra fecha o inicia una nueva sesión de caja para comenzar a registrar operaciones.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )}
 
         {/* Cash Sessions History */}
         <div className="bg-white p-6 rounded-xl shadow-md mt-8">
