@@ -949,6 +949,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to create coworking session');
             const newSession = await response.json();
+
+            // Invalidate Service Worker cache for coworking-sessions API
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'INVALIDATE_API',
+                    endpoint: 'coworking-sessions'
+                });
+            }
+
             setCoworkingSessions(prev => {
                 const updated = [newSession, ...prev];
                 sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
@@ -969,6 +978,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
             if (!response.ok) throw new Error('Failed to update coworking session');
             const updatedSession = await response.json();
+
+            // Invalidate Service Worker cache for coworking-sessions API
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'INVALIDATE_API',
+                    endpoint: 'coworking-sessions'
+                });
+            }
+
             setCoworkingSessions(prev => {
                 const updated = prev.map(s => s.id === sessionId ? updatedSession : s);
                 sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
@@ -1132,6 +1150,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             }
 
             console.log('✅ Session cancelled successfully from database');
+
+            // Invalidate Service Worker cache for coworking-sessions API
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'INVALIDATE_API',
+                    endpoint: 'coworking-sessions'
+                });
+            }
+
             setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
             alert('✅ Sesión cancelada exitosamente');
         } catch (error) {
@@ -1149,6 +1176,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
 
             if (!response.ok) throw new Error('Failed to delete coworking session');
+
+            // Invalidate Service Worker cache for coworking-sessions API
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({
+                    type: 'INVALIDATE_API',
+                    endpoint: 'coworking-sessions'
+                });
+            }
+
             setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
         } catch (error) {
             console.error("Error deleting coworking session:", error);
