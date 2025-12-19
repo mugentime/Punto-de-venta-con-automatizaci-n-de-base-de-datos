@@ -88,13 +88,31 @@ const ReportsScreen: React.FC = () => {
         // CRITICAL: Must match toISODateString() which uses LOCAL timezone
         // This ensures "Hoy" filter matches orders created today in user's local time
         const getLocalDateString = (dateInput: string | Date): string => {
+            let date: Date;
+
             // Handle both string and Date objects
-            // If it's already a Date, use it. If it's a string, parse it.
-            const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+            if (typeof dateInput === 'string') {
+                // Try parsing as-is first
+                date = new Date(dateInput);
+
+                // If invalid, try manual parsing for common PostgreSQL formats
+                if (isNaN(date.getTime())) {
+                    // Try format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD HH:MM:SS.mmm"
+                    const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
+                    if (match) {
+                        const [, year, month, day] = match;
+                        return `${year}-${month}-${day}`;
+                    }
+                    console.error('❌ Invalid date format:', dateInput);
+                    return '1970-01-01'; // Return epoch as fallback
+                }
+            } else {
+                date = dateInput;
+            }
 
             // Check for invalid dates
             if (isNaN(date.getTime())) {
-                console.error('❌ Invalid date:', dateInput);
+                console.error('❌ Invalid date object:', dateInput);
                 return '1970-01-01'; // Return epoch as fallback
             }
 
