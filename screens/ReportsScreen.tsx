@@ -123,6 +123,20 @@ const ReportsScreen: React.FC = () => {
                 };
             });
             console.log('🔍 Sample order analysis:', sampleOrders);
+
+            // Group orders by date to see distribution
+            const ordersByDate = deduplicatedOrders.reduce((acc, o) => {
+                const localDate = getLocalDateString(o.date);
+                acc[localDate] = (acc[localDate] || 0) + 1;
+                return acc;
+            }, {} as Record<string, number>);
+            console.log('📊 Orders by date:', ordersByDate);
+            console.log(`📊 Total unique dates: ${Object.keys(ordersByDate).length}`);
+
+            // Show which dates are in range
+            const datesInRange = Object.keys(ordersByDate).filter(date => date >= startDate && date <= endDate);
+            console.log(`✅ Dates in range [${startDate} to ${endDate}]:`, datesInRange);
+            console.log(`❌ Dates outside range:`, Object.keys(ordersByDate).filter(date => date < startDate || date > endDate));
         }
 
         if (coworkingSessions.length > 0) {
