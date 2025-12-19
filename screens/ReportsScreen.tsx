@@ -88,7 +88,16 @@ const ReportsScreen: React.FC = () => {
         // CRITICAL: Must match toISODateString() which uses LOCAL timezone
         // This ensures "Hoy" filter matches orders created today in user's local time
         const getLocalDateString = (dateInput: string | Date): string => {
-            const date = new Date(dateInput);
+            // Handle both string and Date objects
+            // If it's already a Date, use it. If it's a string, parse it.
+            const date = typeof dateInput === 'string' ? new Date(dateInput) : dateInput;
+
+            // Check for invalid dates
+            if (isNaN(date.getTime())) {
+                console.error('❌ Invalid date:', dateInput);
+                return '1970-01-01'; // Return epoch as fallback
+            }
+
             const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
@@ -99,13 +108,23 @@ const ReportsScreen: React.FC = () => {
         console.log('📅 Date Range:', { startDate, endDate });
         console.log('📦 Total orders (deduplicated):', deduplicatedOrders.length);
         console.log('🏢 Total coworking sessions:', coworkingSessions.length);
-        if (orders.length > 0) {
-            console.log('Sample order dates:', orders.slice(0, 3).map(o => ({
-                date: o.date,
-                localDate: getLocalDateString(o.date),
-                total: o.total
-            })));
+
+        // Enhanced debug logging
+        if (deduplicatedOrders.length > 0) {
+            const sampleOrders = deduplicatedOrders.slice(0, 5).map(o => {
+                const localDate = getLocalDateString(o.date);
+                const inRange = localDate >= startDate && localDate <= endDate;
+                return {
+                    rawDate: o.date,
+                    localDate,
+                    total: o.total,
+                    inRange,
+                    comparison: `${localDate} >= ${startDate} && ${localDate} <= ${endDate}`
+                };
+            });
+            console.log('🔍 Sample order analysis:', sampleOrders);
         }
+
         if (coworkingSessions.length > 0) {
             console.log('Sample coworking dates:', coworkingSessions.slice(0, 3).map(s => ({
                 endTime: s.endTime,
@@ -117,6 +136,18 @@ const ReportsScreen: React.FC = () => {
         const currentFilteredOrders = deduplicatedOrders.filter(o => {
             const orderLocalDate = getLocalDateString(o.date);
             const isInRange = orderLocalDate >= startDate && orderLocalDate <= endDate;
+
+            // Debug first few comparisons
+            if (deduplicatedOrders.indexOf(o) < 3) {
+                console.log(`🔎 Order ${deduplicatedOrders.indexOf(o)}:`, {
+                    rawDate: o.date,
+                    orderLocalDate,
+                    startDate,
+                    endDate,
+                    isInRange
+                });
+            }
+
             return isInRange;
         });
 
