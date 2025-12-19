@@ -171,7 +171,7 @@ const CloseDayModal: React.FC<{
 
 
 const CashReportScreen: React.FC = () => {
-  const { orders, expenses, cashSessions, cashWithdrawals, coworkingSessions, startCashSession, closeCashSession, addCashWithdrawal } = useAppContext();
+  const { orders, expenses, cashSessions, cashWithdrawals, coworkingSessions, startCashSession, closeCashSession, addCashWithdrawal, refetchAll } = useAppContext();
   const [isStartModalOpen, setIsStartModalOpen] = useState(false);
   const [isCloseModalOpen, setIsCloseModalOpen] = useState(false);
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);

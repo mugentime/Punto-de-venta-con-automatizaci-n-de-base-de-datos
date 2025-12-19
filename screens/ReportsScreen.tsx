@@ -214,7 +214,10 @@ const ReportsScreen: React.FC = () => {
     
     return (
         <div id="report-content">
-            <h1 className="text-2xl sm:text-3xl font-bold text-slate-800 mb-6">Reportes Financieros</h1>
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Reportes Financieros</h1>
+                <RefreshButton onRefresh={refetchAll} size="md" />
+            </div>
 
             {/* Date Filters */}
             <div className="bg-white p-4 rounded-3xl shadow-md mb-6">
