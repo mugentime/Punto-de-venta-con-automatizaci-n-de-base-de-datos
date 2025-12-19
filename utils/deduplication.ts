@@ -7,6 +7,7 @@ import type { Order } from '../types';
 export function deduplicateOrders(orders: Order[]): Order[] {
     const seen = new Set<string>();
     const deduplicated: Order[] = [];
+    const duplicateIds: string[] = []; // Track duplicate IDs for summary
 
     for (const order of orders) {
         // Create a unique key based on critical order properties
@@ -19,13 +20,19 @@ export function deduplicateOrders(orders: Order[]): Order[] {
             seen.add(key);
             deduplicated.push(order);
         } else {
-            console.warn(`⚠️ Duplicate order detected and removed: ${order.id} (${order.clientName}, $${order.total})`);
+            // ⚡ PERF: Only track duplicate IDs, don't log each one (too slow)
+            duplicateIds.push(order.id);
         }
     }
 
+    // ⚡ PERF: Log summary only once instead of per duplicate
     const removedCount = orders.length - deduplicated.length;
     if (removedCount > 0) {
-        console.log(`🧹 Removed ${removedCount} duplicate order(s) from ${orders.length} total orders`);
+        console.log(`🧹 Removed ${removedCount} duplicate order(s) from ${orders.length} total`);
+        if (removedCount <= 5) {
+            // Only show individual IDs if there are 5 or fewer duplicates
+            console.log(`   Duplicates: ${duplicateIds.join(', ')}`);
+        }
     }
 
     return deduplicated;

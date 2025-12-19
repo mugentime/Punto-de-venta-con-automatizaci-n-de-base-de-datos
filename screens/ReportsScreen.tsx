@@ -24,7 +24,13 @@ const ReportsScreen: React.FC = () => {
     // This was causing unnecessary API calls and potential slowdowns
 
     // FIX BUG 4: Deduplicate orders before calculations
-    const deduplicatedOrders = useMemo(() => deduplicateOrders(orders), [orders]);
+    // ⚡ PERF: Memoize with performance timing
+    const deduplicatedOrders = useMemo(() => {
+        console.time('⏱️ Order Deduplication');
+        const result = deduplicateOrders(orders);
+        console.timeEnd('⏱️ Order Deduplication');
+        return result;
+    }, [orders]);
     
     const today = new Date();
     const startOfMonth = toISODateString(new Date(today.getFullYear(), today.getMonth(), 1));
@@ -84,6 +90,8 @@ const ReportsScreen: React.FC = () => {
         averageTicket,
         totalOrdersCount
     } = useMemo(() => {
+        console.time('⏱️ Report Calculations');
+
         // Helper to extract date in LOCAL timezone as YYYY-MM-DD
         // CRITICAL: Must match toISODateString() which uses LOCAL timezone
         // This ensures "Hoy" filter matches orders created today in user's local time
@@ -163,6 +171,9 @@ const ReportsScreen: React.FC = () => {
         const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
+        console.timeEnd('⏱️ Report Calculations');
+        console.log(`📊 Filtered: ${currentFilteredOrders.length} orders, ${currentFilteredExpenses.length} expenses, ${currentFilteredCoworkingSessions.length} sessions`);
+
         return {
             filteredOrders: currentFilteredOrders,
             filteredExpenses: currentFilteredExpenses,
@@ -173,7 +184,7 @@ const ReportsScreen: React.FC = () => {
             averageTicket,
             totalOrdersCount
         };
-    }, [startDate, endDate, orders, expenses, coworkingSessions]);
+    }, [startDate, endDate, deduplicatedOrders, expenses, coworkingSessions]);
 
     const downloadCSV = (data: any[], filename: string) => {
         if (data.length === 0) {
