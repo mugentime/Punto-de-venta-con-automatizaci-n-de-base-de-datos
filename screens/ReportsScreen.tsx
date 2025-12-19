@@ -122,65 +122,10 @@ const ReportsScreen: React.FC = () => {
             return `${year}-${month}-${day}`;
         };
 
-        // DEBUG: Log date range and sample data
-        console.log('📅 Date Range:', { startDate, endDate });
-        console.log('📦 Total orders (deduplicated):', deduplicatedOrders.length);
-        console.log('🏢 Total coworking sessions:', coworkingSessions.length);
-
-        // Enhanced debug logging
-        if (deduplicatedOrders.length > 0) {
-            const sampleOrders = deduplicatedOrders.slice(0, 5).map(o => {
-                const localDate = getLocalDateString(o.date);
-                const inRange = localDate >= startDate && localDate <= endDate;
-                return {
-                    rawDate: o.date,
-                    localDate,
-                    total: o.total,
-                    inRange,
-                    comparison: `${localDate} >= ${startDate} && ${localDate} <= ${endDate}`
-                };
-            });
-            console.log('🔍 Sample order analysis:', sampleOrders);
-
-            // Group orders by date to see distribution
-            const ordersByDate = deduplicatedOrders.reduce((acc, o) => {
-                const localDate = getLocalDateString(o.date);
-                acc[localDate] = (acc[localDate] || 0) + 1;
-                return acc;
-            }, {} as Record<string, number>);
-            console.log('📊 Orders by date:', ordersByDate);
-            console.log(`📊 Total unique dates: ${Object.keys(ordersByDate).length}`);
-
-            // Show which dates are in range
-            const datesInRange = Object.keys(ordersByDate).filter(date => date >= startDate && date <= endDate);
-            console.log(`✅ Dates in range [${startDate} to ${endDate}]:`, datesInRange);
-            console.log(`❌ Dates outside range:`, Object.keys(ordersByDate).filter(date => date < startDate || date > endDate));
-        }
-
-        if (coworkingSessions.length > 0) {
-            console.log('Sample coworking dates:', coworkingSessions.slice(0, 3).map(s => ({
-                endTime: s.endTime,
-                localDate: s.endTime ? getLocalDateString(s.endTime) : null,
-                total: s.total
-            })));
-        }
-
+        // Simple filtering without debug overhead
         const currentFilteredOrders = deduplicatedOrders.filter(o => {
             const orderLocalDate = getLocalDateString(o.date);
-            const isInRange = orderLocalDate >= startDate && orderLocalDate <= endDate;
-
-            // Debug first few comparisons
-            if (deduplicatedOrders.indexOf(o) < 3) {
-                console.log(`🔎 Order ${deduplicatedOrders.indexOf(o)}:`, {
-                    rawDate: o.date,
-                    orderLocalDate,
-                    startDate,
-                    endDate,
-                    isInRange
-                });
-            }
-
-            return isInRange;
+            return orderLocalDate >= startDate && orderLocalDate <= endDate;
         });
 
         const currentFilteredExpenses = expenses.filter(e => {
@@ -193,12 +138,6 @@ const ReportsScreen: React.FC = () => {
             if (session.status !== 'finished' || !session.endTime) return false;
             const sessionLocalDate = getLocalDateString(session.endTime);
             return sessionLocalDate >= startDate && sessionLocalDate <= endDate;
-        });
-
-        console.log('✅ Filtered results:', {
-            orders: currentFilteredOrders.length,
-            coworking: currentFilteredCoworkingSessions.length,
-            expenses: currentFilteredExpenses.length
         });
 
         // Calculate revenue from orders
