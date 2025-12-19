@@ -84,13 +84,14 @@ const ReportsScreen: React.FC = () => {
         averageTicket,
         totalOrdersCount
     } = useMemo(() => {
-        // Helper to extract date in UTC timezone as YYYY-MM-DD
-        // FIX: Use UTC methods to avoid timezone conversion issues that cause orders to disappear from reports
+        // Helper to extract date in LOCAL timezone as YYYY-MM-DD
+        // CRITICAL: Must match toISODateString() which uses LOCAL timezone
+        // This ensures "Hoy" filter matches orders created today in user's local time
         const getLocalDateString = (dateInput: string | Date): string => {
             const date = new Date(dateInput);
-            const year = date.getUTCFullYear();
-            const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(date.getUTCDate()).padStart(2, '0');
+            const year = date.getFullYear();
+            const month = String(date.getMonth() + 1).padStart(2, '0');
+            const day = String(date.getDate()).padStart(2, '0');
             return `${year}-${month}-${day}`;
         };
 
