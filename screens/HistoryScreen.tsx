@@ -85,7 +85,7 @@ const HistoryScreen: React.FC = () => {
                     <table className="w-full text-left">
                         <thead className="bg-slate-50">
                             <tr>
-                                <th className="p-4 text-sm font-semibold text-slate-600">Hora</th>
+                                <th className="p-4 text-sm font-semibold text-slate-600">Fecha y Hora</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600">Cliente</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600">Servicio</th>
                                 <th className="p-4 text-sm font-semibold text-slate-600">Consumo</th>
@@ -97,7 +97,9 @@ const HistoryScreen: React.FC = () => {
                         <tbody>
                             {orders.map(order => {
                                 const orderDate = new Date(order.date);
+                                const dateString = orderDate.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
                                 const timeString = orderDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                                const dateTimeString = `${dateString} ${timeString}`;
                                 const isCoworking = order.items.some(item => item.id === 'COWORK_SERVICE' || item.name.includes('Coworking'));
                                 const serviceType = isCoworking ? 'Coworking' : 'Cafetería';
                                 const serviceColor = isCoworking ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800';
@@ -108,7 +110,7 @@ const HistoryScreen: React.FC = () => {
 
                                 return (
                                     <tr key={order.id} className="border-b hover:bg-slate-50">
-                                        <td className="p-4 text-sm text-slate-800 font-medium">{timeString}</td>
+                                        <td className="p-4 text-sm text-slate-800 font-medium">{dateTimeString}</td>
                                         <td className="p-4 text-sm text-slate-800">{order.clientName || 'Cliente general'}</td>
                                         <td className="p-4 text-sm">
                                             <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${serviceColor}`}>
@@ -153,7 +155,9 @@ const HistoryScreen: React.FC = () => {
                 <div className="md:hidden">
                     {orders.map(order => {
                         const orderDate = new Date(order.date);
+                        const dateString = orderDate.toLocaleDateString('es-MX', { day: '2-digit', month: '2-digit', year: 'numeric' });
                         const timeString = orderDate.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' });
+                        const dateTimeString = `${dateString} ${timeString}`;
                         const isCoworking = order.items.some(item => item.id === 'COWORK_SERVICE' || item.name.includes('Coworking'));
                         const serviceType = isCoworking ? 'Coworking' : 'Cafetería';
                         const serviceColor = isCoworking ? 'bg-purple-100 text-purple-800' : 'bg-orange-100 text-orange-800';
@@ -167,7 +171,7 @@ const HistoryScreen: React.FC = () => {
                                 <div className="flex justify-between items-start mb-2">
                                     <div className="flex-1">
                                         <p className="text-sm text-slate-800 font-semibold">{order.clientName || 'Cliente general'}</p>
-                                        <p className="text-xs text-slate-500 mt-0.5">{timeString}</p>
+                                        <p className="text-xs text-slate-500 mt-0.5">{dateTimeString}</p>
                                     </div>
                                     <p className="text-lg font-bold text-slate-800">${order.total.toFixed(2)}</p>
                                 </div>
