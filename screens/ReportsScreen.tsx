@@ -95,39 +95,42 @@ const ReportsScreen: React.FC = () => {
         // Helper to extract date in LOCAL timezone as YYYY-MM-DD
         // CRITICAL: Must match toISODateString() which uses LOCAL timezone
         // This ensures "Hoy" filter matches orders created today in user's local time
+        //
+        // FIX: Avoid UTC conversion bugs by parsing date strings directly
+        // When new Date("2024-01-07") is called, JavaScript interprets it as UTC midnight,
+        // which then converts to local timezone (e.g., "2024-01-06 18:00" in Mexico UTC-6)
         const getLocalDateString = (dateInput: string | Date): string => {
-            let date: Date;
+            // If it's already a Date object, extract components
+            if (dateInput instanceof Date) {
+                const year = dateInput.getFullYear();
+                const month = String(dateInput.getMonth() + 1).padStart(2, '0');
+                const day = String(dateInput.getDate()).padStart(2, '0');
+                return `${year}-${month}-${day}`;
+            }
 
-            // Handle both string and Date objects
-            if (typeof dateInput === 'string') {
-                // Try parsing as-is first
-                date = new Date(dateInput);
+            // For strings, parse directly without UTC conversion
+            // Try format: "YYYY-MM-DD" or "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD HH:MM:SS.mmm"
+            const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
+            if (match) {
+                const [, year, month, day] = match;
+                return `${year}-${month}-${day}`;
+            }
 
-                // If invalid, try manual parsing for common PostgreSQL formats
-                if (isNaN(date.getTime())) {
-                    // Try format: "YYYY-MM-DD HH:MM:SS" or "YYYY-MM-DD HH:MM:SS.mmm"
-                    const match = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})/);
-                    if (match) {
-                        const [, year, month, day] = match;
-                        return `${year}-${month}-${day}`;
-                    }
-                    console.error('❌ Invalid date format:', dateInput);
-                    return '1970-01-01'; // Return epoch as fallback
+            // Fallback: Try ISO format with time (e.g., "2024-01-07T14:30:00.000Z")
+            const isoMatch = dateInput.match(/^(\d{4})-(\d{2})-(\d{2})T/);
+            if (isoMatch) {
+                // For ISO dates with timezone, we need to convert to local
+                const date = new Date(dateInput);
+                if (!isNaN(date.getTime())) {
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    return `${year}-${month}-${day}`;
                 }
-            } else {
-                date = dateInput;
             }
 
-            // Check for invalid dates
-            if (isNaN(date.getTime())) {
-                console.error('❌ Invalid date object:', dateInput);
-                return '1970-01-01'; // Return epoch as fallback
-            }
-
-            const year = date.getFullYear();
-            const month = String(date.getMonth() + 1).padStart(2, '0');
-            const day = String(date.getDate()).padStart(2, '0');
-            return `${year}-${month}-${day}`;
+            console.error('❌ Invalid date format:', dateInput);
+            return '1970-01-01'; // Return epoch as fallback
         };
 
         // Simple filtering without debug overhead
@@ -168,7 +171,10 @@ const ReportsScreen: React.FC = () => {
         // Los costos NO entran separadamente para evitar duplicación
         const netProfit = totalRevenue - totalExpensesAmount;
 
-        const totalOrdersCount = currentFilteredOrders.length + currentFilteredCoworkingSessions.length;
+        // FIX: Do NOT count coworking sessions separately!
+        // Coworking sessions are already saved as orders via finishCoworkingSession() in AppContext
+        // Adding them to the count would inflate totalOrdersCount and deflate averageTicket
+        const totalOrdersCount = currentFilteredOrders.length;
         const averageTicket = totalOrdersCount > 0 ? totalRevenue / totalOrdersCount : 0;
 
         console.timeEnd('⏱️ Report Calculations');

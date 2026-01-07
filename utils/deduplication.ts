@@ -10,11 +10,10 @@ export function deduplicateOrders(orders: Order[]): Order[] {
     const duplicateIds: string[] = []; // Track duplicate IDs for summary
 
     for (const order of orders) {
-        // Create a unique key based on critical order properties
-        // Orders with identical clientName, total, and timestamp (within same second) are considered duplicates
-        const timestamp = new Date(order.date).getTime();
-        const timestampKey = Math.floor(timestamp / 1000); // Round to nearest second
-        const key = `${order.clientName}-${order.total}-${timestampKey}`;
+        // FIX: Use unique order ID as the deduplication key
+        // Previous logic used clientName+total+timestamp which incorrectly flagged
+        // legitimate orders as duplicates (e.g., multiple sales of same amount to same client)
+        const key = order.id;
 
         if (!seen.has(key)) {
             seen.add(key);
