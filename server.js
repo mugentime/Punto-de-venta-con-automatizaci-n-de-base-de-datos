@@ -553,11 +553,11 @@ async function startServer() {
                 ORDER BY category, name
             `);
 
-            // Update prices
+            // Update prices - FLOOR to round down, no decimals
             const updateResult = await pool.query(`
                 UPDATE products
                 SET
-                    price = ROUND(price * $1, 2),
+                    price = FLOOR(price * $1),
                     updated_at = CURRENT_TIMESTAMP
                 RETURNING id, name, category, price
             `, [multiplier]);

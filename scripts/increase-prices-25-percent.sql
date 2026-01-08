@@ -7,15 +7,16 @@ SELECT
     id,
     name,
     price AS old_price,
-    ROUND(price * 1.25, 2) AS new_price,
-    ROUND((price * 1.25) - price, 2) AS increase
+    FLOOR(price * 1.25) AS new_price,
+    FLOOR(price * 1.25) - price AS increase
 FROM products
 ORDER BY category, name;
 
 -- Update all product prices by multiplying by 1.25 (25% increase)
+-- FLOOR rounds down, no decimals
 UPDATE products
 SET
-    price = ROUND(price * 1.25, 2),
+    price = FLOOR(price * 1.25),
     updated_at = CURRENT_TIMESTAMP;
 
 -- Show updated prices

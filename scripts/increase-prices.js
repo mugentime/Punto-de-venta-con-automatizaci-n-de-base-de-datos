@@ -38,8 +38,8 @@ async function increasePrices() {
                 name,
                 category,
                 price AS old_price,
-                ROUND(price * 1.25, 2) AS new_price,
-                ROUND((price * 1.25) - price, 2) AS increase
+                FLOOR(price * 1.25) AS new_price,
+                FLOOR(price * 1.25) - price AS increase
             FROM products
             ORDER BY category, name
         `);
@@ -50,11 +50,11 @@ async function increasePrices() {
         // Confirm with user (in production, this would be automatic)
         console.log('\n⚠️  UPDATING ALL PRICES BY 25%...');
 
-        // Execute update
+        // Execute update - FLOOR to round down, no decimals
         const result = await client.query(`
             UPDATE products
             SET
-                price = ROUND(price * 1.25, 2),
+                price = FLOOR(price * 1.25),
                 updated_at = CURRENT_TIMESTAMP
         `);
 
