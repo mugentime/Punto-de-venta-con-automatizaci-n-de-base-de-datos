@@ -534,6 +534,60 @@ async function startServer() {
         }
     });
 
+    // ADMIN: Increase all prices by 25% to reach break-even point
+    app.post('/api/products/increase-prices', async (req, res) => {
+        try {
+            if (!useDb) {
+                return res.status(400).json({ error: 'Database not connected' });
+            }
+
+            const { percentage = 25 } = req.body;
+            const multiplier = 1 + (percentage / 100);
+
+            console.log(`📈 Increasing all product prices by ${percentage}%...`);
+
+            // Get current prices
+            const beforeResult = await pool.query(`
+                SELECT id, name, category, price
+                FROM products
+                ORDER BY category, name
+            `);
+
+            // Update prices
+            const updateResult = await pool.query(`
+                UPDATE products
+                SET
+                    price = ROUND(price * $1, 2),
+                    updated_at = CURRENT_TIMESTAMP
+                RETURNING id, name, category, price
+            `, [multiplier]);
+
+            // Get summary
+            const summaryResult = await pool.query(`
+                SELECT
+                    COUNT(*) AS total_products,
+                    ROUND(AVG(price), 2) AS avg_price,
+                    ROUND(MIN(price), 2) AS min_price,
+                    ROUND(MAX(price), 2) AS max_price
+                FROM products
+            `);
+
+            console.log(`✅ Updated ${updateResult.rowCount} products`);
+
+            res.json({
+                success: true,
+                percentage,
+                productsUpdated: updateResult.rowCount,
+                before: beforeResult.rows,
+                after: updateResult.rows,
+                summary: summaryResult.rows[0]
+            });
+        } catch (error) {
+            console.error("Error increasing prices:", error);
+            res.status(500).json({ error: 'Failed to increase prices' });
+        }
+    });
+
     // --- ORDERS API ---
     app.get('/api/orders', async (req, res) => {
         try {
