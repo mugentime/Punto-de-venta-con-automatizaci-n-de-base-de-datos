@@ -1,0 +1,85 @@
+ID,Categoría,Nombre del Producto,Precio Actual,Precio Nuevo (+25%),Aumento,Costo,Margen %
+prod-1764367620313,Alimentos,"Agua mineral botega",$43.00,$53,$10,$30.00,43.40%
+prod-1759859564815,Alimentos,"brownie maiz",$50.00,$62,$12,$0.00,100.00%
+prod-1765567201542,Alimentos,"Chilaquiles botega",$162.00,$202,$40,$1090.00,-439.60%
+prod-1758904128900,Alimentos,"Croisant",$112.00,$140,$28,$91.00,35.00%
+prod-1761845768156,Alimentos,"Desayuno bendita ",$187.00,$233,$46,$127.00,45.49%
+prod-1758743488069,Alimentos,"Efrinfijoldas",$150.00,$187,$37,$102.00,45.45%
+prod-1766163575918,Alimentos,"Enchiladas verdes",$150.00,$187,$37,$104.00,44.39%
+prod-1758659698560,Alimentos,"Ensalada vegetales ",$187.00,$233,$46,$112.00,51.93%
+prod-1759527287221,Alimentos,"Gnocchi de camote XIII",$225.00,$281,$56,$153.00,45.55%
+prod-1759345791723,Alimentos,"huevos a la cazuela shaksuka",$187.00,$233,$46,$130.00,44.21%
+prod-1767120105728,Alimentos,"Huevos al gusto",$137.00,$171,$34,$0.00,100.00%
+prod-1759527131970,Alimentos,"Huevos Bendita ",$187.00,$233,$46,$128.00,45.06%
+prod-1763588248048,Alimentos,"Hummus platillo ",$175.00,$218,$43,$119.00,45.41%
+prod-1759356110960,Alimentos,"Humus",$62.00,$77,$15,$42.50,44.81%
+prod-1764367568450,Alimentos,"Jocoque",$125.00,$156,$31,$85.00,45.51%
+prod-1759527334115,Alimentos,"Omelette XIII",$150.00,$187,$37,$102.00,45.45%
+prod-1764367711174,Alimentos,"Pan botega ",$12.00,$15,$3,$8.50,43.33%
+prod-1762195527659,Alimentos,"pancakes",$106.00,$132,$26,$73.00,44.70%
+prod-1762195638655,Alimentos,"papas fritas",$93.00,$116,$23,$64.00,44.83%
+prod-1762889277606,Alimentos,"Paquete desayuno XVIII",$237.00,$296,$59,$161.00,45.61%
+prod-1764204911580,Alimentos,"Pizza alcachofa",$237.00,$296,$59,$0.00,100.00%
+prod-1762810995814,Alimentos,"Pizza corazón ❤️",$237.00,$296,$59,$160.00,45.95%
+prod-1762388580314,Alimentos,"Pizza portobelo ",$231.00,$288,$57,$148.00,48.61%
+prod-1758901536724,Alimentos,"Plato de fruta ",$93.00,$116,$23,$64.00,44.83%
+prod-1761342221843,Alimentos,"Quinoa XIII",$137.00,$171,$34,$84.00,50.88%
+prod-1759280209335,Alimentos,"Sandwich de Roast Beaf Bendita Tienda",$212.00,$265,$53,$150.00,43.40%
+prod-1758901301751,Alimentos,"Sandwich. El seis ",$212.00,$265,$53,$145.00,45.28%
+prod-1759356324677,Alimentos,"Sopa de dia de verduraas",$68.00,$85,$17,$42.00,50.59%
+prod-1764367680128,Alimentos,"Victoria botega ",$68.00,$85,$17,$47.00,44.71%
+prod-1758300020856-0.5251557248201801,Cafetería,"Americano",$56.00,$70,$14,$22.00,68.57%
+prod-1758300020869-0.8397549872442405,Cafetería,"Cacao caliente",$56.00,$70,$14,$45.00,35.71%
+prod-1758300020862-0.35150508323712937,Cafetería,"Café Latte ",$68.00,$85,$17,$26.00,69.41%
+prod-1762182735426,Cafetería,"Cafe molido",$112.00,$140,$28,$70.00,50.00%
+prod-1758224377940,Cafetería," Capuchino ",$75.00,$93,$18,$25.00,73.12%
+prod-1764204981179,Cafetería,"Cerveza",$68.00,$85,$17,$0.00,100.00%
+prod-1761237870167,Cafetería,"Chocolate",$75.00,$93,$18,$15.00,83.87%
+prod-1758300020858-0.8783779894392061,Cafetería,"Espresso",$45.00,$56,$11,$18.00,67.86%
+prod-1758300020859-0.21650973789092753,Cafetería,"Espresso doble",$50.00,$62,$12,$22.00,64.52%
+prod-1759356036639,Cafetería,"Falafel",$187.00,$233,$46,$112.00,51.93%
+prod-1758300020863-0.9918765504667901,Cafetería,"Flat white ",$81.00,$101,$20,$25.00,75.25%
+prod-1758300020872-0.7286488576891126,Cafetería," Frappe cacao ",$93.00,$116,$23,$26.00,77.59%
+prod-1758300020869-0.14134553774702519,Cafetería," Frappe café",$93.00,$116,$23,$26.00,77.59%
+prod-1758300020871-0.240768410017272,Cafetería," Frappe matcha",$106.00,$132,$26,$36.00,72.73%
+prod-1758300020872-0.9807191473563506,Cafetería,"Frappe moka",$100.00,$125,$25,$36.00,71.20%
+prod-1758300020867-0.04794590154381817,Cafetería," Leche dorada ",$81.00,$101,$20,$37.00,63.37%
+prod-1758300020866-0.5478283977724465,Cafetería,"Matcha latte ",$87.00,$108,$21,$31.00,71.30%
+prod-1758300020865-0.8748424630073068,Cafetería," Moccacino",$81.00,$101,$20,$27.00,73.27%
+prod-1765386471628,Cafetería,"Moka ",$81.00,$101,$20,$65.00,35.64%
+prod-1759356164017,Cafetería,"Naranjada ",$56.00,$70,$14,$38.00,45.71%
+prod-1759337949440,Cafetería,"pasta Pomodoro ",$187.00,$233,$46,$110.00,52.79%
+prod-1766170500172,Cafetería,"PLATO DE FUTA MELON SANDIA PLATANO",$93.00,$116,$23,$0.00,100.00%
+prod-1766170669059,Cafetería,"PLATO FROTA MELON SANDIA",$93.00,$116,$23,$0.00,100.00%
+prod-1764084313797,Cafetería,"Te",$45.00,$56,$11,$36.00,35.71%
+prod-1761176100330,Membresías," coworking dia",$225.00,$281,$56,$0.00,100.00%
+prod-1761092605619,Membresías,"coworking día",$225.00,$281,$56,$0.00,100.00%
+prod-1758331139030,Membresías,"coworking mensual",$2250.00,$2812,$562,$0.00,100.00%
+prod-1759799121028,Membresías,"Coworking semanal",$875.00,$1093,$218,$0.00,100.00%
+prod-1765322076291,Membresías,"Hora cw",$72.00,$90,$18,$0.00,100.00%
+prod-1758300020878-0.8591965318189778,Refrigerador,"Arizona ",$31.00,$38,$7,$12.00,68.42%
+prod-1758300020885-0.20089230708187933,Refrigerador," Barra de granola",$22.00,$27,$5,$5.00,81.48%
+prod-1758652521499,Refrigerador,"barra de granola con pasas",$18.00,$22,$4,$5.00,77.27%
+prod-1765574874932,Refrigerador,"Barra de proteína ",$25.00,$31,$6,$8.00,74.19%
+prod-1758729263155,Refrigerador,"Boing",$25.00,$31,$6,$10.00,67.74%
+prod-1758729193907,Refrigerador,"Calahua agua de coco ",$31.00,$38,$7,$15.00,60.53%
+prod-1762278690897,Refrigerador,"Chicharos",$37.00,$46,$9,$20.00,56.52%
+prod-1762278765347,Refrigerador,"Chicharron",$50.00,$62,$12,$30.00,51.61%
+prod-1763578529961,Refrigerador,"Chobani",$43.00,$53,$10,$22.00,58.49%
+prod-1761072775718,Refrigerador,"Choco crossies",$81.00,$101,$20,$50.00,50.50%
+prod-1759944400224,Refrigerador,"Copias ",$3.00,$3,$0,$1.00,66.67%
+prod-1764195843751,Refrigerador,"copias fotostaticas papel",$3.00,$3,$0,$0.00,100.00%
+prod-1758232389533,Refrigerador,"Fig bar ",$25.00,$31,$6,$0.00,100.00%
+prod-1758300020873-0.4771377126403509,Refrigerador,"Freelife ",$37.00,$46,$9,$12.00,73.91%
+prod-1758303657766,Refrigerador,"Galleta chispas de chocolate",$20.00,$25,$5,$8.00,68.00%
+prod-1758300020875-0.6050605903453332,Refrigerador,"Joyburst ",$50.00,$62,$12,$7.00,88.71%
+prod-1758300020884-0.5922010849655899,Refrigerador,"Kombucha 1L ",$175.00,$218,$43,$110.00,49.54%
+prod-1758300020882-0.06830527951543508,Refrigerador," Kombucha 300ml ",$75.00,$93,$18,$45.00,51.61%
+prod-1758300020883-0.26826085215661455,Refrigerador," Kombucha 500ml",$97.00,$121,$24,$75.00,38.02%
+prod-1762278642861,Refrigerador,"Maiz de sal",$43.00,$53,$10,$25.00,52.83%
+prod-1762278529075,Refrigerador,"Maíz/queso",$43.00,$53,$10,$25.00,52.83%
+prod-1762368577401,Refrigerador,"Mangos enchilados",$62.00,$77,$15,$40.00,48.05%
+prod-1762278732598,Refrigerador,"Mazapan",$31.00,$38,$7,$20.00,47.37%
+prod-1758300020881-0.4559229094285999,Refrigerador," Topo Chico ",$43.00,$53,$10,$16.00,69.81%
+prod-1758300020879-0.7152074331194644,Refrigerador," Treetop ",$25.00,$31,$6,$10.00,67.74%
+prod-1758300020877-0.6540365552908904,Refrigerador," Yoli",$31.00,$38,$7,$16.00,57.89%
