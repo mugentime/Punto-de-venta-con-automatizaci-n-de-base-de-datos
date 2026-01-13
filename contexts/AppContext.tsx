@@ -938,7 +938,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const sessionData = {
                 clientName: clientName || 'Cliente',
                 startTime: new Date().toISOString(),
-                hourlyRate: 50,
+                hourlyRate: 62,
             };
 
             const response = await fetch('/api/coworking-sessions', {
@@ -1016,15 +1016,15 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         if (durationMinutes > 0) {
             if (durationHours >= 4) {
                 // 4+ horas = día completo
-                baseCost = 180;
+                baseCost = 225;
             } else if (durationMinutes <= 60) {
                 // Primera hora
-                baseCost = 58;
+                baseCost = 72;
             } else {
-                // Después de la primera hora: $29 por cada bloque de 30 minutos
+                // Después de la primera hora: $36 por cada bloque de 30 minutos
                 const extraMinutes = durationMinutes - 60;
                 const halfHourBlocks = Math.ceil(extraMinutes / 30);
-                baseCost = 58 + (halfHourBlocks * 29);
+                baseCost = 72 + (halfHourBlocks * 36);
             }
         }
 

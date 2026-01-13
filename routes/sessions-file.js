@@ -109,7 +109,7 @@ router.get('/:id', auth, async (req, res) => {
 // Create new coworking session
 router.post('/', auth, canManageCoworking, async (req, res) => {
   try {
-    const { client, hourlyRate = 58, notes = '', startTime } = req.body;
+    const { client, hourlyRate = 72, notes = '', startTime } = req.body;
 
     // Validation
     if (!client || client.trim().length === 0) {

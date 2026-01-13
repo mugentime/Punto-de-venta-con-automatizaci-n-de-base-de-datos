@@ -31,15 +31,15 @@ const calculateCoworkingCost = (startTime: string, endTime: string): { cost: num
     if (durationMinutes > 0) {
         if (durationHours >= 3) {
             // 3+ hours = day rate
-            cost = 180;
+            cost = 225;
         } else if (durationMinutes <= 60) {
-            // First hour: $58
-            cost = 58;
+            // First hour: $72
+            cost = 72;
         } else {
-            // After first hour: $29 per half-hour block
+            // After first hour: $36 per half-hour block
             const extraMinutes = durationMinutes - 60;
             const halfHourBlocks = Math.ceil(extraMinutes / 30);
-            cost = 58 + (halfHourBlocks * 29);
+            cost = 72 + (halfHourBlocks * 36);
         }
     }
     return { cost, minutes: durationMinutes };

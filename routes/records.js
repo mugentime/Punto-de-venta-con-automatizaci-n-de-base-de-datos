@@ -182,7 +182,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         totalCost = recordProducts.reduce((sum, p) => sum + (p.quantity * p.cost), 0);
       } else {
         // Coworking: charge hourly rate + only refrigerador products
-        const coworkingRate = 58;
+        const coworkingRate = 72;
         total = coworkingRate * parseInt(hours);
         
         // Add refrigerador product prices to total
@@ -248,7 +248,7 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
       if (service.toLowerCase() === 'cafeteria') {
         total = product.price;
       } else {
-        const coworkingRate = 58;
+        const coworkingRate = 72;
         total = coworkingRate * parseInt(hours);
       }
 
@@ -335,7 +335,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
         if (service.toLowerCase() === 'cafeteria') {
           updateData.total = record.drinkProduct.price;
         } else {
-          const coworkingRate = 58;
+          const coworkingRate = 72;
           updateData.total = coworkingRate * (hours || record.hours);
         }
       }
@@ -343,7 +343,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     if (hours && record.service === 'coworking') {
       updateData.hours = parseInt(hours);
       // Recalculate total for coworking
-      const coworkingRate = 58;
+      const coworkingRate = 72;
       updateData.total = coworkingRate * parseInt(hours);
     }
     if (payment && ['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
@@ -696,7 +696,7 @@ router.post('/historical', async (req, res) => {
         total = recordProducts.reduce((sum, p) => sum + (p.quantity * p.price), 0);
         totalCost = recordProducts.reduce((sum, p) => sum + (p.quantity * p.cost), 0);
       } else {
-        const coworkingRate = 58;
+        const coworkingRate = 72;
         total = coworkingRate * parseInt(hours);
         
         const refrigeradorTotal = recordProducts
@@ -746,7 +746,7 @@ router.post('/historical', async (req, res) => {
       if (service.toLowerCase() === 'cafeteria') {
         total = product.price;
       } else {
-        const coworkingRate = 58;
+        const coworkingRate = 72;
         total = coworkingRate * parseInt(hours);
       }
 

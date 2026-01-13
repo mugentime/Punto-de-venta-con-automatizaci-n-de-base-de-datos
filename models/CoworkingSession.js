@@ -8,7 +8,7 @@ class CoworkingSession {
     this.startTime = data.startTime || new Date().toISOString();
     this.endTime = data.endTime || null;
     this.duration = data.duration || 0;
-    this.hourlyRate = data.hourlyRate || 58; // Updated default rate
+    this.hourlyRate = data.hourlyRate || 72; // Updated default rate
     this.totalCost = data.totalCost || 0;
     this.status = data.status || 'active'; // active, paused, completed, closed
     this.notes = data.notes || '';
@@ -74,7 +74,7 @@ class CoworkingSession {
     
     // Apply day rate if session exceeds 4 hours
     if (hours > 4) {
-      this.timeCharge = 180; // Day rate
+      this.timeCharge = 225; // Day rate
       this.appliedRate = 'day';
       this.rateReason = 'Session exceeded 4 hours, day rate applied';
     } else {

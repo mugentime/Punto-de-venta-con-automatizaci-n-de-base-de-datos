@@ -418,7 +418,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
         if (service.toLowerCase() === 'cafeteria') {
           updateData.total = product.price;
         } else {
-          const coworkingRate = 58;
+          const coworkingRate = 72;
           updateData.total = coworkingRate * (hours || record.hours);
         }
       }
@@ -426,7 +426,7 @@ router.put('/:id', auth, canRegisterClients, async (req, res) => {
     if (hours && record.service === 'coworking') {
       updateData.hours = parseInt(hours);
       // Recalculate total for coworking
-      const coworkingRate = 58;
+      const coworkingRate = 72;
       updateData.total = coworkingRate * parseInt(hours);
     }
     if (payment && ['efectivo', 'tarjeta', 'transferencia'].includes(payment.toLowerCase())) {
