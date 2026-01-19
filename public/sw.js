@@ -1,8 +1,8 @@
 // Service Worker Optimizado para Conejo Negro POS - PWA Performance Edition
-// Versión: 4.3.0 - Fixed report revenue calculation with aggressive cache invalidation
+// Versión: 4.4.0 - Added pagination + SSE real-time sync
 // Performance target: >90% cache hit rate, instant page loads
 
-const VERSION = '4.3.0';
+const VERSION = '4.4.0';
 const CACHE_PREFIX = 'conejo-negro-pos';
 const CACHES = {
   static: `${CACHE_PREFIX}-static-v${VERSION}`,      // JS, CSS con hash - Cache First
@@ -28,9 +28,9 @@ const CACHE_TTL = {
   runtime: 24 * 60 * 60 * 1000,      // 1 día para runtime
   api: {
     products: 10 * 60 * 1000,        // 10 minutos - productos cambian poco
-    orders: 5 * 1000,                // 5 segundos - órdenes cambian MUCHO (CRITICAL FOR REPORTS)
+    orders: 60 * 1000,               // 60 segundos - SSE invalida cache cuando cambian
     expenses: 2 * 60 * 1000,         // 2 minutos
-    'coworking-sessions': 5 * 1000,  // 5 segundos - real-time
+    'coworking-sessions': 60 * 1000, // 60 segundos - SSE invalida cache cuando cambian
     'cash-sessions': 60 * 1000,      // 1 minuto
     users: 5 * 60 * 1000,            // 5 minutos
     customers: 5 * 60 * 1000,        // 5 minutos

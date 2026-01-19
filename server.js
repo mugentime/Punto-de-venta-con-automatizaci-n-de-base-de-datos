@@ -593,7 +593,16 @@ async function startServer() {
     app.get('/api/orders', async (req, res) => {
         try {
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM orders ORDER BY created_at DESC');
+
+            // 🚀 PAGINATION: Add pagination to prevent fetching all orders
+            const limit = parseInt(req.query.limit) || 100; // Default: last 100 orders
+            const offset = parseInt(req.query.offset) || 0;
+
+            const result = await pool.query(
+                'SELECT * FROM orders ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
+
             res.json(result.rows.map(order => ({
                 ...order,
                 subtotal: parseFloat(order.subtotal),
@@ -869,7 +878,15 @@ async function startServer() {
     app.get('/api/expenses', async (req, res) => {
         try {
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM expenses ORDER BY created_at DESC');
+
+            // 🚀 PAGINATION: Add pagination to prevent fetching all expenses
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            const result = await pool.query(
+                'SELECT * FROM expenses ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
             res.json(result.rows.map(expense => ({
                 ...expense,
                 amount: parseFloat(expense.amount),
@@ -951,7 +968,15 @@ async function startServer() {
     app.get('/api/coworking-sessions', async (req, res) => {
         try {
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM coworking_sessions ORDER BY created_at DESC');
+
+            // 🚀 PAGINATION: Add pagination to prevent fetching all sessions
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            const result = await pool.query(
+                'SELECT * FROM coworking_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
             res.json(result.rows.map(session => ({
                 ...session,
                 hourlyRate: parseFloat(session.hourlyRate),
@@ -1170,7 +1195,15 @@ async function startServer() {
     app.get('/api/cash-withdrawals', async (req, res) => {
         try {
             if (!useDb) return res.json([]);
-            const result = await pool.query('SELECT * FROM cash_withdrawals ORDER BY withdrawn_at DESC');
+
+            // 🚀 PAGINATION: Add pagination to prevent fetching all withdrawals
+            const limit = parseInt(req.query.limit) || 100;
+            const offset = parseInt(req.query.offset) || 0;
+
+            const result = await pool.query(
+                'SELECT * FROM cash_withdrawals ORDER BY withdrawn_at DESC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
             res.json(result.rows.map(withdrawal => ({
                 ...withdrawal,
                 amount: parseFloat(withdrawal.amount)
@@ -1367,7 +1400,15 @@ async function startServer() {
     app.get('/api/customers', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
-            const result = await pool.query('SELECT * FROM customers ORDER BY name ASC');
+
+            // 🚀 PAGINATION: Add pagination to prevent fetching all customers
+            const limit = parseInt(req.query.limit) || 200; // Customers might be few
+            const offset = parseInt(req.query.offset) || 0;
+
+            const result = await pool.query(
+                'SELECT * FROM customers ORDER BY name ASC LIMIT $1 OFFSET $2',
+                [limit, offset]
+            );
             res.json(result.rows.map(c => ({
                 ...c,
                 discountPercentage: parseFloat(c.discountPercentage),
