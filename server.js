@@ -4,6 +4,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
+import { registerClient, broadcastDataChange } from './src/services/sseService.js';
 
 const { Pool } = pg;
 

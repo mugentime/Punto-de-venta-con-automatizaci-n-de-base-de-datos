@@ -494,20 +494,35 @@ self.addEventListener('message', (event) => {
     );
   }
 
-  // Invalidar cache de API específico
+  // Invalidar cache de API específico (usado por SSE para sincronización en tiempo real)
   if (event.data && event.data.type === 'INVALIDATE_API') {
     const endpoint = event.data.endpoint;
-    console.log(`[SW] Invalidating API cache for: ${endpoint}`);
+    console.log(`[SW SSE] 🔄 Invalidating API cache for: ${endpoint}`);
     event.waitUntil(
       (async () => {
         const cache = await caches.open(CACHES.api);
         const keys = await cache.keys();
+        let deleted = 0;
+
         for (const request of keys) {
           if (request.url.includes(endpoint)) {
             await cache.delete(request);
-            console.log(`[SW] Deleted cache: ${request.url}`);
+            deleted++;
+            console.log(`[SW SSE] ✅ Deleted cache: ${request.url}`);
           }
         }
+
+        console.log(`[SW SSE] Invalidated ${deleted} cache entries for ${endpoint}`);
+
+        // Notify all clients that cache was invalidated
+        const clients = await self.clients.matchAll();
+        clients.forEach(client => {
+          client.postMessage({
+            type: 'CACHE_INVALIDATED',
+            endpoint,
+            count: deleted
+          });
+        });
       })()
     );
   }

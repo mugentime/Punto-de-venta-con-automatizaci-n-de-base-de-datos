@@ -97,22 +97,15 @@
 
     <!-- Service Worker Registration for PWA -->
     <script>
-      // AGGRESSIVE Service Worker update - force new version to activate immediately
+      // Service Worker registration with smart update strategy
       if ('serviceWorker' in navigator) {
         window.addEventListener('load', async () => {
           try {
-            // First, unregister ALL old service workers to start fresh
-            const registrations = await navigator.serviceWorker.getRegistrations();
-            for (let registration of registrations) {
-              console.log('🔄 Unregistering old Service Worker...');
-              await registration.unregister();
-            }
-
-            // Now register the new Service Worker
+            // Register Service Worker (don't unregister on every load - causes cache thrashing!)
             const registration = await navigator.serviceWorker.register('/sw.js');
-            console.log('✅ Service Worker registrado:', registration.scope);
+            console.log('✅ Service Worker registered:', registration.scope);
 
-            // Force immediate update check
+            // Check for updates on load
             await registration.update();
 
             // Listen for new Service Worker installing
@@ -129,18 +122,12 @@
               });
             });
 
-            // When the new service worker takes control, reload the page (DISABLED to prevent refresh loop)
-            // navigator.serviceWorker.addEventListener('controllerchange', () => {
-            //   console.log('🔄 Service Worker updated! Reloading page...');
-            //   window.location.reload();
-            // });
-
-            // Check for updates every 5 minutes (more aggressive)
+            // Check for updates every 30 minutes (balanced approach)
             setInterval(() => {
               registration.update();
-            }, 1000 * 60 * 5);
+            }, 1000 * 60 * 30);
           } catch (error) {
-            console.log('❌ Error al registrar Service Worker:', error);
+            console.error('❌ Error al registrar Service Worker:', error);
           }
         });
       }
