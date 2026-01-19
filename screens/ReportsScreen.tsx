@@ -23,6 +23,41 @@ const ReportsScreen: React.FC = () => {
     // AppContext already manages data freshness with multi-tier caching
     // This was causing unnecessary API calls and potential slowdowns
 
+    // 🔧 PWA Cache Management
+    const clearPWACache = async () => {
+        try {
+            console.log('🧹 Clearing PWA cache and IndexedDB...');
+
+            // 1. Clear Service Worker API cache
+            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+                navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_API_CACHE' });
+            }
+
+            // 2. Clear IndexedDB
+            if ('indexedDB' in window) {
+                const DBDeleteRequest = indexedDB.deleteDatabase('ConejoNegroPOS');
+                DBDeleteRequest.onsuccess = () => {
+                    console.log('✅ IndexedDB cleared');
+                };
+                DBDeleteRequest.onerror = () => {
+                    console.error('❌ Failed to clear IndexedDB');
+                };
+            }
+
+            // 3. Clear session storage
+            sessionStorage.clear();
+
+            // 4. Wait and refetch fresh data
+            setTimeout(() => {
+                refetchAll();
+                alert('✅ Cache de PWA e IndexedDB limpiados completamente.\n\nLos datos frescos se están cargando desde el servidor...');
+            }, 1000);
+        } catch (error) {
+            console.error('Error clearing PWA cache:', error);
+            alert('❌ Error al limpiar cache. Intenta recargar la página manualmente (Ctrl+R o Cmd+R).');
+        }
+    };
+
     // FIX BUG 4: Deduplicate orders before calculations
     // ⚡ PERF: Memoize with performance timing
     const deduplicatedOrders = useMemo(() => {
@@ -286,7 +321,19 @@ const ReportsScreen: React.FC = () => {
         <div id="report-content">
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl sm:text-3xl font-bold text-slate-800">Reportes Financieros</h1>
-                <RefreshButton onRefresh={refetchAll} size="md" />
+                <div className="flex gap-2">
+                    <RefreshButton onRefresh={refetchAll} size="md" />
+                    <button
+                        onClick={clearPWACache}
+                        className="px-3 py-2 bg-red-100 text-red-700 rounded-lg hover:bg-red-200 transition-colors text-sm font-medium flex items-center gap-2"
+                        title="Limpiar cache de PWA y recargar datos"
+                    >
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                        </svg>
+                        <span className="hidden sm:inline">Limpiar Cache PWA</span>
+                    </button>
+                </div>
             </div>
 
             {/* Date Filters */}
