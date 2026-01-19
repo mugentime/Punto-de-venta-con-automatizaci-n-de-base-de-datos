@@ -80,6 +80,22 @@ const ReportsScreen: React.FC = () => {
         setDateRange(startOfWeek, today);
     };
 
+    const setLastWeek = () => {
+        const dayOfWeek = today.getDay(); // 0 = Sunday, 1 = Monday, etc.
+        // Calculate days to Monday of this week
+        const daysToMonday = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
+
+        // Start = Monday of last week (7 days before Monday of this week)
+        const startOfLastWeek = new Date(today);
+        startOfLastWeek.setDate(today.getDate() - daysToMonday - 7);
+
+        // End = Sunday of last week (1 day before Monday of this week)
+        const endOfLastWeek = new Date(today);
+        endOfLastWeek.setDate(today.getDate() - daysToMonday - 1);
+
+        setDateRange(startOfLastWeek, endOfLastWeek);
+    };
+
     const {
         filteredOrders,
         filteredExpenses,
@@ -133,10 +149,37 @@ const ReportsScreen: React.FC = () => {
             return '1970-01-01'; // Return epoch as fallback
         };
 
-        // Simple filtering without debug overhead
+        // Debug: Log date range and order count
+        console.log('📊 Report Filter Debug:', {
+            startDate,
+            endDate,
+            totalOrders: deduplicatedOrders.length,
+            dateRange: `${startDate} to ${endDate}`
+        });
+
+        // Filtering with detailed logging
         const currentFilteredOrders = deduplicatedOrders.filter(o => {
             const orderLocalDate = getLocalDateString(o.date);
-            return orderLocalDate >= startDate && orderLocalDate <= endDate;
+            const isInRange = orderLocalDate >= startDate && orderLocalDate <= endDate;
+
+            // Log first few orders for debugging
+            if (deduplicatedOrders.indexOf(o) < 3) {
+                console.log('  Order sample:', {
+                    id: o.id,
+                    clientName: o.clientName,
+                    originalDate: o.date,
+                    parsedDate: orderLocalDate,
+                    total: o.total,
+                    isInRange
+                });
+            }
+
+            return isInRange;
+        });
+
+        console.log('✅ Filtered Results:', {
+            filteredCount: currentFilteredOrders.length,
+            totalRevenue: currentFilteredOrders.reduce((acc, o) => acc + o.total, 0)
         });
 
         const currentFilteredExpenses = expenses.filter(e => {
@@ -261,6 +304,7 @@ const ReportsScreen: React.FC = () => {
                         <button onClick={setToday} className="px-3 py-2 text-sm bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors font-medium">Hoy</button>
                         <button onClick={setYesterday} className="px-3 py-2 text-sm bg-purple-100 text-purple-700 rounded-lg hover:bg-purple-200 transition-colors font-medium">Ayer</button>
                         <button onClick={setThisWeek} className="px-3 py-2 text-sm bg-green-100 text-green-700 rounded-lg hover:bg-green-200 transition-colors font-medium">Esta Semana</button>
+                        <button onClick={setLastWeek} className="px-3 py-2 text-sm bg-orange-100 text-orange-700 rounded-lg hover:bg-orange-200 transition-colors font-medium">Semana Pasada</button>
                         <button onClick={setThisMonth} className="px-3 py-2 text-sm bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Este Mes</button>
                         <button onClick={setLastMonth} className="px-3 py-2 text-sm bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Mes Pasado</button>
                         <button onClick={setThisYear} className="px-3 py-2 text-sm bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors">Este Año</button>
