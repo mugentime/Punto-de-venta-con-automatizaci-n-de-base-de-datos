@@ -211,11 +211,23 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         createdBy: req.user.userId
       };
       
-      // Add custom date if provided
+      // Add custom date if provided (with validation)
       if (date || historicalDate) {
-        recordData.date = new Date(date || historicalDate);
+        const customDateValue = new Date(date || historicalDate);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // End of today
+
+        // Validate date is not in the future
+        if (customDateValue > today) {
+          return res.status(400).json({
+            error: 'Date cannot be in the future',
+            details: `Provided date ${customDateValue.toISOString()} is after today ${today.toISOString()}`
+          });
+        }
+
+        recordData.date = customDateValue;
       }
-      
+
       record = new Record(recordData);
 
       await record.save();
@@ -265,11 +277,23 @@ router.post('/', auth, canRegisterClients, async (req, res) => {
         createdBy: req.user.userId
       };
       
-      // Add custom date if provided
+      // Add custom date if provided (with validation)
       if (date || historicalDate) {
-        recordData.date = new Date(date || historicalDate);
+        const customDateValue = new Date(date || historicalDate);
+        const today = new Date();
+        today.setHours(23, 59, 59, 999); // End of today
+
+        // Validate date is not in the future
+        if (customDateValue > today) {
+          return res.status(400).json({
+            error: 'Date cannot be in the future',
+            details: `Provided date ${customDateValue.toISOString()} is after today ${today.toISOString()}`
+          });
+        }
+
+        recordData.date = customDateValue;
       }
-      
+
       record = new Record(recordData);
 
       await record.save();
