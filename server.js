@@ -780,6 +780,7 @@ async function startServer() {
                 await client.query('COMMIT');
                 console.log('✅ Order deleted successfully:', req.params.id);
 
+                broadcastDataChange('orders', { action: 'delete', id: req.params.id });
                 res.status(204).send();
             } catch (error) {
                 await client.query('ROLLBACK');
@@ -920,6 +921,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Expense not found' });
             }
             const updatedExpense = result.rows[0];
+            broadcastDataChange('expenses', { action: 'update', id: req.params.id });
             res.json({
                 ...updatedExpense,
                 amount: parseFloat(updatedExpense.amount),
@@ -937,6 +939,7 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             await pool.query('DELETE FROM expenses WHERE id = $1', [req.params.id]);
+            broadcastDataChange('expenses', { action: 'delete', id: req.params.id });
             res.status(204).send();
         } catch (error) {
             console.error("Error deleting expense:", error);
@@ -971,6 +974,7 @@ async function startServer() {
                 [id, clientName, startTime, hourlyRate || 50, JSON.stringify([])]
             );
             const newSession = result.rows[0];
+            broadcastDataChange('coworking-sessions', { action: 'create', id: newSession.id });
             res.status(201).json({
                 ...newSession,
                 hourlyRate: parseFloat(newSession.hourlyRate),
@@ -1030,6 +1034,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Coworking session not found' });
             }
             const updatedSession = result.rows[0];
+            broadcastDataChange('coworking-sessions', { action: 'update', id: req.params.id });
             res.json({
                 ...updatedSession,
                 hourlyRate: parseFloat(updatedSession.hourlyRate),
@@ -1056,6 +1061,7 @@ async function startServer() {
             }
 
             console.log('✅ Coworking session deleted successfully:', req.params.id);
+            broadcastDataChange('coworking-sessions', { action: 'delete', id: req.params.id });
             res.status(204).send();
         } catch (error) {
             console.error('❌ Error deleting coworking session:', error);
@@ -1116,6 +1122,7 @@ async function startServer() {
                 [id, startAmount, startTime, userId]
             );
             const newSession = result.rows[0];
+            broadcastDataChange('cash-sessions', { action: 'create', id: newSession.id });
             res.status(201).json({
                 ...newSession,
                 startAmount: parseFloat(newSession.startAmount),
@@ -1143,6 +1150,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Cash session not found' });
             }
             const updatedSession = result.rows[0];
+            broadcastDataChange('cash-sessions', { action: 'update', id: req.params.id });
             res.json({
                 ...updatedSession,
                 startAmount: parseFloat(updatedSession.startAmount),
@@ -1200,6 +1208,7 @@ async function startServer() {
                 [id, cashSessionId, amount, description, userId]
             );
             const newWithdrawal = result.rows[0];
+            broadcastDataChange('cash-withdrawals', { action: 'create', id: newWithdrawal.id });
             res.status(201).json({
                 ...newWithdrawal,
                 amount: parseFloat(newWithdrawal.amount)
@@ -1214,6 +1223,7 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             await pool.query('DELETE FROM cash_withdrawals WHERE id = $1', [req.params.id]);
+            broadcastDataChange('cash-withdrawals', { action: 'delete', id: req.params.id });
             res.status(204).send();
         } catch (error) {
             console.error("Error deleting cash withdrawal:", error);
@@ -1381,6 +1391,7 @@ async function startServer() {
                 [id, name, email || null, phone || null, discountPercentage || 0, creditLimit || 0]
             );
             const customer = result.rows[0];
+            broadcastDataChange('customers', { action: 'create', id: customer.id });
             res.status(201).json({
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
@@ -1406,6 +1417,7 @@ async function startServer() {
                 return res.status(404).json({ error: 'Customer not found' });
             }
             const customer = result.rows[0];
+            broadcastDataChange('customers', { action: 'update', id: req.params.id });
             res.json({
                 ...customer,
                 discountPercentage: parseFloat(customer.discountPercentage),
@@ -1423,6 +1435,7 @@ async function startServer() {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             await pool.query('DELETE FROM customers WHERE id = $1', [req.params.id]);
+            broadcastDataChange('customers', { action: 'delete', id: req.params.id });
             res.status(204).send();
         } catch (error) {
             console.error("Error deleting customer:", error);
@@ -1508,6 +1521,7 @@ async function startServer() {
                 await client.query('COMMIT');
 
                 const credit = creditResult.rows[0];
+                broadcastDataChange('customers', { action: 'update', id: req.params.id });
                 res.status(201).json({
                     ...credit,
                     amount: parseFloat(credit.amount),
