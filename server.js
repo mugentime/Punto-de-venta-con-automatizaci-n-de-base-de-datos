@@ -5,6 +5,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { registerClient, broadcastDataChange } from './src/services/sseService.js';
+import { runPendingMigrations } from './scripts/auto-run-migrations.js';
 
 const { Pool } = pg;
 
@@ -38,7 +39,14 @@ async function setupAndGetDataStore() {
             const client = await pool.connect();
             console.log("Successfully connected to PostgreSQL with optimized pool (max: 20 connections).");
 
-            await client.query(`
+            // Run pending migrations
+            client.release(); // Release client before running migrations
+            await runPendingMigrations();
+
+            // Reconnect for schema setup
+            const schemaClient = await pool.connect();
+
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS products (
                 id VARCHAR(255) PRIMARY KEY,
                 name VARCHAR(255) NOT NULL UNIQUE,
@@ -53,7 +61,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS users (
                 id VARCHAR(255) PRIMARY KEY,
                 username VARCHAR(255) NOT NULL UNIQUE,
@@ -65,7 +73,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS orders (
                 id VARCHAR(255) PRIMARY KEY,
                 "clientName" VARCHAR(255) NOT NULL,
@@ -82,7 +90,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS expenses (
                 id VARCHAR(255) PRIMARY KEY,
                 description VARCHAR(255) NOT NULL,
@@ -93,7 +101,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS coworking_sessions (
                 id VARCHAR(255) PRIMARY KEY,
                 "clientName" VARCHAR(255) NOT NULL,
@@ -109,7 +117,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS cash_sessions (
                 id VARCHAR(255) PRIMARY KEY,
                 "startAmount" NUMERIC(10, 2) NOT NULL,
@@ -126,7 +134,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS customers (
                 id VARCHAR(255) PRIMARY KEY,
                 name VARCHAR(255) NOT NULL,
@@ -139,7 +147,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS customer_credits (
                 id VARCHAR(255) PRIMARY KEY,
                 "customerId" VARCHAR(255) NOT NULL REFERENCES customers(id) ON DELETE CASCADE,
@@ -152,7 +160,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS cash_registry (
                 id VARCHAR(255) PRIMARY KEY,
                 date DATE NOT NULL UNIQUE,
@@ -175,7 +183,7 @@ async function setupAndGetDataStore() {
               );
             `);
 
-            await client.query(`
+            await schemaClient.query(`
               CREATE TABLE IF NOT EXISTS cash_withdrawals (
                 id VARCHAR(255) PRIMARY KEY,
                 cash_session_id VARCHAR(255) NOT NULL,
@@ -199,7 +207,7 @@ async function setupAndGetDataStore() {
             // AUTO-MIGRATION: Add discount and tip columns if they don't exist
             console.log('🔄 Running auto-migrations...');
             try {
-                await client.query(`
+                await schemaClient.query(`
                     DO $$
                     BEGIN
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns
@@ -219,7 +227,7 @@ async function setupAndGetDataStore() {
 
                 // Update existing orders with NULL discount/tip to default 0
                 console.log('🔄 Updating existing orders with NULL discount/tip...');
-                const updateResult = await client.query(`
+                const updateResult = await schemaClient.query(`
                     UPDATE orders
                     SET discount = COALESCE(discount, 0),
                         tip = COALESCE(tip, 0)
@@ -238,15 +246,15 @@ async function setupAndGetDataStore() {
             // 🚀 PERFORMANCE FIX: Create indexes for frequently queried columns
             console.log('🔄 Creating performance indexes...');
             try {
-                await client.query(`
+                await schemaClient.query(`
                     CREATE INDEX IF NOT EXISTS idx_cash_sessions_created_at
                     ON cash_sessions(created_at DESC);
                 `);
-                await client.query(`
+                await schemaClient.query(`
                     CREATE INDEX IF NOT EXISTS idx_cash_sessions_status
                     ON cash_sessions(status);
                 `);
-                await client.query(`
+                await schemaClient.query(`
                     CREATE INDEX IF NOT EXISTS idx_orders_created_at
                     ON orders(created_at DESC);
                 `);
@@ -256,21 +264,21 @@ async function setupAndGetDataStore() {
                 // Don't fail startup if index creation has issues
             }
 
-            const res = await client.query('SELECT COUNT(*) FROM products');
+            const res = await schemaClient.query('SELECT COUNT(*) FROM products');
             if (res.rows[0].count === '0') {
                 console.log('Seeding initial products into database...');
                 const insertQuery = 'INSERT INTO products (id, name, price, cost, stock, description, "imageUrl", category) VALUES ($1, $2, $3, $4, $5, $6, $7, $8)';
                 for (const p of initialProducts) {
-                    await client.query(insertQuery, [p.id, p.name, p.price, p.cost, p.stock, p.description, p.imageUrl, p.category]);
+                    await schemaClient.query(insertQuery, [p.id, p.name, p.price, p.cost, p.stock, p.description, p.imageUrl, p.category]);
                 }
                 console.log('Database seeded successfully.');
             }
 
             // Seed initial admin user
-            const userRes = await client.query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
+            const userRes = await schemaClient.query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
             if (userRes.rows[0].count === '0') {
                 console.log('Seeding initial admin user...');
-                await client.query(
+                await schemaClient.query(
                     'INSERT INTO users (id, username, email, password, role, status) VALUES ($1, $2, $3, $4, $5, $6)',
                     ['admin-001', 'Admin1', 'je2alvarela@gmail.com', '1357', 'admin', 'approved']
                 );
@@ -279,7 +287,7 @@ async function setupAndGetDataStore() {
 
             // Add consumedExtras column if it doesn't exist
             try {
-                await client.query('ALTER TABLE coworking_sessions ADD COLUMN IF NOT EXISTS "consumedExtras" JSONB DEFAULT \'[]\'::jsonb');
+                await schemaClient.query('ALTER TABLE coworking_sessions ADD COLUMN IF NOT EXISTS "consumedExtras" JSONB DEFAULT \'[]\'::jsonb');
                 console.log('Added consumedExtras column to coworking_sessions if needed.');
             } catch (err) {
                 console.log('consumedExtras column already exists or error:', err.message);
@@ -288,7 +296,7 @@ async function setupAndGetDataStore() {
             // AUTO-MIGRATION: Add paymentSource and type columns to expenses table
             console.log('🔄 Running expenses table migrations...');
             try {
-                await client.query(`
+                await schemaClient.query(`
                     DO $$
                     BEGIN
                         IF NOT EXISTS (SELECT 1 FROM information_schema.columns
@@ -308,7 +316,7 @@ async function setupAndGetDataStore() {
             } catch (expenseMigrationError) {
                 console.error('⚠️ Expenses migration warning:', expenseMigrationError.message);
             }
-            client.release();
+            schemaClient.release();
             useDb = true;
             console.log("Running in Database Mode.");
         } catch (err) {
