@@ -3,7 +3,6 @@ import useLocalStorage from '../hooks/useLocalStorage';
 import { sessionCache, CACHE_KEYS } from '../utils/sessionCache';
 import { dedupedFetch, invalidateCache, shouldRefreshOnVisibility, getCachedData } from '../utils/apiCache';
 import offlineStorage, { STORES } from '../utils/offlineStorage';
-import { useRealtimeSync } from '../hooks/useRealtimeSync';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
 
 const initialAdmin: User = {
@@ -92,42 +91,6 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
     const [cashWithdrawals, setCashWithdrawals] = useState<CashWithdrawal[]>([]);
     const [customers, setCustomers] = useState<Customer[]>([]);
-
-    // --- REAL-TIME SYNC ---
-    // Enable SSE for automatic cache invalidation and data refresh
-    useRealtimeSync({
-        dataTypes: ['products', 'orders', 'expenses', 'coworking-sessions', 'cash-sessions', 'customers', 'cash-withdrawals'],
-        onDataChange: async (dataType, action) => {
-            console.log(`[AppContext] Real-time update: ${dataType} ${action}`);
-
-            // Refetch the specific data type that changed
-            switch (dataType) {
-                case 'products':
-                    await fetchProducts();
-                    break;
-                case 'orders':
-                    await fetchOrders();
-                    break;
-                case 'expenses':
-                    await fetchExpenses();
-                    break;
-                case 'coworking-sessions':
-                    await fetchCoworkingSessions();
-                    break;
-                case 'cash-sessions':
-                    await fetchCashSessions();
-                    break;
-                case 'customers':
-                    await fetchCustomers();
-                    break;
-                case 'cash-withdrawals':
-                    await fetchCashWithdrawals();
-                    break;
-            }
-        },
-        enabled: true,
-        debounceDelay: 1000 // Wait 1 second before refetching (prevents rapid fire)
-    });
 
     // --- EFFECTS ---
 
