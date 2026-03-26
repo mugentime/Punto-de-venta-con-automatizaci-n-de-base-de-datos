@@ -192,7 +192,7 @@ const CashReportScreen: React.FC = () => {
   const sessionOrders = currentSession ? deduplicatedOrders.filter(o => new Date(o.date) >= new Date(currentSession.startDate)) : [];
   const sessionExpenses = currentSession ? expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate)) : [];
   const sessionCoworking = currentSession ? coworkingSessions.filter(s =>
-    s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
+    s.status === 'closed' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
   ) : [];
 
   const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
@@ -326,7 +326,7 @@ const CashReportScreen: React.FC = () => {
   const filteredOrders = deduplicatedOrders.filter(order => order.date && order.date.startsWith(selectedDate));
   const filteredExpenses = expenses.filter(expense => expense.date && expense.date.startsWith(selectedDate));
   const filteredCoworkingHist = coworkingSessions.filter(s =>
-    s.status === 'finished' && s.endTime && s.endTime.startsWith(selectedDate)
+    s.status === 'closed' && s.endTime && s.endTime.startsWith(selectedDate)
   );
 
   const ordersRevenueHist = filteredOrders.reduce((sum, order) => sum + order.total, 0);

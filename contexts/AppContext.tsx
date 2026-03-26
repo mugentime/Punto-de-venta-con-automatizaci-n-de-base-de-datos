@@ -1000,7 +1000,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     const finishCoworkingSession = async (sessionId: string, paymentMethod: 'Efectivo' | 'Tarjeta') => {
         try {
             const session = coworkingSessions.find(s => s.id === sessionId);
-            if (!session || session.status === 'finished') {
+            if (!session || session.status === 'closed') {
                 throw new Error('Session not found or already finished');
             }
 
@@ -1266,7 +1266,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             const sessionOrders = orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate));
             const sessionExpenses = expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate));
             const sessionCoworking = coworkingSessions.filter(s =>
-                s.status === 'finished' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
+                s.status === 'closed' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
             );
             const sessionWithdrawals = cashWithdrawals.filter(w => w.cash_session_id === currentSession.id);
 
