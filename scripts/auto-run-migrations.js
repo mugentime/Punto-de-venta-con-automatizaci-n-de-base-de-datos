@@ -40,32 +40,58 @@ export async function runPendingMigrations() {
       );
     `);
 
-    // Check if migration 006 has been run
-    const result = await client.query(
-      `SELECT * FROM schema_migrations WHERE migration_name = $1`,
-      ['006_fix_coworking_sessions']
+    // Get list of executed migrations
+    const executedResult = await client.query(
+      `SELECT migration_name FROM schema_migrations ORDER BY migration_name`
     );
+    const executedMigrations = new Set(executedResult.rows.map(r => r.migration_name));
 
-    if (result.rows.length > 0) {
-      console.log('✅ Migration 006_fix_coworking_sessions already applied');
-      return;
+    // Read all migration files from migrations directory
+    const migrationsDir = path.join(__dirname, '..', 'database', 'migrations');
+    const files = await fs.readdir(migrationsDir);
+    const migrationFiles = files
+      .filter(f => f.endsWith('.sql'))
+      .sort(); // Sort to ensure migrations run in order
+
+    console.log(`📂 Found ${migrationFiles.length} migration files`);
+
+    let ranCount = 0;
+    for (const file of migrationFiles) {
+      const migrationName = file.replace('.sql', '');
+
+      if (executedMigrations.has(migrationName)) {
+        console.log(`⏭️  Skipping ${migrationName} (already applied)`);
+        continue;
+      }
+
+      console.log(`🚀 Running migration: ${migrationName}...`);
+
+      try {
+        // Read and execute migration
+        const migrationPath = path.join(migrationsDir, file);
+        const migrationSQL = await fs.readFile(migrationPath, 'utf8');
+
+        await client.query(migrationSQL);
+
+        // Record migration as completed
+        await client.query(
+          `INSERT INTO schema_migrations (migration_name) VALUES ($1)`,
+          [migrationName]
+        );
+
+        console.log(`✅ Migration ${migrationName} completed successfully!`);
+        ranCount++;
+      } catch (migrationError) {
+        console.error(`❌ Error running migration ${migrationName}:`, migrationError.message);
+        // Continue with other migrations
+      }
     }
 
-    console.log('🚀 Running migration 006_fix_coworking_sessions...');
-
-    // Read and execute migration
-    const migrationPath = path.join(__dirname, '..', 'database', 'migrations', '006_fix_coworking_sessions.sql');
-    const migrationSQL = await fs.readFile(migrationPath, 'utf8');
-
-    await client.query(migrationSQL);
-
-    // Record migration as completed
-    await client.query(
-      `INSERT INTO schema_migrations (migration_name) VALUES ($1)`,
-      ['006_fix_coworking_sessions']
-    );
-
-    console.log('✅ Migration 006_fix_coworking_sessions completed successfully!');
+    if (ranCount === 0) {
+      console.log('✅ All migrations up to date');
+    } else {
+      console.log(`✅ Ran ${ranCount} new migration(s)`);
+    }
 
   } catch (error) {
     console.error('❌ Migration error:', error.message);
