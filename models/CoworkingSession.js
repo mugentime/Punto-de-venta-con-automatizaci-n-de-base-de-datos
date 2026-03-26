@@ -166,7 +166,28 @@ class CoworkingSession {
   
   // Close session
   closeSession(paymentMethod = null) {
-    this.endTime = new Date().toISOString();
+    const endTime = new Date();
+    const startTime = new Date(this.startTime);
+
+    // Validation 1: End time cannot be in the future
+    const today = new Date();
+    today.setHours(23, 59, 59, 999);
+    if (endTime > today) {
+      throw new Error('Cannot close session with future end time');
+    }
+
+    // Validation 2: End time must be after start time
+    if (endTime <= startTime) {
+      throw new Error('End time must be after start time');
+    }
+
+    // Validation 3: Duration sanity check (max 48 hours)
+    const durationHours = (endTime.getTime() - startTime.getTime()) / (1000 * 60 * 60);
+    if (durationHours > 48) {
+      throw new Error(`Session duration exceeds maximum (${durationHours.toFixed(1)}h > 48h)`);
+    }
+
+    this.endTime = endTime.toISOString();
     this.status = 'closed';
     this.payment = paymentMethod;
     this.calculateTotals();

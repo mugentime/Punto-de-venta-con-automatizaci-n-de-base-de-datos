@@ -998,8 +998,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
     };
     
     const finishCoworkingSession = async (sessionId: string, paymentMethod: 'Efectivo' | 'Tarjeta') => {
-        const session = coworkingSessions.find(s => s.id === sessionId);
-        if (!session || session.status === 'finished') return;
+        try {
+            const session = coworkingSessions.find(s => s.id === sessionId);
+            if (!session || session.status === 'finished') {
+                throw new Error('Session not found or already finished');
+            }
 
         // Decrease stock for extras via API
         const stockUpdates = session.consumedExtras.map(item => ({ id: item.id, quantity: item.quantity }));
@@ -1124,14 +1127,23 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             });
         }
 
-        // Update session with calculated total, duration, and payment method for reporting
-        updateCoworkingSession(sessionId, {
-            endTime: endTime.toISOString(),
-            status: 'finished',
-            total: total,
-            duration: durationMinutes,
-            paymentMethod: paymentMethod
-        });
+            // Update session with calculated total, duration, and payment method for reporting
+            updateCoworkingSession(sessionId, {
+                endTime: endTime.toISOString(),
+                status: 'finished',
+                total: total,
+                duration: durationMinutes,
+                paymentMethod: paymentMethod
+            });
+
+            // Force refresh to ensure consistency across devices
+            await refetchAll();
+        } catch (error) {
+            console.error('Error finishing coworking session:', error);
+            // Still try to refresh to show current state
+            await refetchAll();
+            throw error; // Re-throw so caller can handle
+        }
     };
 
     const cancelCoworkingSession = async (sessionId: string) => {

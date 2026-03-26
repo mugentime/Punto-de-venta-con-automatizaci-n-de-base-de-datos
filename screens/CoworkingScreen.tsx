@@ -323,7 +323,15 @@ const FinalizeModal: React.FC<{session: CoworkingSession, onClose: () => void, o
                 </div>
                 <div className="flex justify-end space-x-3 mt-6">
                     <button onClick={onClose} className="px-4 py-2 bg-white border border-slate-300 rounded-xl text-sm font-medium text-slate-700">Cancelar</button>
-                    <button onClick={() => { onConfirm(session.id, paymentMethod); onClose(); }} className="px-4 py-2 bg-green-500 rounded-xl text-sm font-medium text-white">Confirmar Pago</button>
+                    <button onClick={async () => {
+                        try {
+                            await onConfirm(session.id, paymentMethod);
+                            onClose();
+                        } catch (error) {
+                            console.error('Error finalizing session:', error);
+                            alert('Error al cerrar sesión: ' + (error.message || 'Error desconocido'));
+                        }
+                    }} className="px-4 py-2 bg-green-500 rounded-xl text-sm font-medium text-white">Confirmar Pago</button>
                 </div>
             </div>
         </div>

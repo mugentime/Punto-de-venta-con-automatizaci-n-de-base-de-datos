@@ -132,9 +132,21 @@ router.post('/', auth, canManageCoworking, async (req, res) => {
       createdBy: req.user.userId
     };
 
-    // If custom startTime is provided, use it
+    // If custom startTime is provided, validate it
     if (startTime) {
-      sessionData.startTime = new Date(startTime).toISOString();
+      const customStartTime = new Date(startTime);
+      const today = new Date();
+      today.setHours(23, 59, 59, 999); // End of today
+
+      // Validate date is not in the future
+      if (customStartTime > today) {
+        return res.status(400).json({
+          error: 'Start time cannot be in the future',
+          details: `Provided date ${customStartTime.toISOString()} is after today ${today.toISOString()}`
+        });
+      }
+
+      sessionData.startTime = customStartTime.toISOString();
     }
 
     const session = new CoworkingSession(sessionData);

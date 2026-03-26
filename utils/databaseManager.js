@@ -747,10 +747,20 @@ class DatabaseManager {
             throw new Error('Session not found');
         }
 
+        // Validate session is not already closed
+        if (session.status !== 'active') {
+            throw new Error(`Cannot close session with status: ${session.status}`);
+        }
+
         // Calculate final totals
         const CoworkingSession = require('../models/CoworkingSession');
         const sessionObj = new CoworkingSession(session);
-        sessionObj.closeSession(paymentMethod);
+
+        try {
+            sessionObj.closeSession(paymentMethod); // Will throw if validation fails
+        } catch (error) {
+            throw new Error(`Validation failed: ${error.message}`);
+        }
 
         // Update the session in database
         const updatedSession = await this.updateCoworkingSession(id, sessionObj.toJSON());

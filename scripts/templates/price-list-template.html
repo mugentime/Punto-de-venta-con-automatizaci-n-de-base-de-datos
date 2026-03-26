@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Lista de Precios - {{category}}</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    @page {
+      size: A4;
+      margin: 15mm;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+      color: #333;
+      padding: 40px;
+      min-height: 100vh;
+    }
+
+    .price-list {
+      background: white;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 50px 40px;
+      border-radius: 16px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .header {
+      text-align: center;
+      margin-bottom: 50px;
+      border-bottom: 4px solid #2c3e50;
+      padding-bottom: 30px;
+    }
+
+    .logo {
+      font-size: 42px;
+      font-weight: 800;
+      color: #1a1a1a;
+      margin-bottom: 8px;
+      letter-spacing: -1px;
+    }
+
+    .subtitle {
+      font-size: 18px;
+      color: #666;
+      margin-bottom: 15px;
+      font-weight: 300;
+    }
+
+    .category-badge {
+      display: inline-block;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 12px 30px;
+      border-radius: 50px;
+      font-size: 20px;
+      font-weight: 600;
+      margin: 15px 0;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .date {
+      color: #999;
+      font-size: 14px;
+      margin-top: 15px;
+      font-weight: 400;
+    }
+
+    .products-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 30px;
+    }
+
+    .products-table thead {
+      background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+      color: white;
+    }
+
+    .products-table th {
+      padding: 18px 20px;
+      text-align: left;
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .products-table th:last-child {
+      text-align: right;
+    }
+
+    .products-table tbody tr {
+      border-bottom: 1px solid #e0e0e0;
+      transition: background-color 0.2s;
+    }
+
+    .products-table tbody tr:nth-child(even) {
+      background-color: #f8f9fa;
+    }
+
+    .products-table tbody tr:hover {
+      background-color: #e3f2fd;
+    }
+
+    .products-table td {
+      padding: 16px 20px;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .products-table td:first-child {
+      font-weight: 500;
+    }
+
+    .products-table td:last-child {
+      text-align: right;
+      font-size: 18px;
+      font-weight: 700;
+      color: #27ae60;
+    }
+
+    .footer {
+      margin-top: 50px;
+      padding-top: 30px;
+      border-top: 2px solid #e0e0e0;
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+    }
+
+    .footer-note {
+      margin-bottom: 10px;
+      line-height: 1.6;
+    }
+
+    .count-badge {
+      display: inline-block;
+      background: #ecf0f1;
+      color: #7f8c8d;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 600;
+      margin-top: 20px;
+    }
+
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+
+      .price-list {
+        box-shadow: none;
+        border-radius: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="price-list">
+    <div class="header">
+      <div class="logo">🐰 Conejo Negro Café</div>
+      <div class="subtitle">Lista de Precios Actualizada</div>
+      <div class="category-badge">{{category}}</div>
+      <div class="date">Actualizado: {{date}}</div>
+    </div>
+
+    <table class="products-table">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Precio</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{products}}
+      </tbody>
+    </table>
+
+    <div class="count-badge">Total de productos: {{count}}</div>
+
+    <div class="footer">
+      <div class="footer-note">
+        Los precios están sujetos a cambios sin previo aviso.<br>
+        Precios expresados en pesos mexicanos (MXN).
+      </div>
+      <div>© 2025 Conejo Negro Café - Todos los derechos reservados</div>
+    </div>
+  </div>
+</body>
+</html>
