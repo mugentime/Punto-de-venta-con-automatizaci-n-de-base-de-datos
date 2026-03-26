@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reporte Completo - Punto de Venta Conejo Negro</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+            border-radius: 10px;
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+            margin-bottom: 30px;
+        }
+        h1 {
+            color: #2c3e50;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        .subtitle {
+            color: #7f8c8d;
+            font-size: 1.1em;
+        }
+        .section {
+            margin: 30px 0;
+        }
+        h2 {
+            color: #2c3e50;
+            border-left: 4px solid #3498db;
+            padding-left: 15px;
+            margin: 25px 0 15px 0;
+            font-size: 1.8em;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 10px;
+            color: white;
+            text-align: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .stat-card.green {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e063 100%);
+        }
+        .stat-card.orange {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+        .stat-card.blue {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+        .stat-label {
+            font-size: 0.9em;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .stat-value {
+            font-size: 2em;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        th {
+            background: #34495e;
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        tr:hover {
+            background: #f8f9fa;
+        }
+        .highlight {
+            background: #fff3cd;
+            padding: 20px;
+            border-left: 4px solid #ffc107;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+        .positive {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .negative {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 2px solid #ecf0f1;
+            color: #7f8c8d;
+        }
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Reporte Completo</h1>
+            <div class="subtitle">Punto de Venta - Conejo Negro</div>
+            <div class="subtitle" style="margin-top: 10px;">
+                <strong>Generado:</strong> <span id="fecha"></span>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>💰 Resumen Ejecutivo</h2>
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="stat-label">Ventas Totales</div>
+                    <div class="stat-value" id="ventas-totales">$0</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-label">Ganancias</div>
+                    <div class="stat-value" id="ganancias">$0</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-label">Órdenes</div>
+                    <div class="stat-value" id="ordenes">0</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Promedio/Día</div>
+                    <div class="stat-value" id="promedio">$0</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section">
+            <h2>📈 Métricas Financieras</h2>
+            <table id="metricas-table">
+                <thead>
+                    <tr>
+                        <th>Métrica</th>
+                        <th>Valor</th>
+                    </tr>
+                </thead>
+                <tbody id="metricas-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📅 Ventas por Mes</h2>
+            <table id="ventas-mes-table">
+                <thead>
+                    <tr>
+                        <th>Mes</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Subtotal</th>
+                        <th>Propinas</th>
+                        <th>Promedio</th>
+                    </tr>
+                </thead>
+                <tbody id="ventas-mes-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>🎯 Ventas por Tipo de Servicio</h2>
+            <table id="servicios-table">
+                <thead>
+                    <tr>
+                        <th>Tipo de Servicio</th>
+                        <th>Cantidad</th>
+                        <th>Total</th>
+                        <th>Promedio</th>
+                    </tr>
+                </thead>
+                <tbody id="servicios-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>💳 Métodos de Pago</h2>
+            <table id="pagos-table">
+                <thead>
+                    <tr>
+                        <th>Método</th>
+                        <th>Transacciones</th>
+                        <th>Total</th>
+                        <th>% del Total</th>
+                        <th>Promedio</th>
+                    </tr>
+                </thead>
+                <tbody id="pagos-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>👥 Top 30 Clientes</h2>
+            <table id="clientes-table">
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Cliente</th>
+                        <th>Órdenes</th>
+                        <th>Total Gastado</th>
+                        <th>Promedio/Visita</th>
+                    </tr>
+                </thead>
+                <tbody id="clientes-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="section">
+            <h2>📦 Inventario de Productos</h2>
+            <table id="productos-table">
+                <thead>
+                    <tr>
+                        <th>Producto</th>
+                        <th>Categoría</th>
+                        <th>Precio</th>
+                        <th>Costo</th>
+                        <th>Stock</th>
+                        <th>Valor Total</th>
+                        <th>Margen</th>
+                    </tr>
+                </thead>
+                <tbody id="productos-body">
+                </tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p><strong>Punto de Venta - Conejo Negro</strong></p>
+            <p>Datos extraídos de PostgreSQL Production (Railway)</p>
+            <p>Total de registros procesados: <span id="total-registros">0</span></p>
+        </div>
+    </div>
+
+    <script>
+        // Cargar datos del JSON
+        fetch('datos-completos-punto-venta.json')
+            .then(response => response.json())
+            .then(data => {
+                const stats = data.estadisticas;
+                const datos = data.datos;
+
+                // Fecha
+                document.getElementById('fecha').textContent = new Date(data.fecha_extraccion).toLocaleString('es-MX');
+                document.getElementById('total-registros').textContent = data.total_registros.toLocaleString();
+
+                // Stats cards
+                document.getElementById('ventas-totales').textContent = '$' + stats.total_ventas.toLocaleString('es-MX', {minimumFractionDigits: 2});
+                document.getElementById('ganancias').textContent = '$' + stats.total_ganancias.toLocaleString('es-MX', {minimumFractionDigits: 2});
+                document.getElementById('ordenes').textContent = stats.cantidad_ordenes.toLocaleString();
+                document.getElementById('promedio').textContent = '$' + stats.promedio_diario.toLocaleString('es-MX', {minimumFractionDigits: 2});
+
+                // Métricas financieras
+                const metricasBody = document.getElementById('metricas-body');
+                const metricas = [
+                    ['Ventas Totales', '$' + stats.total_ventas.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Subtotal', '$' + stats.total_subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Propinas', '$' + stats.total_propinas.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Descuentos', '$' + stats.total_descuentos.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Costos', '$' + stats.total_costos.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Ganancias', '$' + stats.total_ganancias.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Gastos Operativos', '$' + stats.total_gastos.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Utilidad Neta', '$' + stats.utilidad_neta.toLocaleString('es-MX', {minimumFractionDigits: 2})],
+                    ['Margen de Ganancia', stats.margen],
+                    ['Período', stats.fecha_inicio + ' - ' + stats.fecha_fin],
+                    ['Días de Operación', stats.dias_operacion + ' días'],
+                    ['Promedio Diario', '$' + stats.promedio_diario.toLocaleString('es-MX', {minimumFractionDigits: 2})]
+                ];
+                metricas.forEach(([label, value]) => {
+                    metricasBody.innerHTML += `<tr><td><strong>${label}</strong></td><td>${value}</td></tr>`;
+                });
+
+                // Ventas por mes
+                const ventasMesBody = document.getElementById('ventas-mes-body');
+                Object.keys(stats.ventas_por_mes).sort().forEach(mes => {
+                    const d = stats.ventas_por_mes[mes];
+                    const promedio = d.cantidad > 0 ? d.total / d.cantidad : 0;
+                    ventasMesBody.innerHTML += `
+                        <tr>
+                            <td><strong>${mes}</strong></td>
+                            <td>${d.cantidad}</td>
+                            <td>$${d.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${d.subtotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${d.propinas.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${promedio.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+
+                // Ventas por servicio
+                const serviciosBody = document.getElementById('servicios-body');
+                Object.entries(stats.ventas_por_servicio).sort((a,b) => b[1].total - a[1].total).forEach(([tipo, d]) => {
+                    const promedio = d.cantidad > 0 ? d.total / d.cantidad : 0;
+                    serviciosBody.innerHTML += `
+                        <tr>
+                            <td><strong>${tipo}</strong></td>
+                            <td>${d.cantidad}</td>
+                            <td>$${d.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${promedio.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+
+                // Métodos de pago
+                const pagosBody = document.getElementById('pagos-body');
+                Object.entries(stats.metodos_pago).sort((a,b) => b[1].total - a[1].total).forEach(([metodo, d]) => {
+                    const porcentaje = ((d.total / stats.total_ventas) * 100).toFixed(1);
+                    const promedio = d.cantidad > 0 ? d.total / d.cantidad : 0;
+                    pagosBody.innerHTML += `
+                        <tr>
+                            <td><strong>${metodo}</strong></td>
+                            <td>${d.cantidad}</td>
+                            <td>$${d.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>${porcentaje}%</td>
+                            <td>$${promedio.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+
+                // Top clientes
+                const clientesBody = document.getElementById('clientes-body');
+                let num = 1;
+                Object.entries(stats.top_clientes).forEach(([cliente, d]) => {
+                    const promedio = d.cantidad > 0 ? d.total / d.cantidad : 0;
+                    clientesBody.innerHTML += `
+                        <tr>
+                            <td>${num++}</td>
+                            <td>${cliente}</td>
+                            <td>${d.cantidad}</td>
+                            <td>$${d.total.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${promedio.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                        </tr>
+                    `;
+                });
+
+                // Productos
+                const productosBody = document.getElementById('productos-body');
+                datos.productos.forEach(p => {
+                    const valorTotal = parseFloat(p.price) * parseInt(p.stock);
+                    const margen = ((parseFloat(p.price) - parseFloat(p.cost)) / parseFloat(p.price) * 100).toFixed(1);
+                    productosBody.innerHTML += `
+                        <tr>
+                            <td>${p.name}</td>
+                            <td>${p.category}</td>
+                            <td>$${parseFloat(p.price).toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>$${parseFloat(p.cost).toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td>${p.stock}</td>
+                            <td>$${valorTotal.toLocaleString('es-MX', {minimumFractionDigits: 2})}</td>
+                            <td class="${margen > 0 ? 'positive' : 'negative'}">${margen}%</td>
+                        </tr>
+                    `;
+                });
+            })
+            .catch(error => {
+                console.error('Error loading data:', error);
+                document.querySelector('.container').innerHTML = '<h2 style="color: red;">Error cargando datos. Asegúrate de que el archivo datos-completos-punto-venta.json esté en la misma carpeta.</h2>';
+            });
+    </script>
+</body>
+</html>
