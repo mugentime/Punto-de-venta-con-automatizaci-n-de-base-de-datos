@@ -59,6 +59,12 @@ const CoworkingScreen: React.FC = () => {
         return () => clearInterval(timer);
     }, []);
 
+    // PWA FIX: Force refresh on mount to ensure fresh data
+    useEffect(() => {
+        console.log('[CoworkingScreen] Forcing refresh on mount for PWA');
+        refetchAll();
+    }, []);
+
     // Keep sessionForExtras in sync with coworkingSessions
     useEffect(() => {
         if (sessionForExtras) {
