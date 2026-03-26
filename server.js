@@ -6,6 +6,10 @@ import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { registerClient, broadcastDataChange } from './src/services/sseService.js';
 import { runPendingMigrations } from './scripts/auto-run-migrations.js';
+import { createRequire } from 'module';
+
+// Create require function for CommonJS modules
+const require = createRequire(import.meta.url);
 
 const { Pool } = pg;
 
@@ -476,6 +480,15 @@ async function startServer() {
     const app = express();
     const port = process.env.PORT || 3001;
     app.use(express.json({ limit: '50mb' }));
+
+    // --- MOUNT FILE-BASED ROUTES ---
+    // When PostgreSQL is not available, use file-based routes
+    if (!useDb) {
+        console.log('📁 Mounting file-based routes for coworking sessions...');
+        const sessionsRouter = require('./routes/sessions-file.js');
+        app.use('/api/coworking-sessions', sessionsRouter);
+        console.log('✅ File-based coworking routes mounted');
+    }
 
     // --- AI SETUP ---
     console.log("*******************************************************************");
@@ -972,10 +985,11 @@ async function startServer() {
         }
     });
 
-    // --- COWORKING SESSIONS API ---
+    // --- COWORKING SESSIONS API (PostgreSQL only) ---
+    // NOTE: File-based routes are mounted above when !useDb
+    if (useDb) {
     app.get('/api/coworking-sessions', async (req, res) => {
         try {
-            if (!useDb) return res.json([]);
 
             // 🚀 PAGINATION: Add pagination to prevent fetching all sessions
             const limit = parseInt(req.query.limit) || 100;
@@ -999,7 +1013,6 @@ async function startServer() {
 
     app.post('/api/coworking-sessions', async (req, res) => {
         try {
-            if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const { clientName, startTime, hourlyRate } = req.body;
             const id = `coworking-${Date.now()}`;
             const result = await pool.query(
@@ -1022,8 +1035,6 @@ async function startServer() {
 
     app.put('/api/coworking-sessions/:id', async (req, res) => {
         try {
-            if (!useDb) return res.status(503).json({ error: 'Database not available' });
-
             // Build dynamic update query based on provided fields
             const updates = [];
             const values = [];
@@ -1082,8 +1093,6 @@ async function startServer() {
 
     app.delete('/api/coworking-sessions/:id', async (req, res) => {
         try {
-            if (!useDb) return res.status(503).json({ error: 'Database not available' });
-
             console.log('🗑️ Deleting coworking session:', req.params.id);
 
             const result = await pool.query('DELETE FROM coworking_sessions WHERE id = $1 RETURNING *', [req.params.id]);
@@ -1101,6 +1110,7 @@ async function startServer() {
             res.status(500).json({ error: 'Failed to delete coworking session' });
         }
     });
+    } // End of useDb block for coworking sessions
 
     // --- CASH SESSIONS API ---
     app.get('/api/cash-sessions', async (req, res) => {
