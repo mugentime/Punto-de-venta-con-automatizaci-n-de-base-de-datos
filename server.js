@@ -6,10 +6,6 @@ import { fileURLToPath } from 'url';
 import pg from 'pg';
 import { registerClient, broadcastDataChange } from './src/services/sseService.js';
 import { runPendingMigrations } from './scripts/auto-run-migrations.js';
-import { createRequire } from 'module';
-
-// Create require function for CommonJS modules
-const require = createRequire(import.meta.url);
 
 const { Pool } = pg;
 
@@ -481,13 +477,18 @@ async function startServer() {
     const port = process.env.PORT || 3001;
     app.use(express.json({ limit: '50mb' }));
 
-    // --- MOUNT FILE-BASED ROUTES ---
-    // When PostgreSQL is not available, use file-based routes
+    // --- INITIALIZE FILE-BASED DATABASE MANAGER ---
+    let dbManager;
     if (!useDb) {
-        console.log('📁 Mounting file-based routes for coworking sessions...');
-        const sessionsRouter = require('./routes/sessions-file.js');
-        app.use('/api/coworking-sessions', sessionsRouter);
-        console.log('✅ File-based coworking routes mounted');
+        console.log('📁 Initializing file-based database manager...');
+        // Dynamically import CommonJS module
+        const { createRequire } = await import('module');
+        const require = createRequire(import.meta.url);
+        const dbManagerModule = require('./utils/databaseManager.cjs');
+        // databaseManager.cjs exports a single instance, not a class
+        dbManager = dbManagerModule;
+        await dbManager.initialize();
+        console.log('✅ File-based database ready');
     }
 
     // --- AI SETUP ---
@@ -985,26 +986,31 @@ async function startServer() {
         }
     });
 
-    // --- COWORKING SESSIONS API (PostgreSQL only) ---
-    // NOTE: File-based routes are mounted above when !useDb
-    if (useDb) {
+    // --- COWORKING SESSIONS API ---
     app.get('/api/coworking-sessions', async (req, res) => {
         try {
+            if (useDb) {
+                // PostgreSQL mode
+                const limit = parseInt(req.query.limit) || 100;
+                const offset = parseInt(req.query.offset) || 0;
 
-            // 🚀 PAGINATION: Add pagination to prevent fetching all sessions
-            const limit = parseInt(req.query.limit) || 100;
-            const offset = parseInt(req.query.offset) || 0;
-
-            const result = await pool.query(
-                'SELECT * FROM coworking_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
-                [limit, offset]
-            );
-            res.json(result.rows.map(session => ({
-                ...session,
-                hourlyRate: parseFloat(session.hourlyRate),
-                total: parseFloat(session.total),
-                consumedExtras: session.consumedExtras || []
-            })));
+                const result = await pool.query(
+                    'SELECT * FROM coworking_sessions ORDER BY created_at DESC LIMIT $1 OFFSET $2',
+                    [limit, offset]
+                );
+                res.json(result.rows.map(session => ({
+                    ...session,
+                    hourlyRate: parseFloat(session.hourlyRate),
+                    total: parseFloat(session.total),
+                    consumedExtras: session.consumedExtras || []
+                })));
+            } else {
+                // File-based mode
+                console.log('📁 Fetching coworking sessions from file-based database...');
+                const sessions = await dbManager.getCoworkingSessions();
+                console.log(`📋 Found ${sessions.length} coworking sessions`);
+                res.json(sessions);
+            }
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
             res.status(500).json({ error: 'Failed to fetch coworking sessions' });
@@ -1110,7 +1116,6 @@ async function startServer() {
             res.status(500).json({ error: 'Failed to delete coworking session' });
         }
     });
-    } // End of useDb block for coworking sessions
 
     // --- CASH SESSIONS API ---
     app.get('/api/cash-sessions', async (req, res) => {

@@ -1,5 +1,5 @@
-const database = require('./database');
-const fileDatabase = require('./fileDatabase');
+const database = require('./database.cjs');
+const fileDatabase = require('./fileDatabase.cjs');
 
 class DatabaseManager {
     constructor() {
