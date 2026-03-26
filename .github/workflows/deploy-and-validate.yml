@@ -64,7 +64,7 @@ jobs:
     - name: Validate Render deployment
       run: |
         echo "🔧 Validando deployment en Render..."
-        node validate-render-deploy.js
+        node validate-render-deploy.cjs
         
     - name: Check deployment status
       run: |
