@@ -1009,7 +1009,16 @@ async function startServer() {
                 console.log('📁 Fetching coworking sessions from file-based database...');
                 const sessions = await dbManager.getCoworkingSessions();
                 console.log(`📋 Found ${sessions.length} coworking sessions`);
-                res.json(sessions);
+
+                // Map field names to match frontend expectations
+                const mappedSessions = sessions.map(session => ({
+                    ...session,
+                    id: session._id || session.id,
+                    clientName: session.client || session.clientName,
+                    consumedExtras: session.consumedExtras || session.products || []
+                }));
+
+                res.json(mappedSessions);
             }
         } catch (error) {
             console.error("Error fetching coworking sessions:", error);
