@@ -116,7 +116,7 @@ const CoworkingScreen: React.FC = () => {
     };
     
     const activeSessions = coworkingSessions.filter(s => s.status === 'active').sort((a,b) => new Date(a.startTime).getTime() - new Date(b.startTime).getTime());
-    const pastSessions = coworkingSessions.filter(s => s.status === 'closed').sort((a,b) => new Date(b.endTime || b.startTime).getTime() - new Date(a.endTime || a.startTime).getTime()).slice(0, 10);
+    const pastSessions = coworkingSessions.filter(s => s.status === 'finished').sort((a,b) => new Date(b.endTime || b.startTime).getTime() - new Date(a.endTime || a.startTime).getTime()).slice(0, 10);
 
     // Debug logging for session data
     console.log('[CoworkingScreen] Total sessions:', coworkingSessions.length);
