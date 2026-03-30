@@ -232,6 +232,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                         offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
                     }
                     if (coworkingData) {
+                        console.log(`${logPrefix} 🏢 Coworking sessions refreshed: ${coworkingData.length} sessions`);
                         setCoworkingSessions(coworkingData);
                         sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
                     }
@@ -313,6 +314,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 }
 
                 if (coworkingData) {
+                    console.log(`${logPrefix} 🏢 Coworking sessions loaded: ${coworkingData.length} sessions`);
                     setCoworkingSessions(coworkingData);
                     sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
                 }
@@ -819,6 +821,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
             }
             if (coworkingData) {
+                console.log(`🏢 Coworking sessions refetched: ${coworkingData.length} sessions`);
                 setCoworkingSessions(coworkingData);
                 sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
             }
