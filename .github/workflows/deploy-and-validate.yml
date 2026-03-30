@@ -69,7 +69,7 @@ jobs:
     - name: Check deployment status
       run: |
         echo "🌐 Verificando estado del deployment..."
-        curl -f https://pos-conejo-negro.onrender.com/health || {
+        curl -f https://pos-conejo-negro.onrender.com/api/health || {
           echo "❌ Health check failed"
           exit 1
         }
