@@ -123,6 +123,16 @@ const CoworkingScreen: React.FC = () => {
     console.log('[CoworkingScreen] Active sessions:', activeSessions.length);
     console.log('[CoworkingScreen] Past sessions (displaying):', pastSessions.length);
 
+    // Check status values in sessions
+    if (coworkingSessions.length > 0) {
+        const statusCounts = coworkingSessions.reduce((acc, s) => {
+            acc[s.status] = (acc[s.status] || 0) + 1;
+            return acc;
+        }, {} as Record<string, number>);
+        console.log('[CoworkingScreen] Status breakdown:', statusCounts);
+        console.log('[CoworkingScreen] Sample session:', coworkingSessions[0]);
+    }
+
     const extraProducts = products.filter(p => p.category === 'Refrigerador' || p.category === 'Alimentos');
 
     return (
