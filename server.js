@@ -502,6 +502,50 @@ async function startServer() {
     console.log("*** - Text generation: HuggingFace Mistral-7B (FREE)           ***");
     console.log("*******************************************************************");
 
+    // --- SECURITY HELPERS ---
+
+    // Lightweight in-process rate limiter (no external library needed)
+    function createSimpleRateLimiter(maxRequests, windowMs) {
+        const hits = new Map(); // ip -> { count, resetAt }
+        return (req, res, next) => {
+            const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || req.ip || 'unknown';
+            const now = Date.now();
+            let entry = hits.get(ip);
+            if (!entry || now > entry.resetAt) {
+                entry = { count: 0, resetAt: now + windowMs };
+                hits.set(ip, entry);
+            }
+            entry.count++;
+            if (entry.count > maxRequests) {
+                return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+            }
+            // Periodic cleanup to prevent unbounded map growth
+            if (hits.size > 5000) {
+                for (const [k, v] of hits) {
+                    if (now > v.resetAt) hits.delete(k);
+                }
+            }
+            next();
+        };
+    }
+
+    const loginRateLimiter = createSimpleRateLimiter(5,  15 * 60 * 1000); // 5 attempts per 15 min
+    const aiRateLimiter    = createSimpleRateLimiter(10, 60 * 60 * 1000); // 10 per hour
+
+    // Admin-key guard — requires X-Admin-Key header matching ADMIN_SECRET_KEY env var
+    function requireAdminKey(req, res, next) {
+        const adminKey = process.env.ADMIN_SECRET_KEY;
+        if (!adminKey) {
+            console.warn('⚠️  ADMIN_SECRET_KEY not configured — admin endpoint blocked for safety. Set it in .env to enable.');
+            return res.status(503).json({ error: 'Admin endpoints disabled: configure ADMIN_SECRET_KEY in environment.' });
+        }
+        const provided = req.headers['x-admin-key'] || req.query.adminKey;
+        if (!provided || provided !== adminKey) {
+            return res.status(403).json({ error: 'Forbidden: valid X-Admin-Key header required.' });
+        }
+        next();
+    }
+
     // --- API ENDPOINTS ---
     app.get('/api/products', async (req, res) => {
         try {
@@ -617,8 +661,8 @@ async function startServer() {
             if (!useDb) return res.json([]);
 
             // 🚀 PAGINATION: Add pagination to prevent fetching all orders
-            const limit = parseInt(req.query.limit) || 100; // Default: last 100 orders
-            const offset = parseInt(req.query.offset) || 0;
+            const limit  = Math.min(Math.max(parseInt(req.query.limit,  10) || 100, 1), 500); // cap 1–500
+            const offset = Math.max(parseInt(req.query.offset, 10) || 0, 0);
 
             const result = await pool.query(
                 'SELECT * FROM orders ORDER BY created_at DESC LIMIT $1 OFFSET $2',
@@ -720,6 +764,16 @@ async function startServer() {
 
                 // FIX BUG 3: Store idempotency key
                 if (idempotencyKey) {
+                    // Guard against unbounded growth under heavy traffic
+                    if (recentOrderKeys.size >= 2000) {
+                        // Evict all expired entries before adding a new one
+                        const nowMs = Date.now();
+                        for (const [k] of recentOrderKeys) {
+                            // TTL eviction is handled by setTimeout; do a full clear as a safety net
+                            if (recentOrderKeys.size >= 2000) recentOrderKeys.delete(k);
+                            else break;
+                        }
+                    }
                     recentOrderKeys.set(idempotencyKey, id);
                     setTimeout(() => recentOrderKeys.delete(idempotencyKey), ORDER_KEY_TTL);
                 }
@@ -1309,7 +1363,7 @@ async function startServer() {
     });
 
     // --- LOGIN ENDPOINT ---
-    app.post('/api/login', async (req, res) => {
+    app.post('/api/login', loginRateLimiter, async (req, res) => {
         try {
             const { username, password } = req.body;
 
@@ -1349,7 +1403,9 @@ async function startServer() {
 
             const user = result.rows[0];
 
-            // Check password (in production, use bcrypt)
+            // TODO: passwords are stored and compared in plaintext.
+            // Migrate to bcrypt: npm install bcryptjs, hash on registration, use bcrypt.compare() here.
+            // WARNING: changing this requires a one-time migration of all stored passwords.
             if (user.password !== password) {
                 return res.status(401).json({ error: 'Contraseña incorrecta.' });
             }
@@ -1640,7 +1696,7 @@ async function startServer() {
     });
 
     // --- ADMIN FIX ENDPOINT ---
-    app.post('/api/admin/fix-coworking-totals', async (req, res) => {
+    app.post('/api/admin/fix-coworking-totals', requireAdminKey, async (req, res) => {
         if (!useDb) return res.status(503).json({ error: 'Database not available' });
 
         const calculateCoworkingCost = (startTime, endTime) => {
@@ -1726,7 +1782,7 @@ async function startServer() {
     });
 
     // --- DATABASE OPTIMIZATION ENDPOINT ---
-    app.post('/api/admin/optimize-database', async (req, res) => {
+    app.post('/api/admin/optimize-database', requireAdminKey, async (req, res) => {
         if (!useDb) return res.status(503).json({ error: 'Database not available' });
 
         try {
@@ -1786,7 +1842,7 @@ async function startServer() {
     });
 
     // --- TEMPORARY MIGRATION ENDPOINT ---
-    app.post('/api/admin/add-customerId-column', async (req, res) => {
+    app.post('/api/admin/add-customerId-column', requireAdminKey, async (req, res) => {
         if (!useDb) return res.status(503).json({ error: 'Database not available' });
 
         try {
@@ -1834,7 +1890,7 @@ async function startServer() {
     });
 
     // --- AI ENDPOINTS ---
-    app.post('/api/generate-description', async (req, res) => {
+    app.post('/api/generate-description', aiRateLimiter, async (req, res) => {
       const { productName, keywords } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
@@ -1891,7 +1947,7 @@ async function startServer() {
       }
     });
     
-    app.post('/api/generate-image', async (req, res) => {
+    app.post('/api/generate-image', aiRateLimiter, async (req, res) => {
       const { productName, description } = req.body;
       if (!productName) {
         return res.status(400).json({ error: 'productName is required' });
