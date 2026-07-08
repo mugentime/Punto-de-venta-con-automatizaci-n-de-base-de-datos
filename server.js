@@ -1367,27 +1367,26 @@ async function startServer() {
         try {
             const { username, password } = req.body;
 
-            // 🧪 IN-MEMORY MODE: Allow testing with default admin user
+            // 🧪 IN-MEMORY MODE: Fallback admin login, configured via env vars only (no hardcoded credentials)
             if (!useDb) {
-                const inMemoryUsers = [
-                    { id: 'admin-001', username: 'Admin1', email: 'je2alvarela@gmail.com', password: '1357', role: 'admin', status: 'approved' }
-                ];
-                const user = inMemoryUsers.find(u => u.username.toLowerCase() === username.toLowerCase());
-                if (!user) {
+                const fallbackUsername = process.env.FALLBACK_ADMIN_USERNAME;
+                const fallbackPassword = process.env.FALLBACK_ADMIN_PASSWORD;
+                if (!fallbackUsername || !fallbackPassword) {
+                    console.warn('⚠️  No database configured and FALLBACK_ADMIN_USERNAME/FALLBACK_ADMIN_PASSWORD not set — login disabled.');
+                    return res.status(503).json({ error: 'No hay base de datos configurada y no hay credenciales de respaldo definidas.' });
+                }
+                if (username.toLowerCase() !== fallbackUsername.toLowerCase()) {
                     return res.status(401).json({ error: 'Usuario no encontrado.' });
                 }
-                if (user.password !== password) {
+                if (password !== fallbackPassword) {
                     return res.status(401).json({ error: 'Contraseña incorrecta.' });
                 }
-                if (user.status !== 'approved') {
-                    return res.status(403).json({ error: 'Usuario pendiente de aprobación.' });
-                }
                 return res.json({
-                    id: user.id,
-                    username: user.username,
-                    email: user.email,
-                    role: user.role,
-                    status: user.status
+                    id: 'fallback-admin',
+                    username: fallbackUsername,
+                    email: process.env.FALLBACK_ADMIN_EMAIL || '',
+                    role: 'admin',
+                    status: 'approved'
                 });
             }
 
