@@ -1,0 +1,208 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`orders POST /api/orders creates an order in memory 1`] = `
+{
+  "keys": {
+    "clientName": {
+      "type": "string",
+    },
+    "created_at": {
+      "type": "string",
+    },
+    "customerId": {
+      "type": "null",
+    },
+    "date": {
+      "type": "string",
+    },
+    "discount": {
+      "type": "number",
+    },
+    "id": {
+      "type": "string",
+    },
+    "items": {
+      "itemShape": {
+        "keys": {
+          "cost": {
+            "type": "number",
+          },
+          "id": {
+            "type": "string",
+          },
+          "name": {
+            "type": "string",
+          },
+          "price": {
+            "type": "number",
+          },
+          "quantity": {
+            "type": "number",
+          },
+        },
+        "type": "object",
+      },
+      "length": 1,
+      "type": "array",
+    },
+    "paymentMethod": {
+      "type": "string",
+    },
+    "serviceType": {
+      "type": "string",
+    },
+    "subtotal": {
+      "type": "number",
+    },
+    "tip": {
+      "type": "number",
+    },
+    "total": {
+      "type": "number",
+    },
+    "totalCost": {
+      "type": "number",
+    },
+    "userId": {
+      "type": "string",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`products (stateful - order matters, shares the seeded in-memory array) GET /api/products returns the 10 seeded products 1`] = `
+{
+  "itemShape": {
+    "keys": {
+      "category": {
+        "type": "string",
+      },
+      "cost": {
+        "type": "number",
+      },
+      "description": {
+        "type": "string",
+      },
+      "id": {
+        "type": "string",
+      },
+      "imageUrl": {
+        "type": "string",
+      },
+      "name": {
+        "type": "string",
+      },
+      "price": {
+        "type": "number",
+      },
+      "stock": {
+        "type": "number",
+      },
+    },
+    "type": "object",
+  },
+  "length": 10,
+  "type": "array",
+}
+`;
+
+exports[`products (stateful - order matters, shares the seeded in-memory array) POST /api/products creates a product in memory 1`] = `
+{
+  "keys": {
+    "category": {
+      "type": "string",
+    },
+    "cost": {
+      "type": "number",
+    },
+    "description": {
+      "type": "string",
+    },
+    "id": {
+      "type": "string",
+    },
+    "imageUrl": {
+      "type": "string",
+    },
+    "name": {
+      "type": "string",
+    },
+    "price": {
+      "type": "number",
+    },
+    "stock": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
+
+exports[`products (stateful - order matters, shares the seeded in-memory array) POST /api/products/import upserts by name in memory 1`] = `
+{
+  "itemShape": {
+    "keys": {
+      "category": {
+        "type": "string",
+      },
+      "cost": {
+        "type": "number",
+      },
+      "description": {
+        "type": "string",
+      },
+      "id": {
+        "type": "string",
+      },
+      "imageUrl": {
+        "type": "string",
+      },
+      "name": {
+        "type": "string",
+      },
+      "price": {
+        "type": "number",
+      },
+      "stock": {
+        "type": "number",
+      },
+    },
+    "type": "object",
+  },
+  "length": 10,
+  "type": "array",
+}
+`;
+
+exports[`products (stateful - order matters, shares the seeded in-memory array) PUT /api/products/:id updates the created product 1`] = `
+{
+  "keys": {
+    "category": {
+      "type": "string",
+    },
+    "cost": {
+      "type": "number",
+    },
+    "description": {
+      "type": "string",
+    },
+    "id": {
+      "type": "string",
+    },
+    "imageUrl": {
+      "type": "string",
+    },
+    "name": {
+      "type": "string",
+    },
+    "price": {
+      "type": "number",
+    },
+    "stock": {
+      "type": "number",
+    },
+  },
+  "type": "object",
+}
+`;
