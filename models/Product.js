@@ -1,1 +1,0 @@
-// MongoDB y mongoose eliminados. Implementa aquí el almacenamiento alternativo para Product.
