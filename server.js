@@ -12,6 +12,7 @@ import { createProductsRouter } from './routes/products.js';
 import { createOrdersRouter } from './routes/orders.js';
 import { createExpensesRouter } from './routes/expenses.js';
 import { createCoworkingSessionsRouter } from './routes/coworkingSessions.js';
+import { createCoworkingSessionsRepository } from './repositories/coworkingSessions.js';
 import { createCashSessionsRouter } from './routes/cashSessions.js';
 import { createCashWithdrawalsRouter } from './routes/cashWithdrawals.js';
 import { createUsersRouter } from './routes/users.js';
@@ -532,7 +533,8 @@ async function startServer() {
     app.use(createProductsRouter({ productStore, pool, useDb }));
     app.use(createOrdersRouter({ pool, useDb, broadcastDataChange }));
     app.use(createExpensesRouter({ pool, useDb, broadcastDataChange }));
-    app.use(createCoworkingSessionsRouter({ pool, useDb, dbManager, broadcastDataChange }));
+    const coworkingSessions = createCoworkingSessionsRepository({ useDb, pool, dbManager });
+    app.use(createCoworkingSessionsRouter({ coworkingSessions, broadcastDataChange }));
     app.use(createCashSessionsRouter({ pool, useDb, broadcastDataChange }));
     app.use(createCashWithdrawalsRouter({ pool, useDb, broadcastDataChange }));
     app.use(createUsersRouter({ pool, useDb }));

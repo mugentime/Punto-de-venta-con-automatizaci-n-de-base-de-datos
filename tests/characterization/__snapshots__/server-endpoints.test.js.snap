@@ -1,5 +1,74 @@
 // Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
 
+exports[`coworking sessions (FIXED in Phase 3 - was: POST/PUT/DELETE 500 without a database) POST /api/coworking-sessions now works in memory via the file-backed repository 1`] = `
+{
+  "keys": {
+    "_id": {
+      "type": "string",
+    },
+    "client": {
+      "type": "string",
+    },
+    "clientName": {
+      "type": "string",
+    },
+    "consumedExtras": {
+      "itemShape": null,
+      "length": 0,
+      "type": "array",
+    },
+    "cost": {
+      "type": "number",
+    },
+    "createdAt": {
+      "type": "string",
+    },
+    "endTime": {
+      "type": "null",
+    },
+    "hourlyRate": {
+      "type": "number",
+    },
+    "id": {
+      "type": "string",
+    },
+    "notes": {
+      "type": "string",
+    },
+    "payment": {
+      "type": "null",
+    },
+    "products": {
+      "itemShape": null,
+      "length": 0,
+      "type": "array",
+    },
+    "profit": {
+      "type": "number",
+    },
+    "startTime": {
+      "type": "string",
+    },
+    "status": {
+      "type": "string",
+    },
+    "subtotal": {
+      "type": "number",
+    },
+    "timeCharge": {
+      "type": "number",
+    },
+    "total": {
+      "type": "number",
+    },
+    "updatedAt": {
+      "type": "string",
+    },
+  },
+  "type": "object",
+}
+`;
+
 exports[`orders POST /api/orders creates an order in memory 1`] = `
 {
   "keys": {

@@ -179,33 +179,62 @@ describe('expenses', () => {
   });
 });
 
-describe('coworking sessions (KNOWN BUG - see architecture audit)', () => {
+describe('coworking sessions (FIXED in Phase 3 - was: POST/PUT/DELETE 500 without a database)', () => {
+  let createdId;
+
   test('GET /api/coworking-sessions falls back to the file-based store and returns an array', async () => {
     const { status, body } = await get('/api/coworking-sessions');
     expect(status).toBe(200);
     expect(Array.isArray(body)).toBe(true);
   });
 
-  test('KNOWN BUG: POST /api/coworking-sessions has no useDb guard and 500s without a database', async () => {
+  test('POST /api/coworking-sessions now works in memory via the file-backed repository', async () => {
     const { status, body } = await post('/api/coworking-sessions', {
       clientName: 'Test',
       startTime: new Date().toISOString(),
       hourlyRate: 50,
     });
-    expect(status).toBe(500);
-    expect(body).toEqual({ error: 'Failed to create coworking session' });
+    expect(status).toBe(201);
+    expect(body.clientName).toBe('Test');
+    expect(body.hourlyRate).toBe(50);
+    expect(body.consumedExtras).toEqual([]);
+    expect(shapeOf(body)).toMatchSnapshot();
+    createdId = body.id;
   });
 
-  test('KNOWN BUG: PUT /api/coworking-sessions/:id has no useDb guard and 500s without a database', async () => {
-    const { status, body } = await put('/api/coworking-sessions/anything', { status: 'finished' });
-    expect(status).toBe(500);
-    expect(body).toEqual({ error: 'Failed to update coworking session' });
+  test('GET /api/coworking-sessions includes the newly created session', async () => {
+    const { body } = await get('/api/coworking-sessions');
+    expect(body.some((s) => s.id === createdId)).toBe(true);
   });
 
-  test('KNOWN BUG: DELETE /api/coworking-sessions/:id has no useDb guard and 500s without a database', async () => {
-    const { status, body } = await del('/api/coworking-sessions/anything');
-    expect(status).toBe(500);
-    expect(body).toEqual({ error: 'Failed to delete coworking session' });
+  test('PUT /api/coworking-sessions/:id updates the created session', async () => {
+    const { status, body } = await put(`/api/coworking-sessions/${createdId}`, { status: 'finished', total: 72 });
+    expect(status).toBe(200);
+    expect(body.status).toBe('finished');
+    expect(body.total).toBe(72);
+  });
+
+  test('PUT /api/coworking-sessions/:id with no recognized fields returns 400', async () => {
+    const { status, body } = await put(`/api/coworking-sessions/${createdId}`, { notARealField: 1 });
+    expect(status).toBe(400);
+    expect(body).toEqual({ error: 'No fields to update' });
+  });
+
+  test('PUT /api/coworking-sessions/:id on an unknown id returns 404 (not a 500)', async () => {
+    const { status, body } = await put('/api/coworking-sessions/does-not-exist', { status: 'finished' });
+    expect(status).toBe(404);
+    expect(body).toEqual({ error: 'Coworking session not found' });
+  });
+
+  test('DELETE /api/coworking-sessions/:id removes the created session', async () => {
+    const { status } = await del(`/api/coworking-sessions/${createdId}`);
+    expect(status).toBe(204);
+  });
+
+  test('DELETE /api/coworking-sessions/:id on an unknown id returns 404 (not a 500)', async () => {
+    const { status, body } = await del('/api/coworking-sessions/does-not-exist');
+    expect(status).toBe(404);
+    expect(body).toEqual({ error: 'Coworking session not found' });
   });
 });
 
