@@ -274,15 +274,23 @@ async function setupAndGetDataStore() {
                 console.log('Database seeded successfully.');
             }
 
-            // Seed initial admin user
+            // Seed initial admin user, configured via env vars only (no hardcoded credentials).
+            // If ADMIN_SEED_* aren't set, skip seeding rather than creating a default account.
             const userRes = await schemaClient.query('SELECT COUNT(*) FROM users WHERE role = $1', ['admin']);
             if (userRes.rows[0].count === '0') {
-                console.log('Seeding initial admin user...');
-                await schemaClient.query(
-                    'INSERT INTO users (id, username, email, password, role, status) VALUES ($1, $2, $3, $4, $5, $6)',
-                    ['admin-001', 'Admin1', 'je2alvarela@gmail.com', '1357', 'admin', 'approved']
-                );
-                console.log('Admin user seeded successfully.');
+                const seedUsername = process.env.ADMIN_SEED_USERNAME;
+                const seedPassword = process.env.ADMIN_SEED_PASSWORD;
+                const seedEmail = process.env.ADMIN_SEED_EMAIL;
+                if (seedUsername && seedPassword && seedEmail) {
+                    console.log('Seeding initial admin user from ADMIN_SEED_* env vars...');
+                    await schemaClient.query(
+                        'INSERT INTO users (id, username, email, password, role, status) VALUES ($1, $2, $3, $4, $5, $6)',
+                        [`admin-${Date.now()}`, seedUsername, seedEmail, seedPassword, 'admin', 'approved']
+                    );
+                    console.log('Admin user seeded successfully.');
+                } else {
+                    console.warn('⚠️  No admin user exists and ADMIN_SEED_USERNAME/PASSWORD/EMAIL are not set — skipping admin seed. Set them in the environment to create the first admin account.');
+                }
             }
 
             // Add consumedExtras column if it doesn't exist
