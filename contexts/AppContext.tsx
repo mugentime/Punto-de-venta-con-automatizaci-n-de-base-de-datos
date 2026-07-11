@@ -1,18 +1,17 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback, useMemo } from 'react';
-import useLocalStorage from '../hooks/useLocalStorage';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef } from 'react';
 import { sessionCache, CACHE_KEYS } from '../utils/sessionCache';
-import { dedupedFetch, invalidateCache, shouldRefreshOnVisibility, getCachedData } from '../utils/apiCache';
+import { dedupedFetch } from '../utils/apiCache';
 import offlineStorage, { STORES } from '../utils/offlineStorage';
+import useCart from '../hooks/useCart';
+import useAuthUsers from '../hooks/useAuthUsers';
+import useProducts from '../hooks/useProducts';
+import useCustomers from '../hooks/useCustomers';
+import useCashWithdrawals from '../hooks/useCashWithdrawals';
+import useExpenses from '../hooks/useExpenses';
+import useOrders from '../hooks/useOrders';
+import useCoworkingSessions from '../hooks/useCoworkingSessions';
+import useCashSessions from '../hooks/useCashSessions';
 import type { Product, CartItem, Order, Expense, CoworkingSession, CashSession, User, Customer, CustomerCredit, CashWithdrawal } from '../types';
-
-const initialAdmin: User = {
-    id: 'admin-001',
-    username: 'Admin1',
-    email: 'je2alvarela@gmail.com',
-    password: '1357',
-    role: 'admin',
-    status: 'approved',
-};
 
 interface AppContextType {
     // Initialization state
@@ -74,43 +73,196 @@ interface AppContextType {
 
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
+// Phase 5 of the architecture cleanup: this used to be a single 1,485-line
+// file owning all state and every fetch call directly. Now each resource's
+// state + self-contained CRUD lives in its own hook (see hooks/use*.ts).
+// What's left here is exactly the part that doesn't decompose cleanly: app
+// startup (cache-then-network loading for every resource at once) and the
+// handful of functions that genuinely span multiple resources - createOrder
+// (cart + customer discount + product stock), addExpense (cash session +
+// withdrawal), finishCoworkingSession (products + orders + its own session
+// update), and closeCashSession (orders + expenses + coworking + withdrawals).
 export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-    // --- STATE MANAGEMENT ---
+    const cartHook = useCart();
+    const authHook = useAuthUsers();
+    const productsHook = useProducts();
+    const customersHook = useCustomers();
+    const cashWithdrawalsHook = useCashWithdrawals();
+    const expensesHook = useExpenses();
+    const ordersHook = useOrders();
+    const coworkingHook = useCoworkingSessions();
+    const cashSessionsHook = useCashSessions();
 
     // PWA initialization state - prevents showing stale/empty data
     const [isInitializing, setIsInitializing] = useState(true);
 
-    // All State (now fetched from backend)
-    const [users, setUsers] = useState<User[]>([]);
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
-    const [products, setProducts] = useState<Product[]>([]);
-    const [cart, setCart] = useState<CartItem[]>([]);
-    const [orders, setOrders] = useState<Order[]>([]);
-    const [expenses, setExpenses] = useState<Expense[]>([]);
-    const [coworkingSessions, setCoworkingSessions] = useState<CoworkingSession[]>([]);
-    const [cashSessions, setCashSessions] = useState<CashSession[]>([]);
-    const [cashWithdrawals, setCashWithdrawals] = useState<CashWithdrawal[]>([]);
-    const [customers, setCustomers] = useState<Customer[]>([]);
-
-    // --- EFFECTS ---
-
-    // Restore user session from localStorage on app load
-    useEffect(() => {
-        const storedUser = localStorage.getItem('currentUser');
-        if (storedUser) {
-            try {
-                const user = JSON.parse(storedUser);
-                setCurrentUser(user);
-            } catch (error) {
-                console.error('Failed to restore user session:', error);
-                localStorage.removeItem('currentUser');
-            }
-        }
-    }, []);
-
     // Track if initial load from cache has been done
     const initialLoadDone = useRef(false);
     const isFetching = useRef(false); // Prevent concurrent fetches
+
+    const fetchAllDataFromServer = async (isBackground: boolean) => {
+        const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
+
+        // BACKGROUND: Fetch ALL data to ensure fresh data on PWA reload
+        // FIX: Now includes customers for instant PWA loading
+        if (isBackground) {
+            console.log(`${logPrefix} Background refresh - fetching all data including customers`);
+            try {
+                const [productsData, ordersData, expensesData, coworkingData, cashData, customersData] = await Promise.all([
+                    dedupedFetch<Product[]>('/api/products').catch(() => null),
+                    dedupedFetch<Order[]>('/api/orders').catch(() => null),
+                    dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
+                    dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
+                    dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
+                    dedupedFetch<Customer[]>('/api/customers').catch(() => null)
+                ]);
+
+                if (productsData) {
+                    productsHook.hydrateProducts(productsData);
+                    sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
+                    offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(() => {});
+                }
+                if (ordersData) {
+                    ordersHook.hydrateOrders(ordersData);
+                    sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
+                    offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
+                }
+                if (expensesData) {
+                    expensesHook.hydrateExpenses(expensesData);
+                    sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
+                    offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
+                }
+                if (coworkingData) {
+                    console.log(`${logPrefix} 🏢 Coworking sessions refreshed: ${coworkingData.length} sessions`);
+                    coworkingHook.hydrateCoworkingSessions(coworkingData);
+                    sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
+                }
+                if (cashData) {
+                    const mappedSessions: CashSession[] = cashData.map(session => ({
+                        id: session.id,
+                        startDate: session.startTime,
+                        endDate: session.endTime,
+                        startAmount: session.startAmount,
+                        endAmount: session.endAmount,
+                        status: session.status === 'active' ? 'open' : 'closed',
+                        totalSales: session.totalSales,
+                        totalExpenses: session.totalExpenses,
+                        expectedCash: session.expectedCash,
+                        difference: session.difference
+                    }));
+                    cashSessionsHook.hydrateCashSessions(mappedSessions);
+                    sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
+                    offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
+                }
+                // FIX: Customers now included in background refresh for instant PWA load
+                if (customersData) {
+                    customersHook.hydrateCustomers(customersData);
+                    sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
+                    offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
+                    console.log(`${logPrefix} 👥 Customers refreshed: ${customersData.length} customers`);
+                }
+                console.log(`${logPrefix} ✅ Background refresh complete`);
+            } catch (error) {
+                console.error(`${logPrefix} Background refresh failed:`, error);
+            }
+            return;
+        }
+
+        // INITIAL LOAD: Fetch everything
+        console.log(`${logPrefix} Starting initial data fetch (8 calls)...`);
+
+        try {
+            // OPTIMIZED: Parallel fetch with deduplication
+            const [
+                productsData,
+                ordersData,
+                expensesData,
+                coworkingData,
+                cashData,
+                usersData,
+                customersData,
+                withdrawalsData
+            ] = await Promise.all([
+                dedupedFetch<Product[]>('/api/products').catch(() => null),
+                dedupedFetch<Order[]>('/api/orders').catch(() => null),
+                dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
+                dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
+                dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
+                dedupedFetch<User[]>('/api/users').catch(() => []),
+                dedupedFetch<Customer[]>('/api/customers').catch(() => null),
+                dedupedFetch<CashWithdrawal[]>('/api/cash-withdrawals').catch(() => null)
+            ]);
+
+            // Update state and caches in parallel
+            if (productsData) {
+                console.log(`${logPrefix} 📦 Products loaded: ${productsData.length} items`);
+                productsHook.hydrateProducts(productsData);
+                sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
+                offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(console.error);
+            }
+
+            if (ordersData) {
+                console.log(`${logPrefix} 📋 Orders loaded: ${ordersData.length} orders`);
+                ordersHook.hydrateOrders(ordersData);
+                sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
+                offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(console.error);
+            }
+
+            if (expensesData) {
+                expensesHook.hydrateExpenses(expensesData);
+                sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
+                offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(console.error);
+            }
+
+            if (coworkingData) {
+                console.log(`${logPrefix} 🏢 Coworking sessions loaded: ${coworkingData.length} sessions`);
+                coworkingHook.hydrateCoworkingSessions(coworkingData);
+                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
+            }
+
+            if (cashData) {
+                console.log(`${logPrefix} 💰 Cash sessions loaded: ${cashData.length} sessions`);
+                const mappedSessions: CashSession[] = cashData.map(session => ({
+                    id: session.id,
+                    startDate: session.startTime,
+                    endDate: session.endTime,
+                    startAmount: session.startAmount,
+                    endAmount: session.endAmount,
+                    status: session.status === 'active' ? 'open' : 'closed',
+                    totalSales: session.totalSales,
+                    totalExpenses: session.totalExpenses,
+                    expectedCash: session.expectedCash,
+                    difference: session.difference
+                }));
+                cashSessionsHook.hydrateCashSessions(mappedSessions);
+                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
+                offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(console.error);
+            }
+
+            if (usersData) {
+                authHook.hydrateUsers(usersData);
+                sessionCache.set(CACHE_KEYS.USERS, usersData);
+            }
+
+            if (customersData) {
+                console.log(`${logPrefix} 👥 Customers loaded: ${customersData.length} customers`);
+                customersHook.hydrateCustomers(customersData);
+                sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
+                // FIX: Persist customers to IndexedDB for instant PWA reload
+                offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(console.error);
+            }
+
+            if (withdrawalsData) {
+                cashWithdrawalsHook.hydrateCashWithdrawals(withdrawalsData);
+                sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
+            }
+
+            console.log(`${logPrefix} ✅ Data fetch complete (parallel)`);
+        } catch (error) {
+            console.error("Failed to fetch data:", error);
+            authHook.hydrateUsers([]);
+        }
+    };
 
     // Fetch all data from database on app load (with multi-tier cache)
     useEffect(() => {
@@ -150,22 +302,22 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
                     // Load cached data instantly for fast first paint
                     if (cachedProducts && cachedProducts.length > 0) {
-                        setProducts(cachedProducts);
+                        productsHook.hydrateProducts(cachedProducts);
                         console.log(`📦 Products from cache: ${cachedProducts.length} items`);
                     }
                     if (cachedOrders && cachedOrders.length > 0) {
-                        setOrders(cachedOrders);
+                        ordersHook.hydrateOrders(cachedOrders);
                         console.log(`📋 Orders from cache: ${cachedOrders.length} orders`);
                     }
-                    if (cachedExpenses && cachedExpenses.length > 0) setExpenses(cachedExpenses);
-                    if (cachedCoworking && cachedCoworking.length > 0) setCoworkingSessions(cachedCoworking);
+                    if (cachedExpenses && cachedExpenses.length > 0) expensesHook.hydrateExpenses(cachedExpenses);
+                    if (cachedCoworking && cachedCoworking.length > 0) coworkingHook.hydrateCoworkingSessions(cachedCoworking);
                     if (cachedCashSessions && cachedCashSessions.length > 0) {
-                        setCashSessions(cachedCashSessions);
+                        cashSessionsHook.hydrateCashSessions(cachedCashSessions);
                         console.log(`💰 Cash sessions from cache: ${cachedCashSessions.length} sessions`);
                     }
-                    if (cachedUsers && cachedUsers.length > 0) setUsers(cachedUsers);
-                    if (cachedCustomers && cachedCustomers.length > 0) setCustomers(cachedCustomers);
-                    if (cachedWithdrawals && cachedWithdrawals.length > 0) setCashWithdrawals(cachedWithdrawals);
+                    if (cachedUsers && cachedUsers.length > 0) authHook.hydrateUsers(cachedUsers);
+                    if (cachedCustomers && cachedCustomers.length > 0) customersHook.hydrateCustomers(cachedCustomers);
+                    if (cachedWithdrawals && cachedWithdrawals.length > 0) cashWithdrawalsHook.hydrateCashWithdrawals(cachedWithdrawals);
 
                     initialLoadDone.current = true;
                     // PWA FIX: Only mark as initialized if we have valid data
@@ -199,462 +351,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             }
         };
 
-        const fetchAllDataFromServer = async (isBackground: boolean) => {
-            const logPrefix = isBackground ? '🔄 [BG]' : '🔄';
-
-            // BACKGROUND: Fetch ALL data to ensure fresh data on PWA reload
-            // FIX: Now includes customers for instant PWA loading
-            if (isBackground) {
-                console.log(`${logPrefix} Background refresh - fetching all data including customers`);
-                try {
-                    const [productsData, ordersData, expensesData, coworkingData, cashData, customersData] = await Promise.all([
-                        dedupedFetch<Product[]>('/api/products').catch(() => null),
-                        dedupedFetch<Order[]>('/api/orders').catch(() => null),
-                        dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
-                        dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
-                        dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
-                        dedupedFetch<Customer[]>('/api/customers').catch(() => null)
-                    ]);
-
-                    if (productsData) {
-                        setProducts(productsData);
-                        sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
-                        offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(() => {});
-                    }
-                    if (ordersData) {
-                        setOrders(ordersData);
-                        sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
-                        offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
-                    }
-                    if (expensesData) {
-                        setExpenses(expensesData);
-                        sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
-                        offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
-                    }
-                    if (coworkingData) {
-                        console.log(`${logPrefix} 🏢 Coworking sessions refreshed: ${coworkingData.length} sessions`);
-                        setCoworkingSessions(coworkingData);
-                        sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
-                    }
-                    if (cashData) {
-                        const mappedSessions: CashSession[] = cashData.map(session => ({
-                            id: session.id,
-                            startDate: session.startTime,
-                            endDate: session.endTime,
-                            startAmount: session.startAmount,
-                            endAmount: session.endAmount,
-                            status: session.status === 'active' ? 'open' : 'closed',
-                            totalSales: session.totalSales,
-                            totalExpenses: session.totalExpenses,
-                            expectedCash: session.expectedCash,
-                            difference: session.difference
-                        }));
-                        setCashSessions(mappedSessions);
-                        sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
-                        offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
-                    }
-                    // FIX: Customers now included in background refresh for instant PWA load
-                    if (customersData) {
-                        setCustomers(customersData);
-                        sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
-                        offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
-                        console.log(`${logPrefix} 👥 Customers refreshed: ${customersData.length} customers`);
-                    }
-                    console.log(`${logPrefix} ✅ Background refresh complete`);
-                } catch (error) {
-                    console.error(`${logPrefix} Background refresh failed:`, error);
-                }
-                return;
-            }
-
-            // INITIAL LOAD: Fetch everything
-            console.log(`${logPrefix} Starting initial data fetch (8 calls)...`);
-
-            try {
-                // OPTIMIZED: Parallel fetch with deduplication
-                const [
-                    productsData,
-                    ordersData,
-                    expensesData,
-                    coworkingData,
-                    cashData,
-                    usersData,
-                    customersData,
-                    withdrawalsData
-                ] = await Promise.all([
-                    dedupedFetch<Product[]>('/api/products').catch(() => null),
-                    dedupedFetch<Order[]>('/api/orders').catch(() => null),
-                    dedupedFetch<Expense[]>('/api/expenses').catch(() => null),
-                    dedupedFetch<CoworkingSession[]>('/api/coworking-sessions').catch(() => null),
-                    dedupedFetch<any[]>('/api/cash-sessions?limit=100').catch(() => null),
-                    dedupedFetch<User[]>('/api/users').catch(() => [initialAdmin]),
-                    dedupedFetch<Customer[]>('/api/customers').catch(() => null),
-                    dedupedFetch<CashWithdrawal[]>('/api/cash-withdrawals').catch(() => null)
-                ]);
-
-                // Update state and caches in parallel
-                if (productsData) {
-                    console.log(`${logPrefix} 📦 Products loaded: ${productsData.length} items`);
-                    setProducts(productsData);
-                    sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
-                    offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(console.error);
-                }
-
-                if (ordersData) {
-                    console.log(`${logPrefix} 📋 Orders loaded: ${ordersData.length} orders`);
-                    setOrders(ordersData);
-                    sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
-                    offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(console.error);
-                }
-
-                if (expensesData) {
-                    setExpenses(expensesData);
-                    sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
-                    offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(console.error);
-                }
-
-                if (coworkingData) {
-                    console.log(`${logPrefix} 🏢 Coworking sessions loaded: ${coworkingData.length} sessions`);
-                    setCoworkingSessions(coworkingData);
-                    sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
-                }
-
-                if (cashData) {
-                    console.log(`${logPrefix} 💰 Cash sessions loaded: ${cashData.length} sessions`);
-                    const mappedSessions: CashSession[] = cashData.map(session => ({
-                        id: session.id,
-                        startDate: session.startTime,
-                        endDate: session.endTime,
-                        startAmount: session.startAmount,
-                        endAmount: session.endAmount,
-                        status: session.status === 'active' ? 'open' : 'closed',
-                        totalSales: session.totalSales,
-                        totalExpenses: session.totalExpenses,
-                        expectedCash: session.expectedCash,
-                        difference: session.difference
-                    }));
-                    setCashSessions(mappedSessions);
-                    sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
-                    offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(console.error);
-                }
-
-                if (usersData) {
-                    setUsers(usersData);
-                    sessionCache.set(CACHE_KEYS.USERS, usersData);
-                }
-
-                if (customersData) {
-                    console.log(`${logPrefix} 👥 Customers loaded: ${customersData.length} customers`);
-                    setCustomers(customersData);
-                    sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
-                    // FIX: Persist customers to IndexedDB for instant PWA reload
-                    offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(console.error);
-                }
-
-                if (withdrawalsData) {
-                    setCashWithdrawals(withdrawalsData);
-                    sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
-                }
-
-                console.log(`${logPrefix} ✅ Data fetch complete (parallel)`);
-            } catch (error) {
-                console.error("Failed to fetch data:", error);
-                setUsers([initialAdmin]);
-            }
-        };
-
         loadFromCacheOrFetch();
     }, []);
 
-    // 🔄 MINIMAL POLLING: Only poll when there are ACTIVE coworking sessions
-    // No polling = no API calls = cheap & fast
-    // FIX: Memoize active count to prevent infinite loop from .filter() creating new array each render
-    const activeSessionCount = useMemo(
-        () => coworkingSessions.filter(s => s.status === 'active').length,
-        [coworkingSessions]
-    );
-
-    useEffect(() => {
-        // NO POLLING if no active sessions - saves API calls
-        if (activeSessionCount === 0) {
-            console.log('⏱️ No active coworking sessions - polling disabled');
-            return;
-        }
-
-        console.log('⏱️ Active coworking session detected - polling every 10s');
-
-        const pollCoworkingSessions = async () => {
-            if (document.visibilityState !== 'visible' || !navigator.onLine) return;
-
-            try {
-                const sessions = await dedupedFetch<CoworkingSession[]>('/api/coworking-sessions', {}, true);
-                setCoworkingSessions(sessions);
-                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, sessions);
-            } catch (error) {
-                console.error('Failed to poll coworking sessions:', error);
-            }
-        };
-
-        // Poll every 10 seconds ONLY when active sessions exist
-        const interval = setInterval(pollCoworkingSessions, 10000);
-
-        return () => clearInterval(interval);
-    }, [activeSessionCount]); // Stable memoized value - no infinite loop
-
-
-    // --- FUNCTIONS ---
-
-    // Auth Functions (updated for API)
-    const login = async (username: string, password?: string): Promise<void> => {
-        try {
-            // Call the login API endpoint which validates credentials server-side
-            const response = await fetch('/api/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ username, password }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Error al iniciar sesión');
-            }
-
-            const user = await response.json();
-
-            // Set current user and persist to localStorage
-            setCurrentUser(user);
-            localStorage.setItem('currentUser', JSON.stringify(user));
-        } catch (error) {
-            throw error;
-        }
-    };
-
-    const logout = () => {
-        setCurrentUser(null);
-        // Clear from localStorage
-        localStorage.removeItem('currentUser');
-    };
-
-    const register = async (userDetails: Omit<User, 'id' | 'role' | 'status'>): Promise<void> => {
-        // Check for duplicates in local state first (quick validation)
-        if (users.some(u => u.username.toLowerCase() === userDetails.username.toLowerCase())) {
-            throw new Error('El nombre de usuario ya existe.');
-        }
-        if (users.some(u => u.email.toLowerCase() === userDetails.email.toLowerCase())) {
-            throw new Error('El correo electrónico ya está en uso.');
-        }
-
-        try {
-            // Create user via API to persist to database
-            const response = await fetch('/api/users', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    ...userDetails,
-                    role: 'employee',
-                    status: 'pending'
-                }),
-            });
-
-            if (!response.ok) {
-                const error = await response.json();
-                throw new Error(error.error || 'Failed to create user');
-            }
-
-            const newUser = await response.json();
-            setUsers(prev => [...prev, newUser]);
-        } catch (error) {
-            console.error("Error registering user:", error);
-            throw error;
-        }
-    };
-
-    const approveUser = async (userId: string) => {
-        try {
-            const user = users.find(u => u.id === userId);
-            if (!user) {
-                alert('Usuario no encontrado');
-                throw new Error('User not found');
-            }
-
-            const response = await fetch(`/api/users/${userId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    username: user.username,
-                    email: user.email,
-                    role: user.role,
-                    status: 'approved'
-                }),
-            });
-
-            if (!response.ok) {
-                alert('Error al aprobar el usuario. Por favor intente de nuevo.');
-                throw new Error('Failed to approve user');
-            }
-
-            const updatedUser = await response.json();
-            setUsers(prev => prev.map(u => u.id === userId ? updatedUser : u));
-            alert(`✅ Usuario ${user.username} aprobado exitosamente`);
-        } catch (error) {
-            console.error("Error approving user:", error);
-            throw error;
-        }
-    };
-
-    const deleteUser = async (userId: string) => {
-        try {
-            const response = await fetch(`/api/users/${userId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete user');
-
-            setUsers(prev => prev.filter(u => u.id !== userId));
-        } catch (error) {
-            console.error("Error deleting user:", error);
-            throw error;
-        }
-    };
-
-    // Product Functions (rewritten to use API)
-    const addProduct = async (product: Omit<Product, 'id'>) => {
-        try {
-            const response = await fetch('/api/products', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(product),
-            });
-            if (!response.ok) throw new Error('Failed to create product');
-            const newProduct = await response.json();
-            setProducts(prev => {
-                const updated = [...prev, newProduct];
-                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error adding product:", error);
-        }
-    };
-
-    const updateProduct = async (updatedProduct: Product) => {
-        try {
-            const response = await fetch(`/api/products/${updatedProduct.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedProduct),
-            });
-            if (!response.ok) throw new Error('Failed to update product');
-            const returnedProduct = await response.json();
-            setProducts(prev => {
-                const updated = prev.map(p => p.id === returnedProduct.id ? returnedProduct : p);
-                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error updating product:", error);
-        }
-    };
-
-    const deleteProduct = async (productId: string) => {
-        try {
-            const response = await fetch(`/api/products/${productId}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) throw new Error('Failed to delete product');
-            setProducts(prev => {
-                const updated = prev.filter(p => p.id !== productId);
-                sessionCache.set(CACHE_KEYS.PRODUCTS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error deleting product:", error);
-        }
-    };
-
-    const importProducts = async (importedProducts: Omit<Product, 'id'>[]) => {
-        try {
-            const response = await fetch('/api/products/import', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(importedProducts),
-            });
-            if (!response.ok) throw new Error('Failed to import products');
-            const fullProductList = await response.json();
-            setProducts(fullProductList);
-            sessionCache.set(CACHE_KEYS.PRODUCTS, fullProductList);
-        } catch (error) {
-            console.error("Error importing products:", error);
-        }
-    };
-
-    // Cart Functions (no changes to cart logic itself)
-    const addToCart = (product: Product) => {
-        setCart(prev => {
-            const existingItem = prev.find(item => item.id === product.id);
-            if (existingItem) {
-                return prev.map(item =>
-                    item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-                );
-            }
-            return [...prev, { ...product, quantity: 1 }];
-        });
-    };
-    
-    const removeFromCart = (productId: string) => {
-        setCart(prev => prev.filter(item => item.id !== productId));
-    };
-    
-    const updateCartQuantity = (productId: string, quantity: number) => {
-        if (quantity <= 0) {
-            removeFromCart(productId);
-            return;
-        }
-        setCart(prev => prev.map(item => item.id === productId ? { ...item, quantity } : item));
-    };
-
-    const clearCart = () => {
-        setCart([]);
-    };
-    
-    // Combined Order/Stock Update Function
-    const updateStockForSale = async (items: { id: string, quantity: number }[]) => {
-        if (items.length === 0) return;
-        try {
-            await fetch('/api/products/update-stock', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ items }),
-            });
-             // Optimistically update frontend state
-            setProducts(prevProducts => {
-                const updatedProducts = [...prevProducts];
-                items.forEach(itemToUpdate => {
-                    const productIndex = updatedProducts.findIndex(p => p.id === itemToUpdate.id);
-                    if (productIndex > -1) {
-                        updatedProducts[productIndex].stock -= itemToUpdate.quantity;
-                    }
-                });
-                return updatedProducts;
-            });
-        } catch (error) {
-            console.error("Failed to update stock:", error);
-            // Here you might want to refetch products to ensure consistency
-        }
-    }
-
     // Order Function (updated for API)
     const createOrder = async (orderDetails: { clientName: string; serviceType: 'Mesa' | 'Para llevar'; paymentMethod: 'Efectivo' | 'Tarjeta' | 'Crédito'; customerId?: string; tip?: number; }) => {
-        if(cart.length === 0) return;
+        if (cartHook.cart.length === 0) return;
 
         // FIX BUG 3: Clear cart IMMEDIATELY to prevent duplicate orders during async operations
-        const orderCart = [...cart];
-        const orderSubtotal = cartSubtotal;
+        const orderCart = [...cartHook.cart];
+        const orderSubtotal = cartHook.cartSubtotal;
 
         // FIX BUG 1: Calculate discount from customer
         let discount = 0;
         if (orderDetails.customerId) {
-            const customer = customers.find(c => c.id === orderDetails.customerId);
+            const customer = customersHook.customers.find(c => c.id === orderDetails.customerId);
             if (customer && customer.discountPercentage > 0) {
                 discount = orderSubtotal * (customer.discountPercentage / 100);
                 console.log(`💰 Applying ${customer.discountPercentage}% discount for ${customer.name}: -$${discount.toFixed(2)}`);
@@ -664,7 +375,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         const tipAmount = orderDetails.tip || 0;
         const orderTotal = orderSubtotal - discount + tipAmount;
 
-        clearCart();
+        cartHook.clearCart();
 
         console.log('💾 Creating order...', {
             clientName: orderDetails.clientName,
@@ -686,7 +397,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 subtotal: orderSubtotal,
                 discount, // FIX BUG 1: Include discount in order data
                 total: orderTotal,
-                userId: currentUser?.id || 'guest',
+                userId: authHook.currentUser?.id || 'guest',
                 customerId: orderDetails.customerId || null,
                 tip: tipAmount,
                 idempotencyKey, // Add idempotency key
@@ -710,7 +421,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 const errorText = await response.text();
                 console.error('❌ Server error:', response.status, errorText);
                 // Restore cart if order failed
-                orderCart.forEach(item => addToCart(item));
+                orderCart.forEach(item => cartHook.addToCart(item));
                 alert(`❌ Error al guardar la orden: ${response.status} - ${errorText}`);
                 throw new Error(`Failed to create order: ${response.status} - ${errorText}`);
             }
@@ -719,11 +430,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             console.log('✅ Order saved successfully:', newOrder.id);
 
             // Update local state and cache (no refetch needed - we have the new order)
-            setOrders(prev => {
-                const updated = [newOrder, ...prev];
-                sessionCache.set(CACHE_KEYS.ORDERS, updated);
-                return updated;
-            });
+            ordersHook.pushOrder(newOrder);
 
             // 🚀 PERF FIX: Update stock in background (non-blocking)
             // This was causing ~100-500ms delay after order creation
@@ -731,7 +438,7 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 id: item.id,
                 quantity: item.quantity
             }));
-            updateStockForSale(stockUpdates).catch(err =>
+            productsHook.updateStockForSale(stockUpdates).catch(err =>
                 console.error('Background stock update failed:', err)
             );
 
@@ -741,51 +448,6 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             console.error("❌ Error creating order:", error);
             alert(`❌ ERROR: La venta NO se guardó. ${error.message || error}`);
             throw error; // Re-throw so caller knows it failed
-        }
-    };
-
-    const cartSubtotal = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
-    const cartTotal = cartSubtotal;
-
-    // Delete Order Function
-    const deleteOrder = async (orderId: string) => {
-        try {
-            const response = await fetch(`/api/orders/${orderId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete order');
-
-            // Update local state and cache
-            setOrders(prev => {
-                const updated = prev.filter(o => o.id !== orderId);
-                sessionCache.set(CACHE_KEYS.ORDERS, updated);
-                return updated;
-            });
-
-            console.log('✅ Order deleted successfully:', orderId);
-        } catch (error) {
-            console.error("Error deleting order:", error);
-            alert("Error al eliminar la orden");
-            throw error;
-        }
-    };
-
-    // 🔄 OPTION A: Refetch Orders Function - allows manual refresh
-    const refetchOrders = async () => {
-        try {
-            console.log('🔄 Refetching orders...');
-            const ordersResponse = await fetch('/api/orders');
-            if (ordersResponse.ok) {
-                const ordersData: Order[] = await ordersResponse.json();
-                console.log('✅ Orders refetched:', ordersData.length, 'orders');
-                setOrders(ordersData);
-                sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
-            } else {
-                console.error('❌ Failed to refetch orders:', await ordersResponse.text());
-            }
-        } catch (error) {
-            console.error('❌ Error refetching orders:', error);
         }
     };
 
@@ -806,23 +468,23 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
             ]);
 
             if (productsData) {
-                setProducts(productsData);
+                productsHook.hydrateProducts(productsData);
                 sessionCache.set(CACHE_KEYS.PRODUCTS, productsData);
                 offlineStorage.saveAll(STORES.PRODUCTS, productsData).catch(() => {});
             }
             if (ordersData) {
-                setOrders(ordersData);
+                ordersHook.hydrateOrders(ordersData);
                 sessionCache.set(CACHE_KEYS.ORDERS, ordersData);
                 offlineStorage.saveAll(STORES.ORDERS, ordersData).catch(() => {});
             }
             if (expensesData) {
-                setExpenses(expensesData);
+                expensesHook.hydrateExpenses(expensesData);
                 sessionCache.set(CACHE_KEYS.EXPENSES, expensesData);
                 offlineStorage.saveAll(STORES.EXPENSES, expensesData).catch(() => {});
             }
             if (coworkingData) {
                 console.log(`🏢 Coworking sessions refetched: ${coworkingData.length} sessions`);
-                setCoworkingSessions(coworkingData);
+                coworkingHook.hydrateCoworkingSessions(coworkingData);
                 sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, coworkingData);
             }
             if (cashData) {
@@ -838,21 +500,21 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                     expectedCash: session.expectedCash,
                     difference: session.difference
                 }));
-                setCashSessions(mappedSessions);
+                cashSessionsHook.hydrateCashSessions(mappedSessions);
                 sessionCache.set(CACHE_KEYS.CASH_SESSIONS, mappedSessions);
                 offlineStorage.saveAll(STORES.CASH_SESSIONS, mappedSessions).catch(() => {});
             }
             if (usersData) {
-                setUsers(usersData);
+                authHook.hydrateUsers(usersData);
                 sessionCache.set(CACHE_KEYS.USERS, usersData);
             }
             if (customersData) {
-                setCustomers(customersData);
+                customersHook.hydrateCustomers(customersData);
                 sessionCache.set(CACHE_KEYS.CUSTOMERS, customersData);
                 offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
             }
             if (withdrawalsData) {
-                setCashWithdrawals(withdrawalsData);
+                cashWithdrawalsHook.hydrateCashWithdrawals(withdrawalsData);
                 sessionCache.set(CACHE_KEYS.CASH_WITHDRAWALS, withdrawalsData);
             }
 
@@ -867,271 +529,151 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         try {
             // Si el pago es desde efectivo de caja, verificar que hay sesión abierta
             if (expense.paymentSource === 'efectivo_caja') {
-                const openSession = cashSessions.find(s => s.status === 'open');
+                const openSession = cashSessionsHook.cashSessions.find(s => s.status === 'open');
                 if (!openSession) {
                     alert('No hay una sesión de caja abierta. No se puede usar efectivo de caja.');
                     throw new Error('No open cash session');
                 }
 
                 // Crear retiro de caja asociado al gasto
-                await addCashWithdrawal(
+                await cashWithdrawalsHook.addCashWithdrawal(
                     openSession.id,
                     expense.amount,
-                    `Gasto: ${expense.description} (${expense.category})`
+                    `Gasto: ${expense.description} (${expense.category})`,
+                    authHook.currentUser?.id
                 );
             }
 
-            const response = await fetch('/api/expenses', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...expense, userId: currentUser?.id }),
-            });
-            if (!response.ok) throw new Error('Failed to create expense');
-            const newExpense = await response.json();
-            setExpenses(prev => {
-                const updated = [newExpense, ...prev];
-                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
-                return updated;
-            });
-
-            const sourceLabel = expense.paymentSource === 'efectivo_caja' ? 'Efectivo de Caja' : 'Transferencia';
-            alert(`Gasto registrado: $${expense.amount.toFixed(2)} (${sourceLabel})`);
+            await expensesHook.createExpense(expense, authHook.currentUser?.id);
         } catch (error) {
             console.error("Error adding expense:", error);
             throw error;
         }
     };
-    const updateExpense = async (updatedExpense: Expense) => {
-        try {
-            const response = await fetch(`/api/expenses/${updatedExpense.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updatedExpense),
-            });
-            if (!response.ok) throw new Error('Failed to update expense');
-            const returnedExpense = await response.json();
-            setExpenses(prev => {
-                const updated = prev.map(e => e.id === returnedExpense.id ? returnedExpense : e);
-                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error updating expense:", error);
-        }
-    };
-    const deleteExpense = async (expenseId: string) => {
-        try {
-            const response = await fetch(`/api/expenses/${expenseId}`, {
-                method: 'DELETE',
-            });
-            if (!response.ok) throw new Error('Failed to delete expense');
-            setExpenses(prev => {
-                const updated = prev.filter(e => e.id !== expenseId);
-                sessionCache.set(CACHE_KEYS.EXPENSES, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error deleting expense:", error);
-        }
-    };
-    
-    // Coworking Functions (updated for API)
-    const startCoworkingSession = async (clientName: string) => {
-        try {
-            const sessionData = {
-                clientName: clientName || 'Cliente',
-                startTime: new Date().toISOString(),
-                hourlyRate: 62,
-            };
 
-            const response = await fetch('/api/coworking-sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionData),
-            });
-
-            if (!response.ok) throw new Error('Failed to create coworking session');
-            const newSession = await response.json();
-
-            // Invalidate Service Worker cache for coworking-sessions API
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'INVALIDATE_API',
-                    endpoint: 'coworking-sessions'
-                });
-            }
-
-            setCoworkingSessions(prev => {
-                const updated = [newSession, ...prev];
-                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error starting coworking session:", error);
-        }
-    };
-
-    const updateCoworkingSession = async (sessionId: string, updates: Partial<CoworkingSession>) => {
-        try {
-            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updates),
-            });
-
-            if (!response.ok) throw new Error('Failed to update coworking session');
-            const updatedSession = await response.json();
-
-            // Invalidate Service Worker cache for coworking-sessions API
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'INVALIDATE_API',
-                    endpoint: 'coworking-sessions'
-                });
-            }
-
-            setCoworkingSessions(prev => {
-                const updated = prev.map(s => s.id === sessionId ? updatedSession : s);
-                sessionCache.set(CACHE_KEYS.COWORKING_SESSIONS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error updating coworking session:", error);
-        }
-    };
-    
+    // finishCoworkingSession spans coworking-sessions + products (stock) + orders
+    // (creates the closing order) - see hooks/useCoworkingSessions.ts for why the
+    // simpler coworking operations don't need this composition.
     const finishCoworkingSession = async (sessionId: string, paymentMethod: 'Efectivo' | 'Tarjeta') => {
         try {
-            const session = coworkingSessions.find(s => s.id === sessionId);
+            const session = coworkingHook.coworkingSessions.find(s => s.id === sessionId);
             if (!session || session.status === 'closed') {
                 throw new Error('Session not found or already finished');
             }
 
-        // Decrease stock for extras via API
-        const stockUpdates = session.consumedExtras.map(item => ({ id: item.id, quantity: item.quantity }));
-        await updateStockForSale(stockUpdates);
-        
-        // Create Order logic with correct coworking billing
-        const endTime = new Date();
-        const startTime = new Date(session.startTime);
-        const durationMs = endTime.getTime() - startTime.getTime();
-        const durationMinutes = Math.max(0, Math.ceil(durationMs / (1000 * 60)));
-        const durationHours = durationMinutes / 60;
+            // Decrease stock for extras via API
+            const stockUpdates = session.consumedExtras.map(item => ({ id: item.id, quantity: item.quantity }));
+            await productsHook.updateStockForSale(stockUpdates);
 
-        let baseCost = 0;
-        if (durationMinutes > 0) {
+            // Create Order logic with correct coworking billing
+            const endTime = new Date();
+            const startTime = new Date(session.startTime);
+            const durationMs = endTime.getTime() - startTime.getTime();
+            const durationMinutes = Math.max(0, Math.ceil(durationMs / (1000 * 60)));
+            const durationHours = durationMinutes / 60;
+
+            let baseCost = 0;
+            if (durationMinutes > 0) {
+                if (durationHours >= 4) {
+                    // 4+ horas = día completo
+                    baseCost = 225;
+                } else if (durationMinutes <= 60) {
+                    // Primera hora
+                    baseCost = 72;
+                } else {
+                    // Después de la primera hora: $36 por cada bloque de 30 minutos
+                    const extraMinutes = durationMinutes - 60;
+                    const halfHourBlocks = Math.ceil(extraMinutes / 30);
+                    baseCost = 72 + (halfHourBlocks * 36);
+                }
+            }
+
+            // Separar items de cafetería (incluidos) vs otros (se cobran aparte)
+            const cafeItems = session.consumedExtras.filter(item => item.category === 'Cafetería');
+            const chargeableItems = session.consumedExtras.filter(item => item.category !== 'Cafetería');
+
+            // Crear descripción del servicio
+            const hours = Math.floor(durationMinutes / 60);
+            const minutes = durationMinutes % 60;
+            let serviceDescription = `Tiempo: ${hours}h ${minutes}m`;
             if (durationHours >= 4) {
-                // 4+ horas = día completo
-                baseCost = 225;
-            } else if (durationMinutes <= 60) {
-                // Primera hora
-                baseCost = 72;
-            } else {
-                // Después de la primera hora: $36 por cada bloque de 30 minutos
-                const extraMinutes = durationMinutes - 60;
-                const halfHourBlocks = Math.ceil(extraMinutes / 30);
-                baseCost = 72 + (halfHourBlocks * 36);
+                serviceDescription += ` (Día completo)`;
             }
-        }
+            if (cafeItems.length > 0) {
+                serviceDescription += ` | Café incluido: ${cafeItems.map(item => `${item.name} x${item.quantity}`).join(', ')}`;
+            }
 
-        // Separar items de cafetería (incluidos) vs otros (se cobran aparte)
-        const cafeItems = session.consumedExtras.filter(item => item.category === 'Cafetería');
-        const chargeableItems = session.consumedExtras.filter(item => item.category !== 'Cafetería');
+            const coworkingServiceItem: CartItem = {
+                id: 'COWORK_SERVICE', name: `Servicio Coworking`, price: baseCost, cost: 0,
+                quantity: 1, stock: Infinity, description: serviceDescription,
+                imageUrl: '', category: 'Cafetería',
+            };
 
-        // Crear descripción del servicio
-        const hours = Math.floor(durationMinutes / 60);
-        const minutes = durationMinutes % 60;
-        let serviceDescription = `Tiempo: ${hours}h ${minutes}m`;
-        if (durationHours >= 4) {
-            serviceDescription += ` (Día completo)`;
-        }
-        if (cafeItems.length > 0) {
-            serviceDescription += ` | Café incluido: ${cafeItems.map(item => `${item.name} x${item.quantity}`).join(', ')}`;
-        }
+            // Convert cafe items to $0 price (complimentary) but keep cost for tracking
+            const cafeItemsWithZeroPrice = cafeItems.map(item => ({
+                ...item,
+                price: 0 // Complimentary for customers, but cost still tracked
+            }));
 
-        const coworkingServiceItem: CartItem = {
-            id: 'COWORK_SERVICE', name: `Servicio Coworking`, price: baseCost, cost: 0,
-            quantity: 1, stock: Infinity, description: serviceDescription,
-            imageUrl: '', category: 'Cafetería',
-        };
+            // Include ALL items: service + cafe items (at $0) + chargeable items
+            const allOrderItems = [coworkingServiceItem, ...cafeItemsWithZeroPrice, ...chargeableItems];
+            const subtotal = allOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
+            const total = subtotal;
 
-        // Convert cafe items to $0 price (complimentary) but keep cost for tracking
-        const cafeItemsWithZeroPrice = cafeItems.map(item => ({
-            ...item,
-            price: 0 // Complimentary for customers, but cost still tracked
-        }));
+            // Cost will be automatically calculated from allOrderItems by the server
+            const totalCost = session.consumedExtras.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
 
-        // Include ALL items: service + cafe items (at $0) + chargeable items
-        const allOrderItems = [coworkingServiceItem, ...cafeItemsWithZeroPrice, ...chargeableItems];
-        const subtotal = allOrderItems.reduce((acc, item) => acc + item.price * item.quantity, 0);
-        const total = subtotal;
+            const newOrder: Order = {
+                id: `ORD-${Date.now()}`, date: endTime.toISOString(), items: allOrderItems,
+                subtotal, total, totalCost, clientName: session.clientName,
+                serviceType: 'Mesa', paymentMethod,
+            };
 
-        // Cost will be automatically calculated from allOrderItems by the server
-        const totalCost = session.consumedExtras.reduce((acc, item) => acc + (item.cost * item.quantity), 0);
-
-        const newOrder: Order = {
-            id: `ORD-${Date.now()}`, date: endTime.toISOString(), items: allOrderItems,
-            subtotal, total, totalCost, clientName: session.clientName,
-            serviceType: 'Mesa', paymentMethod,
-        };
-
-        // CRITICAL FIX: Persist coworking order to database for profit tracking
-        console.log('💾 Attempting to save coworking order to database...', {
-            clientName: session.clientName,
-            total,
-            items: allOrderItems.length
-        });
-
-        try {
-            const response = await fetch('/api/orders', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    clientName: session.clientName,
-                    serviceType: 'Mesa',
-                    paymentMethod,
-                    items: allOrderItems,
-                    subtotal,
-                    total,
-                    userId: currentUser?.id || 'coworking-system'
-                })
+            // CRITICAL FIX: Persist coworking order to database for profit tracking
+            console.log('💾 Attempting to save coworking order to database...', {
+                clientName: session.clientName,
+                total,
+                items: allOrderItems.length
             });
 
-            console.log('📡 Server response status:', response.status);
-
-            if (response.ok) {
-                const createdOrder = await response.json();
-                setOrders(prev => {
-                    const updated = [createdOrder, ...prev];
-                    sessionCache.set(CACHE_KEYS.ORDERS, updated);
-                    return updated;
+            try {
+                const response = await fetch('/api/orders', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        clientName: session.clientName,
+                        serviceType: 'Mesa',
+                        paymentMethod,
+                        items: allOrderItems,
+                        subtotal,
+                        total,
+                        userId: authHook.currentUser?.id || 'coworking-system'
+                    })
                 });
-                console.log('✅ Coworking order successfully saved to database:', createdOrder.id);
-                alert(`✅ Sesión de coworking guardada: ${session.clientName} - $${total.toFixed(2)}`);
-            } else {
-                const errorText = await response.text();
-                console.error('❌ Failed to save coworking order. Status:', response.status, 'Error:', errorText);
-                alert(`⚠️ Error al guardar la orden de coworking: ${response.status} - ${errorText}`);
+
+                console.log('📡 Server response status:', response.status);
+
+                if (response.ok) {
+                    const createdOrder = await response.json();
+                    ordersHook.pushOrder(createdOrder);
+                    console.log('✅ Coworking order successfully saved to database:', createdOrder.id);
+                    alert(`✅ Sesión de coworking guardada: ${session.clientName} - $${total.toFixed(2)}`);
+                } else {
+                    const errorText = await response.text();
+                    console.error('❌ Failed to save coworking order. Status:', response.status, 'Error:', errorText);
+                    alert(`⚠️ Error al guardar la orden de coworking: ${response.status} - ${errorText}`);
+                    // Fallback to local state only
+                    ordersHook.pushOrder(newOrder);
+                }
+            } catch (error) {
+                console.error('❌ Error saving coworking order:', error);
+                alert(`⚠️ Error al guardar la orden de coworking: ${error.message}`);
                 // Fallback to local state only
-                setOrders(prev => {
-                    const updated = [newOrder, ...prev];
-                    sessionCache.set(CACHE_KEYS.ORDERS, updated);
-                    return updated;
-                });
+                ordersHook.pushOrder(newOrder);
             }
-        } catch (error) {
-            console.error('❌ Error saving coworking order:', error);
-            alert(`⚠️ Error al guardar la orden de coworking: ${error.message}`);
-            // Fallback to local state only
-            setOrders(prev => {
-                const updated = [newOrder, ...prev];
-                sessionCache.set(CACHE_KEYS.ORDERS, updated);
-                return updated;
-            });
-        }
 
             // Update session with calculated total, duration, and payment method for reporting
-            updateCoworkingSession(sessionId, {
+            await coworkingHook.updateCoworkingSession(sessionId, {
                 endTime: endTime.toISOString(),
                 status: 'finished',
                 total: total,
@@ -1149,116 +691,11 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
         }
     };
 
-    const cancelCoworkingSession = async (sessionId: string) => {
-        try {
-            console.log('🗑️ Attempting to cancel coworking session:', sessionId);
-            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
-                method: 'DELETE',
-            });
-
-            console.log('📡 Server response status:', response.status);
-
-            if (!response.ok) {
-                const errorText = await response.text();
-                console.error('❌ Failed to cancel session. Status:', response.status, 'Error:', errorText);
-                throw new Error(`Failed to cancel coworking session: ${response.status} - ${errorText}`);
-            }
-
-            console.log('✅ Session cancelled successfully from database');
-
-            // Invalidate Service Worker cache for coworking-sessions API
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'INVALIDATE_API',
-                    endpoint: 'coworking-sessions'
-                });
-            }
-
-            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
-            alert('✅ Sesión cancelada exitosamente');
-        } catch (error) {
-            console.error("❌ Error canceling coworking session:", error);
-            alert(`❌ Error al cancelar la sesión: ${error.message || error}`);
-            // DO NOT update local state if API fails - this ensures data consistency
-            throw error;
-        }
-    };
-
-    const deleteCoworkingSession = async (sessionId: string) => {
-        try {
-            const response = await fetch(`/api/coworking-sessions/${sessionId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete coworking session');
-
-            // Invalidate Service Worker cache for coworking-sessions API
-            if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-                navigator.serviceWorker.controller.postMessage({
-                    type: 'INVALIDATE_API',
-                    endpoint: 'coworking-sessions'
-                });
-            }
-
-            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
-        } catch (error) {
-            console.error("Error deleting coworking session:", error);
-            // Fallback to local state update if API fails
-            setCoworkingSessions(prev => prev.filter(s => s.id !== sessionId));
-        }
-    };
-
-    // Cash Session Functions (updated for API)
-    const startCashSession = async (startAmount: number) => {
-        const existingOpenSession = cashSessions.find(s => s.status === 'open');
-        if (existingOpenSession) {
-            alert("Ya hay una sesión de caja abierta.");
-            return;
-        }
-
-        try {
-            const sessionData = {
-                startAmount,
-                startTime: new Date().toISOString(),
-                userId: currentUser?.id || 'guest'
-            };
-
-            const response = await fetch('/api/cash-sessions', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(sessionData),
-            });
-
-            if (!response.ok) throw new Error('Failed to create cash session');
-            const newSession = await response.json();
-
-            // Map API response to frontend CashSession type
-            const mappedSession: CashSession = {
-                id: newSession.id,
-                startDate: newSession.startTime,
-                endDate: newSession.endTime,
-                startAmount: newSession.startAmount,
-                endAmount: newSession.endAmount,
-                status: newSession.status === 'active' ? 'open' : 'closed',
-                totalSales: newSession.totalSales || 0,
-                totalExpenses: newSession.totalExpenses || 0,
-                expectedCash: newSession.expectedCash || newSession.startAmount,
-                difference: newSession.difference || 0
-            };
-
-            setCashSessions(prev => {
-                const updated = [mappedSession, ...prev];
-                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, updated);
-                return updated;
-            });
-        } catch (error) {
-            console.error("Error starting cash session:", error);
-            alert("Error al iniciar la sesión de caja");
-        }
-    };
-
+    // closeCashSession spans cash-sessions + orders + expenses + coworking-sessions
+    // + cash-withdrawals to compute the closing summary - see
+    // hooks/useCashSessions.ts for why that calculation isn't in the hook itself.
     const closeCashSession = async (endAmount: number) => {
-        const currentSession = cashSessions.find(s => s.status === 'open');
+        const currentSession = cashSessionsHook.cashSessions.find(s => s.status === 'open');
         if (!currentSession) {
             alert("No hay una sesión de caja abierta para cerrar.");
             return;
@@ -1266,12 +703,12 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
 
         try {
             // Calculate totals from current session data
-            const sessionOrders = orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate));
-            const sessionExpenses = expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate));
-            const sessionCoworking = coworkingSessions.filter(s =>
+            const sessionOrders = ordersHook.orders.filter(o => new Date(o.date) >= new Date(currentSession.startDate));
+            const sessionExpenses = expensesHook.expenses.filter(e => new Date(e.date) >= new Date(currentSession.startDate));
+            const sessionCoworking = coworkingHook.coworkingSessions.filter(s =>
                 s.status === 'closed' && s.endTime && new Date(s.endTime) >= new Date(currentSession.startDate)
             );
-            const sessionWithdrawals = cashWithdrawals.filter(w => w.cash_session_id === currentSession.id);
+            const sessionWithdrawals = cashWithdrawalsHook.cashWithdrawals.filter(w => w.cash_session_id === currentSession.id);
 
             const ordersSales = sessionOrders.reduce((sum, order) => sum + order.total, 0);
             const coworkingSales = sessionCoworking.reduce((sum, session) => sum + ((session as any).total || 0), 0);
@@ -1296,181 +733,50 @@ export const AppContextProvider: React.FC<{ children: ReactNode }> = ({ children
                 status: 'closed'
             };
 
-            const response = await fetch(`/api/cash-sessions/${currentSession.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(updateData),
-            });
-
-            if (!response.ok) throw new Error('Failed to close cash session');
-            const updatedSession = await response.json();
-
-            // Map API response to frontend CashSession type
-            const mappedSession: CashSession = {
-                id: updatedSession.id,
-                startDate: updatedSession.startTime,
-                endDate: updatedSession.endTime,
-                startAmount: updatedSession.startAmount,
-                endAmount: updatedSession.endAmount,
-                status: updatedSession.status === 'active' ? 'open' : 'closed',
-                totalSales: updatedSession.totalSales,
-                totalExpenses: updatedSession.totalExpenses,
-                expectedCash: updatedSession.expectedCash,
-                difference: updatedSession.difference
-            };
-
-            setCashSessions(prev => {
-                const updated = prev.map(s => s.id === currentSession.id ? mappedSession : s);
-                sessionCache.set(CACHE_KEYS.CASH_SESSIONS, updated);
-                return updated;
-            });
+            await cashSessionsHook.closeCashSessionRequest(currentSession.id, updateData);
         } catch (error) {
             console.error("Error closing cash session:", error);
             alert("Error al cerrar la sesión de caja");
         }
     };
 
-    // Customer Functions
-    const addCustomer = async (customerData: Omit<Customer, 'id' | 'createdAt' | 'currentCredit'>) => {
-        try {
-            const response = await fetch('/api/customers', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(customerData),
-            });
+    // Thin wrappers so the public interface stays `(cashSessionId, amount, description)` /
+    // `(startAmount)`, with currentUser injected here rather than reaching into
+    // useAuthUsers from inside useCashWithdrawals/useCashSessions.
+    const addCashWithdrawal = (cashSessionId: string, amount: number, description: string) =>
+        cashWithdrawalsHook.addCashWithdrawal(cashSessionId, amount, description, authHook.currentUser?.id);
 
-            if (!response.ok) throw new Error('Failed to add customer');
-            const newCustomer: Customer = await response.json();
-            setCustomers(prev => [...prev, newCustomer]);
-        } catch (error) {
-            console.error("Error adding customer:", error);
-            alert("Error al agregar el cliente");
-        }
-    };
-
-    const updateCustomer = async (customer: Customer) => {
-        try {
-            const response = await fetch(`/api/customers/${customer.id}`, {
-                method: 'PUT',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(customer),
-            });
-
-            if (!response.ok) throw new Error('Failed to update customer');
-            const updatedCustomer: Customer = await response.json();
-            setCustomers(prev => prev.map(c => c.id === customer.id ? updatedCustomer : c));
-        } catch (error) {
-            console.error("Error updating customer:", error);
-            alert("Error al actualizar el cliente");
-        }
-    };
-
-    const deleteCustomer = async (customerId: string) => {
-        try {
-            const response = await fetch(`/api/customers/${customerId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete customer');
-            setCustomers(prev => prev.filter(c => c.id !== customerId));
-        } catch (error) {
-            console.error("Error deleting customer:", error);
-            alert("Error al eliminar el cliente");
-        }
-    };
-
-    const addCustomerCredit = async (customerId: string, amount: number, type: 'charge' | 'payment', description: string) => {
-        try {
-            const response = await fetch(`/api/customers/${customerId}/credits`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ amount, type, description }),
-            });
-
-            if (!response.ok) throw new Error('Failed to add customer credit');
-
-            // Optimistic UI update - immediately reflect the change
-            setCustomers(prev => prev.map(c => {
-                if (c.id === customerId) {
-                    const newCredit = type === 'charge'
-                        ? c.currentCredit + amount
-                        : c.currentCredit - amount;
-                    return { ...c, currentCredit: Math.max(0, newCredit) };
-                }
-                return c;
-            }));
-
-            // Also refresh from server with cache bypass to ensure sync
-            const customerResponse = await fetch(`/api/customers?_t=${Date.now()}`, {
-                cache: 'no-store'
-            });
-            if (customerResponse.ok) {
-                const customersData: Customer[] = await customerResponse.json();
-                setCustomers(customersData);
-                // Update IndexedDB cache
-                offlineStorage.saveAll(STORES.CUSTOMERS, customersData).catch(() => {});
-            }
-        } catch (error) {
-            console.error("Error adding customer credit:", error);
-            alert("Error al agregar el crédito");
-        }
-    };
-
-    // Cash Withdrawal Functions
-    const addCashWithdrawal = async (cashSessionId: string, amount: number, description: string) => {
-        try {
-            const response = await fetch('/api/cash-withdrawals', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    cashSessionId,
-                    amount,
-                    description,
-                    userId: currentUser?.id
-                }),
-            });
-
-            if (!response.ok) throw new Error('Failed to create cash withdrawal');
-
-            const newWithdrawal = await response.json();
-            setCashWithdrawals(prev => [newWithdrawal, ...prev]);
-
-            alert(`✅ Retiro registrado: $${amount.toFixed(2)}`);
-        } catch (error) {
-            console.error("Error adding cash withdrawal:", error);
-            alert("Error al registrar el retiro de efectivo");
-            throw error;
-        }
-    };
-
-    const deleteCashWithdrawal = async (withdrawalId: string) => {
-        try {
-            const response = await fetch(`/api/cash-withdrawals/${withdrawalId}`, {
-                method: 'DELETE',
-            });
-
-            if (!response.ok) throw new Error('Failed to delete cash withdrawal');
-
-            setCashWithdrawals(prev => prev.filter(w => w.id !== withdrawalId));
-        } catch (error) {
-            console.error("Error deleting cash withdrawal:", error);
-            alert("Error al eliminar el retiro");
-            throw error;
-        }
-    };
+    const startCashSession = (startAmount: number) =>
+        cashSessionsHook.startCashSession(startAmount, authHook.currentUser?.id);
 
     return (
         <AppContext.Provider value={{
             isInitializing,
-            users, currentUser, login, logout, register, approveUser, deleteUser,
-            products, addProduct, updateProduct, deleteProduct, importProducts,
-            cart, addToCart, removeFromCart, updateCartQuantity, clearCart,
-            cartSubtotal, cartTotal,
-            orders, createOrder, deleteOrder, refetchOrders, refetchAll,
-            expenses, addExpense, updateExpense, deleteExpense,
-            coworkingSessions, startCoworkingSession, updateCoworkingSession, finishCoworkingSession, cancelCoworkingSession, deleteCoworkingSession,
-            cashSessions, cashWithdrawals, startCashSession, closeCashSession, addCashWithdrawal, deleteCashWithdrawal,
-            customers, addCustomer, updateCustomer, deleteCustomer, addCustomerCredit
+            users: authHook.users, currentUser: authHook.currentUser,
+            login: authHook.login, logout: authHook.logout, register: authHook.register,
+            approveUser: authHook.approveUser, deleteUser: authHook.deleteUser,
+            products: productsHook.products,
+            addProduct: productsHook.addProduct, updateProduct: productsHook.updateProduct,
+            deleteProduct: productsHook.deleteProduct, importProducts: productsHook.importProducts,
+            cart: cartHook.cart, addToCart: cartHook.addToCart, removeFromCart: cartHook.removeFromCart,
+            updateCartQuantity: cartHook.updateCartQuantity, clearCart: cartHook.clearCart,
+            cartSubtotal: cartHook.cartSubtotal, cartTotal: cartHook.cartTotal,
+            orders: ordersHook.orders, createOrder, deleteOrder: ordersHook.deleteOrder,
+            refetchOrders: ordersHook.refetchOrders, refetchAll,
+            expenses: expensesHook.expenses, addExpense,
+            updateExpense: expensesHook.updateExpense, deleteExpense: expensesHook.deleteExpense,
+            coworkingSessions: coworkingHook.coworkingSessions,
+            startCoworkingSession: coworkingHook.startCoworkingSession,
+            updateCoworkingSession: coworkingHook.updateCoworkingSession,
+            finishCoworkingSession,
+            cancelCoworkingSession: coworkingHook.cancelCoworkingSession,
+            deleteCoworkingSession: coworkingHook.deleteCoworkingSession,
+            cashSessions: cashSessionsHook.cashSessions, cashWithdrawals: cashWithdrawalsHook.cashWithdrawals,
+            startCashSession, closeCashSession,
+            addCashWithdrawal, deleteCashWithdrawal: cashWithdrawalsHook.deleteCashWithdrawal,
+            customers: customersHook.customers, addCustomer: customersHook.addCustomer,
+            updateCustomer: customersHook.updateCustomer, deleteCustomer: customersHook.deleteCustomer,
+            addCustomerCredit: customersHook.addCustomerCredit,
         }}>
             {children}
         </AppContext.Provider>
