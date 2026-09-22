@@ -18,6 +18,7 @@ import { createCashWithdrawalsRouter } from './routes/cashWithdrawals.js';
 import { createUsersRouter } from './routes/users.js';
 import { createAuthRouter } from './routes/auth.js';
 import { createCustomersRouter } from './routes/customers.js';
+import { createLoyaltyRouter } from './routes/loyalty.js';
 import { createAdminRouter } from './routes/admin.js';
 import { createAiRouter } from './routes/ai.js';
 
@@ -540,6 +541,7 @@ async function startServer() {
     app.use(createUsersRouter({ pool, useDb }));
     app.use(createAuthRouter({ pool, useDb, loginRateLimiter }));
     app.use(createCustomersRouter({ pool, useDb, broadcastDataChange }));
+    app.use(createLoyaltyRouter({ pool, useDb, broadcastDataChange }));
     app.use(createAdminRouter({ pool, useDb, requireAdminKey }));
     app.use(createAiRouter({ aiRateLimiter }));
 
@@ -547,6 +549,13 @@ async function startServer() {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
     app.use(express.static(path.join(__dirname, 'dist')));
+
+    // Loyalty program page (vanilla HTML/JS). Served explicitly so it wins over the
+    // SPA catch-all below. Lives in public/ (also copied to dist/ by the Vite build).
+    app.get('/loyalty', (req, res) => {
+        res.sendFile(path.join(__dirname, 'public', 'loyalty.html'));
+    });
+
     app.get('*', (req, res) => {
         res.sendFile(path.join(__dirname, 'dist', 'index.html'));
     });

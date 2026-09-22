@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lealtad - POS Conejo Negro</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700;900&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg-primary: #0a0a0f;
+            --bg-secondary: #12121a;
+            --bg-card: #1a1a2e;
+            --text-primary: #e0e0ff;
+            --text-secondary: #a0a0c0;
+            --accent-cyan: #00d9ff;
+            --accent-purple: #9d00ff;
+            --accent-pink: #ff00d9;
+            --success: #00ff88;
+            --danger: #ff0055;
+            --warning: #ffaa00;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: 'Roboto', sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+        .nav-header {
+            background: rgba(26, 26, 46, 0.95);
+            border-bottom: 1px solid rgba(0, 217, 255, 0.2);
+            padding: 15px 0;
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+        .nav-container {
+            max-width: 1100px; margin: 0 auto; padding: 0 20px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .nav-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; color: var(--text-primary); }
+        .nav-logo i { color: var(--accent-cyan); font-size: 1.6rem; }
+        .nav-logo span { font-family: 'Orbitron', sans-serif; font-weight: 700; letter-spacing: 1px; }
+        .nav-back { color: var(--text-secondary); text-decoration: none; font-size: 0.9rem; }
+        .nav-back:hover { color: var(--accent-cyan); }
+
+        .container { max-width: 1100px; margin: 0 auto; padding: 24px 20px 60px; }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid rgba(0, 217, 255, 0.15);
+            border-radius: 14px;
+            padding: 22px;
+            margin-bottom: 22px;
+        }
+        .card h2 {
+            font-family: 'Orbitron', sans-serif; font-size: 1.05rem; font-weight: 600;
+            margin-bottom: 16px; color: var(--accent-cyan);
+            display: flex; align-items: center; gap: 10px;
+        }
+        label { display: block; font-size: 0.8rem; color: var(--text-secondary); margin: 12px 0 6px; }
+        input {
+            width: 100%; padding: 12px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(160,160,192,0.25);
+            border-radius: 8px; color: var(--text-primary); font-size: 1rem;
+        }
+        input:focus { outline: none; border-color: var(--accent-cyan); }
+        .row { display: flex; gap: 12px; flex-wrap: wrap; }
+        .row > * { flex: 1; min-width: 160px; }
+
+        button {
+            cursor: pointer; border: none; border-radius: 8px;
+            padding: 12px 18px; font-size: 0.95rem; font-weight: 600;
+            font-family: 'Roboto', sans-serif; color: #04040a;
+            background: var(--accent-cyan); transition: opacity .15s, transform .05s;
+        }
+        button:hover { opacity: 0.9; }
+        button:active { transform: translateY(1px); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; }
+        button.secondary { background: transparent; color: var(--accent-cyan); border: 1px solid var(--accent-cyan); }
+        button.success { background: var(--success); }
+        button.purple { background: var(--accent-purple); color: #fff; }
+        .btn-row { display: flex; gap: 12px; margin-top: 16px; flex-wrap: wrap; }
+
+        .muted { color: var(--text-secondary); font-size: 0.85rem; }
+        .hidden { display: none !important; }
+
+        .status-banner { padding: 14px 16px; border-radius: 8px; margin-top: 16px; font-weight: 500; }
+        .status-banner.ok { background: rgba(0,255,136,0.12); border: 1px solid var(--success); color: var(--success); }
+        .status-banner.warn { background: rgba(255,170,0,0.12); border: 1px solid var(--warning); color: var(--warning); }
+        .status-banner.err { background: rgba(255,0,85,0.12); border: 1px solid var(--danger); color: var(--danger); }
+
+        .sellos-count {
+            font-family: 'Orbitron', sans-serif; font-size: 2.6rem; font-weight: 900;
+            color: var(--accent-cyan); line-height: 1; margin: 8px 0;
+        }
+        .cliente-name { font-size: 1.3rem; font-weight: 600; }
+
+        .stamps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+        .stamp {
+            width: 34px; height: 34px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            background: rgba(0,217,255,0.12); border: 1px solid var(--accent-cyan);
+            color: var(--accent-cyan);
+        }
+
+        table { width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 0.9rem; }
+        th, td { text-align: left; padding: 10px 8px; border-bottom: 1px solid rgba(160,160,192,0.12); }
+        th { color: var(--text-secondary); font-weight: 600; font-size: 0.78rem; text-transform: uppercase; letter-spacing: 0.5px; }
+        .pill { padding: 2px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
+        .pill.active { background: rgba(0,255,136,0.15); color: var(--success); }
+        .pill.inactive { background: rgba(160,160,192,0.15); color: var(--text-secondary); }
+        .table-wrap { overflow-x: auto; }
+        .tokens-out { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--success); word-break: break-word; margin-top: 12px; }
+    </style>
+</head>
+<body>
+    <div class="nav-header">
+        <div class="nav-container">
+            <a class="nav-logo" href="/"><i class="fas fa-mug-hot"></i><span>CONEJO NEGRO · LEALTAD</span></a>
+            <a class="nav-back" href="/"><i class="fas fa-arrow-left"></i> Volver al POS</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- ==================== CONSULTA / ESCANEO ==================== -->
+        <div class="card">
+            <h2><i class="fas fa-qrcode"></i> Tarjeta de lealtad</h2>
+            <label for="tokenInput">Escanea o escribe el token de la tarjeta</label>
+            <div class="row">
+                <input id="tokenInput" placeholder="CNK-0042" autocomplete="off" autocapitalize="characters">
+                <button style="flex:0 0 auto" onclick="consultar()"><i class="fas fa-search"></i> Consultar</button>
+            </div>
+            <div id="consultaMsg"></div>
+
+            <!-- Activación (tarjeta inactiva) -->
+            <div id="activarBox" class="hidden">
+                <div class="status-banner warn"><i class="fas fa-triangle-exclamation"></i> Tarjeta pendiente de activación.</div>
+                <label for="nombreInput">Nombre del cliente *</label>
+                <input id="nombreInput" placeholder="Nombre y apellido">
+                <label for="telInput">Teléfono</label>
+                <input id="telInput" placeholder="Opcional" inputmode="tel">
+                <div class="btn-row">
+                    <button class="success" onclick="activar()"><i class="fas fa-user-check"></i> Activar tarjeta</button>
+                </div>
+            </div>
+
+            <!-- Perfil (tarjeta activa) -->
+            <div id="perfilBox" class="hidden">
+                <div class="status-banner ok" id="perfilBanner"></div>
+                <div class="cliente-name" id="perfilNombre"></div>
+                <div class="muted" id="perfilTel"></div>
+                <div class="sellos-count"><span id="perfilSellos">0</span> <span style="font-size:1rem;color:var(--text-secondary)">sellos</span></div>
+                <div class="stamps" id="stampsRow"></div>
+                <div class="btn-row">
+                    <button class="purple" onclick="registrarVisita()"><i class="fas fa-stamp"></i> Registrar visita de hoy</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== ADMIN: GENERAR ==================== -->
+        <div class="card">
+            <h2><i class="fas fa-layer-group"></i> Generar tarjetas</h2>
+            <div class="row">
+                <div style="flex:0 0 160px">
+                    <label for="cantidadInput">Cantidad</label>
+                    <input id="cantidadInput" type="number" min="1" max="1000" value="10">
+                </div>
+                <div style="display:flex; align-items:flex-end">
+                    <button class="secondary" onclick="generar()"><i class="fas fa-plus"></i> Generar tokens</button>
+                </div>
+            </div>
+            <div id="generarMsg"></div>
+            <div id="tokensOut" class="tokens-out"></div>
+        </div>
+
+        <!-- ==================== ADMIN: LISTA ==================== -->
+        <div class="card">
+            <h2><i class="fas fa-users"></i> Clientes <button class="secondary" style="margin-left:auto;font-size:0.8rem;padding:6px 12px" onclick="cargarClientes()"><i class="fas fa-rotate"></i> Actualizar</button></h2>
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th></tr>
+                    </thead>
+                    <tbody id="clientesBody">
+                        <tr><td colspan="6" class="muted">Cargando…</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const $ = (id) => document.getElementById(id);
+        const getToken = () => ($('tokenInput').value || '').trim().toUpperCase();
+
+        function banner(el, kind, html) {
+            el.innerHTML = '<div class="status-banner ' + kind + '">' + html + '</div>';
+        }
+
+        async function api(path, opts) {
+            const res = await fetch(path, opts);
+            let data = null;
+            try { data = await res.json(); } catch (_) {}
+            return { ok: res.ok, status: res.status, data };
+        }
+
+        // --- Consultar (sin registrar sello) ---
+        async function consultar() {
+            const token = getToken();
+            $('activarBox').classList.add('hidden');
+            $('perfilBox').classList.add('hidden');
+            if (!token) { banner($('consultaMsg'), 'err', 'Escribe un token.'); return; }
+            banner($('consultaMsg'), 'warn', 'Consultando ' + token + '…');
+
+            const { ok, status, data } = await api('/loyalty/cliente/' + encodeURIComponent(token));
+            if (status === 404) {
+                $('consultaMsg').innerHTML = '';
+                $('activarBox').classList.remove('hidden');
+                banner($('consultaMsg'), 'warn', 'Tarjeta ' + token + ' no registrada aún. Actívala abajo.');
+                return;
+            }
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'Error al consultar.'); return; }
+
+            $('consultaMsg').innerHTML = '';
+            if (!data.activo) {
+                $('activarBox').classList.remove('hidden');
+            } else {
+                mostrarPerfil(data, 'Tarjeta activa.');
+            }
+        }
+
+        function mostrarPerfil(data, mensaje) {
+            $('perfilBox').classList.remove('hidden');
+            $('activarBox').classList.add('hidden');
+            $('perfilBanner').innerHTML = '<i class="fas fa-circle-check"></i> ' + mensaje;
+            $('perfilNombre').textContent = data.nombre || '(sin nombre)';
+            $('perfilTel').textContent = data.telefono ? ('Tel: ' + data.telefono) : '';
+            const total = data.totalSellos || 0;
+            $('perfilSellos').textContent = total;
+            const stamps = [];
+            for (let i = 0; i < total; i++) stamps.push('<div class="stamp"><i class="fas fa-mug-hot"></i></div>');
+            $('stampsRow').innerHTML = stamps.join('');
+        }
+
+        // --- Activar tarjeta ---
+        async function activar() {
+            const token = getToken();
+            const nombre = ($('nombreInput').value || '').trim();
+            const telefono = ($('telInput').value || '').trim();
+            if (!nombre) { banner($('consultaMsg'), 'err', 'El nombre es obligatorio.'); return; }
+
+            const { ok, data } = await api('/loyalty/activar/' + encodeURIComponent(token), {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ nombre, telefono })
+            });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo activar.'); return; }
+
+            $('nombreInput').value = ''; $('telInput').value = '';
+            banner($('consultaMsg'), 'ok', 'Tarjeta ' + token + ' activada para ' + (data.cliente.nombre) + '.');
+            consultar();
+            cargarClientes();
+        }
+
+        // --- Registrar visita (usa el mismo endpoint que el escaneo del QR) ---
+        async function registrarVisita() {
+            const token = getToken();
+            const { ok, data } = await api('/loyalty/scan/' + encodeURIComponent(token));
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'Error al registrar.'); return; }
+            if (data.status !== 'activo') {
+                banner($('consultaMsg'), 'warn', data.mensaje || 'Tarjeta pendiente de activación.');
+                return;
+            }
+            mostrarPerfil(
+                { nombre: data.nombre, telefono: null, totalSellos: data.totalSellos },
+                data.mensaje + ' · Total: ' + data.totalSellos
+            );
+            cargarClientes();
+        }
+
+        // --- Generar tokens ---
+        async function generar() {
+            const cantidad = parseInt($('cantidadInput').value, 10);
+            $('tokensOut').textContent = '';
+            if (!Number.isInteger(cantidad) || cantidad < 1) { banner($('generarMsg'), 'err', 'Cantidad inválida.'); return; }
+            banner($('generarMsg'), 'warn', 'Generando ' + cantidad + ' tarjeta(s)…');
+
+            const { ok, data } = await api('/loyalty/generar', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ cantidad })
+            });
+            if (!ok) { banner($('generarMsg'), 'err', (data && data.error) || 'No se pudo generar.'); return; }
+            banner($('generarMsg'), 'ok', 'Se generaron ' + data.generados + ' tarjeta(s) inactivas.');
+            $('tokensOut').textContent = data.tokens.join('  ·  ');
+            cargarClientes();
+        }
+
+        // --- Lista de clientes ---
+        async function cargarClientes() {
+            const body = $('clientesBody');
+            const { ok, data } = await api('/loyalty/clientes');
+            if (!ok || !Array.isArray(data)) {
+                body.innerHTML = '<tr><td colspan="6" class="muted">No se pudo cargar.</td></tr>';
+                return;
+            }
+            if (data.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" class="muted">Sin tarjetas todavía. Genera algunas arriba.</td></tr>';
+                return;
+            }
+            body.innerHTML = data.map(function (c) {
+                const estado = c.activo
+                    ? '<span class="pill active">Activa</span>'
+                    : '<span class="pill inactive">Inactiva</span>';
+                const ultimo = c.ultimoSello ? new Date(c.ultimoSello).toLocaleDateString('es-MX') : '—';
+                return '<tr>'
+                    + '<td>' + c.token + '</td>'
+                    + '<td>' + (c.nombre || '—') + '</td>'
+                    + '<td>' + (c.telefono || '—') + '</td>'
+                    + '<td>' + estado + '</td>'
+                    + '<td>' + (c.totalSellos || 0) + '</td>'
+                    + '<td>' + ultimo + '</td>'
+                    + '</tr>';
+            }).join('');
+        }
+
+        $('tokenInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') consultar(); });
+        cargarClientes();
+    </script>
+</body>
+</html>
