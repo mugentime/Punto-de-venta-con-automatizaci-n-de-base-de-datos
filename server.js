@@ -219,6 +219,34 @@ async function setupAndGetDataStore() {
               );
             `);
 
+            // --- LOYALTY PROGRAM (tarjetas de lealtad con QR) ---
+            // Created inline (idempotent) on purpose: the migrations runner is unreliable
+            // for NEW migrations. 001/002 contain non-idempotent / psql-only statements
+            // that abort the shared transaction, so every later migration — including
+            // 008_create_loyalty_tables.sql — is skipped with "transaction is aborted".
+            // These CREATE TABLE IF NOT EXISTS run on the dedicated schemaClient and are
+            // the reliable source of truth for the loyalty schema.
+            await schemaClient.query(`
+              CREATE TABLE IF NOT EXISTS clientes (
+                id             SERIAL PRIMARY KEY,
+                token          VARCHAR(20) NOT NULL UNIQUE,
+                nombre         VARCHAR(255),
+                telefono       VARCHAR(50),
+                activo         BOOLEAN NOT NULL DEFAULT false,
+                fecha_registro TIMESTAMP WITH TIME ZONE,
+                created_at     TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+            await schemaClient.query(`
+              CREATE TABLE IF NOT EXISTS sellos (
+                id         SERIAL PRIMARY KEY,
+                cliente_id INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+                fecha      TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                venta_id   VARCHAR(255)
+              );
+            `);
+            await schemaClient.query('CREATE INDEX IF NOT EXISTS idx_sellos_cliente_id ON sellos(cliente_id);');
+
             // AUTO-MIGRATION: Add discount and tip columns if they don't exist
             console.log('🔄 Running auto-migrations...');
             try {
