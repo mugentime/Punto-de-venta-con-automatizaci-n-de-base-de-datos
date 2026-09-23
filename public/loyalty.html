@@ -267,9 +267,10 @@
         }
 
         // --- Registrar visita (usa el mismo endpoint que el escaneo del QR) ---
+        // ?format=json fuerza respuesta JSON (el endpoint devuelve HTML a los navegadores).
         async function registrarVisita() {
             const token = getToken();
-            const { ok, data } = await api('/loyalty/scan/' + encodeURIComponent(token));
+            const { ok, data } = await api('/loyalty/scan/' + encodeURIComponent(token) + '?format=json');
             if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'Error al registrar.'); return; }
             if (data.status !== 'activo') {
                 banner($('consultaMsg'), 'warn', data.mensaje || 'Tarjeta pendiente de activación.');

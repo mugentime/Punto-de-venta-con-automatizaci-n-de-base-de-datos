@@ -17,22 +17,90 @@ function normalizeToken(raw) {
     return String(raw || '').trim().toUpperCase();
 }
 
+// Escape untrusted text before interpolating into HTML.
+function escapeHtml(s) {
+    return String(s == null ? '' : s)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// A phone camera opening the QR lands on GET /loyalty/scan/:token and, unlike the
+// operator page's fetch(), asks for text/html — so we render this self-contained
+// page (same dark/neon POS theme) instead of raw JSON. `data` is the same payload
+// object the JSON branch returns.
+function renderScanPage(data, httpStatus) {
+    const activo = data.status === 'activo';
+    const total = Number(data.totalSellos || 0);
+    const stamps = Array.from({ length: total },
+        () => '<div class="stamp">&#9733;</div>').join('');
+
+    let heading, sub, tone;
+    if (data.error) {
+        tone = 'err';  heading = 'Ups';                 sub = escapeHtml(data.error);
+    } else if (!activo) {
+        tone = 'warn'; heading = 'Tarjeta sin activar'; sub = 'Acércate al mostrador para activar tu tarjeta y empezar a juntar sellos.';
+    } else {
+        tone = 'ok';   heading = '¡Hola, ' + escapeHtml(data.nombre || '') + '!';
+        sub = data.selloRegistrado ? '¡Sello registrado! 🎉' : 'Ya registraste tu visita de hoy ☕';
+    }
+
+    return `<!DOCTYPE html>
+<html lang="es"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex">
+<title>Lealtad · Conejo Negro</title>
+<style>
+:root{--bg:#0a0a0f;--bg2:#12121a;--card:#1a1a2e;--txt:#e0e0ff;--sub:#a0a0c0;--cyan:#00d9ff;--ok:#00ff88;--warn:#ffaa00;--err:#ff0055;}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Roboto',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--bg2));color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+.card{background:var(--card);border:1px solid rgba(0,217,255,.18);border-radius:18px;padding:32px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.4)}
+.brand{font-size:.8rem;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:20px}
+.token{font-family:'Roboto Mono',monospace;color:var(--sub);font-size:.85rem;margin-bottom:18px}
+h1{font-size:1.5rem;margin-bottom:8px}
+.sub{color:var(--sub);font-size:1rem;margin-bottom:8px}
+.sub.ok{color:var(--ok)}.sub.warn{color:var(--warn)}.sub.err{color:var(--err)}
+.count{font-size:3rem;font-weight:900;line-height:1;margin:22px 0 6px;color:var(--cyan)}
+.count small{font-size:1rem;color:var(--sub);font-weight:400}
+.stamps{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
+.stamp{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,217,255,.12);border:1px solid var(--cyan);color:var(--cyan);font-size:16px}
+.foot{margin-top:24px;font-size:.75rem;color:var(--sub)}
+</style></head><body>
+<div class="card">
+  <div class="brand">🐰 Conejo Negro · Lealtad</div>
+  <div class="token">${escapeHtml(data.token || '')}</div>
+  <h1>${heading}</h1>
+  <div class="sub ${tone}">${sub}</div>
+  ${activo ? `<div class="count">${total}<br><small>sello${total === 1 ? '' : 's'} acumulado${total === 1 ? '' : 's'}</small></div><div class="stamps">${stamps}</div>` : ''}
+  <div class="foot">Gracias por tu visita ☕</div>
+</div>
+</body></html>`;
+}
+
 export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     const router = express.Router();
 
     // --- GET /loyalty/scan/:token --- PUBLIC. Hit directly when scanning the QR.
-    // Inactive / unknown card -> { status: 'pendiente_activacion' }.
-    // Active card -> registers today's stamp (max one per day) and returns the total.
+    // Content negotiation: a phone camera (Accept: text/html) gets a rendered page;
+    // the operator page's fetch() and any API caller get JSON. Force JSON with
+    // ?format=json. Business logic is identical for both: inactive/unknown ->
+    // pendiente_activacion (no stamp); active -> register today's stamp (max one/day).
     router.get('/loyalty/scan/:token', async (req, res) => {
+        const wantsHtml = req.query.format !== 'json'
+            && String(req.headers.accept || '').includes('text/html');
+        const reply = (status, payload) => wantsHtml
+            ? res.status(status).type('html').send(renderScanPage(payload, status))
+            : res.status(status).json(payload);
+
         try {
-            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            if (!useDb) return reply(503, { error: 'Base de datos no disponible' });
             const token = normalizeToken(req.params.token);
 
             const { rows } = await pool.query('SELECT * FROM clientes WHERE token = $1', [token]);
             const cliente = rows[0];
 
             if (!cliente || !cliente.activo) {
-                return res.json({
+                return reply(200, {
                     status: 'pendiente_activacion',
                     token,
                     existe: Boolean(cliente),
@@ -61,7 +129,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 [cliente.id]
             );
 
-            res.json({
+            return reply(200, {
                 status: 'activo',
                 token: cliente.token,
                 nombre: cliente.nombre,
@@ -71,7 +139,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
             });
         } catch (error) {
             console.error('Error scanning loyalty card:', error);
-            res.status(500).json({ error: 'Failed to scan loyalty card' });
+            return reply(500, { error: 'No se pudo registrar el escaneo. Intenta de nuevo.' });
         }
     });
 
