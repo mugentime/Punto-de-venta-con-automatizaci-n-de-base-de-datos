@@ -114,7 +114,6 @@
         .pill.active { background: rgba(0,255,136,0.15); color: var(--success); }
         .pill.inactive { background: rgba(160,160,192,0.15); color: var(--text-secondary); }
         .table-wrap { overflow-x: auto; }
-        .tokens-out { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--success); word-break: break-word; margin-top: 12px; }
 
         /* QR scanner overlay */
         .scan-overlay {
@@ -132,13 +131,6 @@
         }
         .scan-msg { color: var(--text-primary); margin: 16px 0; font-size: 0.95rem; }
         .scan-close { margin-top: 4px; background: var(--danger); color: #fff; }
-
-        .btn-del {
-            background: transparent; color: var(--danger);
-            border: 1px solid var(--danger); border-radius: 6px;
-            padding: 5px 10px; font-size: 0.8rem; cursor: pointer;
-        }
-        .btn-del:hover { background: rgba(255,0,85,0.12); }
     </style>
 </head>
 <body>
@@ -186,32 +178,18 @@
             </div>
         </div>
 
-        <!-- ==================== ADMIN: GENERAR ==================== -->
+        <!-- ==================== CLIENTES (solo lectura) ==================== -->
+        <!-- Panel de CAJERO: consulta de solo lectura. Generar/eliminar tarjetas
+             vive en la app de escritorio (generar_tarjetas.py), no aquí. -->
         <div class="card">
-            <h2><i class="fas fa-layer-group"></i> Generar tarjetas</h2>
-            <div class="row">
-                <div style="flex:0 0 160px">
-                    <label for="cantidadInput">Cantidad</label>
-                    <input id="cantidadInput" type="number" min="1" max="1000" value="10">
-                </div>
-                <div style="display:flex; align-items:flex-end">
-                    <button class="secondary" onclick="generar()"><i class="fas fa-plus"></i> Generar tokens</button>
-                </div>
-            </div>
-            <div id="generarMsg"></div>
-            <div id="tokensOut" class="tokens-out"></div>
-        </div>
-
-        <!-- ==================== ADMIN: LISTA ==================== -->
-        <div class="card">
-            <h2><i class="fas fa-users"></i> Clientes <button class="secondary" style="margin-left:auto;font-size:0.8rem;padding:6px 12px" onclick="cargarClientes()"><i class="fas fa-rotate"></i> Actualizar</button></h2>
+            <h2><i class="fas fa-users"></i> Clientes <span class="muted" style="font-weight:400;font-size:0.75rem">(solo lectura)</span> <button class="secondary" style="margin-left:auto;font-size:0.8rem;padding:6px 12px" onclick="cargarClientes()"><i class="fas fa-rotate"></i> Actualizar</button></h2>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th><th>Acción</th></tr>
+                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th></tr>
                     </thead>
                     <tbody id="clientesBody">
-                        <tr><td colspan="7" class="muted">Cargando…</td></tr>
+                        <tr><td colspan="6" class="muted">Cargando…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -320,38 +298,18 @@
             cargarClientes();
         }
 
-        // --- Generar tokens ---
-        async function generar() {
-            const cantidad = parseInt($('cantidadInput').value, 10);
-            $('tokensOut').textContent = '';
-            if (!Number.isInteger(cantidad) || cantidad < 1) { banner($('generarMsg'), 'err', 'Cantidad inválida.'); return; }
-            banner($('generarMsg'), 'warn', 'Generando ' + cantidad + ' tarjeta(s)…');
-
-            const { ok, data } = await api('/loyalty/generar', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ cantidad })
-            });
-            if (!ok) { banner($('generarMsg'), 'err', (data && data.error) || 'No se pudo generar.'); return; }
-            banner($('generarMsg'), 'ok', 'Se generaron ' + data.generados + ' tarjeta(s) inactivas.');
-            $('tokensOut').textContent = data.tokens.join('  ·  ');
-            cargarClientes();
-        }
-
-        // --- Lista de clientes ---
-        // Cache de la última lista cargada, para poder mostrar el nombre del
-        // cliente en la confirmación de borrado sin volver a pedirlo al backend.
-        let clientesCache = [];
+        // --- Lista de clientes (solo lectura) ---
+        // Generar/eliminar se hace desde la app de escritorio (generar_tarjetas.py),
+        // no desde el panel del cajero.
         async function cargarClientes() {
             const body = $('clientesBody');
             const { ok, data } = await api('/loyalty/clientes');
             if (!ok || !Array.isArray(data)) {
-                body.innerHTML = '<tr><td colspan="7" class="muted">No se pudo cargar.</td></tr>';
+                body.innerHTML = '<tr><td colspan="6" class="muted">No se pudo cargar.</td></tr>';
                 return;
             }
-            clientesCache = data;
             if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="7" class="muted">Sin tarjetas todavía. Genera algunas arriba.</td></tr>';
+                body.innerHTML = '<tr><td colspan="6" class="muted">Sin tarjetas todavía.</td></tr>';
                 return;
             }
             body.innerHTML = data.map(function (c) {
@@ -359,7 +317,6 @@
                     ? '<span class="pill active">Activa</span>'
                     : '<span class="pill inactive">Inactiva</span>';
                 const ultimo = c.ultimoSello ? new Date(c.ultimoSello).toLocaleDateString('es-MX') : '—';
-                const tok = String(c.token).replace(/'/g, "\\'");
                 return '<tr>'
                     + '<td>' + c.token + '</td>'
                     + '<td>' + (c.nombre || '—') + '</td>'
@@ -367,24 +324,8 @@
                     + '<td>' + estado + '</td>'
                     + '<td>' + (c.totalSellos || 0) + '</td>'
                     + '<td>' + ultimo + '</td>'
-                    + '<td><button class="btn-del" onclick="borrarCliente(\'' + tok + '\')"><i class="fas fa-trash"></i> Eliminar</button></td>'
                     + '</tr>';
             }).join('');
-        }
-
-        // --- Borrar tarjeta (y sus sellos) ---
-        async function borrarCliente(token) {
-            const c = clientesCache.find(function (x) { return x.token === token; });
-            const nombre = c && c.nombre;
-            const quien = nombre ? ('a ' + nombre) : ('la tarjeta ' + token);
-            if (!window.confirm('¿Eliminar ' + quien + '?\n\nSe borrarán también todos sus sellos. Esta acción no se puede deshacer.')) return;
-            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token), { method: 'DELETE' });
-            if (!ok) {
-                banner($('generarMsg'), 'err', (data && data.error) || 'No se pudo borrar la tarjeta.');
-                return;
-            }
-            banner($('generarMsg'), 'ok', 'Tarjeta ' + token + ' eliminada.');
-            cargarClientes();
         }
 
         // ==================== ESCÁNER DE QR (cámara) ====================

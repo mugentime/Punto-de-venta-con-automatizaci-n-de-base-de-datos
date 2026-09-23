@@ -18,24 +18,37 @@ Capas por color (convención de láser tipo LightBurn):
   importarlo al software del láser NO lo escales; impórtalo al 100 %. Si lo
   estiras, la regla deja de medir bien.
 
-Fuentes de tokens (elige una):
-  1. --tokens CNK-0001,CNK-0002,...
-  2. --rango 1-200
-  3. (por defecto) la base de datos vía DATABASE_URL
+Esta "app de escritorio" es también el ÚNICO lugar para dar de alta o borrar
+tarjetas: habla con el POS por HTTP para que el punto de venta reconozca los QR
+(activar / sumar puntos). El panel del cajero (/loyalty) queda solo de consulta.
+
+Modos (elige uno):
+  --crear N            Da de alta N tokens NUEVOS en el POS y genera sus tarjetas.
+  --rango 1-200        Regenera SVGs de tokens que YA existen (no crea).
+  --tokens CNK-0001,…  Regenera SVGs de esos tokens (no crea).
+  --eliminar CNK-0001,…  Borra tarjetas del POS (no genera SVG).
+  (sin nada)           Regenera SVGs de TODAS las tarjetas dadas de alta en el POS.
 
 Ejemplos:
-  python generar_tarjetas.py --tokens CNK-0001 --base-url https://mi-app.up.railway.app
-  python generar_tarjetas.py --rango 1-200 --base-url https://mi-app.up.railway.app
+  # dar de alta 200 y producir sus tarjetas para el láser (un solo paso):
+  python generar_tarjetas.py --crear 200 --base-url https://mi-app.up.railway.app
+  # regenerar todas las tarjetas existentes:
+  python generar_tarjetas.py --base-url https://mi-app.up.railway.app
+  # borrar de prueba:
+  python generar_tarjetas.py --eliminar CNK-0001,CNK-0002 --base-url https://mi-app.up.railway.app
 
 Dependencias:
-  pip install "qrcode[pil]" psycopg2-binary   (psycopg2 solo si lees de la DB)
+  pip install "qrcode[pil]"     (la comunicación con el POS usa solo la stdlib)
 """
 
 import argparse
 import io
+import json
 import os
 import re
 import sys
+import urllib.error
+import urllib.request
 
 # --- Geometría de la tarjeta (todo en mm; el viewBox del SVG = mm reales) ---
 CARD_W, CARD_H = 85.0, 54.0          # tamaño tarjeta (crédito)
@@ -65,21 +78,58 @@ def tokens_desde_rango(rango: str):
     return [f"CNK-{n:04d}" for n in range(inicio, fin + 1)]
 
 
-def tokens_desde_db():
+# ----------------------------- API del POS -----------------------------
+# El script "app de escritorio" habla con el POS por HTTP (stdlib, sin psycopg2):
+#   * dar de alta tokens   -> POST /loyalty/generar
+#   * borrar tokens        -> DELETE /loyalty/cliente/:token
+#   * listar existentes    -> GET  /loyalty/clientes
+# Así el POS reconoce los QR para activar / sumar puntos al escanear.
+def api(base_url, method, path, body=None):
+    url = base_url + path
+    data = json.dumps(body).encode("utf-8") if body is not None else None
+    req = urllib.request.Request(
+        url, data=data, method=method,
+        headers={"Content-Type": "application/json", "Accept": "application/json"})
     try:
-        import psycopg2
-    except ImportError:
-        sys.exit('Falta psycopg2. Instala:  pip install psycopg2-binary')
-    url = os.environ.get("DATABASE_URL")
-    if not url:
-        sys.exit("No hay DATABASE_URL. Usa --rango / --tokens, o expórtala.")
-    conn = psycopg2.connect(url)
-    try:
-        with conn.cursor() as cur:
-            cur.execute("SELECT token FROM clientes ORDER BY token ASC")
-            return [r[0] for r in cur.fetchall()]
-    finally:
-        conn.close()
+        with urllib.request.urlopen(req, timeout=20) as r:
+            txt = r.read().decode("utf-8")
+            return r.status, (json.loads(txt) if txt else None)
+    except urllib.error.HTTPError as e:
+        txt = e.read().decode("utf-8", "replace")
+        try:
+            payload = json.loads(txt)
+        except ValueError:
+            payload = {"error": txt[:200]}
+        return e.code, payload
+    except urllib.error.URLError as e:
+        sys.exit(f"No pude conectar con el POS ({url}): {e.reason}")
+
+
+def crear_tokens_en_pos(base_url, cantidad):
+    """POST /loyalty/generar -> da de alta N tokens en el POS y devuelve la lista."""
+    status, data = api(base_url, "POST", "/loyalty/generar", {"cantidad": cantidad})
+    if status != 201 or not isinstance(data, dict) or "tokens" not in data:
+        sys.exit(f"El POS rechazó la creación ({status}): {data}")
+    return data["tokens"]
+
+
+def tokens_desde_api(base_url):
+    """GET /loyalty/clientes -> todos los tokens ya dados de alta en el POS."""
+    status, data = api(base_url, "GET", "/loyalty/clientes")
+    if status != 200 or not isinstance(data, list):
+        sys.exit(f"No pude leer los clientes del POS ({status}): {data}")
+    return [c["token"] for c in data]
+
+
+def eliminar_tokens_en_pos(base_url, tokens):
+    """DELETE /loyalty/cliente/:token por cada token."""
+    ok = 0
+    for t in tokens:
+        status, data = api(base_url, "DELETE", f"/loyalty/cliente/{t}")
+        marca = "✓" if status == 200 else "✗"
+        print(f"  {marca} {t} -> {status} {data}")
+        ok += 1 if status == 200 else 0
+    print(f"\nEliminadas {ok}/{len(tokens)} tarjeta(s) del POS.")
 
 
 # ----------------------------- logo -----------------------------
@@ -192,12 +242,18 @@ def main():
         except Exception:
             pass
 
-    p = argparse.ArgumentParser(description="Genera tarjetas de lealtad (logo+QR+regla) en SVG para láser.")
+    p = argparse.ArgumentParser(
+        description="App de escritorio: da de alta tarjetas en el POS y genera su "
+                    "diseño (logo+QR+regla) en SVG para láser.")
     p.add_argument("--base-url", default=os.environ.get("LOYALTY_BASE_URL"),
                    help="URL base del POS (o var LOYALTY_BASE_URL).")
     g = p.add_mutually_exclusive_group()
-    g.add_argument("--rango", help="Ej: 1-200 -> CNK-0001..CNK-0200")
-    g.add_argument("--tokens", help="Ej: CNK-0001,CNK-0002")
+    g.add_argument("--crear", type=int, metavar="N",
+                   help="Da de alta N tokens NUEVOS en el POS y genera sus tarjetas.")
+    g.add_argument("--rango", help="Regenera SVGs de un rango existente. Ej: 1-200")
+    g.add_argument("--tokens", help="Regenera SVGs de estos tokens. Ej: CNK-0001,CNK-0002")
+    g.add_argument("--eliminar", metavar="TOKENS",
+                   help="Borra tarjetas del POS (no genera SVG). Ej: CNK-0001,CNK-0002")
     p.add_argument("--logo", default=LOGO_DEFAULT, help="SVG del logo.")
     p.add_argument("--ec", choices=["L", "M", "Q", "H"], default="M",
                    help="Corrección de error del QR (H = más tolerante en madera).")
@@ -208,6 +264,14 @@ def main():
         sys.exit("Falta --base-url (o la variable LOYALTY_BASE_URL).")
     base_url = args.base_url.rstrip("/")
 
+    # --- Modo borrar: solo habla con el POS, no genera SVG ---
+    if args.eliminar:
+        toks = [t.strip().upper() for t in args.eliminar.split(",") if t.strip()]
+        if not toks:
+            sys.exit("--eliminar no recibió tokens válidos.")
+        eliminar_tokens_en_pos(base_url, toks)
+        return
+
     try:
         import qrcode  # noqa: F401
     except ImportError:
@@ -216,13 +280,20 @@ def main():
     if not os.path.exists(args.logo):
         sys.exit(f"No encuentro el logo: {args.logo}")
 
-    if args.tokens:
+    # --- Determinar los tokens a producir ---
+    if args.crear is not None:
+        if args.crear < 1:
+            sys.exit("--crear debe ser un entero >= 1.")
+        print(f"Dando de alta {args.crear} tarjeta(s) nueva(s) en el POS…")
+        tokens = crear_tokens_en_pos(base_url, args.crear)
+        print(f"  → altas: {tokens[0]} .. {tokens[-1]}")
+    elif args.tokens:
         tokens = [t.strip().upper() for t in args.tokens.split(",") if t.strip()]
     elif args.rango:
         tokens = tokens_desde_rango(args.rango)
     else:
-        print("Leyendo tokens desde la base de datos (DATABASE_URL)…")
-        tokens = tokens_desde_db()
+        print("Sin --crear/--rango/--tokens: leyendo TODAS las tarjetas del POS…")
+        tokens = tokens_desde_api(base_url)
     if not tokens:
         sys.exit("No hay tokens para generar.")
 
