@@ -60,5 +60,6 @@ docs/datos-completos-punto-venta.json
 docs/export-sheets.zip
 tmpclaude-*
 
-# Generated loyalty QR images
+# Generated loyalty QR images / card SVGs
 qrs/
+tarjetas/
