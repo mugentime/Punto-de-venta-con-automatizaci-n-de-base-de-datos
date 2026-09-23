@@ -63,6 +63,3 @@ tmpclaude-*
 # Generated loyalty QR images / card SVGs
 qrs/
 tarjetas/
-
-# Generated loyalty card SVGs
-tarjetas/
