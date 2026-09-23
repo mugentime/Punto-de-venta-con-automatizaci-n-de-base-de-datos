@@ -115,6 +115,23 @@
         .pill.inactive { background: rgba(160,160,192,0.15); color: var(--text-secondary); }
         .table-wrap { overflow-x: auto; }
         .tokens-out { font-family: 'Roboto Mono', monospace; font-size: 0.85rem; color: var(--success); word-break: break-word; margin-top: 12px; }
+
+        /* QR scanner overlay */
+        .scan-overlay {
+            position: fixed; inset: 0; z-index: 200;
+            background: rgba(4,4,10,0.95);
+            display: flex; align-items: center; justify-content: center; padding: 20px;
+        }
+        .scan-box { width: 100%; max-width: 460px; text-align: center; }
+        .scan-video-wrap { position: relative; width: 100%; border-radius: 16px; overflow: hidden; background: #000; aspect-ratio: 1 / 1; }
+        #scanVideo { width: 100%; height: 100%; object-fit: cover; display: block; }
+        .scan-frame {
+            position: absolute; inset: 15%;
+            border: 3px solid var(--accent-cyan); border-radius: 16px;
+            box-shadow: 0 0 0 100vmax rgba(0,0,0,0.35);
+        }
+        .scan-msg { color: var(--text-primary); margin: 16px 0; font-size: 0.95rem; }
+        .scan-close { margin-top: 4px; background: var(--danger); color: #fff; }
     </style>
 </head>
 <body>
@@ -129,10 +146,11 @@
         <!-- ==================== CONSULTA / ESCANEO ==================== -->
         <div class="card">
             <h2><i class="fas fa-qrcode"></i> Tarjeta de lealtad</h2>
-            <label for="tokenInput">Escanea o escribe el token de la tarjeta</label>
+            <label for="tokenInput">Escanea con la cámara o escribe el token de la tarjeta</label>
             <div class="row">
                 <input id="tokenInput" placeholder="CNK-0042" autocomplete="off" autocapitalize="characters">
-                <button style="flex:0 0 auto" onclick="consultar()"><i class="fas fa-search"></i> Consultar</button>
+                <button type="button" class="purple" style="flex:0 0 auto" onclick="abrirScanner()"><i class="fas fa-camera"></i> Escanear</button>
+                <button type="button" style="flex:0 0 auto" onclick="consultar()"><i class="fas fa-search"></i> Consultar</button>
             </div>
             <div id="consultaMsg"></div>
 
@@ -190,6 +208,18 @@
                     </tbody>
                 </table>
             </div>
+        </div>
+    </div>
+
+    <!-- QR scanner overlay (camera) -->
+    <div id="scanOverlay" class="scan-overlay hidden">
+        <div class="scan-box">
+            <div class="scan-video-wrap">
+                <video id="scanVideo" playsinline muted></video>
+                <div class="scan-frame"></div>
+            </div>
+            <div id="scanMsg" class="scan-msg">Iniciando cámara…</div>
+            <button class="scan-close" onclick="cerrarScanner()"><i class="fas fa-times"></i> Cerrar</button>
         </div>
     </div>
 
@@ -327,6 +357,107 @@
                     + '<td>' + ultimo + '</td>'
                     + '</tr>';
             }).join('');
+        }
+
+        // ==================== ESCÁNER DE QR (cámara) ====================
+        // Usa BarcodeDetector nativo si existe (Android/Chrome); si no, carga jsQR
+        // desde CDN (cubre iPhone/iPad). Requiere HTTPS (contexto seguro).
+        let scanStream = null, scanRAF = null, barcodeDetector = null, jsQRLib = null;
+        const scanCanvas = document.createElement('canvas');
+
+        function loadScript(src) {
+            return new Promise((res, rej) => {
+                const s = document.createElement('script');
+                s.src = src; s.onload = res;
+                s.onerror = () => rej(new Error('No se pudo cargar el lector de QR'));
+                document.head.appendChild(s);
+            });
+        }
+
+        // El QR contiene la URL .../loyalty/scan/CNK-XXXX (o a veces solo el token).
+        function parseToken(text) {
+            if (!text) return '';
+            const m = String(text).match(/CNK-?\s*(\d+)/i);
+            if (m) return 'CNK-' + m[1].padStart(4, '0');
+            return String(text).trim().toUpperCase();
+        }
+
+        async function abrirScanner() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                banner($('consultaMsg'), 'err', 'Este navegador no permite usar la cámara. Escribe el token a mano.');
+                return;
+            }
+            $('scanOverlay').classList.remove('hidden');
+            $('scanMsg').textContent = 'Iniciando cámara…';
+            try {
+                scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio: false });
+            } catch (e) {
+                cerrarScanner();
+                const msg = (e && e.name === 'NotAllowedError')
+                    ? 'Permiso de cámara denegado. Actívalo en el navegador o escribe el token.'
+                    : 'No se pudo abrir la cámara. Escribe el token a mano.';
+                banner($('consultaMsg'), 'err', msg);
+                return;
+            }
+            const video = $('scanVideo');
+            video.srcObject = scanStream;
+            video.setAttribute('playsinline', '');
+            try { await video.play(); } catch (_) {}
+            $('scanMsg').textContent = 'Apunta la cámara al código QR…';
+
+            if ('BarcodeDetector' in window) {
+                try { barcodeDetector = new window.BarcodeDetector({ formats: ['qr_code'] }); }
+                catch (_) { barcodeDetector = null; }
+            }
+            if (!barcodeDetector && !jsQRLib) {
+                try {
+                    await loadScript('https://cdn.jsdelivr.net/npm/jsqr@1.4.0/dist/jsQR.js');
+                    jsQRLib = window.jsQR;
+                } catch (_) {
+                    $('scanMsg').textContent = 'No se pudo cargar el lector. Escribe el token a mano.';
+                }
+            }
+            scanTick();
+        }
+
+        async function scanTick() {
+            if (!scanStream) return;
+            const video = $('scanVideo');
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                let text = null;
+                if (barcodeDetector) {
+                    try {
+                        const codes = await barcodeDetector.detect(video);
+                        if (codes && codes.length) text = codes[0].rawValue;
+                    } catch (_) {}
+                } else if (jsQRLib) {
+                    const w = video.videoWidth, h = video.videoHeight;
+                    if (w && h) {
+                        scanCanvas.width = w; scanCanvas.height = h;
+                        const ctx = scanCanvas.getContext('2d');
+                        ctx.drawImage(video, 0, 0, w, h);
+                        const img = ctx.getImageData(0, 0, w, h);
+                        const code = jsQRLib(img.data, w, h);
+                        if (code) text = code.data;
+                    }
+                }
+                if (text) {
+                    const token = parseToken(text);
+                    cerrarScanner();
+                    $('tokenInput').value = token;
+                    consultar();
+                    return;
+                }
+            }
+            scanRAF = requestAnimationFrame(scanTick);
+        }
+
+        function cerrarScanner() {
+            if (scanRAF) { cancelAnimationFrame(scanRAF); scanRAF = null; }
+            if (scanStream) { scanStream.getTracks().forEach(t => t.stop()); scanStream = null; }
+            const video = $('scanVideo');
+            if (video) video.srcObject = null;
+            $('scanOverlay').classList.add('hidden');
         }
 
         $('tokenInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') consultar(); });
