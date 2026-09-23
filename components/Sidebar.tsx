@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import type { View } from '../App';
-import { DashboardIcon, SalesIcon, ProductsIcon, HistoryIcon, CashIcon, ExpenseIcon, CoworkingIcon, ReportIcon, UsersIcon, LogoutIcon } from './Icons';
+import { DashboardIcon, SalesIcon, ProductsIcon, HistoryIcon, CashIcon, ExpenseIcon, CoworkingIcon, ReportIcon, UsersIcon, LoyaltyIcon, LogoutIcon } from './Icons';
 import { useAppContext } from '../contexts/AppContext';
 
 interface BottomNavProps {
@@ -66,8 +66,11 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
     { id: 'customers', label: 'Clientes', icon: <UsersIcon />, show: true, priority: 5 },
     { id: 'history', label: 'Historial', icon: <HistoryIcon />, show: true, priority: 6 },
     { id: 'expenses', label: 'Gastos', icon: <ExpenseIcon />, show: true, priority: 7 },
-    { id: 'reports', label: 'Reportes', icon: <ReportIcon />, show: true, priority: 8 },
-    { id: 'admin', label: 'Admin', icon: <UsersIcon />, show: currentUser?.role === 'admin', priority: 9 },
+    // 'href' items navigate to a standalone page (outside the React SPA) instead of
+    // switching an internal View. Loyalty lives at the vanilla /loyalty page.
+    { id: 'loyalty', label: 'Lealtad', icon: <LoyaltyIcon />, show: true, priority: 8, href: '/loyalty' },
+    { id: 'reports', label: 'Reportes', icon: <ReportIcon />, show: true, priority: 9 },
+    { id: 'admin', label: 'Admin', icon: <UsersIcon />, show: currentUser?.role === 'admin', priority: 10 },
   ];
 
   const visibleItems = navItems.filter(item => item.show);
@@ -107,8 +110,14 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
     ? visibleItems.slice(window.innerWidth < 640 ? 4 : 6)
     : [];
 
-  const handleItemClick = (view: View) => {
-    setCurrentView(view);
+  const handleItemClick = (item: { id: string; href?: string }) => {
+    // External/standalone pages (e.g. /loyalty) navigate the browser; internal
+    // items just switch the SPA view.
+    if (item.href) {
+      window.location.href = item.href;
+      return;
+    }
+    setCurrentView(item.id as View);
     setShowMoreMenu(false);
   };
 
@@ -129,7 +138,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
               {moreItems.map((item) => (
                 <button
                   key={item.id}
-                  onClick={() => handleItemClick(item.id as View)}
+                  onClick={() => handleItemClick(item)}
                   className={`flex flex-col items-center justify-center p-4 rounded-xl min-h-[80px] transition-all ${
                     currentView === item.id
                       ? 'bg-white/10 text-white'
@@ -171,7 +180,7 @@ const BottomNav: React.FC<BottomNavProps> = ({ currentView, setCurrentView }) =>
               label={item.label}
               icon={item.icon}
               isActive={currentView === item.id}
-              onClick={() => handleItemClick(item.id as View)}
+              onClick={() => handleItemClick(item)}
               iconSize={window.innerWidth < 640 ? 'medium' : 'large'}
             />
           ))}
