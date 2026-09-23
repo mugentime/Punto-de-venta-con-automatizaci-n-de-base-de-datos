@@ -211,6 +211,27 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
         }
     });
 
+    // --- DELETE /loyalty/cliente/:token --- Delete a card and (via ON DELETE
+    // CASCADE on sellos.cliente_id) all its stamps.
+    router.delete('/loyalty/cliente/:token', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const token = normalizeToken(req.params.token);
+            const result = await pool.query(
+                'DELETE FROM clientes WHERE token = $1 RETURNING token',
+                [token]
+            );
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Tarjeta no encontrada.' });
+            }
+            broadcastDataChange('clientes', { action: 'delete', token });
+            res.json({ deleted: token });
+        } catch (error) {
+            console.error('Error deleting loyalty card:', error);
+            res.status(500).json({ error: 'Failed to delete loyalty card' });
+        }
+    });
+
     // --- GET /loyalty/clientes --- Admin list of every card with its stamp totals.
     router.get('/loyalty/clientes', async (req, res) => {
         try {

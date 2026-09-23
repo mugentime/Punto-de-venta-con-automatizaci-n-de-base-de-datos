@@ -132,6 +132,13 @@
         }
         .scan-msg { color: var(--text-primary); margin: 16px 0; font-size: 0.95rem; }
         .scan-close { margin-top: 4px; background: var(--danger); color: #fff; }
+
+        .btn-del {
+            background: transparent; color: var(--danger);
+            border: 1px solid var(--danger); border-radius: 6px;
+            padding: 5px 10px; font-size: 0.8rem; cursor: pointer;
+        }
+        .btn-del:hover { background: rgba(255,0,85,0.12); }
     </style>
 </head>
 <body>
@@ -201,10 +208,10 @@
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th></tr>
+                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th><th>Acción</th></tr>
                     </thead>
                     <tbody id="clientesBody">
-                        <tr><td colspan="6" class="muted">Cargando…</td></tr>
+                        <tr><td colspan="7" class="muted">Cargando…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -336,11 +343,11 @@
             const body = $('clientesBody');
             const { ok, data } = await api('/loyalty/clientes');
             if (!ok || !Array.isArray(data)) {
-                body.innerHTML = '<tr><td colspan="6" class="muted">No se pudo cargar.</td></tr>';
+                body.innerHTML = '<tr><td colspan="7" class="muted">No se pudo cargar.</td></tr>';
                 return;
             }
             if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="6" class="muted">Sin tarjetas todavía. Genera algunas arriba.</td></tr>';
+                body.innerHTML = '<tr><td colspan="7" class="muted">Sin tarjetas todavía. Genera algunas arriba.</td></tr>';
                 return;
             }
             body.innerHTML = data.map(function (c) {
@@ -348,6 +355,7 @@
                     ? '<span class="pill active">Activa</span>'
                     : '<span class="pill inactive">Inactiva</span>';
                 const ultimo = c.ultimoSello ? new Date(c.ultimoSello).toLocaleDateString('es-MX') : '—';
+                const tok = String(c.token).replace(/'/g, "\\'");
                 return '<tr>'
                     + '<td>' + c.token + '</td>'
                     + '<td>' + (c.nombre || '—') + '</td>'
@@ -355,8 +363,21 @@
                     + '<td>' + estado + '</td>'
                     + '<td>' + (c.totalSellos || 0) + '</td>'
                     + '<td>' + ultimo + '</td>'
+                    + '<td><button class="btn-del" onclick="borrarCliente(\'' + tok + '\')"><i class="fas fa-trash"></i></button></td>'
                     + '</tr>';
             }).join('');
+        }
+
+        // --- Borrar tarjeta (y sus sellos) ---
+        async function borrarCliente(token) {
+            if (!window.confirm('¿Borrar la tarjeta ' + token + ' y todos sus sellos?\n\nEsta acción no se puede deshacer.')) return;
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token), { method: 'DELETE' });
+            if (!ok) {
+                banner($('generarMsg'), 'err', (data && data.error) || 'No se pudo borrar la tarjeta.');
+                return;
+            }
+            banner($('generarMsg'), 'ok', 'Tarjeta ' + token + ' eliminada.');
+            cargarClientes();
         }
 
         // ==================== ESCÁNER DE QR (cámara) ====================
