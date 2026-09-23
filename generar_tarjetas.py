@@ -45,8 +45,9 @@ LOGO_X, LOGO_Y, LOGO_MAX = 4.0, 5.0, 34.0   # caja del logo (izquierda)
 QR_X, QR_Y, QR_SIZE = 50.0, 7.0, 30.0        # QR (derecha), incluye quiet zone
 
 RULER_X0, RULER_LEN = 7.5, 70.0        # regla: empieza en x=7.5mm, mide 70mm (0–7cm exactos)
-RULER_BASE_Y = 46.8                    # línea base de la regla
-TICK_MM, TICK_5MM, TICK_CM = 1.2, 2.0, 3.0   # alturas de marca (hacia arriba)
+RULER_BASE_Y = 53.4                    # línea base PEGADA al borde inferior (card=54, corte=53.7)
+TICK_MM, TICK_5MM, TICK_CM = 1.2, 2.0, 3.0   # alturas de marca (hacia ARRIBA desde el borde)
+RULER_NUM_FS = 1.5                     # tamaño de los números en mm (pequeño, arriba de los ticks)
 
 OUT_DIR_DEFAULT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tarjetas")
 LOGO_DEFAULT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -141,9 +142,10 @@ def bloque_qr(url, ec_name):
 
 # ----------------------------- regla -----------------------------
 def bloque_regla():
-    """Regla de 0 a 75 mm con marcas de 1 mm / 5 mm / 1 cm y números por cm."""
+    """Regla de canto: línea base PEGADA al borde inferior, marcas de 1/5/10 mm
+    hacia ARRIBA, y números por cm ENCIMA de los ticks (pequeños, sin encimarse)."""
     partes = ['<g fill="none" stroke="#000000" stroke-width="0.18">']
-    # línea base
+    # línea base (al borde inferior)
     partes.append(f'<line x1="{RULER_X0:.3f}" y1="{RULER_BASE_Y:.3f}" '
                   f'x2="{RULER_X0 + RULER_LEN:.3f}" y2="{RULER_BASE_Y:.3f}"/>')
     for mm in range(0, int(RULER_LEN) + 1):
@@ -152,15 +154,16 @@ def bloque_regla():
         partes.append(f'<line x1="{x:.3f}" y1="{RULER_BASE_Y:.3f}" '
                       f'x2="{x:.3f}" y2="{RULER_BASE_Y - h:.3f}"/>')
     partes.append('</g>')
-    # números por cm (debajo de la base)
-    partes.append('<g fill="#000000" font-family="Arial, sans-serif" '
-                  'font-size="2.4" text-anchor="middle">')
+    # números por cm, ARRIBA del tick de cm (baseline 0.6 mm por encima del tick),
+    # letra pequeña para no encimarse con las marcas.
+    num_y = RULER_BASE_Y - TICK_CM - 0.6
+    partes.append(f'<g fill="#000000" font-family="Arial, sans-serif" '
+                  f'font-size="{RULER_NUM_FS}" text-anchor="middle">')
     for cm in range(0, int(RULER_LEN // 10) + 1):
         x = RULER_X0 + cm * 10
-        partes.append(f'<text x="{x:.3f}" y="{RULER_BASE_Y + 2.6:.3f}">{cm}</text>')
-    partes.append(f'<text x="{RULER_X0 + RULER_LEN + 2.2:.3f}" '
-                  f'y="{RULER_BASE_Y + 2.6:.3f}" text-anchor="start" '
-                  f'font-size="2.0">cm</text>')
+        partes.append(f'<text x="{x:.3f}" y="{num_y:.3f}">{cm}</text>')
+    partes.append(f'<text x="{RULER_X0 + RULER_LEN + 1.6:.3f}" y="{num_y:.3f}" '
+                  f'text-anchor="start" font-size="{RULER_NUM_FS * 0.85:.2f}">cm</text>')
     partes.append('</g>')
     return "".join(partes)
 
