@@ -339,6 +339,9 @@
         }
 
         // --- Lista de clientes ---
+        // Cache de la última lista cargada, para poder mostrar el nombre del
+        // cliente en la confirmación de borrado sin volver a pedirlo al backend.
+        let clientesCache = [];
         async function cargarClientes() {
             const body = $('clientesBody');
             const { ok, data } = await api('/loyalty/clientes');
@@ -346,6 +349,7 @@
                 body.innerHTML = '<tr><td colspan="7" class="muted">No se pudo cargar.</td></tr>';
                 return;
             }
+            clientesCache = data;
             if (data.length === 0) {
                 body.innerHTML = '<tr><td colspan="7" class="muted">Sin tarjetas todavía. Genera algunas arriba.</td></tr>';
                 return;
@@ -363,14 +367,17 @@
                     + '<td>' + estado + '</td>'
                     + '<td>' + (c.totalSellos || 0) + '</td>'
                     + '<td>' + ultimo + '</td>'
-                    + '<td><button class="btn-del" onclick="borrarCliente(\'' + tok + '\')"><i class="fas fa-trash"></i></button></td>'
+                    + '<td><button class="btn-del" onclick="borrarCliente(\'' + tok + '\')"><i class="fas fa-trash"></i> Eliminar</button></td>'
                     + '</tr>';
             }).join('');
         }
 
         // --- Borrar tarjeta (y sus sellos) ---
         async function borrarCliente(token) {
-            if (!window.confirm('¿Borrar la tarjeta ' + token + ' y todos sus sellos?\n\nEsta acción no se puede deshacer.')) return;
+            const c = clientesCache.find(function (x) { return x.token === token; });
+            const nombre = c && c.nombre;
+            const quien = nombre ? ('a ' + nombre) : ('la tarjeta ' + token);
+            if (!window.confirm('¿Eliminar ' + quien + '?\n\nSe borrarán también todos sus sellos. Esta acción no se puede deshacer.')) return;
             const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token), { method: 'DELETE' });
             if (!ok) {
                 banner($('generarMsg'), 'err', (data && data.error) || 'No se pudo borrar la tarjeta.');
