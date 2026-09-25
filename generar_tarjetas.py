@@ -29,10 +29,18 @@ Modos (elige uno):
   --eliminar CNK-0001,…  Borra tarjetas del POS (no genera SVG).
   (sin nada)           Regenera SVGs de TODAS las tarjetas dadas de alta en el POS.
 
+Salida (elige una):
+  (por defecto)        Un SVG por tarjeta (CNK-0001.svg, …).
+  --pliego 400x400     Acomoda varias tarjetas por hoja en UN SVG por hoja (listo para
+                       LightBurn), dentro de un área de 400×400 mm (= 40×40 cm). Ideal
+                       cuando no quieres cientos de archivos sueltos.
+
 Ejemplos:
   # dar de alta 200 y producir sus tarjetas para el láser (un solo paso):
   python generar_tarjetas.py --crear 200 --base-url https://mi-app.up.railway.app
-  # regenerar todas las tarjetas existentes:
+  # regenerar TODAS las existentes en pliegos de 40×40 cm (NO crea, NO duplica):
+  python generar_tarjetas.py --pliego 400x400 --ec H --base-url https://mi-app.up.railway.app
+  # regenerar todas las tarjetas existentes, una por archivo:
   python generar_tarjetas.py --base-url https://mi-app.up.railway.app
   # borrar de prueba:
   python generar_tarjetas.py --eliminar CNK-0001,CNK-0002 --base-url https://mi-app.up.railway.app
@@ -219,20 +227,67 @@ def bloque_regla():
 
 
 # ----------------------------- tarjeta -----------------------------
+def _cut_rect():
+    """Contorno de corte (rojo) de UNA tarjeta, en su espacio 0..CARD_W × 0..CARD_H."""
+    return (f'<rect x="{CUT_INSET:.3f}" y="{CUT_INSET:.3f}" '
+            f'width="{CARD_W - 2 * CUT_INSET:.3f}" height="{CARD_H - 2 * CUT_INSET:.3f}" '
+            f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="#ff0000" stroke-width="0.2"/>')
+
+
+def contenido_tarjeta(logo_g, qr_g, ruler_g):
+    """Fragmento (SIN <svg>) de UNA tarjeta en su propio espacio 0..CARD_W × 0..CARD_H:
+    corte (rojo) + grabado (negro). Se reutiliza tal cual dentro de un pliego."""
+    return (f'<!-- CORTE (rojo) --> {_cut_rect()} '
+            f'<!-- GRABADO (negro): logo + QR + regla --> {logo_g} {qr_g} {ruler_g}')
+
+
 def componer_tarjeta(logo_g, qr_g, ruler_g):
-    cut = (f'<rect x="{CUT_INSET:.3f}" y="{CUT_INSET:.3f}" '
-           f'width="{CARD_W - 2 * CUT_INSET:.3f}" height="{CARD_H - 2 * CUT_INSET:.3f}" '
-           f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="#ff0000" stroke-width="0.2"/>')
+    """SVG completo de UNA tarjeta (85×54 mm), un archivo por token."""
     return (
         f'<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" '
         f'width="{CARD_W}mm" height="{CARD_H}mm" '
         f'viewBox="0 0 {CARD_W} {CARD_H}">\n'
-        f'  <!-- CORTE (rojo) -->\n  {cut}\n'
-        f'  <!-- GRABADO (negro): logo + QR + regla -->\n'
-        f'  {logo_g}\n  {qr_g}\n  {ruler_g}\n'
+        f'  {contenido_tarjeta(logo_g, qr_g, ruler_g)}\n'
         f'</svg>\n'
     )
+
+
+# ----------------------------- pliego (varias tarjetas por hoja) -----------------------------
+def parse_pliego(spec):
+    """'400x400' -> (400.0, 400.0) en mm. Acepta x, X o *."""
+    m = re.match(r'^\s*(\d+(?:\.\d+)?)\s*[xX*]\s*(\d+(?:\.\d+)?)\s*$', spec)
+    if not m:
+        sys.exit("Formato de --pliego inválido. Usa por ejemplo: --pliego 400x400")
+    return float(m.group(1)), float(m.group(2))
+
+
+def rejilla(sheet_w, sheet_h, margen, sep):
+    """Cuántas tarjetas caben por hoja: (columnas, filas)."""
+    cols = int((sheet_w - 2 * margen + sep) // (CARD_W + sep))
+    rows = int((sheet_h - 2 * margen + sep) // (CARD_H + sep))
+    if cols < 1 or rows < 1:
+        sys.exit(f"En un pliego de {sheet_w:.0f}×{sheet_h:.0f} mm no cabe ni una tarjeta "
+                 f"de {CARD_W:.0f}×{CARD_H:.0f} mm (margen {margen}, separación {sep}).")
+    return cols, rows
+
+
+def componer_pliego(fragmentos, sheet_w, sheet_h, margen, sep, cols):
+    """Un SVG con varias tarjetas acomodadas en rejilla, listo para LightBurn.
+    `fragmentos` = lista de contenido_tarjeta() (una por tarjeta de esta hoja)."""
+    piezas = [
+        f'<?xml version="1.0" encoding="UTF-8"?>\n'
+        f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" '
+        f'width="{sheet_w}mm" height="{sheet_h}mm" '
+        f'viewBox="0 0 {sheet_w} {sheet_h}">\n'
+    ]
+    for idx, frag in enumerate(fragmentos):
+        col, row = idx % cols, idx // cols
+        ox = margen + col * (CARD_W + sep)
+        oy = margen + row * (CARD_H + sep)
+        piezas.append(f'  <g transform="translate({ox:.3f},{oy:.3f})">{frag}</g>\n')
+    piezas.append('</svg>\n')
+    return "".join(piezas)
 
 
 def main():
@@ -258,6 +313,13 @@ def main():
     p.add_argument("--ec", choices=["L", "M", "Q", "H"], default="M",
                    help="Corrección de error del QR (H = más tolerante en madera).")
     p.add_argument("--out", default=OUT_DIR_DEFAULT, help="Carpeta de salida (por defecto ./tarjetas)")
+    p.add_argument("--pliego", metavar="WxH",
+                   help="Acomoda varias tarjetas por hoja en UN SVG por hoja (listo para "
+                        "LightBurn), en vez de un archivo por tarjeta. Ej: 400x400 (mm = 40×40 cm).")
+    p.add_argument("--margen", type=float, default=5.0,
+                   help="[--pliego] Margen desde el borde de la hoja, en mm (por defecto 5).")
+    p.add_argument("--sep", type=float, default=4.0,
+                   help="[--pliego] Separación entre tarjetas, en mm (por defecto 4).")
     args = p.parse_args()
 
     if not args.base_url:
@@ -302,6 +364,35 @@ def main():
     ruler_g = bloque_regla()                    # la regla también
 
     os.makedirs(args.out, exist_ok=True)
+
+    # --- Modo PLIEGO: varias tarjetas por hoja, un SVG por hoja (para LightBurn) ---
+    if args.pliego:
+        sheet_w, sheet_h = parse_pliego(args.pliego)
+        cols, rows = rejilla(sheet_w, sheet_h, args.margen, args.sep)
+        por_hoja = cols * rows
+        # El logo y la regla son fijos; solo el QR cambia por token.
+        fragmentos = [
+            (t, contenido_tarjeta(logo_g,
+                                  bloque_qr(f"{base_url}/loyalty/scan/{t}", args.ec),
+                                  ruler_g))
+            for t in tokens
+        ]
+        n_hojas = (len(fragmentos) + por_hoja - 1) // por_hoja
+        for h in range(n_hojas):
+            grupo = fragmentos[h * por_hoja:(h + 1) * por_hoja]
+            svg = componer_pliego([f for _, f in grupo],
+                                  sheet_w, sheet_h, args.margen, args.sep, cols)
+            primero, ultimo = grupo[0][0], grupo[-1][0]
+            nombre = f"pliego_{h + 1:02d}_{primero}-{ultimo}.svg"
+            with open(os.path.join(args.out, nombre), "w", encoding="utf-8") as f:
+                f.write(svg)
+            print(f"  ✓ {nombre}  ({len(grupo)} tarjeta(s): {primero}..{ultimo})")
+        print(f"\nListo: {len(fragmentos)} tarjeta(s) en {n_hojas} pliego(s) de "
+              f"{sheet_w:.0f}×{sheet_h:.0f} mm — {cols}×{rows} = {por_hoja} por hoja, en {args.out}")
+        print("Importa cada pliego al láser al 100 % (sin escalar). Rojo = cortar, negro = grabar.")
+        return
+
+    # --- Modo por archivo: un SVG por tarjeta (comportamiento original) ---
     for token in tokens:
         url = f"{base_url}/loyalty/scan/{token}"
         svg = componer_tarjeta(logo_g, bloque_qr(url, args.ec), ruler_g)
