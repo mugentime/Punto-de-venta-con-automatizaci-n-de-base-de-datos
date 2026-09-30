@@ -2,21 +2,21 @@
 """Genera el DISEÑO COMPLETO de la tarjeta de lealtad (madera, láser), un SVG por
 token, combinando en una sola tarjeta:
 
-  [ LOGO Conejo Negro ]  |  [ QR único CNK-XXXX ]
-  ┈┈┈┈┈┈┈ regla 0–7.5 cm con marcas de mm/cm ┈┈┈┈┈┈┈
+  [ LOGO Conejo Negro ]  |  [ QR grande único CNK-XXXX ]
   (todo dentro de un contorno de corte)
 
 El logo es fijo; lo único que cambia por tarjeta es el QR → grabas cientos sin
-rediseñar. Cada QR apunta a {BASE_URL}/loyalty/scan/{TOKEN}.
+rediseñar. Cada QR apunta a {BASE_URL}/loyalty/scan/{TOKEN}. El QR se hace lo
+más grande posible (limitado por el alto de la tarjeta) para que se lea fácil
+desde cualquier celular.
 
 Capas por color (convención de láser tipo LightBurn):
-  * NEGRO (#000000) = GRABAR: logo + QR + regla + números.
+  * NEGRO (#000000) = GRABAR: logo + QR.
   * ROJO  (#ff0000) = CORTAR: contorno de la tarjeta.
 
-⚠️ IMPORTANTE PARA QUE LA REGLA SEA EXACTA:
-  El SVG viene dimensionado en milímetros reales (width=85mm height=54mm). Al
-  importarlo al software del láser NO lo escales; impórtalo al 100 %. Si lo
-  estiras, la regla deja de medir bien.
+El SVG viene dimensionado en milímetros reales (width=85mm height=54mm). Al
+importarlo al software del láser impórtalo al 100 % para conservar el tamaño
+físico de la tarjeta.
 
 Esta "app de escritorio" es también el ÚNICO lugar para dar de alta o borrar
 tarjetas: habla con el POS por HTTP para que el punto de venta reconozca los QR
@@ -62,13 +62,10 @@ import urllib.request
 CARD_W, CARD_H = 85.0, 54.0          # tamaño tarjeta (crédito)
 CUT_INSET, CUT_RADIUS = 0.3, 3.5      # contorno de corte
 
-LOGO_X, LOGO_Y, LOGO_MAX = 4.0, 5.0, 34.0   # caja del logo (izquierda)
-QR_X, QR_Y, QR_SIZE = 50.0, 7.0, 30.0        # QR (derecha), incluye quiet zone
-
-RULER_X0, RULER_LEN = 7.5, 70.0        # regla: empieza en x=7.5mm, mide 70mm (0–7cm exactos)
-RULER_BASE_Y = 53.4                    # línea base PEGADA al borde inferior (card=54, corte=53.7)
-TICK_MM, TICK_5MM, TICK_CM = 1.2, 2.0, 3.0   # alturas de marca (hacia ARRIBA desde el borde)
-RULER_NUM_FS = 1.5                     # tamaño de los números en mm (pequeño, arriba de los ticks)
+# QR lo más grande posible: cuadrado limitado por el alto de la tarjeta, con
+# ~4 mm de margen para no tocar las esquinas redondeadas del corte.
+LOGO_X, LOGO_Y, LOGO_MAX = 3.0, 12.5, 29.0   # caja del logo (izquierda, centrada vertical)
+QR_X, QR_Y, QR_SIZE = 34.0, 4.0, 46.0        # QR (derecha, grande), incluye quiet zone
 
 OUT_DIR_DEFAULT = os.path.join(os.path.dirname(os.path.abspath(__file__)), "tarjetas")
 LOGO_DEFAULT = os.path.join(os.path.dirname(os.path.abspath(__file__)),
@@ -198,34 +195,6 @@ def bloque_qr(url, ec_name):
             f'<path d="{d}" fill="#000000"/></g>')
 
 
-# ----------------------------- regla -----------------------------
-def bloque_regla():
-    """Regla de canto: línea base PEGADA al borde inferior, marcas de 1/5/10 mm
-    hacia ARRIBA, y números por cm ENCIMA de los ticks (pequeños, sin encimarse)."""
-    partes = ['<g fill="none" stroke="#000000" stroke-width="0.18">']
-    # línea base (al borde inferior)
-    partes.append(f'<line x1="{RULER_X0:.3f}" y1="{RULER_BASE_Y:.3f}" '
-                  f'x2="{RULER_X0 + RULER_LEN:.3f}" y2="{RULER_BASE_Y:.3f}"/>')
-    for mm in range(0, int(RULER_LEN) + 1):
-        x = RULER_X0 + mm
-        h = TICK_CM if mm % 10 == 0 else (TICK_5MM if mm % 5 == 0 else TICK_MM)
-        partes.append(f'<line x1="{x:.3f}" y1="{RULER_BASE_Y:.3f}" '
-                      f'x2="{x:.3f}" y2="{RULER_BASE_Y - h:.3f}"/>')
-    partes.append('</g>')
-    # números por cm, ARRIBA del tick de cm (baseline 0.6 mm por encima del tick),
-    # letra pequeña para no encimarse con las marcas.
-    num_y = RULER_BASE_Y - TICK_CM - 0.6
-    partes.append(f'<g fill="#000000" font-family="Arial, sans-serif" '
-                  f'font-size="{RULER_NUM_FS}" text-anchor="middle">')
-    for cm in range(0, int(RULER_LEN // 10) + 1):
-        x = RULER_X0 + cm * 10
-        partes.append(f'<text x="{x:.3f}" y="{num_y:.3f}">{cm}</text>')
-    partes.append(f'<text x="{RULER_X0 + RULER_LEN + 1.6:.3f}" y="{num_y:.3f}" '
-                  f'text-anchor="start" font-size="{RULER_NUM_FS * 0.85:.2f}">cm</text>')
-    partes.append('</g>')
-    return "".join(partes)
-
-
 # ----------------------------- tarjeta -----------------------------
 def _cut_rect():
     """Contorno de corte (rojo) de UNA tarjeta, en su espacio 0..CARD_W × 0..CARD_H."""
@@ -234,21 +203,21 @@ def _cut_rect():
             f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="#ff0000" stroke-width="0.2"/>')
 
 
-def contenido_tarjeta(logo_g, qr_g, ruler_g):
+def contenido_tarjeta(logo_g, qr_g):
     """Fragmento (SIN <svg>) de UNA tarjeta en su propio espacio 0..CARD_W × 0..CARD_H:
     corte (rojo) + grabado (negro). Se reutiliza tal cual dentro de un pliego."""
     return (f'<!-- CORTE (rojo) --> {_cut_rect()} '
-            f'<!-- GRABADO (negro): logo + QR + regla --> {logo_g} {qr_g} {ruler_g}')
+            f'<!-- GRABADO (negro): logo + QR --> {logo_g} {qr_g}')
 
 
-def componer_tarjeta(logo_g, qr_g, ruler_g):
+def componer_tarjeta(logo_g, qr_g):
     """SVG completo de UNA tarjeta (85×54 mm), un archivo por token."""
     return (
         f'<?xml version="1.0" encoding="UTF-8"?>\n'
         f'<svg xmlns="http://www.w3.org/2000/svg" version="1.1" '
         f'width="{CARD_W}mm" height="{CARD_H}mm" '
         f'viewBox="0 0 {CARD_W} {CARD_H}">\n'
-        f'  {contenido_tarjeta(logo_g, qr_g, ruler_g)}\n'
+        f'  {contenido_tarjeta(logo_g, qr_g)}\n'
         f'</svg>\n'
     )
 
@@ -299,7 +268,7 @@ def main():
 
     p = argparse.ArgumentParser(
         description="App de escritorio: da de alta tarjetas en el POS y genera su "
-                    "diseño (logo+QR+regla) en SVG para láser.")
+                    "diseño (logo+QR) en SVG para láser.")
     p.add_argument("--base-url", default=os.environ.get("LOYALTY_BASE_URL"),
                    help="URL base del POS (o var LOYALTY_BASE_URL).")
     g = p.add_mutually_exclusive_group()
@@ -361,7 +330,6 @@ def main():
 
     logo_paths, vw, vh = cargar_logo_paths(args.logo)
     logo_g = bloque_logo(logo_paths, vw, vh)   # el logo es igual en todas
-    ruler_g = bloque_regla()                    # la regla también
 
     os.makedirs(args.out, exist_ok=True)
 
@@ -370,11 +338,10 @@ def main():
         sheet_w, sheet_h = parse_pliego(args.pliego)
         cols, rows = rejilla(sheet_w, sheet_h, args.margen, args.sep)
         por_hoja = cols * rows
-        # El logo y la regla son fijos; solo el QR cambia por token.
+        # El logo es fijo; solo el QR cambia por token.
         fragmentos = [
             (t, contenido_tarjeta(logo_g,
-                                  bloque_qr(f"{base_url}/loyalty/scan/{t}", args.ec),
-                                  ruler_g))
+                                  bloque_qr(f"{base_url}/loyalty/scan/{t}", args.ec)))
             for t in tokens
         ]
         n_hojas = (len(fragmentos) + por_hoja - 1) // por_hoja
@@ -395,13 +362,13 @@ def main():
     # --- Modo por archivo: un SVG por tarjeta (comportamiento original) ---
     for token in tokens:
         url = f"{base_url}/loyalty/scan/{token}"
-        svg = componer_tarjeta(logo_g, bloque_qr(url, args.ec), ruler_g)
+        svg = componer_tarjeta(logo_g, bloque_qr(url, args.ec))
         with open(os.path.join(args.out, f"{token}.svg"), "w", encoding="utf-8") as f:
             f.write(svg)
         print(f"  ✓ {token} -> {url}")
 
     print(f"\nListo: {len(tokens)} tarjeta(s) SVG ({CARD_W:.0f}×{CARD_H:.0f} mm) en {args.out}")
-    print("Recuerda: importa al láser al 100 % (sin escalar) para que la regla mida bien.")
+    print("Recuerda: importa al láser al 100 % (sin escalar) para conservar el tamaño físico.")
 
 
 if __name__ == "__main__":
