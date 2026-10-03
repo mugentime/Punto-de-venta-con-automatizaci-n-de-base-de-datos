@@ -298,6 +298,22 @@
         </div>
     </div>
 
+    <!-- Puerta de clave de cajero -->
+    <div id="claveOverlay" class="scan-overlay hidden">
+        <div class="scan-box" style="max-width:360px">
+            <div class="card" style="margin:0">
+                <h2><i class="fas fa-lock"></i> Clave de cajero</h2>
+                <label for="claveInput">Ingresa la clave para usar el panel de lealtad</label>
+                <input id="claveInput" type="password" placeholder="Clave" autocomplete="off">
+                <div id="claveMsg" class="sub err" style="min-height:1.1em;margin-top:8px;color:var(--danger);font-size:0.85rem"></div>
+                <div class="btn-row">
+                    <button class="success" id="claveOk"><i class="fas fa-unlock"></i> Entrar</button>
+                    <button class="secondary" id="claveCancel">Cancelar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- QR scanner overlay (camera) -->
     <div id="scanOverlay" class="scan-overlay hidden">
         <div class="scan-box">
@@ -333,8 +349,53 @@
             el.innerHTML = '<div class="status-banner ' + kind + '">' + html + '</div>';
         }
 
+        // --- Protección: clave de cajero (header X-Loyalty-Key) ---
+        // Se guarda en sessionStorage (dura mientras la pestaña esté abierta).
+        // Si el servidor responde 401, pedimos la clave y reintentamos una vez.
+        const getKey = () => sessionStorage.getItem('loyaltyKey') || '';
+        const setKey = (k) => sessionStorage.setItem('loyaltyKey', k);
+
+        function pedirClave(reintento) {
+            return new Promise(function (resolve) {
+                $('claveMsg').textContent = reintento ? 'Clave incorrecta. Intenta de nuevo.' : '';
+                $('claveInput').value = '';
+                $('claveOverlay').classList.remove('hidden');
+                setTimeout(function () { $('claveInput').focus(); }, 50);
+                function done(ok) {
+                    $('claveOverlay').classList.add('hidden');
+                    $('claveOk').onclick = null; $('claveInput').onkeydown = null;
+                    resolve(ok);
+                }
+                $('claveOk').onclick = function () {
+                    const k = ($('claveInput').value || '').trim();
+                    if (!k) return;
+                    setKey(k); done(true);
+                };
+                $('claveInput').onkeydown = function (e) { if (e.key === 'Enter') $('claveOk').click(); };
+                $('claveCancel').onclick = function () { done(false); };
+            });
+        }
+
         async function api(path, opts) {
-            const res = await fetch(path, opts);
+            opts = opts || {};
+            const run = function () {
+                const headers = Object.assign({}, opts.headers || {});
+                const k = getKey();
+                if (k) headers['X-Loyalty-Key'] = k;
+                return fetch(path, Object.assign({}, opts, { headers: headers }));
+            };
+            let res = await run();
+            if (res.status === 401) {
+                // Clave faltante o incorrecta: pedirla y reintentar (hasta 3 veces).
+                sessionStorage.removeItem('loyaltyKey');
+                let intento = 0;
+                while (res.status === 401 && intento < 3) {
+                    const ok = await pedirClave(intento > 0);
+                    if (!ok) break;
+                    res = await run();
+                    intento++;
+                }
+            }
             let data = null;
             try { data = await res.json(); } catch (_) {}
             return { ok: res.ok, status: res.status, data };

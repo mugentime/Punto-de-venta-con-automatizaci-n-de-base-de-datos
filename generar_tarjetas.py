@@ -90,12 +90,19 @@ def tokens_desde_rango(rango: str):
 #   * borrar tokens        -> DELETE /loyalty/cliente/:token
 #   * listar existentes    -> GET  /loyalty/clientes
 # Así el POS reconoce los QR para activar / sumar puntos al escanear.
+# Clave de cajero opcional (header X-Loyalty-Key). Se fija en main() desde
+# --key o la variable de entorno LOYALTY_KEY. Si el POS tiene LOYALTY_KEY
+# configurada, estas operaciones (crear/listar/borrar) la exigen.
+API_KEY = None
+
+
 def api(base_url, method, path, body=None):
     url = base_url + path
     data = json.dumps(body).encode("utf-8") if body is not None else None
-    req = urllib.request.Request(
-        url, data=data, method=method,
-        headers={"Content-Type": "application/json", "Accept": "application/json"})
+    headers = {"Content-Type": "application/json", "Accept": "application/json"}
+    if API_KEY:
+        headers["X-Loyalty-Key"] = API_KEY
+    req = urllib.request.Request(url, data=data, method=method, headers=headers)
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
             txt = r.read().decode("utf-8")
@@ -106,6 +113,9 @@ def api(base_url, method, path, body=None):
             payload = json.loads(txt)
         except ValueError:
             payload = {"error": txt[:200]}
+        if e.code == 401:
+            print("  ⚠️  El POS pide clave de cajero. Pasa --key TU_CLAVE "
+                  "(o define la variable LOYALTY_KEY).", file=sys.stderr)
         return e.code, payload
     except urllib.error.URLError as e:
         sys.exit(f"No pude conectar con el POS ({url}): {e.reason}")
@@ -279,6 +289,8 @@ def main():
                     "diseño (logo+QR) en SVG para láser.")
     p.add_argument("--base-url", default=os.environ.get("LOYALTY_BASE_URL"),
                    help="URL base del POS (o var LOYALTY_BASE_URL).")
+    p.add_argument("--key", default=os.environ.get("LOYALTY_KEY"),
+                   help="Clave de cajero del POS si está protegido (o var LOYALTY_KEY).")
     g = p.add_mutually_exclusive_group()
     g.add_argument("--crear", type=int, metavar="N",
                    help="Da de alta N tokens NUEVOS en el POS y genera sus tarjetas.")
@@ -302,6 +314,9 @@ def main():
     if not args.base_url:
         sys.exit("Falta --base-url (o la variable LOYALTY_BASE_URL).")
     base_url = args.base_url.rstrip("/")
+
+    global API_KEY
+    API_KEY = args.key or None
 
     # --- Modo borrar: solo habla con el POS, no genera SVG ---
     if args.eliminar:

@@ -17,6 +17,30 @@ function normalizeToken(raw) {
     return String(raw || '').trim().toUpperCase();
 }
 
+// Protección sencilla del panel de cajero: clave compartida en el header
+// X-Loyalty-Key (o ?key=) que debe coincidir con la variable LOYALTY_KEY.
+//   * Si LOYALTY_KEY NO está configurada -> NO bloquea (fail-open), para no romper
+//     un POS en producción; avisa una vez en consola. Define LOYALTY_KEY para activar.
+//   * Si está configurada -> exige la clave; responde 401 si falta o es incorrecta.
+// GET /loyalty/scan/:token queda SIEMPRE público (lo abre el teléfono desde el QR).
+let _avisoSinClave = false;
+function requireLoyaltyKey(req, res, next) {
+    const key = process.env.LOYALTY_KEY;
+    if (!key) {
+        if (!_avisoSinClave) {
+            console.warn('⚠️  LOYALTY_KEY no configurada — panel de lealtad SIN protección. '
+                + 'Define LOYALTY_KEY en el entorno (Railway) para activarla.');
+            _avisoSinClave = true;
+        }
+        return next();
+    }
+    const provided = req.headers['x-loyalty-key'] || req.query.key;
+    if (!provided || provided !== key) {
+        return res.status(401).json({ error: 'Clave de cajero requerida o incorrecta.' });
+    }
+    next();
+}
+
 // Cuenta corriente de la tarjeta. `saldo` es un número neto:
 //   saldo < 0  -> el cliente DEBE (deuda)
 //   saldo > 0  -> tiene SALDO A FAVOR
@@ -174,7 +198,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
 
     // --- POST /loyalty/activar/:token --- Alta/activación de la tarjeta con
     // { nombre (o pseudónimo), telefono?, descuento?, nota? }.
-    router.post('/loyalty/activar/:token', async (req, res) => {
+    router.post('/loyalty/activar/:token', requireLoyaltyKey, async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const token = normalizeToken(req.params.token);
@@ -218,7 +242,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     // --- PUT /loyalty/cliente/:token --- Editar datos del cliente (nombre,
     // teléfono, descuento, nota) SIN tocar saldo ni sellos. Para corregir el
     // descuento o la nota después del alta.
-    router.put('/loyalty/cliente/:token', async (req, res) => {
+    router.put('/loyalty/cliente/:token', requireLoyaltyKey, async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const token = normalizeToken(req.params.token);
@@ -258,7 +282,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     // body { tipo, monto, descripcion? }. Actualiza `saldo` transaccionalmente y
     // deja un renglón en loyalty_movimientos. El signo/efecto lo decide el servidor
     // según el tipo (no se confía en el cliente).
-    router.post('/loyalty/cliente/:token/cobro', async (req, res) => {
+    router.post('/loyalty/cliente/:token/cobro', requireLoyaltyKey, async (req, res) => {
         if (!useDb) return res.status(503).json({ error: 'Database not available' });
 
         const token = normalizeToken(req.params.token);
@@ -327,7 +351,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     });
 
     // --- GET /loyalty/cliente/:token --- Full profile + stamp count (does NOT stamp).
-    router.get('/loyalty/cliente/:token', async (req, res) => {
+    router.get('/loyalty/cliente/:token', requireLoyaltyKey, async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const token = normalizeToken(req.params.token);
@@ -375,7 +399,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
 
     // --- DELETE /loyalty/cliente/:token --- Delete a card and (via ON DELETE
     // CASCADE on sellos.cliente_id) all its stamps.
-    router.delete('/loyalty/cliente/:token', async (req, res) => {
+    router.delete('/loyalty/cliente/:token', requireLoyaltyKey, async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const token = normalizeToken(req.params.token);
@@ -395,7 +419,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     });
 
     // --- GET /loyalty/clientes --- Admin list of every card with its stamp totals.
-    router.get('/loyalty/clientes', async (req, res) => {
+    router.get('/loyalty/clientes', requireLoyaltyKey, async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const { rows } = await pool.query(
@@ -421,7 +445,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
     });
 
     // --- POST /loyalty/generar --- Generate N new inactive CNK-XXXX cards.
-    router.post('/loyalty/generar', async (req, res) => {
+    router.post('/loyalty/generar', requireLoyaltyKey, async (req, res) => {
         if (!useDb) return res.status(503).json({ error: 'Database not available' });
 
         const cantidad = parseInt(req.body?.cantidad, 10);
