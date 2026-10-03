@@ -17,6 +17,35 @@ function normalizeToken(raw) {
     return String(raw || '').trim().toUpperCase();
 }
 
+// Cuenta corriente de la tarjeta. `saldo` es un número neto:
+//   saldo < 0  -> el cliente DEBE (deuda)
+//   saldo > 0  -> tiene SALDO A FAVOR
+// En la práctica nunca se tienen ambos a la vez (se netean solos).
+function desglosarCuenta(saldo) {
+    const s = Math.round((Number(saldo) || 0) * 100) / 100;
+    return { saldo: s, deuda: s < 0 ? -s : 0, saldoAFavor: s > 0 ? s : 0 };
+}
+
+// Tipos de movimiento de cobro y su efecto (signo) sobre el saldo.
+//   cargo_credito  : consumo a crédito        -> sube la deuda  (−)
+//   consumo_pagado : consumo pagado al momento -> no toca la cuenta (0), solo deja registro
+//   uso_saldo      : consumo cubierto con saldo a favor -> baja el saldo a favor (−)
+//   pago           : pago/abono del cliente    -> baja la deuda / sube el saldo (+)
+const TIPOS_MOVIMIENTO = {
+    cargo_credito:  -1,
+    consumo_pagado:  0,
+    uso_saldo:      -1,
+    pago:           +1,
+};
+
+// Normaliza un % de descuento a un número 0..100 (o 0 si viene basura).
+function normalizarDescuento(raw) {
+    let d = Number(raw);
+    if (!Number.isFinite(d) || d < 0) d = 0;
+    if (d > 100) d = 100;
+    return Math.round(d * 100) / 100;
+}
+
 // Escape untrusted text before interpolating into HTML.
 function escapeHtml(s) {
     return String(s == null ? '' : s)
@@ -143,12 +172,13 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
         }
     });
 
-    // --- POST /loyalty/activar/:token --- Activate a card with { nombre, telefono }.
+    // --- POST /loyalty/activar/:token --- Alta/activación de la tarjeta con
+    // { nombre (o pseudónimo), telefono?, descuento?, nota? }.
     router.post('/loyalty/activar/:token', async (req, res) => {
         try {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const token = normalizeToken(req.params.token);
-            const { nombre, telefono } = req.body || {};
+            const { nombre, telefono, descuento, nota } = req.body || {};
 
             if (!nombre || !String(nombre).trim()) {
                 return res.status(400).json({ error: 'El nombre es obligatorio.' });
@@ -158,11 +188,19 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 `UPDATE clientes
                     SET nombre = $1,
                         telefono = $2,
+                        descuento = $3,
+                        nota = $4,
                         activo = true,
                         fecha_registro = COALESCE(fecha_registro, CURRENT_TIMESTAMP)
-                  WHERE token = $3
-              RETURNING id, token, nombre, telefono, activo, fecha_registro, created_at`,
-                [String(nombre).trim(), telefono ? String(telefono).trim() : null, token]
+                  WHERE token = $5
+              RETURNING id, token, nombre, telefono, descuento, nota, activo, saldo, fecha_registro, created_at`,
+                [
+                    String(nombre).trim(),
+                    telefono ? String(telefono).trim() : null,
+                    normalizarDescuento(descuento),
+                    nota ? String(nota).trim() : null,
+                    token
+                ]
             );
 
             if (result.rows.length === 0) {
@@ -174,6 +212,117 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
         } catch (error) {
             console.error('Error activating loyalty card:', error);
             res.status(500).json({ error: 'Failed to activate loyalty card' });
+        }
+    });
+
+    // --- PUT /loyalty/cliente/:token --- Editar datos del cliente (nombre,
+    // teléfono, descuento, nota) SIN tocar saldo ni sellos. Para corregir el
+    // descuento o la nota después del alta.
+    router.put('/loyalty/cliente/:token', async (req, res) => {
+        try {
+            if (!useDb) return res.status(503).json({ error: 'Database not available' });
+            const token = normalizeToken(req.params.token);
+            const { nombre, telefono, descuento, nota } = req.body || {};
+
+            if (!nombre || !String(nombre).trim()) {
+                return res.status(400).json({ error: 'El nombre es obligatorio.' });
+            }
+
+            const result = await pool.query(
+                `UPDATE clientes
+                    SET nombre = $1, telefono = $2, descuento = $3, nota = $4
+                  WHERE token = $5
+              RETURNING id, token, nombre, telefono, descuento, nota, activo, saldo`,
+                [
+                    String(nombre).trim(),
+                    telefono ? String(telefono).trim() : null,
+                    normalizarDescuento(descuento),
+                    nota ? String(nota).trim() : null,
+                    token
+                ]
+            );
+
+            if (result.rows.length === 0) {
+                return res.status(404).json({ error: 'Tarjeta no encontrada.' });
+            }
+
+            broadcastDataChange('clientes', { action: 'update', token });
+            res.json({ cliente: result.rows[0] });
+        } catch (error) {
+            console.error('Error updating loyalty client:', error);
+            res.status(500).json({ error: 'Failed to update loyalty client' });
+        }
+    });
+
+    // --- POST /loyalty/cliente/:token/cobro --- Registra un movimiento de cuenta:
+    // body { tipo, monto, descripcion? }. Actualiza `saldo` transaccionalmente y
+    // deja un renglón en loyalty_movimientos. El signo/efecto lo decide el servidor
+    // según el tipo (no se confía en el cliente).
+    router.post('/loyalty/cliente/:token/cobro', async (req, res) => {
+        if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+        const token = normalizeToken(req.params.token);
+        const tipo = String(req.body?.tipo || '');
+        const monto = Math.round(Number(req.body?.monto) * 100) / 100;
+        const descripcion = req.body?.descripcion ? String(req.body.descripcion).trim().slice(0, 500) : null;
+
+        if (!(tipo in TIPOS_MOVIMIENTO)) {
+            return res.status(400).json({ error: 'Tipo de movimiento inválido.' });
+        }
+        if (!Number.isFinite(monto) || monto <= 0) {
+            return res.status(400).json({ error: 'El monto debe ser mayor a 0.' });
+        }
+
+        let client;
+        try {
+            client = await pool.connect();
+            await client.query('BEGIN');
+
+            // Bloquea la fila del cliente para que dos cobros simultáneos no pisen el saldo.
+            const { rows } = await client.query('SELECT * FROM clientes WHERE token = $1 FOR UPDATE', [token]);
+            const c = rows[0];
+            if (!c) {
+                await client.query('ROLLBACK');
+                return res.status(404).json({ error: 'Cliente no encontrado.' });
+            }
+            if (!c.activo) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({ error: 'La tarjeta no está activada.' });
+            }
+
+            const saldoActual = Number(c.saldo) || 0;
+            const delta = Math.round(TIPOS_MOVIMIENTO[tipo] * monto * 100) / 100;
+
+            // Guardia: "usar saldo a favor" no puede exceder el saldo a favor disponible
+            // (si no, estaría generando deuda, que no es lo que quiere esa acción).
+            if (tipo === 'uso_saldo' && monto > Math.max(saldoActual, 0) + 1e-9) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({ error: 'Saldo a favor insuficiente.' });
+            }
+
+            const saldoPost = Math.round((saldoActual + delta) * 100) / 100;
+
+            await client.query('UPDATE clientes SET saldo = $1 WHERE id = $2', [saldoPost, c.id]);
+            const movRes = await client.query(
+                `INSERT INTO loyalty_movimientos (cliente_id, tipo, monto, delta, saldo_post, descripcion)
+                 VALUES ($1, $2, $3, $4, $5, $6)
+             RETURNING id, tipo, monto, delta, saldo_post, descripcion, fecha`,
+                [c.id, tipo, monto, delta, saldoPost, descripcion]
+            );
+
+            await client.query('COMMIT');
+            broadcastDataChange('clientes', { action: 'cobro', token, tipo });
+
+            res.status(201).json({
+                movimiento: movRes.rows[0],
+                ...desglosarCuenta(saldoPost)
+            });
+        } catch (error) {
+            if (client) await client.query('ROLLBACK').catch(() => {});
+            console.error('Error registrando cobro de lealtad:', error);
+            res.status(500).json({ error: 'No se pudo registrar el cobro.' });
+        } finally {
+            if (client) client.release();
         }
     });
 
@@ -194,16 +343,29 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 [c.id]
             );
 
+            const movRes = await pool.query(
+                `SELECT id, tipo, monto, delta, saldo_post, descripcion, fecha
+                   FROM loyalty_movimientos
+                  WHERE cliente_id = $1
+               ORDER BY fecha DESC, id DESC
+                  LIMIT 30`,
+                [c.id]
+            );
+
             res.json({
                 id: c.id,
                 token: c.token,
                 nombre: c.nombre,
                 telefono: c.telefono,
+                descuento: Number(c.descuento) || 0,
+                nota: c.nota,
                 activo: c.activo,
                 fecha_registro: c.fecha_registro,
                 created_at: c.created_at,
                 totalSellos: sellosRes.rows.length,
-                sellos: sellosRes.rows
+                sellos: sellosRes.rows,
+                ...desglosarCuenta(c.saldo),
+                movimientos: movRes.rows
             });
         } catch (error) {
             console.error('Error fetching loyalty client:', error);
@@ -238,6 +400,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
             if (!useDb) return res.status(503).json({ error: 'Database not available' });
             const { rows } = await pool.query(
                 `SELECT c.id, c.token, c.nombre, c.telefono, c.activo,
+                        c.descuento, c.nota, c.saldo,
                         c.fecha_registro, c.created_at,
                         COUNT(s.id)::int AS "totalSellos",
                         MAX(s.fecha)     AS "ultimoSello"
@@ -246,7 +409,11 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                GROUP BY c.id
                ORDER BY c.token ASC`
             );
-            res.json(rows);
+            res.json(rows.map(r => ({
+                ...r,
+                descuento: Number(r.descuento) || 0,
+                ...desglosarCuenta(r.saldo)
+            })));
         } catch (error) {
             console.error('Error listing loyalty clients:', error);
             res.status(500).json({ error: 'Failed to list loyalty clients' });

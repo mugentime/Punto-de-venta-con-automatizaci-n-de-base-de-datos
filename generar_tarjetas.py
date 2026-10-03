@@ -61,6 +61,7 @@ import urllib.request
 # --- Geometría de la tarjeta (todo en mm; el viewBox del SVG = mm reales) ---
 CARD_W, CARD_H = 85.0, 54.0          # tamaño tarjeta (crédito)
 CUT_INSET, CUT_RADIUS = 0.3, 3.5      # contorno de corte
+FRAME_INSET, FRAME_RADIUS = 2.0, 2.5  # marco delgado grabado (negro), dentro del corte
 
 # QR lo más grande posible: cuadrado limitado por el alto de la tarjeta, con
 # ~4 mm de margen para no tocar las esquinas redondeadas del corte.
@@ -203,11 +204,18 @@ def _cut_rect():
             f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="#ff0000" stroke-width="0.2"/>')
 
 
+def _marco():
+    """Marco delgado grabado (negro) de UNA tarjeta, dentro del contorno de corte."""
+    return (f'<rect x="{FRAME_INSET:.3f}" y="{FRAME_INSET:.3f}" '
+            f'width="{CARD_W - 2 * FRAME_INSET:.3f}" height="{CARD_H - 2 * FRAME_INSET:.3f}" '
+            f'rx="{FRAME_RADIUS:.3f}" fill="none" stroke="#000000" stroke-width="0.3"/>')
+
+
 def contenido_tarjeta(logo_g, qr_g):
     """Fragmento (SIN <svg>) de UNA tarjeta en su propio espacio 0..CARD_W × 0..CARD_H:
     corte (rojo) + grabado (negro). Se reutiliza tal cual dentro de un pliego."""
     return (f'<!-- CORTE (rojo) --> {_cut_rect()} '
-            f'<!-- GRABADO (negro): logo + QR --> {logo_g} {qr_g}')
+            f'<!-- GRABADO (negro): marco + logo + QR --> {_marco()} {logo_g} {qr_g}')
 
 
 def componer_tarjeta(logo_g, qr_g):

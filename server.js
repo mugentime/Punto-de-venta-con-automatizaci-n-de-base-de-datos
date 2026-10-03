@@ -247,6 +247,32 @@ async function setupAndGetDataStore() {
             `);
             await schemaClient.query('CREATE INDEX IF NOT EXISTS idx_sellos_cliente_id ON sellos(cliente_id);');
 
+            // Alta ampliada + cuenta corriente por tarjeta de lealtad.
+            //   descuento = % de descuento del cliente (0-100)
+            //   nota      = nota interna del cajero (rasgos, acuerdos, etc.)
+            //   saldo     = cuenta neta: NEGATIVO = deuda, POSITIVO = saldo a favor.
+            // Idempotente: ADD COLUMN IF NOT EXISTS corre en cada arranque sin romper nada.
+            await schemaClient.query('ALTER TABLE clientes ADD COLUMN IF NOT EXISTS descuento NUMERIC(5,2) NOT NULL DEFAULT 0;');
+            await schemaClient.query('ALTER TABLE clientes ADD COLUMN IF NOT EXISTS nota TEXT;');
+            await schemaClient.query('ALTER TABLE clientes ADD COLUMN IF NOT EXISTS saldo NUMERIC(10,2) NOT NULL DEFAULT 0;');
+            // Libro de movimientos de la cuenta (fuente de verdad del historial).
+            //   tipo: cargo_credito | consumo_pagado | uso_saldo | pago
+            //   delta: efecto firmado sobre `saldo` (lo que se suma/resta)
+            //   saldo_post: saldo resultante tras el movimiento (para el historial)
+            await schemaClient.query(`
+              CREATE TABLE IF NOT EXISTS loyalty_movimientos (
+                id          SERIAL PRIMARY KEY,
+                cliente_id  INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+                tipo        VARCHAR(30) NOT NULL,
+                monto       NUMERIC(10,2) NOT NULL,
+                delta       NUMERIC(10,2) NOT NULL,
+                saldo_post  NUMERIC(10,2) NOT NULL,
+                descripcion TEXT,
+                fecha       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP
+              );
+            `);
+            await schemaClient.query('CREATE INDEX IF NOT EXISTS idx_loyalty_mov_cliente ON loyalty_movimientos(cliente_id);');
+
             // AUTO-MIGRATION: Add discount and tip columns if they don't exist
             console.log('🔄 Running auto-migrations...');
             try {

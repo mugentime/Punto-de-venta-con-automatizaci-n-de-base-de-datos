@@ -99,6 +99,43 @@
         }
         .cliente-name { font-size: 1.3rem; font-weight: 600; }
 
+        textarea {
+            width: 100%; padding: 12px 14px;
+            background: var(--bg-secondary);
+            border: 1px solid rgba(160,160,192,0.25);
+            border-radius: 8px; color: var(--text-primary); font-size: 1rem;
+            font-family: 'Roboto', sans-serif; resize: vertical; min-height: 64px;
+        }
+        textarea:focus { outline: none; border-color: var(--accent-cyan); }
+
+        h3 {
+            font-family: 'Orbitron', sans-serif; font-size: 0.9rem; font-weight: 600;
+            color: var(--accent-cyan); margin: 22px 0 6px;
+            border-top: 1px solid rgba(160,160,192,0.12); padding-top: 18px;
+        }
+
+        /* Cuenta: sellos / deuda / saldo a favor / descuento */
+        .cuenta-grid {
+            display: grid; grid-template-columns: repeat(4, 1fr);
+            gap: 12px; margin: 16px 0 6px;
+        }
+        @media (max-width: 560px) { .cuenta-grid { grid-template-columns: repeat(2, 1fr); } }
+        .metric {
+            background: var(--bg-secondary); border: 1px solid rgba(160,160,192,0.18);
+            border-radius: 10px; padding: 12px; text-align: center;
+        }
+        .metric .lbl { font-size: 0.7rem; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 0.5px; }
+        .metric .val { font-family: 'Orbitron', sans-serif; font-size: 1.5rem; font-weight: 700; margin-top: 6px; color: var(--text-primary); }
+        .metric .val.danger { color: var(--danger); }
+        .metric .val.success { color: var(--success); }
+        .nota-box {
+            background: rgba(255,170,0,0.08); border: 1px solid rgba(255,170,0,0.3);
+            border-radius: 8px; padding: 10px 12px; margin-top: 10px; font-size: 0.9rem;
+            white-space: pre-wrap;
+        }
+        .nota-box .lbl { color: var(--warning); font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.5px; display: block; margin-bottom: 4px; }
+        .preview { font-size: 0.85rem; color: var(--accent-cyan); margin-top: 6px; min-height: 1.1em; }
+
         .stamps { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
         .stamp {
             width: 34px; height: 34px; border-radius: 50%;
@@ -153,15 +190,25 @@
             </div>
             <div id="consultaMsg"></div>
 
-            <!-- Activación (tarjeta inactiva) -->
+            <!-- Alta / activación (tarjeta inactiva) -->
             <div id="activarBox" class="hidden">
-                <div class="status-banner warn"><i class="fas fa-triangle-exclamation"></i> Tarjeta pendiente de activación.</div>
-                <label for="nombreInput">Nombre del cliente *</label>
-                <input id="nombreInput" placeholder="Nombre y apellido">
-                <label for="telInput">Teléfono</label>
-                <input id="telInput" placeholder="Opcional" inputmode="tel">
+                <div class="status-banner warn"><i class="fas fa-triangle-exclamation"></i> Tarjeta pendiente de activación. Captura los datos del cliente.</div>
+                <label for="nombreInput">Nombre o pseudónimo *</label>
+                <input id="nombreInput" placeholder="Nombre, apodo o como lo identifiquen">
+                <div class="row">
+                    <div>
+                        <label for="telInput">Teléfono</label>
+                        <input id="telInput" placeholder="Opcional" inputmode="tel">
+                    </div>
+                    <div>
+                        <label for="descInput">% de descuento</label>
+                        <input id="descInput" type="number" min="0" max="100" step="1" placeholder="0" inputmode="decimal">
+                    </div>
+                </div>
+                <label for="notaInput">Nota interna</label>
+                <textarea id="notaInput" placeholder="Rasgo, acuerdo o cualquier cosa a recordar de este cliente (opcional)"></textarea>
                 <div class="btn-row">
-                    <button class="success" onclick="activar()"><i class="fas fa-user-check"></i> Activar tarjeta</button>
+                    <button class="success" onclick="activar()"><i class="fas fa-user-check"></i> Dar de alta y activar</button>
                 </div>
             </div>
 
@@ -170,10 +217,65 @@
                 <div class="status-banner ok" id="perfilBanner"></div>
                 <div class="cliente-name" id="perfilNombre"></div>
                 <div class="muted" id="perfilTel"></div>
-                <div class="sellos-count"><span id="perfilSellos">0</span> <span style="font-size:1rem;color:var(--text-secondary)">sellos</span></div>
+
+                <!-- Cuenta del cliente -->
+                <div class="cuenta-grid">
+                    <div class="metric"><div class="lbl">Sellos</div><div class="val" id="mSellos">0</div></div>
+                    <div class="metric"><div class="lbl">Deuda</div><div class="val danger" id="mDeuda">$0.00</div></div>
+                    <div class="metric"><div class="lbl">Saldo a favor</div><div class="val success" id="mSaldo">$0.00</div></div>
+                    <div class="metric"><div class="lbl">Descuento</div><div class="val" id="mDesc">0%</div></div>
+                </div>
                 <div class="stamps" id="stampsRow"></div>
+                <div class="nota-box hidden" id="notaBox"><span class="lbl">Nota interna</span><span id="notaText"></span></div>
+
                 <div class="btn-row">
                     <button class="purple" onclick="registrarVisita()"><i class="fas fa-stamp"></i> Registrar visita de hoy</button>
+                    <button class="secondary" onclick="editar()"><i class="fas fa-pen"></i> Editar datos</button>
+                </div>
+
+                <!-- Cobro de consumo -->
+                <h3><i class="fas fa-cash-register"></i> Cobrar consumo</h3>
+                <label for="montoInput">Monto del consumo</label>
+                <input id="montoInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="actualizarPreview()">
+                <div class="preview" id="montoPreview"></div>
+                <div class="btn-row">
+                    <button class="purple" onclick="cobrar('cargo_credito')"><i class="fas fa-hand-holding-dollar"></i> Cargar a crédito</button>
+                    <button class="success" onclick="cobrar('consumo_pagado')"><i class="fas fa-money-bill-wave"></i> Cobrar pagado</button>
+                    <button class="secondary" onclick="cobrar('uso_saldo')"><i class="fas fa-wallet"></i> Pagar con saldo a favor</button>
+                </div>
+
+                <!-- Pago / abono de cuenta -->
+                <h3><i class="fas fa-coins"></i> Pago o abono</h3>
+                <label for="abonoInput">Monto (abona a la deuda o deja saldo a favor)</label>
+                <input id="abonoInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00">
+                <div class="btn-row">
+                    <button class="success" onclick="abonar()"><i class="fas fa-plus"></i> Registrar pago / abono</button>
+                </div>
+
+                <!-- Editor (oculto hasta pulsar Editar) -->
+                <div id="editorBox" class="hidden">
+                    <h3><i class="fas fa-pen"></i> Editar datos</h3>
+                    <label for="editNombre">Nombre o pseudónimo *</label>
+                    <input id="editNombre">
+                    <div class="row">
+                        <div><label for="editTel">Teléfono</label><input id="editTel" inputmode="tel"></div>
+                        <div><label for="editDesc">% de descuento</label><input id="editDesc" type="number" min="0" max="100" step="1" inputmode="decimal"></div>
+                    </div>
+                    <label for="editNota">Nota interna</label>
+                    <textarea id="editNota"></textarea>
+                    <div class="btn-row">
+                        <button class="success" onclick="guardarEdicion()"><i class="fas fa-save"></i> Guardar</button>
+                        <button class="secondary" onclick="document.getElementById('editorBox').classList.add('hidden')">Cancelar</button>
+                    </div>
+                </div>
+
+                <!-- Historial de movimientos -->
+                <h3><i class="fas fa-clock-rotate-left"></i> Movimientos</h3>
+                <div class="table-wrap">
+                    <table>
+                        <thead><tr><th>Fecha</th><th>Tipo</th><th>Monto</th><th>Saldo</th><th>Nota</th></tr></thead>
+                        <tbody id="movBody"><tr><td colspan="5" class="muted">Sin movimientos.</td></tr></tbody>
+                    </table>
                 </div>
             </div>
         </div>
@@ -186,10 +288,10 @@
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Último sello</th></tr>
+                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Desc.</th><th>Cuenta</th><th>Último sello</th></tr>
                     </thead>
                     <tbody id="clientesBody">
-                        <tr><td colspan="6" class="muted">Cargando…</td></tr>
+                        <tr><td colspan="8" class="muted">Cargando…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -211,6 +313,21 @@
     <script>
         const $ = (id) => document.getElementById(id);
         const getToken = () => ($('tokenInput').value || '').trim().toUpperCase();
+
+        let currentCliente = null;
+        const money = (n) => '$' + (Number(n) || 0).toFixed(2);
+        const esc = (s) => String(s == null ? '' : s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        const TIPO_LABEL = {
+            cargo_credito: 'Consumo a crédito',
+            consumo_pagado: 'Consumo pagado',
+            uso_saldo: 'Pago con saldo',
+            pago: 'Pago / abono'
+        };
+        // Monto neto tras aplicar el % de descuento del cliente actual.
+        const montoNeto = (bruto) => {
+            const d = (currentCliente && currentCliente.descuento) || 0;
+            return Math.round(bruto * (1 - d / 100) * 100) / 100;
+        };
 
         function banner(el, kind, html) {
             el.innerHTML = '<div class="status-banner ' + kind + '">' + html + '</div>';
@@ -249,36 +366,159 @@
         }
 
         function mostrarPerfil(data, mensaje) {
+            currentCliente = data;
             $('perfilBox').classList.remove('hidden');
             $('activarBox').classList.add('hidden');
+            $('editorBox').classList.add('hidden');
             $('perfilBanner').innerHTML = '<i class="fas fa-circle-check"></i> ' + mensaje;
             $('perfilNombre').textContent = data.nombre || '(sin nombre)';
             $('perfilTel').textContent = data.telefono ? ('Tel: ' + data.telefono) : '';
+
             const total = data.totalSellos || 0;
-            $('perfilSellos').textContent = total;
+            $('mSellos').textContent = total;
+            $('mDeuda').textContent = money(data.deuda || 0);
+            $('mSaldo').textContent = money(data.saldoAFavor || 0);
+            $('mDesc').textContent = (data.descuento || 0) + '%';
+
             const stamps = [];
             for (let i = 0; i < total; i++) stamps.push('<div class="stamp"><i class="fas fa-mug-hot"></i></div>');
             $('stampsRow').innerHTML = stamps.join('');
+
+            if (data.nota) { $('notaBox').classList.remove('hidden'); $('notaText').textContent = data.nota; }
+            else { $('notaBox').classList.add('hidden'); $('notaText').textContent = ''; }
+
+            renderMovimientos(data.movimientos || []);
+            $('montoInput').value = ''; $('abonoInput').value = '';
+            actualizarPreview();
         }
 
-        // --- Activar tarjeta ---
+        function renderMovimientos(movs) {
+            const body = $('movBody');
+            if (!movs || !movs.length) { body.innerHTML = '<tr><td colspan="5" class="muted">Sin movimientos.</td></tr>'; return; }
+            body.innerHTML = movs.map(function (m) {
+                const fecha = m.fecha
+                    ? new Date(m.fecha).toLocaleString('es-MX', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                    : '—';
+                const sp = Number(m.saldo_post) || 0;
+                const saldoTxt = sp < 0
+                    ? '<span style="color:var(--danger)">Debe ' + money(-sp) + '</span>'
+                    : (sp > 0 ? '<span style="color:var(--success)">A favor ' + money(sp) + '</span>' : '$0.00');
+                return '<tr>'
+                    + '<td>' + fecha + '</td>'
+                    + '<td>' + (TIPO_LABEL[m.tipo] || esc(m.tipo)) + '</td>'
+                    + '<td>' + money(m.monto) + '</td>'
+                    + '<td>' + saldoTxt + '</td>'
+                    + '<td>' + (m.descripcion ? esc(m.descripcion) : '—') + '</td>'
+                    + '</tr>';
+            }).join('');
+        }
+
+        // Previsualiza cuánto se cobra tras aplicar el descuento del cliente.
+        function actualizarPreview() {
+            const bruto = parseFloat($('montoInput').value);
+            const el = $('montoPreview');
+            const d = (currentCliente && currentCliente.descuento) || 0;
+            if (!(bruto > 0)) { el.textContent = ''; return; }
+            el.textContent = d > 0
+                ? ('Con ' + d + '% de descuento se cobra ' + money(montoNeto(bruto)))
+                : ('Se cobra ' + money(bruto));
+        }
+
+        // --- Alta / activación de tarjeta ---
         async function activar() {
             const token = getToken();
             const nombre = ($('nombreInput').value || '').trim();
             const telefono = ($('telInput').value || '').trim();
+            const descuento = parseFloat($('descInput').value) || 0;
+            const nota = ($('notaInput').value || '').trim();
             if (!nombre) { banner($('consultaMsg'), 'err', 'El nombre es obligatorio.'); return; }
 
             const { ok, data } = await api('/loyalty/activar/' + encodeURIComponent(token), {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ nombre, telefono })
+                body: JSON.stringify({ nombre, telefono, descuento, nota })
             });
             if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo activar.'); return; }
 
-            $('nombreInput').value = ''; $('telInput').value = '';
-            banner($('consultaMsg'), 'ok', 'Tarjeta ' + token + ' activada para ' + (data.cliente.nombre) + '.');
-            consultar();
+            $('nombreInput').value = ''; $('telInput').value = ''; $('descInput').value = ''; $('notaInput').value = '';
+            await consultar();
             cargarClientes();
+            banner($('consultaMsg'), 'ok', 'Tarjeta ' + token + ' dada de alta para ' + (data.cliente.nombre) + '.');
+        }
+
+        // --- Editar datos del cliente ---
+        function editar() {
+            if (!currentCliente) return;
+            $('editNombre').value = currentCliente.nombre || '';
+            $('editTel').value = currentCliente.telefono || '';
+            $('editDesc').value = currentCliente.descuento || 0;
+            $('editNota').value = currentCliente.nota || '';
+            $('editorBox').classList.remove('hidden');
+        }
+
+        async function guardarEdicion() {
+            const token = getToken();
+            const nombre = ($('editNombre').value || '').trim();
+            if (!nombre) { banner($('consultaMsg'), 'err', 'El nombre es obligatorio.'); return; }
+            const payload = {
+                nombre: nombre,
+                telefono: ($('editTel').value || '').trim(),
+                descuento: parseFloat($('editDesc').value) || 0,
+                nota: ($('editNota').value || '').trim()
+            };
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token), {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo guardar.'); return; }
+            await consultar();
+            cargarClientes();
+            banner($('consultaMsg'), 'ok', 'Datos actualizados.');
+        }
+
+        // --- Cobro de consumo (crédito / pagado / usar saldo a favor) ---
+        async function cobrar(tipo) {
+            const token = getToken();
+            const bruto = parseFloat($('montoInput').value);
+            if (!(bruto > 0)) { banner($('consultaMsg'), 'err', 'Escribe un monto válido.'); return; }
+
+            const d = (currentCliente && currentCliente.descuento) || 0;
+            const neto = montoNeto(bruto);
+            const descripcion = d > 0
+                ? ('Consumo ' + money(bruto) + ' −' + d + '% = ' + money(neto))
+                : ('Consumo ' + money(bruto));
+
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token) + '/cobro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: tipo, monto: neto, descripcion: descripcion })
+            });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo registrar el cobro.'); return; }
+
+            const etiqueta = tipo === 'cargo_credito' ? 'Cargado a crédito'
+                : (tipo === 'uso_saldo' ? 'Pagado con saldo a favor' : 'Cobrado');
+            await consultar();
+            cargarClientes();
+            banner($('consultaMsg'), 'ok', etiqueta + ': ' + money(neto) + '.');
+        }
+
+        // --- Pago / abono (baja deuda o deja saldo a favor) ---
+        async function abonar() {
+            const token = getToken();
+            const monto = parseFloat($('abonoInput').value);
+            if (!(monto > 0)) { banner($('consultaMsg'), 'err', 'Escribe un monto válido.'); return; }
+
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token) + '/cobro', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ tipo: 'pago', monto: monto, descripcion: 'Pago / abono ' + money(monto) })
+            });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo registrar el pago.'); return; }
+
+            await consultar();
+            cargarClientes();
+            banner($('consultaMsg'), 'ok', 'Pago / abono de ' + money(monto) + ' registrado.');
         }
 
         // --- Registrar visita (usa el mismo endpoint que el escaneo del QR) ---
@@ -291,11 +531,9 @@
                 banner($('consultaMsg'), 'warn', data.mensaje || 'Tarjeta pendiente de activación.');
                 return;
             }
-            mostrarPerfil(
-                { nombre: data.nombre, telefono: null, totalSellos: data.totalSellos },
-                data.mensaje + ' · Total: ' + data.totalSellos
-            );
+            await consultar();
             cargarClientes();
+            banner($('consultaMsg'), 'ok', data.mensaje + ' · Total: ' + data.totalSellos + ' sellos');
         }
 
         // --- Lista de clientes (solo lectura) ---
@@ -305,11 +543,11 @@
             const body = $('clientesBody');
             const { ok, data } = await api('/loyalty/clientes');
             if (!ok || !Array.isArray(data)) {
-                body.innerHTML = '<tr><td colspan="6" class="muted">No se pudo cargar.</td></tr>';
+                body.innerHTML = '<tr><td colspan="8" class="muted">No se pudo cargar.</td></tr>';
                 return;
             }
             if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="6" class="muted">Sin tarjetas todavía.</td></tr>';
+                body.innerHTML = '<tr><td colspan="8" class="muted">Sin tarjetas todavía.</td></tr>';
                 return;
             }
             body.innerHTML = data.map(function (c) {
@@ -317,12 +555,18 @@
                     ? '<span class="pill active">Activa</span>'
                     : '<span class="pill inactive">Inactiva</span>';
                 const ultimo = c.ultimoSello ? new Date(c.ultimoSello).toLocaleDateString('es-MX') : '—';
+                const desc = c.descuento ? (c.descuento + '%') : '—';
+                let cuenta = '—';
+                if (c.deuda > 0) cuenta = '<span style="color:var(--danger)">Debe ' + money(c.deuda) + '</span>';
+                else if (c.saldoAFavor > 0) cuenta = '<span style="color:var(--success)">' + money(c.saldoAFavor) + '</span>';
                 return '<tr>'
-                    + '<td>' + c.token + '</td>'
-                    + '<td>' + (c.nombre || '—') + '</td>'
-                    + '<td>' + (c.telefono || '—') + '</td>'
+                    + '<td>' + esc(c.token) + '</td>'
+                    + '<td>' + esc(c.nombre || '—') + '</td>'
+                    + '<td>' + esc(c.telefono || '—') + '</td>'
                     + '<td>' + estado + '</td>'
                     + '<td>' + (c.totalSellos || 0) + '</td>'
+                    + '<td>' + desc + '</td>'
+                    + '<td>' + cuenta + '</td>'
                     + '<td>' + ultimo + '</td>'
                     + '</tr>';
             }).join('');
