@@ -77,6 +77,12 @@ function escapeHtml(s) {
         .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 }
 
+// Format a number as pesos for the customer-facing dashboard.
+const fmtMoney = (n) => '$' + (Number(n) || 0).toFixed(2);
+
+// Lealtad: cada 5 visitas (sellos) el cliente gana un café gratis.
+const SELLOS_POR_CAFE = 5;
+
 // A phone camera opening the QR lands on GET /loyalty/scan/:token and, unlike the
 // operator page's fetch(), asks for text/html — so we render this self-contained
 // page (same dark/neon POS theme) instead of raw JSON. `data` is the same payload
@@ -84,8 +90,21 @@ function escapeHtml(s) {
 function renderScanPage(data, httpStatus) {
     const activo = data.status === 'activo';
     const total = Number(data.totalSellos || 0);
-    const stamps = Array.from({ length: total },
-        () => '<div class="stamp">&#9733;</div>').join('');
+
+    // Progreso del ciclo actual hacia el próximo café gratis (cada SELLOS_POR_CAFE sellos).
+    const enCiclo = total % SELLOS_POR_CAFE;                 // 0..4
+    const llenos = (total > 0 && enCiclo === 0) ? SELLOS_POR_CAFE : enCiclo;
+    const faltan = (SELLOS_POR_CAFE - enCiclo) % SELLOS_POR_CAFE; // 0 => café disponible
+    const cafeListo = total > 0 && faltan === 0;
+    const slots = Array.from({ length: SELLOS_POR_CAFE }, (_, i) =>
+        '<div class="slot' + (i < llenos ? ' on' : '') + '">' + (i < llenos ? '&#9733;' : '&#9734;') + '</div>'
+    ).join('');
+    const freeMsg = cafeListo
+        ? '🎉 ¡Tienes un café gratis disponible!'
+        : ('Te falta' + (faltan === 1 ? '' : 'n') + ' ' + faltan + ' visita' + (faltan === 1 ? '' : 's') + ' para tu café gratis');
+
+    const deuda = Number(data.deuda || 0);
+    const saldoAFavor = Number(data.saldoAFavor || 0);
 
     let heading, sub, tone;
     if (data.error) {
@@ -108,23 +127,45 @@ function renderScanPage(data, httpStatus) {
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Roboto',system-ui,sans-serif;background:linear-gradient(135deg,var(--bg),var(--bg2));color:var(--txt);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
 .card{background:var(--card);border:1px solid rgba(0,217,255,.18);border-radius:18px;padding:32px 24px;max-width:420px;width:100%;text-align:center;box-shadow:0 10px 40px rgba(0,0,0,.4)}
-.brand{font-size:.8rem;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:20px}
+.logo-badge{width:92px;height:92px;margin:0 auto 16px;background:#fff;border-radius:22px;display:flex;align-items:center;justify-content:center;padding:10px;box-shadow:0 6px 20px rgba(0,0,0,.35)}
+.logo-badge img{width:100%;height:100%;object-fit:contain;display:block}
+.brand{font-size:.8rem;letter-spacing:2px;color:var(--cyan);text-transform:uppercase;margin-bottom:18px}
 .token{font-family:'Roboto Mono',monospace;color:var(--sub);font-size:.85rem;margin-bottom:18px}
 h1{font-size:1.5rem;margin-bottom:8px}
 .sub{color:var(--sub);font-size:1rem;margin-bottom:8px}
 .sub.ok{color:var(--ok)}.sub.warn{color:var(--warn)}.sub.err{color:var(--err)}
 .count{font-size:3rem;font-weight:900;line-height:1;margin:22px 0 6px;color:var(--cyan)}
 .count small{font-size:1rem;color:var(--sub);font-weight:400}
-.stamps{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:12px}
-.stamp{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(0,217,255,.12);border:1px solid var(--cyan);color:var(--cyan);font-size:16px}
+.metrics{display:flex;gap:12px;margin:22px 0 4px}
+.metric{flex:1;background:rgba(255,255,255,.04);border:1px solid rgba(0,217,255,.14);border-radius:14px;padding:12px 10px}
+.metric .ml{font-size:.66rem;letter-spacing:.5px;text-transform:uppercase;color:var(--sub)}
+.metric .mv{font-size:1.25rem;font-weight:800;margin-top:4px}
+.metric .mv.ok{color:var(--ok)}.metric .mv.err{color:var(--err)}
+.metric .mv.zero{color:var(--sub)}
+.progress{margin-top:24px}
+.free{font-size:.98rem;font-weight:700;color:var(--cyan);margin-bottom:12px}
+.free.ready{color:var(--ok)}
+.slots{display:flex;gap:10px;justify-content:center}
+.slot{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:17px;border:1px solid var(--cyan);background:rgba(0,217,255,.08);color:var(--sub)}
+.slot.on{background:var(--cyan);color:#06202a;border-color:var(--cyan)}
 .foot{margin-top:24px;font-size:.75rem;color:var(--sub)}
 </style></head><body>
 <div class="card">
-  <div class="brand">🐰 Conejo Negro · Lealtad</div>
+  <div class="logo-badge"><img src="/logos/Conejo%20negro%20logo%20NEGATIVO.svg" alt="Conejo Negro" onerror="this.closest('.logo-badge').style.display='none'"></div>
+  <div class="brand">Conejo Negro · Lealtad</div>
   <div class="token">${escapeHtml(data.token || '')}</div>
   <h1>${heading}</h1>
   <div class="sub ${tone}">${sub}</div>
-  ${activo ? `<div class="count">${total}<br><small>sello${total === 1 ? '' : 's'} acumulado${total === 1 ? '' : 's'}</small></div><div class="stamps">${stamps}</div>` : ''}
+  ${activo ? `
+  <div class="count">${total}<br><small>sello${total === 1 ? '' : 's'} en total</small></div>
+  <div class="metrics">
+    <div class="metric"><div class="ml">Saldo a favor</div><div class="mv ${saldoAFavor > 0 ? 'ok' : 'zero'}">${fmtMoney(saldoAFavor)}</div></div>
+    <div class="metric"><div class="ml">Deuda</div><div class="mv ${deuda > 0 ? 'err' : 'zero'}">${fmtMoney(deuda)}</div></div>
+  </div>
+  <div class="progress">
+    <div class="free ${cafeListo ? 'ready' : ''}">${freeMsg}</div>
+    <div class="slots">${slots}</div>
+  </div>` : ''}
   <div class="foot">Gracias por tu visita ☕</div>
 </div>
 </body></html>`;
@@ -188,7 +229,8 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 nombre: cliente.nombre,
                 totalSellos: totalRes.rows[0].total,
                 selloRegistrado,
-                mensaje: selloRegistrado ? '¡Sello registrado!' : 'Ya se registró un sello hoy'
+                mensaje: selloRegistrado ? '¡Sello registrado!' : 'Ya se registró un sello hoy',
+                ...desglosarCuenta(cliente.saldo)
             });
         } catch (error) {
             console.error('Error scanning loyalty card:', error);

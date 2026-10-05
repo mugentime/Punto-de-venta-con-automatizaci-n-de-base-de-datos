@@ -604,6 +604,10 @@ async function startServer() {
     const __dirname = path.dirname(__filename);
     app.use(express.static(path.join(__dirname, 'dist')));
 
+    // Brand assets (logo Conejo Negro) — used by the customer loyalty dashboard
+    // (GET /loyalty/scan/:token renders an inline page that references /logos/...).
+    app.use('/logos', express.static(path.join(__dirname, 'logos')));
+
     // Loyalty program page (vanilla HTML/JS). Served explicitly so it wins over the
     // SPA catch-all below. Lives in public/ (also copied to dist/ by the Vite build).
     app.get('/loyalty', (req, res) => {

@@ -185,6 +185,39 @@
         .scan-msg { color: #f1f5f9; margin: 16px 0; font-size: 0.95rem; }
         .scan-close { margin-top: 4px; background: var(--danger); color: #fff; }
         .scan-close:hover { background: #b91c1c; }
+
+        /* Búsqueda de productos + carrito del cobro */
+        .prod-search-wrap { position: relative; }
+        .prod-results {
+            position: absolute; left: 0; right: 0; top: calc(100% + 4px); z-index: 60;
+            background: #fff; border: 1px solid var(--border-input); border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.12); max-height: 290px; overflow-y: auto;
+        }
+        .prod-result {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px;
+            padding: 10px 14px; cursor: pointer; border-bottom: 1px solid var(--border);
+        }
+        .prod-result:last-child { border-bottom: none; }
+        .prod-result:hover { background: var(--bg-secondary); }
+        .prod-result .pr-name { font-weight: 600; font-size: 0.9rem; }
+        .prod-result .pr-meta { font-size: 0.74rem; color: var(--text-secondary); margin-top: 2px; }
+        .prod-result .pr-price { font-weight: 700; color: var(--accent-cyan); white-space: nowrap; }
+        .prod-result.empty { color: var(--text-secondary); cursor: default; justify-content: center; }
+
+        .carrito { margin-top: 14px; border: 1px solid var(--border); border-radius: 14px; overflow: hidden; }
+        .carrito-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+        .carrito-item:last-child { border-bottom: none; }
+        .carrito-item .ci-name { flex: 1; min-width: 0; font-size: 0.9rem; font-weight: 600; }
+        .carrito-item .ci-name small { display: block; font-weight: 400; color: var(--text-secondary); font-size: 0.74rem; margin-top: 2px; }
+        .qty-stepper { display: flex; align-items: center; gap: 6px; }
+        .qty-stepper button { padding: 4px 11px; border-radius: 8px; background: var(--bg-secondary); color: var(--text-primary); border: 1px solid var(--border-input); font-size: 1rem; line-height: 1; box-shadow: none; }
+        .qty-stepper button:hover { background: #eef2f7; }
+        .qty-stepper .qv { min-width: 22px; text-align: center; font-weight: 700; }
+        .ci-sub { font-weight: 700; white-space: nowrap; min-width: 66px; text-align: right; }
+        .ci-del { background: transparent; color: var(--danger); box-shadow: none; padding: 6px 8px; }
+        .ci-del:hover { background: #fef2f2; }
+        .carrito-foot { display: flex; align-items: center; justify-content: space-between; padding: 12px; background: var(--bg-secondary); font-weight: 700; }
+        .carrito-foot .cf-total { color: var(--text-primary); font-size: 1.05rem; }
     </style>
 </head>
 <body>
@@ -252,8 +285,19 @@
 
                 <!-- Cobro de consumo -->
                 <h3><i class="fas fa-cash-register"></i> Cobrar consumo</h3>
+
+                <!-- Búsqueda de productos: el cajero busca, agrega al carrito y repite -->
+                <label for="prodSearch">Buscar producto para agregar al cobro</label>
+                <div class="prod-search-wrap">
+                    <input id="prodSearch" placeholder="Escribe el nombre del producto…" autocomplete="off" oninput="buscarProductos()" onfocus="buscarProductos()">
+                    <div id="prodResults" class="prod-results hidden"></div>
+                </div>
+
+                <!-- Carrito (productos agregados) -->
+                <div id="carritoWrap" class="hidden"></div>
+
                 <label for="montoInput">Monto del consumo</label>
-                <input id="montoInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="actualizarPreview()">
+                <input id="montoInput" type="number" min="0" step="0.01" inputmode="decimal" placeholder="0.00" oninput="montoManual()">
                 <div class="preview" id="montoPreview"></div>
                 <div class="btn-row">
                     <button class="purple" onclick="cobrar('cargo_credito')"><i class="fas fa-hand-holding-dollar"></i> Cargar a crédito</button>
@@ -466,8 +510,12 @@
             else { $('notaBox').classList.add('hidden'); $('notaText').textContent = ''; }
 
             renderMovimientos(data.movimientos || []);
-            $('montoInput').value = ''; $('abonoInput').value = '';
-            actualizarPreview();
+            $('abonoInput').value = '';
+            // Reinicia el carrito y la búsqueda de productos para la nueva consulta.
+            carrito = [];
+            $('prodSearch').value = '';
+            $('prodResults').classList.add('hidden'); $('prodResults').innerHTML = '';
+            renderCarrito(); // deja montoInput vacío y editable, y actualiza el preview
         }
 
         function renderMovimientos(movs) {
@@ -501,6 +549,139 @@
                 ? ('Con ' + d + '% de descuento se cobra ' + money(montoNeto(bruto)))
                 : ('Se cobra ' + money(bruto));
         }
+
+        // El cajero editó el monto a mano (solo posible cuando el carrito está vacío).
+        function montoManual() { actualizarPreview(); }
+
+        // ==================== PRODUCTOS / CARRITO DEL COBRO ====================
+        // Búsqueda sencilla: se carga la lista de productos una vez y se filtra en
+        // el navegador. El cajero busca, agrega al carrito y repite; el total del
+        // carrito alimenta el monto del cobro (que luego aplica el % de descuento).
+        let productos = [];
+        let carrito = []; // { id, name, price, qty }
+
+        async function cargarProductos() {
+            try {
+                const res = await fetch('/api/products');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (Array.isArray(data)) productos = data;
+            } catch (_) { /* sin red: el cajero puede seguir capturando el monto a mano */ }
+        }
+
+        function buscarProductos() {
+            const q = ($('prodSearch').value || '').trim().toLowerCase();
+            const box = $('prodResults');
+            if (!q) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+            const hits = productos.filter(function (p) {
+                const name = String(p.name || '').toLowerCase();
+                const cat = String(p.category || '').toLowerCase();
+                return name.indexOf(q) !== -1 || cat.indexOf(q) !== -1;
+            }).slice(0, 8);
+
+            if (!hits.length) {
+                box.innerHTML = '<div class="prod-result empty">Sin coincidencias</div>';
+                box.classList.remove('hidden');
+                return;
+            }
+            box.innerHTML = hits.map(function (p) {
+                const meta = [p.category, (p.stock != null ? ('stock ' + p.stock) : null)].filter(Boolean).join(' · ');
+                return '<div class="prod-result" data-id="' + esc(p.id) + '">'
+                    + '<div><div class="pr-name">' + esc(p.name) + '</div>'
+                    + (meta ? '<div class="pr-meta">' + esc(meta) + '</div>' : '')
+                    + '</div>'
+                    + '<div class="pr-price">' + money(p.price) + '</div>'
+                    + '</div>';
+            }).join('');
+            box.classList.remove('hidden');
+        }
+
+        function agregarAlCarrito(id) {
+            const p = productos.find(function (x) { return String(x.id) === String(id); });
+            if (!p) return;
+            const found = carrito.find(function (x) { return String(x.id) === String(id); });
+            if (found) found.qty += 1;
+            else carrito.push({ id: p.id, name: p.name, price: Number(p.price) || 0, qty: 1 });
+            $('prodSearch').value = '';
+            $('prodResults').classList.add('hidden');
+            $('prodResults').innerHTML = '';
+            renderCarrito();
+            $('prodSearch').focus();
+        }
+
+        function cambiarQty(id, delta) {
+            const it = carrito.find(function (x) { return String(x.id) === String(id); });
+            if (!it) return;
+            it.qty += delta;
+            if (it.qty <= 0) carrito = carrito.filter(function (x) { return String(x.id) !== String(id); });
+            renderCarrito();
+        }
+
+        function quitarDelCarrito(id) {
+            carrito = carrito.filter(function (x) { return String(x.id) !== String(id); });
+            renderCarrito();
+        }
+
+        function carritoTotal() {
+            return carrito.reduce(function (s, x) { return s + (Number(x.price) || 0) * x.qty; }, 0);
+        }
+
+        function renderCarrito() {
+            const wrap = $('carritoWrap');
+            const monto = $('montoInput');
+            if (!carrito.length) {
+                wrap.classList.add('hidden');
+                wrap.innerHTML = '';
+                monto.readOnly = false;
+                monto.value = '';
+                actualizarPreview();
+                return;
+            }
+            const rows = carrito.map(function (x) {
+                return '<div class="carrito-item" data-id="' + esc(x.id) + '">'
+                    + '<div class="ci-name">' + esc(x.name) + '<small>' + money(x.price) + ' c/u</small></div>'
+                    + '<div class="qty-stepper">'
+                    +   '<button type="button" data-act="dec" aria-label="Quitar uno">−</button>'
+                    +   '<span class="qv">' + x.qty + '</span>'
+                    +   '<button type="button" data-act="inc" aria-label="Agregar uno">+</button>'
+                    + '</div>'
+                    + '<div class="ci-sub">' + money((Number(x.price) || 0) * x.qty) + '</div>'
+                    + '<button type="button" class="ci-del" data-act="del" aria-label="Quitar producto"><i class="fas fa-trash"></i></button>'
+                    + '</div>';
+            }).join('');
+            wrap.innerHTML = '<div class="carrito">' + rows
+                + '<div class="carrito-foot"><span>Total productos</span><span class="cf-total">' + money(carritoTotal()) + '</span></div>'
+                + '</div>';
+            wrap.classList.remove('hidden');
+            // El carrito manda sobre el monto: campo de solo lectura con el total.
+            monto.value = carritoTotal().toFixed(2);
+            monto.readOnly = true;
+            actualizarPreview();
+        }
+
+        // Delegación de eventos para la lista de resultados y el carrito.
+        $('prodResults').addEventListener('click', function (e) {
+            const row = e.target.closest('.prod-result[data-id]');
+            if (!row) return;
+            agregarAlCarrito(row.getAttribute('data-id'));
+        });
+        $('carritoWrap').addEventListener('click', function (e) {
+            const btn = e.target.closest('button[data-act]');
+            if (!btn) return;
+            const item = e.target.closest('.carrito-item[data-id]');
+            if (!item) return;
+            const id = item.getAttribute('data-id');
+            const act = btn.getAttribute('data-act');
+            if (act === 'inc') cambiarQty(id, 1);
+            else if (act === 'dec') cambiarQty(id, -1);
+            else if (act === 'del') quitarDelCarrito(id);
+        });
+        // Cerrar la lista de resultados al hacer clic fuera.
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('#prodSearch') && !e.target.closest('#prodResults')) {
+                $('prodResults').classList.add('hidden');
+            }
+        });
 
         // --- Alta / activación de tarjeta ---
         async function activar() {
@@ -559,13 +740,18 @@
         async function cobrar(tipo) {
             const token = getToken();
             const bruto = parseFloat($('montoInput').value);
-            if (!(bruto > 0)) { banner($('consultaMsg'), 'err', 'Escribe un monto válido.'); return; }
+            if (!(bruto > 0)) { banner($('consultaMsg'), 'err', 'Agrega productos o escribe un monto válido.'); return; }
 
             const d = (currentCliente && currentCliente.descuento) || 0;
             const neto = montoNeto(bruto);
+            // Si hay productos en el carrito, el detalle los lista; si no, "Consumo".
+            const detalle = carrito.length
+                ? carrito.map(function (x) { return x.name + (x.qty > 1 ? ' x' + x.qty : ''); }).join(', ')
+                : 'Consumo';
+            const base = detalle + ' ' + money(bruto);
             const descripcion = d > 0
-                ? ('Consumo ' + money(bruto) + ' −' + d + '% = ' + money(neto))
-                : ('Consumo ' + money(bruto));
+                ? (base + ' −' + d + '% = ' + money(neto))
+                : base;
 
             const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token) + '/cobro', {
                 method: 'POST',
@@ -753,6 +939,7 @@
 
         $('tokenInput').addEventListener('keydown', function (e) { if (e.key === 'Enter') consultar(); });
         cargarClientes();
+        cargarProductos();
     </script>
 </body>
 </html>
