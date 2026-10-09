@@ -341,18 +341,19 @@
             </div>
         </div>
 
-        <!-- ==================== CLIENTES (solo lectura) ==================== -->
-        <!-- Panel de CAJERO: consulta de solo lectura. Generar/eliminar tarjetas
-             vive en la app de escritorio (generar_tarjetas.py), no aquí. -->
+        <!-- ==================== CLIENTES ==================== -->
+        <!-- Panel de CAJERO: consulta + borrado de tarjetas. Generar tarjetas nuevas
+             vive en la app de escritorio (generar_tarjetas.py); el borrado se hace
+             aquí con el botón 🗑 de cada fila. -->
         <div class="card">
-            <h2><i class="fas fa-users"></i> Clientes <span class="muted" style="font-weight:400;font-size:0.75rem">(solo lectura)</span> <button class="secondary" style="margin-left:auto;font-size:0.8rem;padding:6px 12px" onclick="cargarClientes()"><i class="fas fa-rotate"></i> Actualizar</button></h2>
+            <h2><i class="fas fa-users"></i> Clientes <button class="secondary" style="margin-left:auto;font-size:0.8rem;padding:6px 12px" onclick="cargarClientes()"><i class="fas fa-rotate"></i> Actualizar</button></h2>
             <div class="table-wrap">
                 <table>
                     <thead>
-                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Desc.</th><th>Cuenta</th><th>Último sello</th></tr>
+                        <tr><th>Token</th><th>Nombre</th><th>Teléfono</th><th>Estado</th><th>Sellos</th><th>Desc.</th><th>Cuenta</th><th>Último sello</th><th></th></tr>
                     </thead>
                     <tbody id="clientesBody">
-                        <tr><td colspan="8" class="muted">Cargando…</td></tr>
+                        <tr><td colspan="9" class="muted">Cargando…</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -800,18 +801,20 @@
             banner($('consultaMsg'), 'ok', data.mensaje + ' · Total: ' + data.totalSellos + ' sellos');
         }
 
-        // --- Lista de clientes (solo lectura) ---
-        // Generar/eliminar se hace desde la app de escritorio (generar_tarjetas.py),
-        // no desde el panel del cajero.
+        // --- Lista de clientes (consulta + borrado) ---
+        // Generar tarjetas nuevas se hace desde la app de escritorio
+        // (generar_tarjetas.py); el borrado se hace aquí con el botón 🗑 de cada fila.
+        let clientesCache = [];
         async function cargarClientes() {
             const body = $('clientesBody');
             const { ok, data } = await api('/loyalty/clientes');
             if (!ok || !Array.isArray(data)) {
-                body.innerHTML = '<tr><td colspan="8" class="muted">No se pudo cargar.</td></tr>';
+                body.innerHTML = '<tr><td colspan="9" class="muted">No se pudo cargar.</td></tr>';
                 return;
             }
+            clientesCache = data;
             if (data.length === 0) {
-                body.innerHTML = '<tr><td colspan="8" class="muted">Sin tarjetas todavía.</td></tr>';
+                body.innerHTML = '<tr><td colspan="9" class="muted">Sin tarjetas todavía.</td></tr>';
                 return;
             }
             body.innerHTML = data.map(function (c) {
@@ -832,8 +835,44 @@
                     + '<td>' + desc + '</td>'
                     + '<td>' + cuenta + '</td>'
                     + '<td>' + ultimo + '</td>'
+                    + '<td><button class="ci-del" data-del-token="' + esc(c.token) + '" title="Eliminar tarjeta" aria-label="Eliminar tarjeta"><i class="fas fa-trash"></i></button></td>'
                     + '</tr>';
             }).join('');
+        }
+
+        // Borrado de tarjeta desde la lista (botón 🗑 de cada fila).
+        // Es destructivo e irreversible: borra la tarjeta y, en cascada, sus sellos y
+        // su historial de movimientos. Por eso se confirma y, si la cuenta tiene
+        // sellos/deuda/saldo, se avisa de lo que se perderá.
+        $('clientesBody').addEventListener('click', function (e) {
+            const btn = e.target.closest('button[data-del-token]');
+            if (!btn) return;
+            borrarCliente(btn.getAttribute('data-del-token'));
+        });
+
+        async function borrarCliente(token) {
+            const c = clientesCache.find(function (x) { return x.token === token; }) || {};
+            const nombre = c.nombre || '(sin nombre)';
+            let aviso = '¿Eliminar la tarjeta ' + token + ' (' + nombre + ')?';
+            const detalles = [];
+            if (c.totalSellos) detalles.push(c.totalSellos + ' sello(s)');
+            if (c.deuda > 0) detalles.push('deuda de ' + money(c.deuda));
+            if (c.saldoAFavor > 0) detalles.push('saldo a favor de ' + money(c.saldoAFavor));
+            if (detalles.length) aviso += '\n\nSe perderá también: ' + detalles.join(', ') + '.';
+            aviso += '\n\nEsta acción no se puede deshacer.';
+            if (!window.confirm(aviso)) return;
+
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token), { method: 'DELETE' });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo eliminar la tarjeta.'); return; }
+
+            // Si la tarjeta borrada era la abierta en el perfil, ciérralo.
+            if (currentCliente && currentCliente.token === token) {
+                currentCliente = null;
+                $('perfilBox').classList.add('hidden');
+                $('tokenInput').value = '';
+            }
+            cargarClientes();
+            banner($('consultaMsg'), 'ok', 'Tarjeta ' + token + ' eliminada.');
         }
 
         // ==================== ESCÁNER DE QR (cámara) ====================
