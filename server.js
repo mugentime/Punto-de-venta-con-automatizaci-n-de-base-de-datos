@@ -273,6 +273,19 @@ async function setupAndGetDataStore() {
             `);
             await schemaClient.query('CREATE INDEX IF NOT EXISTS idx_loyalty_mov_cliente ON loyalty_movimientos(cliente_id);');
 
+            // Canjes de bebida gratis (1 por cada 5 sellos). Append-only, igual que
+            // `sellos`: las bebidas disponibles = floor(sellos/5) − COUNT(loyalty_canjes).
+            // Así una bebida ganada no se pierde al seguir acumulando sellos.
+            await schemaClient.query(`
+              CREATE TABLE IF NOT EXISTS loyalty_canjes (
+                id          SERIAL PRIMARY KEY,
+                cliente_id  INTEGER NOT NULL REFERENCES clientes(id) ON DELETE CASCADE,
+                fecha       TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT CURRENT_TIMESTAMP,
+                descripcion TEXT
+              );
+            `);
+            await schemaClient.query('CREATE INDEX IF NOT EXISTS idx_loyalty_canjes_cliente ON loyalty_canjes(cliente_id);');
+
             // AUTO-MIGRATION: Add discount and tip columns if they don't exist
             console.log('🔄 Running auto-migrations...');
             try {

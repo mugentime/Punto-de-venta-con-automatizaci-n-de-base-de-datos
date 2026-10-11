@@ -276,6 +276,7 @@
                     <div class="metric"><div class="lbl">Descuento</div><div class="val" id="mDesc">0%</div></div>
                 </div>
                 <div class="stamps" id="stampsRow"></div>
+                <div id="recompensaBanner"></div>
                 <div class="nota-box hidden" id="notaBox"><span class="lbl">Nota interna</span><span id="notaText"></span></div>
 
                 <div class="btn-row">
@@ -503,9 +504,21 @@
             $('mSaldo').textContent = money(data.saldoAFavor || 0);
             $('mDesc').textContent = (data.descuento || 0) + '%';
 
+            // Anillo de sellos del ciclo actual (0..4 llenos) hacia la próxima bebida.
+            const enCiclo = Number.isFinite(data.enCiclo) ? data.enCiclo : (total % 5);
+            const disponibles = Number(data.disponibles || 0);
+            const porCiclo = Number(data.porCiclo || 5);
+            const llenos = (disponibles > 0 && enCiclo === 0) ? porCiclo : enCiclo;
             const stamps = [];
-            for (let i = 0; i < total; i++) stamps.push('<div class="stamp"><i class="fas fa-mug-hot"></i></div>');
+            for (let i = 0; i < porCiclo; i++) {
+                const on = i < llenos;
+                stamps.push('<div class="stamp"' + (on ? '' : ' style="background:#f1f5f9;border-color:var(--border);color:var(--text-secondary)"') + '>'
+                    + '<i class="fas fa-mug-hot"></i></div>');
+            }
             $('stampsRow').innerHTML = stamps.join('');
+
+            // Aviso de bebida gratis: visible y accionable para el cajero.
+            renderRecompensa(data);
 
             if (data.nota) { $('notaBox').classList.remove('hidden'); $('notaText').textContent = data.nota; }
             else { $('notaBox').classList.add('hidden'); $('notaText').textContent = ''; }
@@ -517,6 +530,50 @@
             $('prodSearch').value = '';
             $('prodResults').classList.add('hidden'); $('prodResults').innerHTML = '';
             renderCarrito(); // deja montoInput vacío y editable, y actualiza el preview
+        }
+
+        // Aviso de bebida gratis en el perfil. Si hay bebidas disponibles, muestra un
+        // banner verde con botón para canjear; si no, cuántas visitas faltan.
+        function renderRecompensa(data) {
+            const rb = $('recompensaBanner');
+            const disponibles = Number(data.disponibles || 0);
+            const faltan = Number(data.faltan != null ? data.faltan : 5);
+            if (disponibles > 0) {
+                const txt = disponibles === 1 ? 'una bebida gratis' : (disponibles + ' bebidas gratis');
+                rb.innerHTML = '<div class="status-banner ok" style="display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:14px">'
+                    + '<span><i class="fas fa-gift"></i> ¡Este cliente tiene ' + txt + '!</span>'
+                    + '<button class="success" style="padding:7px 14px" onclick="canjear()"><i class="fas fa-mug-hot"></i> Canjear bebida gratis</button>'
+                    + '</div>';
+            } else {
+                rb.innerHTML = '<div class="muted" style="margin-top:14px"><i class="fas fa-mug-hot"></i> '
+                    + 'Falta' + (faltan === 1 ? '' : 'n') + ' ' + faltan + ' visita' + (faltan === 1 ? '' : 's')
+                    + ' para la próxima bebida gratis.</div>';
+            }
+        }
+
+        // Canjea UNA bebida gratis (requiere confirmación). El servidor valida que
+        // realmente haya una disponible, así que no se puede canjear de más.
+        async function canjear() {
+            const token = getToken();
+            if (!currentCliente) return;
+            if (Number(currentCliente.disponibles || 0) <= 0) {
+                banner($('consultaMsg'), 'warn', 'No hay bebidas gratis disponibles.');
+                return;
+            }
+            const nombre = currentCliente.nombre || 'este cliente';
+            if (!window.confirm('¿Entregar una bebida gratis a ' + nombre + '?\n\nSe descontará del saldo de bebidas gratis acumuladas.')) return;
+
+            const { ok, data } = await api('/loyalty/cliente/' + encodeURIComponent(token) + '/canjear', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ descripcion: 'Bebida gratis de lealtad' })
+            });
+            if (!ok) { banner($('consultaMsg'), 'err', (data && data.error) || 'No se pudo canjear la bebida.'); return; }
+
+            await consultar();
+            cargarClientes();
+            banner($('consultaMsg'), 'ok', 'Bebida gratis entregada. 🎉'
+                + (Number(data.disponibles || 0) > 0 ? ' Quedan ' + data.disponibles + ' por canjear.' : ''));
         }
 
         function renderMovimientos(movs) {
@@ -823,6 +880,9 @@
                     : '<span class="pill inactive">Inactiva</span>';
                 const ultimo = c.ultimoSello ? new Date(c.ultimoSello).toLocaleDateString('es-MX') : '—';
                 const desc = c.descuento ? (c.descuento + '%') : '—';
+                const disp = Number(c.disponibles || 0);
+                const sellosCell = (c.totalSellos || 0)
+                    + (disp > 0 ? ' <span class="pill" style="background:#dcfce7;color:#15803d">🎁 ' + disp + '</span>' : '');
                 let cuenta = '—';
                 if (c.deuda > 0) cuenta = '<span style="color:var(--danger)">Debe ' + money(c.deuda) + '</span>';
                 else if (c.saldoAFavor > 0) cuenta = '<span style="color:var(--success)">' + money(c.saldoAFavor) + '</span>';
@@ -831,7 +891,7 @@
                     + '<td>' + esc(c.nombre || '—') + '</td>'
                     + '<td>' + esc(c.telefono || '—') + '</td>'
                     + '<td>' + estado + '</td>'
-                    + '<td>' + (c.totalSellos || 0) + '</td>'
+                    + '<td>' + sellosCell + '</td>'
                     + '<td>' + desc + '</td>'
                     + '<td>' + cuenta + '</td>'
                     + '<td>' + ultimo + '</td>'

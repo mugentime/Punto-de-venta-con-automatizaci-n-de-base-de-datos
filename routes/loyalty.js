@@ -80,8 +80,27 @@ function escapeHtml(s) {
 // Format a number as pesos for the customer-facing dashboard.
 const fmtMoney = (n) => '$' + (Number(n) || 0).toFixed(2);
 
-// Lealtad: cada 5 visitas (sellos) el cliente gana un café gratis.
+// Lealtad: cada 5 visitas (sellos) el cliente gana una bebida gratis.
 const SELLOS_POR_CAFE = 5;
+
+// Estado del premio a partir del total de sellos (monótono, nunca baja) y de las
+// bebidas ya canjeadas. Append-only igual que `sellos`: las bebidas ganadas son
+// floor(sellos / SELLOS_POR_CAFE) y las disponibles son las ganadas menos las
+// canjeadas, así una bebida ganada NO se pierde al seguir acumulando sellos.
+//   ganados     = bebidas gratis ganadas en total
+//   canjeados   = bebidas gratis ya entregadas
+//   disponibles = bebidas gratis sin canjear (lo que el cajero puede dar hoy)
+//   enCiclo     = sellos del ciclo actual (0..SELLOS_POR_CAFE-1)
+//   faltan      = sellos que faltan para la PRÓXIMA bebida gratis
+function estadoRecompensa(totalSellos, canjeados) {
+    const total = Math.max(0, Number(totalSellos) || 0);
+    const usados = Math.max(0, Number(canjeados) || 0);
+    const ganados = Math.floor(total / SELLOS_POR_CAFE);
+    const disponibles = Math.max(0, ganados - usados);
+    const enCiclo = total % SELLOS_POR_CAFE;
+    const faltan = enCiclo === 0 ? SELLOS_POR_CAFE : SELLOS_POR_CAFE - enCiclo;
+    return { porCiclo: SELLOS_POR_CAFE, ganados, canjeados: usados, disponibles, enCiclo, faltan };
+}
 
 // A phone camera opening the QR lands on GET /loyalty/scan/:token and, unlike the
 // operator page's fetch(), asks for text/html — so we render this self-contained
@@ -91,17 +110,24 @@ function renderScanPage(data, httpStatus) {
     const activo = data.status === 'activo';
     const total = Number(data.totalSellos || 0);
 
-    // Progreso del ciclo actual hacia el próximo café gratis (cada SELLOS_POR_CAFE sellos).
-    const enCiclo = total % SELLOS_POR_CAFE;                 // 0..4
-    const llenos = (total > 0 && enCiclo === 0) ? SELLOS_POR_CAFE : enCiclo;
-    const faltan = (SELLOS_POR_CAFE - enCiclo) % SELLOS_POR_CAFE; // 0 => café disponible
-    const cafeListo = total > 0 && faltan === 0;
+    // La disponibilidad del premio la decide `disponibles` (ganados − canjeados), no
+    // `total % 5`: así una bebida ganada sigue disponible aunque el cliente siga
+    // acumulando sellos, hasta que el cajero la canjee.
+    const enCiclo = Number.isFinite(data.enCiclo) ? data.enCiclo : (total % SELLOS_POR_CAFE);
+    const disponibles = Number(data.disponibles || 0);
+    const faltan = Number.isFinite(data.faltan)
+        ? data.faltan
+        : (enCiclo === 0 ? SELLOS_POR_CAFE : SELLOS_POR_CAFE - enCiclo);
+    const cafeListo = disponibles > 0;
+    // Ciclo recién completado y sin canjear -> anillo lleno; si no, progreso del ciclo.
+    const llenos = (cafeListo && enCiclo === 0) ? SELLOS_POR_CAFE : enCiclo;
     const slots = Array.from({ length: SELLOS_POR_CAFE }, (_, i) =>
         '<div class="slot' + (i < llenos ? ' on' : '') + '">' + (i < llenos ? '&#9733;' : '&#9734;') + '</div>'
     ).join('');
     const freeMsg = cafeListo
-        ? '🎉 ¡Tienes un café gratis disponible!'
-        : ('Te falta' + (faltan === 1 ? '' : 'n') + ' ' + faltan + ' visita' + (faltan === 1 ? '' : 's') + ' para tu café gratis');
+        ? ('🎉 ¡Tienes ' + (disponibles === 1 ? 'una bebida gratis' : disponibles + ' bebidas gratis')
+            + ' disponible' + (disponibles === 1 ? '' : 's') + '!')
+        : ('Te falta' + (faltan === 1 ? '' : 'n') + ' ' + faltan + ' visita' + (faltan === 1 ? '' : 's') + ' para tu bebida gratis');
 
     const deuda = Number(data.deuda || 0);
     const saldoAFavor = Number(data.saldoAFavor || 0);
@@ -222,6 +248,11 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 'SELECT COUNT(*)::int AS total FROM sellos WHERE cliente_id = $1',
                 [cliente.id]
             );
+            const canjeRes = await pool.query(
+                'SELECT COUNT(*)::int AS total FROM loyalty_canjes WHERE cliente_id = $1',
+                [cliente.id]
+            );
+            const recompensa = estadoRecompensa(totalRes.rows[0].total, canjeRes.rows[0].total);
 
             return reply(200, {
                 status: 'activo',
@@ -230,7 +261,8 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 totalSellos: totalRes.rows[0].total,
                 selloRegistrado,
                 mensaje: selloRegistrado ? '¡Sello registrado!' : 'Ya se registró un sello hoy',
-                ...desglosarCuenta(cliente.saldo)
+                ...desglosarCuenta(cliente.saldo),
+                ...recompensa
             });
         } catch (error) {
             console.error('Error scanning loyalty card:', error);
@@ -392,6 +424,73 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
         }
     });
 
+    // --- POST /loyalty/cliente/:token/canjear --- Canjea UNA bebida gratis.
+    // Append-only: inserta un renglón en loyalty_canjes. Transaccional y con bloqueo
+    // de la fila del cliente para que dos canjes simultáneos no entreguen la misma
+    // bebida dos veces: el total de ganados/canjeados se recalcula DENTRO de la
+    // transacción y se exige disponibles > 0.
+    router.post('/loyalty/cliente/:token/canjear', requireLoyaltyKey, async (req, res) => {
+        if (!useDb) return res.status(503).json({ error: 'Database not available' });
+
+        const token = normalizeToken(req.params.token);
+        const descripcion = req.body?.descripcion ? String(req.body.descripcion).trim().slice(0, 500) : null;
+
+        let client;
+        try {
+            client = await pool.connect();
+            await client.query('BEGIN');
+
+            const { rows } = await client.query('SELECT * FROM clientes WHERE token = $1 FOR UPDATE', [token]);
+            const c = rows[0];
+            if (!c) {
+                await client.query('ROLLBACK');
+                return res.status(404).json({ error: 'Cliente no encontrado.' });
+            }
+            if (!c.activo) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({ error: 'La tarjeta no está activada.' });
+            }
+
+            const sellosRes = await client.query(
+                'SELECT COUNT(*)::int AS total FROM sellos WHERE cliente_id = $1', [c.id]
+            );
+            const canjeRes = await client.query(
+                'SELECT COUNT(*)::int AS total FROM loyalty_canjes WHERE cliente_id = $1', [c.id]
+            );
+            const totalSellos = sellosRes.rows[0].total;
+            const estado = estadoRecompensa(totalSellos, canjeRes.rows[0].total);
+
+            if (estado.disponibles <= 0) {
+                await client.query('ROLLBACK');
+                return res.status(400).json({
+                    error: 'El cliente no tiene bebidas gratis disponibles.',
+                    totalSellos,
+                    ...estado
+                });
+            }
+
+            const ins = await client.query(
+                'INSERT INTO loyalty_canjes (cliente_id, descripcion) VALUES ($1, $2) RETURNING id, fecha, descripcion',
+                [c.id, descripcion]
+            );
+
+            await client.query('COMMIT');
+            broadcastDataChange('clientes', { action: 'canje', token });
+
+            res.status(201).json({
+                canje: ins.rows[0],
+                totalSellos,
+                ...estadoRecompensa(totalSellos, canjeRes.rows[0].total + 1)
+            });
+        } catch (error) {
+            if (client) await client.query('ROLLBACK').catch(() => {});
+            console.error('Error canjeando bebida gratis:', error);
+            res.status(500).json({ error: 'No se pudo canjear la bebida gratis.' });
+        } finally {
+            if (client) client.release();
+        }
+    });
+
     // --- GET /loyalty/cliente/:token --- Full profile + stamp count (does NOT stamp).
     router.get('/loyalty/cliente/:token', requireLoyaltyKey, async (req, res) => {
         try {
@@ -418,6 +517,12 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 [c.id]
             );
 
+            const canjeRes = await pool.query(
+                'SELECT COUNT(*)::int AS total FROM loyalty_canjes WHERE cliente_id = $1',
+                [c.id]
+            );
+            const recompensa = estadoRecompensa(sellosRes.rows.length, canjeRes.rows[0].total);
+
             res.json({
                 id: c.id,
                 token: c.token,
@@ -431,6 +536,7 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                 totalSellos: sellosRes.rows.length,
                 sellos: sellosRes.rows,
                 ...desglosarCuenta(c.saldo),
+                ...recompensa,
                 movimientos: movRes.rows
             });
         } catch (error) {
@@ -469,7 +575,8 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
                         c.descuento, c.nota, c.saldo,
                         c.fecha_registro, c.created_at,
                         COUNT(s.id)::int AS "totalSellos",
-                        MAX(s.fecha)     AS "ultimoSello"
+                        MAX(s.fecha)     AS "ultimoSello",
+                        (SELECT COUNT(*) FROM loyalty_canjes k WHERE k.cliente_id = c.id)::int AS "canjeados"
                    FROM clientes c
               LEFT JOIN sellos s ON s.cliente_id = c.id
                GROUP BY c.id
@@ -478,7 +585,8 @@ export function createLoyaltyRouter({ pool, useDb, broadcastDataChange }) {
             res.json(rows.map(r => ({
                 ...r,
                 descuento: Number(r.descuento) || 0,
-                ...desglosarCuenta(r.saldo)
+                ...desglosarCuenta(r.saldo),
+                ...estadoRecompensa(r.totalSellos, r.canjeados)
             })));
         } catch (error) {
             console.error('Error listing loyalty clients:', error);
