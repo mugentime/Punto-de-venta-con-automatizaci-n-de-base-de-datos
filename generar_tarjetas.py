@@ -10,9 +10,10 @@ rediseñar. Cada QR apunta a {BASE_URL}/loyalty/scan/{TOKEN}. El QR se hace lo
 más grande posible (limitado por el alto de la tarjeta) para que se lea fácil
 desde cualquier celular.
 
-Capas por color (convención de láser tipo LightBurn):
+Capas por color (convención de láser tipo LightBurn): cada color = una capa/operación.
   * NEGRO (#000000) = GRABAR: logo + QR.
-  * ROJO  (#ff0000) = CORTAR: contorno de la tarjeta.
+  * AZUL  (#0000ff) = línea del MARCO interior (capa propia, p. ej. corte ligero/score).
+  * ROJO  (#ff0000) = CORTAR: contorno exterior de la tarjeta.
 
 El SVG viene dimensionado en milímetros reales (width=85mm height=54mm). Al
 importarlo al software del láser impórtalo al 100 % para conservar el tamaño
@@ -61,7 +62,12 @@ import urllib.request
 # --- Geometría de la tarjeta (todo en mm; el viewBox del SVG = mm reales) ---
 CARD_W, CARD_H = 85.0, 54.0          # tamaño tarjeta (crédito)
 CUT_INSET, CUT_RADIUS = 0.3, 3.5      # contorno de corte
-FRAME_INSET, FRAME_RADIUS = 2.0, 2.5  # marco delgado grabado (negro), dentro del corte
+FRAME_INSET, FRAME_RADIUS = 2.0, 2.5  # marco delgado (línea interior), dentro del corte
+
+# Colores por capa (LightBurn): cada color es una capa/operación independiente.
+COLOR_CUT     = "#ff0000"  # ROJO  -> cortar (contorno exterior)
+COLOR_FRAME   = "#0000ff"  # AZUL  -> línea del marco interior (su propia capa)
+COLOR_ENGRAVE = "#000000"  # NEGRO -> grabar (logo + QR)
 
 # QR lo más grande posible: cuadrado limitado por el alto de la tarjeta, con
 # ~4 mm de margen para no tocar las esquinas redondeadas del corte.
@@ -182,7 +188,7 @@ def bloque_logo(paths, vw, vh):
     draw_w, draw_h = vw * s, vh * s
     tx = LOGO_X + (LOGO_MAX - draw_w) / 2
     ty = LOGO_Y + (LOGO_MAX - draw_h) / 2
-    inner = "".join(f'<path d="{d}" fill="#000000"/>' for d in paths)
+    inner = "".join(f'<path d="{d}" fill="{COLOR_ENGRAVE}"/>' for d in paths)
     return f'<g transform="translate({tx:.3f},{ty:.3f}) scale({s:.6f})">{inner}</g>'
 
 
@@ -203,7 +209,7 @@ def bloque_qr(url, ec_name):
     d = re.search(r'<path[^>]*\bd="([^"]*)"', svg).group(1)
     s = QR_SIZE / side
     return (f'<g transform="translate({QR_X:.3f},{QR_Y:.3f}) scale({s:.6f})">'
-            f'<path d="{d}" fill="#000000"/></g>')
+            f'<path d="{d}" fill="{COLOR_ENGRAVE}"/></g>')
 
 
 # ----------------------------- tarjeta -----------------------------
@@ -211,21 +217,23 @@ def _cut_rect():
     """Contorno de corte (rojo) de UNA tarjeta, en su espacio 0..CARD_W × 0..CARD_H."""
     return (f'<rect x="{CUT_INSET:.3f}" y="{CUT_INSET:.3f}" '
             f'width="{CARD_W - 2 * CUT_INSET:.3f}" height="{CARD_H - 2 * CUT_INSET:.3f}" '
-            f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="#ff0000" stroke-width="0.2"/>')
+            f'rx="{CUT_RADIUS:.3f}" fill="none" stroke="{COLOR_CUT}" stroke-width="0.2"/>')
 
 
 def _marco():
-    """Marco delgado grabado (negro) de UNA tarjeta, dentro del contorno de corte."""
+    """Línea del marco interior de UNA tarjeta, en su PROPIA capa (azul), dentro del
+    contorno de corte. Capa aparte del grabado para darle su propia operación en LightBurn."""
     return (f'<rect x="{FRAME_INSET:.3f}" y="{FRAME_INSET:.3f}" '
             f'width="{CARD_W - 2 * FRAME_INSET:.3f}" height="{CARD_H - 2 * FRAME_INSET:.3f}" '
-            f'rx="{FRAME_RADIUS:.3f}" fill="none" stroke="#000000" stroke-width="0.3"/>')
+            f'rx="{FRAME_RADIUS:.3f}" fill="none" stroke="{COLOR_FRAME}" stroke-width="0.3"/>')
 
 
 def contenido_tarjeta(logo_g, qr_g):
     """Fragmento (SIN <svg>) de UNA tarjeta en su propio espacio 0..CARD_W × 0..CARD_H:
     corte (rojo) + grabado (negro). Se reutiliza tal cual dentro de un pliego."""
     return (f'<!-- CORTE (rojo) --> {_cut_rect()} '
-            f'<!-- GRABADO (negro): marco + logo + QR --> {_marco()} {logo_g} {qr_g}')
+            f'<!-- MARCO interior (azul, capa propia) --> {_marco()} '
+            f'<!-- GRABADO (negro): logo + QR --> {logo_g} {qr_g}')
 
 
 def componer_tarjeta(logo_g, qr_g):
@@ -379,7 +387,8 @@ def main():
             print(f"  ✓ {nombre}  ({len(grupo)} tarjeta(s): {primero}..{ultimo})")
         print(f"\nListo: {len(fragmentos)} tarjeta(s) en {n_hojas} pliego(s) de "
               f"{sheet_w:.0f}×{sheet_h:.0f} mm — {cols}×{rows} = {por_hoja} por hoja, en {args.out}")
-        print("Importa cada pliego al láser al 100 % (sin escalar). Rojo = cortar, negro = grabar.")
+        print("Importa cada pliego al láser al 100 % (sin escalar). "
+              "Rojo = cortar · Azul = marco (capa propia) · Negro = grabar.")
         return
 
     # --- Modo por archivo: un SVG por tarjeta (comportamiento original) ---
