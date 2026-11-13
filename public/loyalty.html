@@ -59,6 +59,7 @@
             padding: 24px;
             margin-bottom: 22px;
             box-shadow: 0 4px 6px -1px rgba(0,0,0,0.08), 0 2px 4px -1px rgba(0,0,0,0.05);
+            scroll-margin-top: 72px; /* evita que el header fijo tape la tarjeta al hacer scrollIntoView */
         }
         .card h2 {
             font-size: 1.15rem; font-weight: 700;
@@ -162,6 +163,9 @@
         th, td { text-align: left; padding: 11px 10px; border-bottom: 1px solid var(--border); }
         thead th { background: var(--bg-secondary); color: #475569; font-weight: 600; font-size: 0.82rem; }
         tbody tr:hover { background: var(--bg-secondary); }
+        /* Filas de la lista de clientes: clic en cualquier parte abre su perfil completo */
+        #clientesBody tr[data-token] { cursor: pointer; }
+        #clientesBody tr[data-token]:hover { background: #eff6ff; }
         .pill { padding: 3px 10px; border-radius: 999px; font-size: 0.72rem; font-weight: 700; }
         .pill.active { background: #dcfce7; color: #15803d; }
         .pill.inactive { background: #f1f5f9; color: var(--text-secondary); }
@@ -886,7 +890,7 @@
                 let cuenta = '—';
                 if (c.deuda > 0) cuenta = '<span style="color:var(--danger)">Debe ' + money(c.deuda) + '</span>';
                 else if (c.saldoAFavor > 0) cuenta = '<span style="color:var(--success)">' + money(c.saldoAFavor) + '</span>';
-                return '<tr>'
+                return '<tr data-token="' + esc(c.token) + '" title="Ver información completa">'
                     + '<td>' + esc(c.token) + '</td>'
                     + '<td>' + esc(c.nombre || '—') + '</td>'
                     + '<td>' + esc(c.telefono || '—') + '</td>'
@@ -900,15 +904,24 @@
             }).join('');
         }
 
-        // Borrado de tarjeta desde la lista (botón 🗑 de cada fila).
-        // Es destructivo e irreversible: borra la tarjeta y, en cascada, sus sellos y
-        // su historial de movimientos. Por eso se confirma y, si la cuenta tiene
-        // sellos/deuda/saldo, se avisa de lo que se perderá.
+        // Clic en una fila de la lista: abre el perfil completo del cliente (misma
+        // vista que consultar su token). El botón 🗑 sigue borrando, no abre el perfil.
+        // Borrado de tarjeta: destructivo e irreversible (borra tarjeta, sellos e
+        // historial en cascada), por eso se confirma avisando lo que se perderá.
         $('clientesBody').addEventListener('click', function (e) {
             const btn = e.target.closest('button[data-del-token]');
-            if (!btn) return;
-            borrarCliente(btn.getAttribute('data-del-token'));
+            if (btn) { borrarCliente(btn.getAttribute('data-del-token')); return; }
+            const row = e.target.closest('tr[data-token]');
+            if (row) abrirCliente(row.getAttribute('data-token'));
         });
+
+        // Carga toda la información del cliente en la tarjeta de consulta de arriba
+        // (perfil, cuenta, sellos, recompensas y movimientos) y lleva al cajero ahí.
+        function abrirCliente(token) {
+            $('tokenInput').value = token;
+            consultar();
+            $('tokenInput').closest('.card').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
 
         async function borrarCliente(token) {
             const c = clientesCache.find(function (x) { return x.token === token; }) || {};
